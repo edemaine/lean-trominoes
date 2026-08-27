@@ -2172,6 +2172,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Identify the retained angular comparator on certified
                   incidences with lexicographic `(direction rank, radial
                   length)` order, exposing a numeric slot-ranking key.
+                - [x] Identify each retained angular occurrence fiber with
+                  stable lower-rank sorting by that numeric key, preserving
+                  presentation order across radial ties.
                 - [x] Lift semantic slot attachment to indexed direct-clause
                   families and expose composition from any exact slot-input
                   producer through complete Figure 9 record emission.
