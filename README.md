@@ -2169,6 +2169,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Identify the erased query with the existing compiled
                   copied-clause query and its slot projection with the exact
                   semantic Figure 7 occurrence-slot tuple.
+                - [x] Lift semantic slot attachment to indexed direct-clause
+                  families and expose composition from any exact slot-input
+                  producer through complete Figure 9 record emission.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.

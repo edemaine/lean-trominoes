@@ -38,6 +38,32 @@ noncomputable def
     retainedDirectClauseRouteTailRecordQueriesOfSlotInputsComputableInPolyTime
     retainedDirectClauseRouteTailRecordStreamComputableInPolyTime
 
+/-- Any polynomial-time producer of exact slot inputs composes directly to
+the exact direct-clause Figure 9 record stream. -/
+noncomputable def
+    retainedDirectClauseRouteTailRecordTokensComputableInPolyTimeOf
+    {Source InputSymbol : Type}
+    (encodeInput : Source → List InputSymbol)
+    (slotInputs : Source →
+      List RetainedDirectClauseRouteTailRecordSlotInput)
+    (compiler : @TM2ComputableInPolyTime
+      Source (List RetainedDirectClauseRouteTailRecordSlotInput)
+      InputSymbol RetainedDirectClauseRouteTailRecordSlotInput
+      encodeInput id slotInputs) :
+    @TM2ComputableInPolyTime
+      Source (List PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.Token)
+      InputSymbol
+      PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.Token
+      encodeInput id
+      (fun input =>
+        retainedDirectClauseRouteTailRecordStream
+          (retainedDirectClauseRouteTailRecordQueriesOfSlotInputs
+            (slotInputs input))) := by
+  let attached := TM2CompositionMachine.computableInPolyTime compiler
+    retainedDirectClauseRouteTailRecordQueriesOfSlotInputsComputableInPolyTime
+  exact TM2CompositionMachine.computableInPolyTime attached
+    retainedDirectClauseRouteTailRecordStreamComputableInPolyTime
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
 

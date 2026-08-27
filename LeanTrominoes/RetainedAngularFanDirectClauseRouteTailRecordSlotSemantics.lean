@@ -231,5 +231,83 @@ theorem retainedDirectClauseRouteTailRecordQueryOfSlotInput_semantic
   exact
     retainedDirectClauseRouteTailRecordQueryOfSlotInput_roundtrip _
 
+/-- Semantic slot inputs for an indexed direct clause family. -/
+def retainedFinalDirectClauseRouteTailRecordSlotInputs
+    {Variable : Type} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (taggedClauses : List
+      (PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable) × Nat)) :
+    List RetainedDirectClauseRouteTailRecordSlotInput :=
+  taggedClauses.map fun taggedClause =>
+    retainedFinalDirectClauseRouteTailRecordSlotInput
+      formula taggedClause.2 taggedClause.1
+
+/-- Attaching the semantic slots to a whole successful direct family
+recovers exactly the full query family in global clause order. -/
+theorem retainedDirectClauseRouteTailRecordQueriesOfSlotInputs_semantic
+    {Variable : Type} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (taggedClauses : List
+      (PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable) × Nat))
+    (clausesNonempty :
+      ∀ taggedClause ∈ taggedClauses,
+        taggedClause.1.literals ≠ [])
+    (clausesWidth :
+      ∀ taggedClause ∈ taggedClauses,
+        taggedClause.1.literals.length ≤ 3)
+    (choicesSome :
+      ∀ taggedClause ∈ taggedClauses,
+        ∀ taggedLiteral ∈ taggedClause.1.literals.zipIdx,
+          ∃ choice,
+            retainedFinalDirectSourceRouteChoice?
+                formula taggedClause.2 taggedLiteral.2 = some choice) :
+    retainedDirectClauseRouteTailRecordQueriesOfSlotInputs
+        (retainedFinalDirectClauseRouteTailRecordSlotInputs
+          formula taggedClauses) =
+      retainedFinalDirectClauseRouteTailRecordQueries
+        formula taggedClauses := by
+  induction taggedClauses with
+  | nil => rfl
+  | cons taggedClause taggedClauses induction =>
+      have headNonempty :=
+        clausesNonempty taggedClause (by simp)
+      have headWidth :=
+        clausesWidth taggedClause (by simp)
+      have headChoices := fun taggedLiteral taggedLiteralMember =>
+        choicesSome taggedClause (by simp)
+          taggedLiteral taggedLiteralMember
+      have tailNonempty :
+          ∀ tailClause ∈ taggedClauses,
+            tailClause.1.literals ≠ [] := by
+        intro tailClause tailClauseMember
+        exact clausesNonempty tailClause (by simp [tailClauseMember])
+      have tailWidth :
+          ∀ tailClause ∈ taggedClauses,
+            tailClause.1.literals.length ≤ 3 := by
+        intro tailClause tailClauseMember
+        exact clausesWidth tailClause (by simp [tailClauseMember])
+      have tailChoices :
+          ∀ tailClause ∈ taggedClauses,
+            ∀ taggedLiteral ∈ tailClause.1.literals.zipIdx,
+              ∃ choice,
+                retainedFinalDirectSourceRouteChoice?
+                    formula tailClause.2 taggedLiteral.2 = some choice := by
+        intro tailClause tailClauseMember taggedLiteral taggedLiteralMember
+        exact choicesSome tailClause (by simp [tailClauseMember])
+          taggedLiteral taggedLiteralMember
+      simp only [retainedFinalDirectClauseRouteTailRecordSlotInputs,
+        retainedFinalDirectClauseRouteTailRecordQueries,
+        List.map_cons,
+        retainedDirectClauseRouteTailRecordQueriesOfSlotInputs,
+        List.flatMap_cons]
+      rw [retainedDirectClauseRouteTailRecordQueryOfSlotInput_semantic
+        formula taggedClause.2 taggedClause.1
+        headNonempty headWidth headChoices]
+      simp only [Option.toList_some, List.singleton_append,
+        List.cons.injEq, true_and]
+      exact induction tailNonempty tailWidth tailChoices
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
