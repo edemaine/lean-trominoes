@@ -11584,6 +11584,10 @@ The representation choices for this target are:
   exposes each extended Figure 9 exit connector as a simple finite connector
   followed by its two-point radial segment.  This isolates the possible
   reversal while certifying both translated pieces independently.
+- [`LeanTrominoes/OrthogonalPolylineScalingSimplicity.lean`](LeanTrominoes/OrthogonalPolylineScalingSimplicity.lean)
+  packages the reusable fact that positive uniform scaling preserves complete
+  route simplicity, needed to certify the inherited refined tail before the
+  localized Figure 9 normalization.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
