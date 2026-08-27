@@ -11624,6 +11624,9 @@ The representation choices for this target are:
   broadens the finite block to the complete local-plus-extended prefix.  Its
   dependent finite query stores exactly a width-three clause profile, a valid
   template incidence, fan metadata, and a fan slot.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineClauseProfileTemplate.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineClauseProfileTemplate.lean)
+  proves that the canonical finite profile of every nonempty width-three
+  positioned clause selects exactly its concrete Figure 9 template.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalFarTailSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalFarTailSeparation.lean)
   proves that a retained normalized local route avoids its own factor-`144`
   inherited far tail, even when its endpoint is the near connector's splice
