@@ -11877,6 +11877,13 @@ The representation choices for this target are:
   Pointwise incidence-direction correctness lifts through retained edges and
   reversed through edges, so such a lookup already implies the complete
   canonical raster-request stream.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalCanonicalIncidenceDirectionBlockData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalCanonicalIncidenceDirectionBlockData.lean)
+  names a total proof-oriented block selector from the established
+  per-incidence existence theorem, proves it satisfies the complete stable-tag
+  lookup contract, and fixes the exact canonical compact source-token function
+  for the remaining route machine.  The use of choice only names the semantic
+  target: the outstanding compiler obligation still requires an explicit
+  polynomial-time emitter for that exact function.
 - [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean)
   and [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean)
   split each framed request into its retained raster prefix and role-tagged
