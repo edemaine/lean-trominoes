@@ -11723,6 +11723,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalFixedRedTypedIncidenceDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalFixedRedTypedIncidenceDirectionBlock.lean)
   proves the analogous compact classification for each genuine fixed-red RGB
   connector incidence.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionBlock.lean)
+  combines ordinary, fixed-red, and finite clause-core cases into one compact
+  direction-block classification for every genuine typed incidence.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
