@@ -2079,6 +2079,8 @@ build; an imported proof counts when its statement matches the paper.
               into the actual final route-descriptor stream.
             - [x] Split retained Figure 9 route-tail records into the dynamic
               copied-source prefix and fixed implication-cycle suffix.
+            - [x] Rewrite the implication-cycle tail suffix as fixed-width
+              indexed blocks over the stable retained variable order.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.

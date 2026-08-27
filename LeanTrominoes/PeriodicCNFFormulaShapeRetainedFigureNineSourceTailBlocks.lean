@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineSourceTailRecordData
+import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionBlocks
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineRoutedDescriptorBlocks
 
 /-! # Copied and cycle phases of retained Figure Nine source tails -/
@@ -38,6 +39,29 @@ def cycleTailTables {Variable : Type} [DecidableEq Variable]
     fun taggedClause =>
       orderedTailDirections routes taggedClause.2 taggedClause.1
 
+/-- One positioned implication-cycle tail block at its stable source-variable
+index.  This form exposes the fixed-width outer scan before the local Figure
+Seven geometry is reduced to a finite table. -/
+def indexedCycleTailTableBlock
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (taggedAtom :
+      WrappedPeriodicPlanarSATVariable Variable × Nat) :
+    List (List (List AxisDirection)) :=
+  let routes :=
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+      source
+  let clauses :=
+    (PeriodicEightOccurrenceSplitPositioned.cycleClausesFor
+      (placementScaledForFigureSeven source) taggedAtom.1).map
+        (PositionedPeriodicClause.scale
+          PeriodicEightOccurrenceSplit.retainedTerminalFanRoutingRefinement)
+  (clauses.zipIdx
+    (copiedClauseCount source +
+      FormulaShapeFixedEight.copiesPerVariable * taggedAtom.2)).map
+        fun taggedClause =>
+          orderedTailDirections routes taggedClause.2 taggedClause.1
+
 @[simp] theorem copiedTailTables_length
     {Variable : Type} [DecidableEq Variable]
     (source : PeriodicCNF Variable) :
@@ -63,6 +87,38 @@ theorem tailTables_eq_blocks
     List.zipIdx_append, List.map_append,
     copiedOccurrenceClauses_length_eq_copiedClauseCount]
   simp only [Nat.zero_add]
+
+/-- The complete cycle tail suffix is a fixed-width indexed scan over the
+stable retained source-variable enumeration. -/
+theorem cycleTailTables_eq_indexedBlocks
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    cycleTailTables source =
+      (PeriodicThreeSATThree.sourceVariables
+        (sourceScaledForFigureSeven source).erase).zipIdx.flatMap
+          (indexedCycleTailTableBlock source) := by
+  let atoms := PeriodicThreeSATThree.sourceVariables
+    (sourceScaledForFigureSeven source).erase
+  let block := fun atom =>
+    (PeriodicEightOccurrenceSplitPositioned.cycleClausesFor
+      (placementScaledForFigureSeven source) atom).map
+        (PositionedPeriodicClause.scale
+          PeriodicEightOccurrenceSplit.retainedTerminalFanRoutingRefinement)
+  have blockLength : ∀ atom, (block atom).length =
+      FormulaShapeFixedEight.copiesPerVariable := by
+    intro atom
+    simp [block,
+      PeriodicEightOccurrenceSplitPositioned.cycleClausesFor]
+  unfold cycleTailTables
+  rw [finalCycleClauses_eq_flatMap_scaledCycleBlocks]
+  change ((atoms.flatMap block).zipIdx (copiedClauseCount source)).map _ = _
+  rw [IndexedListScan.flatMap_zipIdx_eq_zipIdx_flatMap_fixed_zero
+    atoms block FormulaShapeFixedEight.copiesPerVariable
+    (copiedClauseCount source) blockLength]
+  rw [List.map_flatMap]
+  apply List.flatMap_congr
+  rintro ⟨atom, atomIndex⟩ atomMember
+  rfl
 
 end FormulaShapeRetainedFigureNineSourceTail
 
