@@ -2123,6 +2123,8 @@ build; an imported proof counts when its statement matches the paper.
                   streams.
                 - [x] Prove that selector suppresses every off-diagonal pair
                   and recovers every numeric descriptor's full raw route word.
+                - [x] Compose the descriptor-pair tagger with the affine
+                  selector to compile all direct-source raw route directions.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
