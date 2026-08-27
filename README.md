@@ -2152,6 +2152,9 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Select each finite bend record block directly from its
                 affine port predicates, prove exact diagonal/off-diagonal
                 semantics, and compile the direct-source bend stream.
+              - [x] Combine retained carrier and base-bend Figure 9 record
+                streams at the numeric descriptor boundary and compose the
+                result with the direct source.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
