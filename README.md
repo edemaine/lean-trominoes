@@ -2114,6 +2114,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Decode repeated east/north/west/south unary field groups
                   into complete direction words with a fixed polynomial-time
                   transducer.
+                - [x] Compose affine normalization with that decoder and prove
+                  exact direction-word output for each fixed route shape.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
