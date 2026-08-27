@@ -10716,6 +10716,13 @@ The representation choices for this target are:
   assembled incidence direction words: one word for a retained edge, or the
   first word followed by the reversed second for a suppressed degree-two
   edge.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestHeaderData.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestHeaderData.lean),
+  [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestHeaderPermutation.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestHeaderPermutation.lean),
+  and [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestTripleHeaderData.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestTripleHeaderData.lean)
+  reduce all six request-header choices to finite endpoint side/color data,
+  prove invariance under endpoint enumeration, and replace every triple fan
+  by the first directions of its three original incidence routes in fixed RGB
+  order.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean)
   expands all three vertex-normalization rounds to the exact affine formula
   `1728 · p + (471, 471)`.  Each vertex block is thereby reduced to its
