@@ -11668,6 +11668,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineCompleteRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineCompleteRouteDirectionBlock.lean)
   classifies every named retained Figure 9 incidence as either a finite local
   block or a finite connector block followed by its repeated source tail.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirectionBlock.lean)
+  transports that compact classification through final clockwise clause
+  ordering and the final variable gauge without changing the direction word.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
