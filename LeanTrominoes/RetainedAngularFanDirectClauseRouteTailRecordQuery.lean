@@ -47,6 +47,22 @@ def RetainedDirectRouteTailRecordLiteralQuery.tailDirections
     List AxisDirection :=
   retainedDirectSourceNormalizedTailOfQuery query.tail
 
+/-- Finite sorting key shared with the semantic clockwise tail ordering. -/
+def RetainedDirectRouteTailRecordLiteralQuery.key
+    (query : RetainedDirectRouteTailRecordLiteralQuery) :
+    LiteralProfile × AxisDirection :=
+  (query.profile, query.firstDirection)
+
+/-- Stable clockwise comparison for finite direct literal records. -/
+def retainedDirectRouteTailRecordLiteralLE
+    (first second : RetainedDirectRouteTailRecordLiteralQuery) : Prop :=
+  FormulaShapeDirectionOrdering.directionLE first.key second.key
+
+instance : DecidableRel retainedDirectRouteTailRecordLiteralLE := by
+  intro first second
+  unfold retainedDirectRouteTailRecordLiteralLE
+  infer_instance
+
 @[simp] theorem retainedDirectRouteTailRecordLiteralQueryOfIndex_firstDirection
     (profile : LiteralProfile)
     (kind : RetainedDirectClauseKind)
@@ -84,28 +100,30 @@ inductive RetainedDirectClauseRouteTailRecordQuery
 instance : Inhabited RetainedDirectClauseRouteTailRecordQuery :=
   ⟨.unary default⟩
 
-/-- Evaluate the finite literal fields to the exact directed clause profile. -/
-def RetainedDirectClauseRouteTailRecordQuery.directedProfile :
+/-- Literal queries in the original clause presentation order. -/
+def RetainedDirectClauseRouteTailRecordQuery.literalQueries :
     RetainedDirectClauseRouteTailRecordQuery →
-      FormulaShapeDirectionOrdering.DirectedClauseProfile
-  | .unary first =>
-      .unary first.profile first.firstDirection
-  | .binary first second =>
-      .binary first.profile first.firstDirection
-        second.profile second.firstDirection
-  | .ternary first second third =>
-      .ternary first.profile first.firstDirection
-        second.profile second.firstDirection
-        third.profile third.firstDirection
+      List RetainedDirectRouteTailRecordLiteralQuery
+  | .unary first => [first]
+  | .binary first second => [first, second]
+  | .ternary first second third => [first, second, third]
 
-/-- Evaluate the finite literal fields to the clockwise dynamic tail table. -/
-def RetainedDirectClauseRouteTailRecordQuery.tailTable :
-    RetainedDirectClauseRouteTailRecordQuery → List (List AxisDirection)
-  | .unary first => [first.tailDirections]
-  | .binary first second =>
-      [first.tailDirections, second.tailDirections]
-  | .ternary first second third =>
-      [first.tailDirections, second.tailDirections, third.tailDirections]
+/-- Evaluate the finite literal fields to the exact directed clause profile. -/
+def RetainedDirectClauseRouteTailRecordQuery.directedProfile
+    (query : RetainedDirectClauseRouteTailRecordQuery) :
+    FormulaShapeDirectionOrdering.DirectedClauseProfile :=
+  FormulaShapeDirectionOrdering.DirectedClauseProfile.ofList
+    (query.literalQueries.map
+      RetainedDirectRouteTailRecordLiteralQuery.key)
+
+/-- Evaluate the finite literal fields to the stably clockwise-sorted dynamic
+tail table, while leaving `directedProfile` in presentation order. -/
+def RetainedDirectClauseRouteTailRecordQuery.tailTable
+    (query : RetainedDirectClauseRouteTailRecordQuery) :
+    List (List AxisDirection) :=
+  (query.literalQueries.insertionSort
+    retainedDirectRouteTailRecordLiteralLE).map
+      RetainedDirectRouteTailRecordLiteralQuery.tailDirections
 
 /-- Exact flat Figure 9 input record selected by one finite direct query. -/
 def retainedDirectClauseRouteTailRecordTokens
