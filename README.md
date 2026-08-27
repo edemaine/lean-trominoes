@@ -10723,6 +10723,11 @@ The representation choices for this target are:
   prove invariance under endpoint enumeration, and replace every triple fan
   by the first directions of its three original incidence routes in fixed RGB
   order.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestElementHeaderData.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestElementHeaderData.lean)
+  and [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestIncidenceHeader.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestIncidenceHeader.lean)
+  likewise replace retained monochromatic fans by the last directions of
+  their three original incidence routes and combine both endpoint cases into
+  the exact six-field header of every contracted edge.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean)
   expands all three vertex-normalization rounds to the exact affine formula
   `1728 · p + (471, 471)`.  Each vertex block is thereby reduced to its
