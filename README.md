@@ -11690,6 +11690,9 @@ The representation choices for this target are:
   complement incidences emit the word after its first two directions.  The
   fresh-variable complement traverses the second direction backward, and the
   final variable-gauge translation vanishes from every output direction word.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRefinedSourceMembership.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRefinedSourceMembership.lean)
+  recovers the original positioned clause and literal at the same indices
+  from every anchor-normalized, threefold-scaled source occurrence.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge
