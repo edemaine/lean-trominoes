@@ -4743,7 +4743,8 @@ The representation choices for this target are:
   endpoint; the retained exact-one planarity certificate remains geometric.
 - [`LeanTrominoes/OrthogonalPolylineSymmetries.lean`](LeanTrominoes/OrthogonalPolylineSymmetries.lean)
   centralizes the facts that translation and route reversal preserve
-  rectilinearity, formerly embedded in the later 3DM-contraction layer.
+  rectilinearity, and now also reflects rectilinearity back from a translated
+  route to its original route.
 - [`LeanTrominoes/OrthogonalPolylineTailReplacement.lean`](LeanTrominoes/OrthogonalPolylineTailReplacement.lean)
   provides the reverse dual of route-head replacement.  It preserves the
   clause-side endpoint while replacing a route's variable-side tail at its

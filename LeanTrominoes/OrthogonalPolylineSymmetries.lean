@@ -43,6 +43,24 @@ theorem PeriodicOrthocrossing.OrthogonalPolyline.translate
         (GridSegment.mk first second) offset).2 aligned
   · exact orthogonal
 
+/-- If translating every point yields an orthogonal polyline, then the
+original polyline was already orthogonal. -/
+theorem PeriodicOrthocrossing.OrthogonalPolyline.of_translate
+    {points : List Cell} (offset : Cell)
+    (orthogonal : OrthogonalPolyline (translatePolyline offset points)) :
+    OrthogonalPolyline points := by
+  induction points using List.twoStepInduction with
+  | nil | singleton =>
+      simp [OrthogonalPolyline]
+  | cons_cons first second rest _ induction =>
+      have parts := List.isChain_cons_cons.mp orthogonal
+      apply List.isChain_cons_cons.mpr
+      constructor
+      · exact
+          (GridSegment.isAxisAligned_translate
+            (GridSegment.mk first second) offset).mp parts.1
+      · exact induction second parts.2
+
 /-- Traversing an orthogonal polyline backward preserves orthogonality. -/
 theorem PeriodicOrthocrossing.OrthogonalPolyline.reverse
     {points : List Cell}
