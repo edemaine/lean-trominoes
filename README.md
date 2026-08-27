@@ -11577,6 +11577,11 @@ The representation choices for this target are:
   incompatible incidences emit its first direction, and original-variable
   complement incidences emit the word after its first two directions; all
   route translations vanish from these equalities.
+- [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
+  proves the full route-reversal law: reverse the direction list and replace
+  every direction by its opposite.  This covers both the reversed middle edge
+  of polarity normalization and the reversed second incidence of every
+  contracted through-edge.
 
 ## Build
 
