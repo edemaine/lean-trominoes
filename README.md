@@ -11580,6 +11580,10 @@ The representation choices for this target are:
   unit-subdivided suffix unchanged.  A companion theorem derives the required
   subdivided only-common-point certificate from simplicity of an endpoint
   join.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineExtendedRouteDecomposition.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineExtendedRouteDecomposition.lean)
+  exposes each extended Figure 9 exit connector as a simple finite connector
+  followed by its two-point radial segment.  This isolates the possible
+  reversal while certifying both translated pieces independently.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
