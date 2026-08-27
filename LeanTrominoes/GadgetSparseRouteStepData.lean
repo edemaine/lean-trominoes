@@ -142,5 +142,119 @@ theorem rebuildRouteFromOffsets_routeStart
   | cons first rest =>
       exact Or.inr (rebuildRouteFromOffsets_routeStepOffsets first rest)
 
+/-- A route whose computed direction is constant on every edge has a constant
+direction word of the expected length. -/
+theorem routeStepDirections_eq_replicate_of_constant
+    (first : Cell) (rest : List Cell) (direction : AxisDirection)
+    (constant :
+      (first :: rest).IsChain fun source target =>
+        AxisDirection.between source target = direction) :
+    routeStepDirections (first :: rest) =
+      List.replicate rest.length direction := by
+  induction rest generalizing first with
+  | nil => simp [routeStepDirections]
+  | cons second rest induction =>
+      have firstDirection :
+          AxisDirection.between first second = direction :=
+        (List.isChain_cons_cons.mp constant).1
+      have remainingConstant :
+          (second :: rest).IsChain fun source target =>
+            AxisDirection.between source target = direction :=
+        (List.isChain_cons_cons.mp constant).2
+      simp only [routeStepDirections, List.length_cons]
+      rw [firstDirection, induction second remainingConstant,
+        List.replicate_succ]
+
+/-- Unit subdivision of one axis-aligned segment is a repeated finite
+cardinal-direction block. -/
+theorem routeStepDirections_unitSegmentPoints
+    {first second : Cell}
+    (aligned : (GridSegment.mk first second).IsAxisAligned) :
+    routeStepDirections (AxisDirection.unitSegmentPoints first second) =
+      List.replicate (AxisDirection.segmentLength first second)
+        (AxisDirection.between first second) := by
+  cases pointsEq : AxisDirection.unitSegmentPoints first second with
+  | nil =>
+      have head := AxisDirection.unitSegmentPoints_head? first second
+      simp [pointsEq] at head
+  | cons actualFirst rest =>
+      have actualFirstEq : actualFirst = first := by
+        have head := AxisDirection.unitSegmentPoints_head? first second
+        rw [pointsEq] at head
+        exact Option.some.inj head
+      subst actualFirst
+      have constant :
+          (first :: rest).IsChain fun source target =>
+            AxisDirection.between source target =
+              AxisDirection.between first second := by
+        simpa [pointsEq] using
+          AxisDirection.unitSegmentPoints_direction aligned
+      have length :
+          rest.length = AxisDirection.segmentLength first second := by
+        have total := AxisDirection.unitSegmentPoints_length first second
+        rw [pointsEq] at total
+        simp only [List.length_cons] at total
+        omega
+      rw [routeStepDirections_eq_replicate_of_constant
+        first rest (AxisDirection.between first second) constant]
+      rw [length]
+
+/-- On a unit step, its exact coordinate offset is its computed cardinal
+step vector. -/
+theorem stepOffset_eq_between_step_of_unitAxisStep
+    {source target : Cell}
+    (unit : AxisDirection.IsUnitAxisStep source target) :
+    Cell.sub target source =
+      (AxisDirection.between source target).step := by
+  rcases unit with ⟨direction, genuine, rfl⟩
+  rw [AxisDirection.between_add_step source genuine]
+  rcases source with ⟨sourceX, sourceY⟩
+  cases direction <;>
+    simp_all [AxisDirection.IsGenuine, AxisDirection.step,
+      Cell.add, Cell.sub]
+
+/-- Exact offsets and finite cardinal directions coincide along every unit
+route. -/
+theorem routeStepOffsets_eq_map_routeStepDirections
+    (first : Cell) (rest : List Cell)
+    (unitSteps :
+      (first :: rest).IsChain AxisDirection.IsUnitAxisStep) :
+    routeStepOffsets (first :: rest) =
+      (routeStepDirections (first :: rest)).map AxisDirection.step := by
+  induction rest generalizing first with
+  | nil => simp [routeStepOffsets, routeStepDirections]
+  | cons second rest induction =>
+      have firstUnit : AxisDirection.IsUnitAxisStep first second :=
+        (List.isChain_cons_cons.mp unitSteps).1
+      have remainingUnitSteps :
+          (second :: rest).IsChain AxisDirection.IsUnitAxisStep :=
+        (List.isChain_cons_cons.mp unitSteps).2
+      simp only [routeStepOffsets, routeStepDirections, List.map_cons,
+        List.cons.injEq]
+      exact ⟨stepOffset_eq_between_step_of_unitAxisStep firstUnit,
+        induction second remainingUnitSteps⟩
+
+/-- Thus one subdivided axis-aligned segment has a repeated exact unit-offset
+word. -/
+theorem routeStepOffsets_unitSegmentPoints
+    {first second : Cell}
+    (aligned : (GridSegment.mk first second).IsAxisAligned) :
+    routeStepOffsets (AxisDirection.unitSegmentPoints first second) =
+      List.replicate (AxisDirection.segmentLength first second)
+        (AxisDirection.between first second).step := by
+  cases pointsEq : AxisDirection.unitSegmentPoints first second with
+  | nil =>
+      have head := AxisDirection.unitSegmentPoints_head? first second
+      simp [pointsEq] at head
+  | cons actualFirst rest =>
+      have unitSteps :
+          (actualFirst :: rest).IsChain AxisDirection.IsUnitAxisStep := by
+        simpa [pointsEq] using
+          AxisDirection.unitSegmentPoints_unitSteps aligned
+      rw [routeStepOffsets_eq_map_routeStepDirections
+        actualFirst rest unitSteps]
+      rw [← pointsEq, routeStepDirections_unitSegmentPoints aligned]
+      simp
+
 end Gadget
 end LeanTrominoes
