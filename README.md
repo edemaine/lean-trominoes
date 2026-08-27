@@ -11882,7 +11882,9 @@ The representation choices for this target are:
   per-incidence existence theorem, proves it satisfies the complete stable-tag
   lookup contract, and fixes a canonical semantic compact source-token target.
   Clause-core incidences now use their explicit finite nine-set/RGB table;
-  choice remains only as a temporary variable-incidence fallback.  The
+  every non-routed variable incidence likewise uses its explicit finite local
+  prefix block.  Choice remains only as a temporary fallback for the unique
+  routed incidence of each occurrence/color pair.  The
   outstanding source machine may emit any polynomial-time compact stream with
   the same interpreted raster requests; it need not reproduce the particular
   block representation selected by choice.

@@ -15,6 +15,11 @@ namespace PeriodicCNFStripReduction
 
 open Computability Turing
 open Gadget PeriodicThreeDM PlanarThreeDM
+open PeriodicPlanarOneInThreeToThreeDM
+
+attribute [local instance]
+  horizontalRoutedRoutesSourceVariableDecidableEq
+  horizontalRibbonRoutedVariableDecidableEq
 
 /-- A harmless total fallback for tags outside the computed incidence list.
 Its value is irrelevant to every canonical contraction lookup. -/
@@ -118,15 +123,127 @@ theorem horizontalClauseExplicitIncidenceDirectionBlocks_correct
             horizontalClauseExplicitIncidenceDirectionBlock_directions_of_clause
               source tag clauseIndex set lookup
 
+/-- A non-routed variable incidence is exactly its finite local prefix. -/
+theorem horizontalLocalVariableIncidenceDirectionBlock_directions
+    (input : HorizontalVariableTypedIncidenceRouteInput)
+    (notRouted : input.1.2 ≠
+      horizontalRoutedOccurrenceTripleQueryComputed input) :
+    (HorizontalTypedIncidenceDirectionBlock.variable
+        input .local).directions =
+      unitSubdivisionDirections
+        (horizontalVariableTypedIncidenceRouteComputed input) := by
+  unfold HorizontalTypedIncidenceDirectionBlock.directions
+    horizontalVariableTypedIncidenceDirections
+    horizontalVariableTypedIncidenceRouteComputed
+  rw [if_neg notRouted]
+  exact
+    (unitSubdivisionDirections_horizontalVariableIncidencePrefixComputed
+      (horizontalVariableRoutePrefixQueryComputed input)).symm
+
+/-- Replace the fallback by the explicit finite local block at every variable
+incidence except the unique routed triple selected for that occurrence and
+color. -/
+noncomputable def horizontalLocalExplicitIncidenceDirectionBlock
+    (source : PeriodicCNF Nat) (tag : IncidenceTag) :
+    HorizontalTypedIncidenceDirectionBlock :=
+  match horizontalAssembledRouteTriple?Computed (source, tag) with
+  | some (.ordinary atom slot variant localTriple) =>
+      let typed : Triple RoutedVariable :=
+        .ordinary atom slot variant localTriple
+      let input : HorizontalVariableTypedIncidenceRouteInput :=
+        ((((source, atom), slot), typed), tag.color)
+      if typed = horizontalRoutedOccurrenceTripleQueryComputed input then
+        horizontalClauseExplicitIncidenceDirectionBlock source tag
+      else
+        .variable input .local
+  | some (.fixedRed atom slot localTriple) =>
+      let typed : Triple RoutedVariable :=
+        .fixedRed atom slot localTriple
+      let input : HorizontalVariableTypedIncidenceRouteInput :=
+        ((((source, atom), slot), typed), tag.color)
+      if typed = horizontalRoutedOccurrenceTripleQueryComputed input then
+        horizontalClauseExplicitIncidenceDirectionBlock source tag
+      else
+        .variable input .local
+  | _ => horizontalClauseExplicitIncidenceDirectionBlock source tag
+
+/-- The mixed selector now uses explicit blocks for all clause and non-routed
+variable incidences while preserving the stable-tag contract. -/
+theorem horizontalLocalExplicitIncidenceDirectionBlocks_correct
+    (source : PeriodicCNF Nat) :
+    HorizontalIncidenceDirectionBlocksCorrect source
+      (horizontalLocalExplicitIncidenceDirectionBlock source) := by
+  intro tag tagMember
+  cases lookup : horizontalAssembledRouteTriple?Computed (source, tag) with
+  | none =>
+      simpa [horizontalLocalExplicitIncidenceDirectionBlock, lookup] using
+        horizontalClauseExplicitIncidenceDirectionBlocks_correct
+          source tag tagMember
+  | some triple =>
+      cases triple with
+      | ordinary atom slot variant localTriple =>
+          by_cases routed :
+              (Triple.ordinary atom slot variant localTriple) =
+                horizontalRoutedOccurrenceTripleQueryComputed
+                  ((((source, atom), slot),
+                    Triple.ordinary atom slot variant localTriple),
+                    tag.color)
+          · unfold horizontalLocalExplicitIncidenceDirectionBlock
+            rw [lookup]
+            dsimp only
+            rw [if_pos routed]
+            exact horizontalClauseExplicitIncidenceDirectionBlocks_correct
+              source tag tagMember
+          · rw [horizontalAssembledRouteAtTagComputed_eq_typedRoute
+              source tag _ lookup]
+            unfold horizontalLocalExplicitIncidenceDirectionBlock
+            rw [lookup]
+            dsimp only
+            rw [if_neg routed]
+            simpa only [horizontalTypedIncidenceRouteComputed] using
+              horizontalLocalVariableIncidenceDirectionBlock_directions
+                ((((source, atom), slot),
+                  Triple.ordinary atom slot variant localTriple), tag.color)
+                routed
+      | fixedRed atom slot localTriple =>
+          by_cases routed :
+              (Triple.fixedRed atom slot localTriple) =
+                horizontalRoutedOccurrenceTripleQueryComputed
+                  ((((source, atom), slot),
+                    Triple.fixedRed atom slot localTriple), tag.color)
+          · unfold horizontalLocalExplicitIncidenceDirectionBlock
+            rw [lookup]
+            dsimp only
+            rw [if_pos routed]
+            exact horizontalClauseExplicitIncidenceDirectionBlocks_correct
+              source tag tagMember
+          · rw [horizontalAssembledRouteAtTagComputed_eq_typedRoute
+              source tag _ lookup]
+            unfold horizontalLocalExplicitIncidenceDirectionBlock
+            rw [lookup]
+            dsimp only
+            rw [if_neg routed]
+            simpa only [horizontalTypedIncidenceRouteComputed] using
+              horizontalLocalVariableIncidenceDirectionBlock_directions
+                ((((source, atom), slot),
+                  Triple.fixedRed atom slot localTriple), tag.color)
+                routed
+      | clause clauseIndex set =>
+          simpa [horizontalLocalExplicitIncidenceDirectionBlock, lookup] using
+            horizontalClauseExplicitIncidenceDirectionBlocks_correct
+              source tag tagMember
+
 /-- Canonically ordered contracted edge blocks with no external lookup
 parameter.  Clause-core blocks are now selected by an explicit finite
-classifier; only variable incidences retain the temporary choice fallback. -/
+classifier, and non-routed variable incidences use their explicit local
+blocks.  Only routed variable incidences retain the temporary choice
+fallback. -/
 noncomputable def horizontalCanonicalContractedDirectionBlocks
     (source : PeriodicCNF Nat) :
     List DirectSparseCompactContractedEdgeBlock :=
   horizontalContractedDirectionBlocks
     (horizontalThreeDMProblemComputed source)
-    (horizontalClauseExplicitIncidenceDirectionBlock source)
+    (horizontalLocalExplicitIncidenceDirectionBlock source)
 
 /-- Exact proof-oriented compact source-token target for the remaining route
 emitter. -/
@@ -166,9 +283,9 @@ theorem directSparseCanonicalCompactContractedRouteSourceTokens_correct
   exact
     directSparseCompactContractedRouteEntries_mappedOutput_of_incidenceBlocks
       decider symbols
-      (horizontalClauseExplicitIncidenceDirectionBlock
+      (horizontalLocalExplicitIncidenceDirectionBlock
         (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
-      (horizontalClauseExplicitIncidenceDirectionBlocks_correct
+      (horizontalLocalExplicitIncidenceDirectionBlocks_correct
         (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
 
 end PeriodicCNFStripReduction
