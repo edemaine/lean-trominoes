@@ -11566,6 +11566,11 @@ The representation choices for this target are:
   proves that ordered unit subdivision preserves the complete direction word,
   and therefore that loop-erasing normalization is direction-invisible on the
   simple orthogonal routes used by the retained construction.
+- [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
+  identifies point-list prefixes and suffixes of a unit route with the
+  corresponding direction-word prefixes and suffixes.  In particular, the
+  polarity-normalization split can now be compiled by fixed `take`/`drop`
+  operations on the threefold-expanded incoming word.
 
 ## Build
 
