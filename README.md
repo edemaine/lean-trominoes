@@ -2184,6 +2184,9 @@ build; an imported proof counts when its statement matches the paper.
                   final coordinated occurrence slot.
                 - [x] Rewrite every genuine stable terminal rank as the sum
                   of its strict-lower-key count and earlier-equal-key count.
+                - [x] Identify each genuine final copied clause's complete
+                  semantic slot tuple with its presentation-ordered bounded
+                  stable-rank tuple.
                 - [x] Lift semantic slot attachment to indexed direct-clause
                   families and expose composition from any exact slot-input
                   producer through complete Figure 9 record emission.
