@@ -2092,6 +2092,19 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Factor each normalization round into fixed template
                 offset words around a trimmed factor-12 block expansion, with
                 exact endpoint-splice semantics.
+              - [x] Express normalization over the finite cardinal-direction
+                alphabet and prove its step map is the exact offset transform.
+              - [x] Compile factor-12 direction expansion, fixed template
+                wrappers, and three-symbol trimming at both ends as small
+                finite transducers.
+              - [x] Compose all three normalization rounds into one
+                polynomial-time transducer for fixed endpoint templates.
+              - [x] Identify every data-only final route's affine source
+                position and, from compact geometric conditions, its exact
+                three-round direction and canonical local-triple record word.
+              - [ ] Emit each contracted edge's initial unit directions and
+                six finite endpoint-template choices, then invoke the
+                three-round direction transducer and record cursor.
               - [x] Reuse the retained-planar variable-marker compiler for
                 the finite Figure 9 source-marker suffix.
               - [x] Compile the finite normalized copied-clause descriptor
@@ -10647,6 +10660,18 @@ The representation choices for this target are:
   gives that exact canonical route word a native polynomial-time compiler
   boundary and turns any implementation into the retained-workspace route
   appender required by the final two-pass sparse pipeline.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationRouteDirectionTransform.lean`](LeanTrominoes/PeriodicThreeDMNormalizationRouteDirectionTransform.lean),
+  [`LeanTrominoes/GadgetDirectionTrimCompiler.lean`](LeanTrominoes/GadgetDirectionTrimCompiler.lean),
+  and [`LeanTrominoes/PeriodicThreeDMNormalizationThreeRoundDirectionCompiler.lean`](LeanTrominoes/PeriodicThreeDMNormalizationThreeRoundDirectionCompiler.lean)
+  replace coordinate-valued normalization streams by finite cardinal
+  directions.  Verified block expansion, bounded endpoint buffers, and fixed
+  template wrappers compose all three factor-12 rounds in polynomial time.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationCompilerRouteDirections.lean`](LeanTrominoes/PeriodicThreeDMNormalizationCompilerRouteDirections.lean),
+  [`LeanTrominoes/PeriodicThreeDMNormalizationCompilerRouteStart.lean`](LeanTrominoes/PeriodicThreeDMNormalizationCompilerRouteStart.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionData.lean)
+  connect the finite stream to the executable final route: its step map is the
+  exact offset word, its start is the affine normalized source vertex, and the
+  direction cursor emits the canonical edge-major local-triple records.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean)
   expands all three vertex-normalization rounds to the exact affine formula
   `1728 · p + (471, 471)`.  Each vertex block is thereby reduced to its
