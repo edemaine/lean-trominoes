@@ -2077,6 +2077,8 @@ build; an imported proof counts when its statement matches the paper.
               first direction with its scaled source route.
             - [x] Combine direct, fallback, and implication-cycle directions
               into the actual final route-descriptor stream.
+            - [x] Split retained Figure 9 route-tail records into the dynamic
+              copied-source prefix and fixed implication-cycle suffix.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.

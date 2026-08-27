@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineSourceTailRecordData
+import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineSourceTailBlocks
 import LeanTrominoes.PeriodicCNFStripDirectFigureNinePolarityRouteTailData
 
 /-! # Direct flat Figure 9 source-tail clause records -/
@@ -34,6 +34,32 @@ def directFigureNinePolarityRouteTailRecordTokens
     List HorizontalRoutedRouteTailRecord.Token :=
   PeriodicCNF.FormulaShapeRetainedFigureNineSourceTailRecord.recordTokens
     (directSourceFormula decider symbols)
+
+/-- Dynamic copied-source clause records, separated from the fixed Figure
+Seven implication-cycle suffix. -/
+def directFigureNineCopiedRouteTailRecordTokens
+    (symbols : List encoding.Γ) :
+    List HorizontalRoutedRouteTailRecord.Token :=
+  PeriodicCNF.FormulaShapeRetainedFigureNineSourceTailRecord.copiedRecordTokens
+    (directSourceFormula decider symbols)
+
+/-- Fixed implication-cycle clause records at the retained Figure Nine
+boundary. -/
+def directFigureNineCycleRouteTailRecordTokens
+    (symbols : List encoding.Γ) :
+    List HorizontalRoutedRouteTailRecord.Token :=
+  PeriodicCNF.FormulaShapeRetainedFigureNineSourceTailRecord.cycleRecordTokens
+    (directSourceFormula decider symbols)
+
+/-- Direct record inputs inherit the exact copied/cycle phase boundary. -/
+@[simp] theorem directFigureNinePolarityRouteTailRecordTokens_eq_blocks
+    (symbols : List encoding.Γ) :
+    directFigureNinePolarityRouteTailRecordTokens decider symbols =
+      directFigureNineCopiedRouteTailRecordTokens decider symbols ++
+        directFigureNineCycleRouteTailRecordTokens decider symbols := by
+  exact
+    PeriodicCNF.FormulaShapeRetainedFigureNineSourceTailRecord.recordTokens_eq_blocks
+      (directSourceFormula decider symbols)
 
 /-- The fixed bounded batch expander reconstructs the exact direct retained
 header/tail record stream. -/
