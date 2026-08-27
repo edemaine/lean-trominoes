@@ -2104,7 +2104,8 @@ build; an imported proof counts when its statement matches the paper.
                 three-round direction and canonical local-triple record word.
               - [ ] Emit each contracted edge's initial unit directions and
                 six finite endpoint-template choices.  This compact source
-                emitter is now the only missing route-appender component.
+                emitter is now reduced to the explicit framed source-token
+                stream and is the only missing route-appender component.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -2154,6 +2155,11 @@ build; an imported proof counts when its statement matches the paper.
                   compiler over incidence delimiters, and prove that each
                   canonical edge block emits its exact contracted direction
                   word with one route boundary.
+                - [x] Fork framed request blocks into metadata/header and
+                  incidence streams, compose contracted assembly with finite
+                  rasterization, and prove that this fixed bridge emits the
+                  exact canonical compact request stream.  The remaining
+                  source obligation is the framed stream alone.
                 - [x] Compile fixed affine expansion and batched three-round
                   direction normalization to canonical unary request blocks.
                 - [x] Verify the complement-counter record machine, including
@@ -11764,6 +11770,17 @@ The representation choices for this target are:
   maps the verified inner compiler independently over incidence-delimited
   streams and proves exact output on canonical retained and through edge
   blocks.
+- [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean)
+  and [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean)
+  split each framed request into its retained raster prefix and role-tagged
+  incidence word, run contracted assembly, and rejoin both streams as one
+  canonical compact raster-request block through a fixed polynomial-time
+  compiler.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseContractedRouteRasterSourceData.lean)
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseContractedRouteRasterSourceCompiler.lean)
+  instantiate the exact direct framed target and prove that any compiler for
+  it supplies the remaining compact raster-request compiler required by the
+  Theorem 5.2 route pipeline.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
