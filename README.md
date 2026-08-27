@@ -11696,6 +11696,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceStoredRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceStoredRouteDirectionBlock.lean)
   applies that bridge to every successful horizontal occurrence lookup,
   identifying its stored route with one compact retained-polarity block.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceSourceRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceSourceRouteDirectionBlock.lean)
+  transports each compact stored route through factor-two padding, reversal,
+  rebasing, and unit subdivision into the variable-to-clause source word.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
