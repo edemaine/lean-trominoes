@@ -11592,7 +11592,9 @@ The representation choices for this target are:
   proves that each translated finite connector is strictly disjoint from its
   own inherited far tail, using the radius-`73` connector bound against the
   factor-`144` simple-source refinement.  It also identifies the radial-plus-
-  far-tail join as a transformed tail of that refined simple source route.
+  far-tail join as a transformed tail of that refined simple source route and
+  proves that the extended connector and far tail have only their subdivided
+  outer boundary in common.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the

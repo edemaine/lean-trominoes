@@ -201,5 +201,160 @@ theorem radialJoinFarTail_isSimple
   simpa [transformed, refined, doubled, sourceRoute] using
     transformedTailSimple
 
+/-- After unit subdivision, an extended connector and its inherited far tail
+share only their advertised outer splice cell. -/
+theorem translatedExtendedRoute_farTail_onlyCommon
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (data : ComposedClauseExitFanData)
+    (slot : Fin 3)
+    (first second : Cell)
+    (rest : List Cell)
+    (fanValid : data.IsValid)
+    (slotActive : data.SlotActive slot)
+    (firstUnit : AxisDirection.IsUnitAxisStep first second)
+    (scaledHead :
+      Cell.scale 2 first =
+        PositionedPeriodicCNF.canonicalClausePosition
+          sourcePlacement sourceClause)
+    (directionEq :
+      data.direction slot = AxisDirection.between first second)
+    (sourceOrthogonal :
+      OrthogonalPolyline (first :: second :: rest))
+    (sourceSimple :
+      LocalIncidenceDrawing.RouteIsSimple
+        (first :: second :: rest)) :
+    let origin := normalizedSourceClausePosition
+      outputPlacement sourceClause generatedClause
+    let farTail :=
+      translatePolyline
+        (inheritedSourceRouteShift
+          outputPlacement sourcePlacement sourceClause generatedClause)
+        (scalePolyline composedGadgetScale
+          (AxisDirection.unitSubdividePolyline
+            (scalePolyline 2 (second :: rest))))
+    let boundary := Cell.add origin
+      (ComposedClauseExitFanData.outerSourceExit
+        (data.direction slot))
+    ∀ point,
+      point ∈ AxisDirection.unitSubdividePolyline
+        (data.translatedExtendedRoute origin slot) →
+      point ∈ AxisDirection.unitSubdividePolyline farTail →
+      point = boundary := by
+  dsimp only
+  let origin := normalizedSourceClausePosition
+    outputPlacement sourceClause generatedClause
+  let shift := inheritedSourceRouteShift
+    outputPlacement sourcePlacement sourceClause generatedClause
+  let connector := data.translatedRoute origin slot
+  let radial := data.translatedRadialExtension origin slot
+  let extended := data.translatedExtendedRoute origin slot
+  let farTail :=
+    translatePolyline shift
+      (scalePolyline composedGadgetScale
+        (AxisDirection.unitSubdividePolyline
+          (scalePolyline 2 (second :: rest))))
+  let boundary := Cell.add origin
+    (ComposedClauseExitFanData.outerSourceExit
+      (data.direction slot))
+  have connectorOrthogonal : OrthogonalPolyline connector :=
+    data.translatedRoute_orthogonal origin fanValid slot slotActive
+  have radialOrthogonal : OrthogonalPolyline radial :=
+    data.translatedRadialExtension_orthogonal
+      origin fanValid slot slotActive
+  have farTailOrthogonal : OrthogonalPolyline farTail := by
+    have sourceTailOrthogonal : OrthogonalPolyline (second :: rest) :=
+      (List.isChain_cons_cons.mp sourceOrthogonal).2
+    exact
+      ((AxisDirection.unitSubdividePolyline_orthogonal
+          (sourceTailOrthogonal.scalePolyline (by norm_num))).scalePolyline
+        (by
+          norm_num [composedGadgetScale, PlanarOneInThree.gadgetScale,
+            PeriodicOneInThreeNoUnitsPositioned.gadgetScale])).translate shift
+  have connectorFarStrict :
+      RoutesStrictlyAvoidEachOther connector farTail := by
+    simpa only [connector, farTail, origin, shift] using
+      translatedConnector_strictlyAvoids_ownFarTail
+        outputPlacement sourcePlacement sourceClause generatedClause
+        data slot first second rest fanValid slotActive scaledHead
+        sourceOrthogonal sourceSimple
+  have connectorFarDisjoint :
+      List.Disjoint
+        (AxisDirection.unitSubdividePolyline connector)
+        (AxisDirection.unitSubdividePolyline farTail) :=
+    connectorFarStrict.unitSubdividePolyline_disjoint
+      connectorOrthogonal farTailOrthogonal
+  have connectorLast : connector.getLast? = some
+      (Cell.add origin
+        (ComposedClauseExitFanData.sourceExit
+          (data.direction slot))) := by
+    simpa only [connector] using
+      data.translatedRoute_getLast? origin fanValid slot slotActive
+  have radialHead : radial.head? = some
+      (Cell.add origin
+        (ComposedClauseExitFanData.sourceExit
+          (data.direction slot))) := by
+    simp [radial,
+      ComposedClauseExitFanData.translatedRadialExtension,
+      translatePolyline]
+  have radialLast : radial.getLast? = some boundary := by
+    simp [radial, boundary,
+      ComposedClauseExitFanData.translatedRadialExtension,
+      translatePolyline]
+  have farTailHead : farTail.head? = some boundary := by
+    simpa only [farTail, boundary, origin, shift] using
+      translatedScaledDoubledSubdividedTail_head?
+        outputPlacement sourcePlacement sourceClause generatedClause
+        data slot first second rest firstUnit scaledHead directionEq
+  have connectorNonempty : connector ≠ [] := by
+    intro empty
+    have connectorHead :=
+      data.translatedRoute_head? origin fanValid slot slotActive
+    simp [connector, empty] at connectorHead
+  have radialNonempty : radial ≠ [] := by
+    intro empty
+    simp [empty] at radialHead
+  have farTailNonempty : farTail ≠ [] := by
+    intro empty
+    simp [empty] at farTailHead
+  have radialFarSimple :
+      LocalIncidenceDrawing.RouteIsSimple
+        (joinAtEndpoint radial farTail) := by
+    simpa only [radial, farTail, origin, shift] using
+      radialJoinFarTail_isSimple
+        outputPlacement sourcePlacement sourceClause generatedClause
+        data slot first second rest firstUnit scaledHead directionEq
+        sourceOrthogonal sourceSimple
+  have radialFarOnlyCommon :=
+    AxisDirection.unitSubdividePolyline_only_common_of_join_simple
+      radialNonempty farTailNonempty radialOrthogonal farTailOrthogonal
+      radialLast farTailHead radialFarSimple
+  have extendedEq : extended = joinAtEndpoint connector radial := by
+    simpa only [extended, connector, radial] using
+      data.translatedExtendedRoute_eq_join origin slot
+  have extendedSubdivisionEq :
+      AxisDirection.unitSubdividePolyline extended =
+        joinAtEndpoint
+          (AxisDirection.unitSubdividePolyline connector)
+          (AxisDirection.unitSubdividePolyline radial) := by
+    rw [extendedEq]
+    exact AxisDirection.unitSubdividePolyline_joinAtEndpoint
+      connectorNonempty connectorLast radialHead
+  intro point extendedMember farMember
+  rw [extendedSubdivisionEq] at extendedMember
+  rcases mem_joinAtEndpoint extendedMember with
+      connectorMember | radialMember
+  · exact (connectorFarDisjoint connectorMember farMember).elim
+  · exact radialFarOnlyCommon point radialMember farMember
+
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes
