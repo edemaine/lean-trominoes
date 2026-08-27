@@ -185,12 +185,6 @@ theorem output_four_routes
   simp [finish, clauseRecord, taggedTailTokens,
     List.append_assoc]
 
-/-- Total profile projection used only with known clause descriptors below. -/
-def descriptorProfile : FormulaShapeDirectionOrdering.Token →
-    FormulaShapeDirectionOrdering.DirectedClauseProfile
-  | .variable => default
-  | .clause profile => profile
-
 /-- Formatting the canonical four-route carrier block gives exactly the two
 flat Figure 9 tail records identified at the semantic boundary. -/
 theorem output_carrier_canonicalBlock

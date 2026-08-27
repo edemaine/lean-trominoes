@@ -74,5 +74,12 @@ def output
   FiniteStateTransducer.output .firstHead
     (transition firstProfile secondProfile) finish input
 
+/-- Total profile projection, used when a prior semantic theorem guarantees
+that the descriptor is a clause token. -/
+def descriptorProfile : FormulaShapeDirectionOrdering.Token →
+    FormulaShapeDirectionOrdering.DirectedClauseProfile
+  | .variable => default
+  | .clause profile => profile
+
 end BinaryRouteTailRecordFormatter
 end LeanTrominoes

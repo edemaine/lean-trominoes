@@ -2141,6 +2141,9 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Compile a finite-state formatter from four complete,
                 delimited route words to two source-slot-tagged binary clause
                 records, and prove its exact carrier-block semantics.
+              - [x] Decode each packed span field by its modulo-four metadata
+                residue and unary quotient into the exact retained-carrier
+                Figure 9 record block.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
