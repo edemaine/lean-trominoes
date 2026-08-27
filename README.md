@@ -11954,6 +11954,11 @@ The representation choices for this target are:
   translate each finite header to the established compact horizontal request
   format.  Local headers are complete; completing an inherited header is
   proved to append exactly its source-tail direction tokens.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderTailData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderTailData.lean)
+  and [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderTailCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderTailCompiler.lean)
+  consume one delimited source-tail record per finite header.  Fixed control
+  suppresses tails for local Figure 9 routes and streams every inherited tail
+  into the exact established routed request in linear time.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge
