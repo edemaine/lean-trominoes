@@ -9,7 +9,7 @@ import Mathlib.Data.List.Enum
 
 namespace List
 
-theorem map_zipIdx_eq_map_of_mem {Value Output : Type}
+theorem map_zipIdx_eq_map_of_mem {Value Output : Type*}
     (values : List Value) (indexed : Value × Nat → Output)
     (plain : Value → Output)
     (equal : ∀ tagged ∈ values.zipIdx,

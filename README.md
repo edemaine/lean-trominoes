@@ -2187,6 +2187,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Replace per-atom ranking by equivalent selected ranks
                   over one global occurrence presentation, enabling one
                   all-pairs comparison square for every slot.
+                - [x] Package those ranks as one occurrence-presentation-
+                  ordered numeric stream and prove its pointwise semantics.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
