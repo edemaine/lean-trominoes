@@ -11714,6 +11714,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceFiniteDirectionData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceFiniteDirectionData.lean)
   removes global translations from finite variable-site prefixes and
   clause-core incidences, exposing their exact finite table words.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalVariableTypedIncidenceDirectionBlockData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalVariableTypedIncidenceDirectionBlockData.lean)
+  packages a variable incidence as either its finite local word or that word
+  extended by one compact occurrence block, and recovers active-slot lookups.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
