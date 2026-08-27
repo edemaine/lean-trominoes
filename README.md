@@ -2080,6 +2080,9 @@ build; an imported proof counts when its statement matches the paper.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
+              - [x] Re-express every final route by a proof-free exact
+                first-cell/coordinate-offset cursor and prove that it emits
+                the same canonical local-triple records.
               - [x] Reuse the retained-planar variable-marker compiler for
                 the finite Figure 9 source-marker suffix.
               - [x] Compile the finite normalized copied-clause descriptor
