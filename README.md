@@ -11573,6 +11573,11 @@ The representation choices for this target are:
   appending a duplicate-free disjoint suffix.  Thus the finite Figure 9 splice
   can be normalized independently of its already-separated inherited source
   tail.
+- [`LeanTrominoes/OrthogonalPolylineLoopErasureJoin.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureJoin.lean)
+  lifts this localization to the actual orthogonal-route normalizer: when a
+  possibly nonsimple prefix meets a simple suffix only at their subdivided
+  join boundary, normalization loop-erases only the prefix and reattaches the
+  unit-subdivided suffix unchanged.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
