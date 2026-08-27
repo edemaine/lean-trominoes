@@ -2152,6 +2152,10 @@ build; an imported proof counts when its statement matches the paper.
                   leading endpoint query, physical ribbon lane, dynamic source
                   directions, and trailing endpoint query with one fixed
                   finite-state transducer.
+                - [x] Add each finite variable-site prefix to its optional
+                  compiled occurrence word, handle clause-core incidences by
+                  the same request interface, restore one direction boundary,
+                  and map the compiler over complete incidence batches.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
@@ -11789,6 +11793,14 @@ The representation choices for this target are:
   surround a dynamic source-direction word by its two finite endpoint queries
   and lane selector.  A fixed finite-state scan emits the exact complete
   coordinated horizontal occurrence word.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestData.lean),
+  [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestCompiler.lean),
+  [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestBatch.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestBatch.lean),
+  and [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestBatchCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestBatchCompiler.lean)
+  compile local, routed, and clause typed incidences through one compact
+  request interface and map that compiler over explicit incidence boundaries.
+  Every classified incidence emits its exact direction word followed by one
+  route delimiter.
 - [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean)
   and [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean)
   split each framed request into its retained raster prefix and role-tagged

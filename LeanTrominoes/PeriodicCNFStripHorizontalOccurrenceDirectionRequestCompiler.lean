@@ -46,6 +46,18 @@ def finish (_ : State) : List AxisDirection := []
 def output (input : List Token) : List AxisDirection :=
   FiniteStateTransducer.output initial transition finish input
 
+/-- A finite query at the start of a request emits its fixed word and leaves
+the corridor control unchanged. -/
+@[simp] theorem output_finite_cons
+    (query : HorizontalFiniteIncidenceDirectionQuery)
+    (input : List Token) :
+    output (.finite query :: input) =
+      HorizontalFiniteIncidenceDirectionQuery.directions query ++
+        output input := by
+  unfold output FiniteStateTransducer.output
+  simp only [FiniteStateTransducer.scan, transition]
+  rw [List.append_assoc]
+
 private theorem scan_some_eq
     (lane : Gadget.WireColor)
     (previous : AxisDirection)
