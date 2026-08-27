@@ -2203,8 +2203,9 @@ build; an imported proof counts when its statement matches the paper.
                   streams, and compile their conjunctions generically.
                 - [x] Prove positive uniform route scaling preserves both
                   strict order and equality of certified retained terminal
-                  coordinates, reducing the final comparison streams to the
-                  unscaled coordinated source routes.
+                  coordinates, then lift the result to both complete
+                  target-major comparison streams, reducing the final
+                  comparison producers to the unscaled coordinated routes.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
