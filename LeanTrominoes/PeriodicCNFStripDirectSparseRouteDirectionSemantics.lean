@@ -49,6 +49,52 @@ theorem directSparseComputedRouteDirectionRecordsOfSymbols_eq_canonical
   directSparseComputedRouteDirectionRecordsOfSymbols_eq decider symbols
     (directSparseComputedRouteDirectionConditions decider symbols)
 
+/-- Opaque compiler-facing equality to the original canonical route-record
+target.  Packaging the two semantic rewrites here prevents downstream
+machine wrappers from unfolding either large route expression. -/
+theorem directSparseComputedRouteDirectionRecordsOfSymbols_eq_routeRecords
+    (symbols : List encoding.Γ) :
+    directSparseComputedRouteDirectionRecordsOfSymbols decider symbols =
+      directSparseComputedRouteRecordsOfSymbols decider symbols :=
+  (directSparseComputedRouteDirectionRecordsOfSymbols_eq_canonical
+      decider symbols).trans
+    (directSparseComputedRouteRecordsOfSymbols_eq_tripleRecords
+      decider symbols).symm
+
+/-- Opaque machine-facing target retaining both the finite-direction
+definition and its exact canonical route-record semantics. -/
+opaque directSparseRouteDirectionRecordOutputSpec :
+    { output : List encoding.Γ →
+        List GadgetSparseAssignmentTokens.Token //
+      (∀ symbols,
+        output symbols =
+          directSparseComputedRouteDirectionRecordsOfSymbols
+            decider symbols) ∧
+      ∀ symbols,
+        output symbols =
+          directSparseComputedRouteRecordsOfSymbols decider symbols } :=
+  ⟨directSparseComputedRouteDirectionRecordsOfSymbols decider,
+    fun _ => rfl,
+    directSparseComputedRouteDirectionRecordsOfSymbols_eq_routeRecords
+      decider⟩
+
+def directSparseRouteDirectionRecordOutput
+    (symbols : List encoding.Γ) :
+    List GadgetSparseAssignmentTokens.Token :=
+  (directSparseRouteDirectionRecordOutputSpec decider).1 symbols
+
+theorem directSparseRouteDirectionRecordOutput_eq_directions
+    (symbols : List encoding.Γ) :
+    directSparseRouteDirectionRecordOutput decider symbols =
+      directSparseComputedRouteDirectionRecordsOfSymbols decider symbols :=
+  (directSparseRouteDirectionRecordOutputSpec decider).2.1 symbols
+
+theorem directSparseRouteDirectionRecordOutput_eq_routeRecords
+    (symbols : List encoding.Γ) :
+    directSparseRouteDirectionRecordOutput decider symbols =
+      directSparseComputedRouteRecordsOfSymbols decider symbols :=
+  (directSparseRouteDirectionRecordOutputSpec decider).2.2 symbols
+
 end PeriodicCNFStripReduction
 end LeanTrominoes
 
