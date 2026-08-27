@@ -33,17 +33,30 @@ def threeRoundNormalizationOffsets
       (normalizationRouteOffsets
         firstSourceTemplate firstTargetTemplate oldRoute))
 
+/-- Three normalization rounds starting from an already unit-subdivided
+finite direction stream. -/
+def threeRoundNormalizationDirectionsFromUnitDirections
+    (firstSourceTemplate firstTargetTemplate : List Cell)
+    (secondSourceTemplate secondTargetTemplate : List Cell)
+    (finalSourceTemplate finalTargetTemplate : List Cell)
+    (oldDirections : List AxisDirection) : List AxisDirection :=
+  normalizationDirectionWord finalSourceTemplate finalTargetTemplate
+    (normalizationDirectionWord
+      secondSourceTemplate secondTargetTemplate
+      (normalizationDirectionWord
+        firstSourceTemplate firstTargetTemplate oldDirections))
+
 /-- Finite direction-word semantics of the full three-round normalization. -/
 def threeRoundNormalizationDirections
     (firstSourceTemplate firstTargetTemplate : List Cell)
     (secondSourceTemplate secondTargetTemplate : List Cell)
     (finalSourceTemplate finalTargetTemplate : List Cell)
     (oldRoute : List Cell) : List AxisDirection :=
-  normalizationDirectionWord finalSourceTemplate finalTargetTemplate
-    (normalizationDirectionWord
-      secondSourceTemplate secondTargetTemplate
-      (firstNormalizationDirections
-        firstSourceTemplate firstTargetTemplate oldRoute))
+  threeRoundNormalizationDirectionsFromUnitDirections
+    firstSourceTemplate firstTargetTemplate
+    secondSourceTemplate secondTargetTemplate
+    finalSourceTemplate finalTargetTemplate
+    (unitSubdivisionDirections oldRoute)
 
 theorem map_step_firstNormalizationDirections
     (sourceTemplate targetTemplate oldRoute : List Cell)
@@ -90,6 +103,7 @@ theorem map_step_threeRoundNormalizationDirections
         secondSourceTemplate secondTargetTemplate
         finalSourceTemplate finalTargetTemplate oldRoute := by
   unfold threeRoundNormalizationDirections
+    threeRoundNormalizationDirectionsFromUnitDirections
     threeRoundNormalizationOffsets
   rw [map_step_normalizationDirectionWord
     finalSourceTemplate finalTargetTemplate _
@@ -97,9 +111,11 @@ theorem map_step_threeRoundNormalizationDirections
   rw [map_step_normalizationDirectionWord
     secondSourceTemplate secondTargetTemplate _
     secondSourceUnitSteps secondTargetReverseUnitSteps]
-  rw [map_step_firstNormalizationDirections
-    firstSourceTemplate firstTargetTemplate oldRoute
+  rw [map_step_normalizationDirectionWord
+    firstSourceTemplate firstTargetTemplate _
     firstSourceUnitSteps firstTargetReverseUnitSteps]
+  rw [map_step_unitSubdivisionDirections]
+  rfl
 
 end PeriodicThreeDM
 end LeanTrominoes
