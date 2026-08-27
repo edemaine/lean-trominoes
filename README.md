@@ -2103,8 +2103,16 @@ build; an imported proof counts when its statement matches the paper.
                 position and, from compact geometric conditions, its exact
                 three-round direction and canonical local-triple record word.
               - [ ] Emit each contracted edge's initial unit directions and
-                six finite endpoint-template choices, then invoke the
-                three-round direction transducer and record cursor.
+                six finite endpoint-template choices.  This compact source
+                emitter is now the only missing route-appender component.
+                - [x] Package affine source metadata and normalization data as
+                  one cursor-valid compact request per contracted edge.
+                - [x] Compile fixed affine expansion and batched three-round
+                  direction normalization to canonical unary request blocks.
+                - [x] Verify the complement-counter record machine, including
+                  exact batched execution, cleanup, and polynomial runtime.
+                - [x] Compose any exact compact request emitter through that
+                  pipeline into the canonical retained-workspace appender.
               - [x] Reuse the retained-planar variable-marker compiler for
                 the finite Figure 9 source-marker suffix.
               - [x] Compile the finite normalized copied-clause descriptor
@@ -10686,9 +10694,18 @@ The representation choices for this target are:
   batch, retaining exactly one route boundary after every normalized word.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestData.lean)
   and [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestCompiler.lean)
-  specialize the batch to the direct source's contracted edges.  Only the
-  compact source-side request emitter remains before the concrete batch
-  normalizer supplies every final route direction and delimiter.
+  specialize the direction batch to the direct source's contracted edges.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteRasterRequestData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteRasterRequestData.lean),
+  [`LeanTrominoes/GadgetSparseRouteRasterRequestTokenCompiler.lean`](LeanTrominoes/GadgetSparseRouteRasterRequestTokenCompiler.lean),
+  and [`LeanTrominoes/GadgetSparseRouteRasterNormalizedTokenBatchCompiler.lean`](LeanTrominoes/GadgetSparseRouteRasterNormalizedTokenBatchCompiler.lean)
+  add compact affine source metadata, expand it with three fixed passes, and
+  normalize every delimited request into canonical unary cursor input.
+- [`LeanTrominoes/GadgetSparseRouteRecordBatchCompiler.lean`](LeanTrominoes/GadgetSparseRouteRecordBatchCompiler.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSparseValidRouteRequestSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseValidRouteRequestSemantics.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteRasterRecordCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteRasterRecordCompiler.lean)
+  verify the complement-counter machine over cursor-valid batches and compose
+  any exact compact source emitter into the canonical route-record appender.
+  Only that compact source-side emitter remains.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean)
   expands all three vertex-normalization rounds to the exact affine formula
   `1728 · p + (471, 471)`.  Each vertex block is thereby reduced to its
