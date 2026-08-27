@@ -2780,6 +2780,7 @@ import LeanTrominoes.RetainedAngularOccurrenceBoundedStableRank
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedOccurrenceStableRank
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedOccurrenceStableRankSemantics
 import LeanTrominoes.RetainedAngularFanDirectClauseOccurrenceSlotStableRankSemantics
+import LeanTrominoes.ListFilterTakeIdxOf
 
 /-!
 # LeanTrominoes
