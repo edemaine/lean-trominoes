@@ -2128,6 +2128,8 @@ build; an imported proof counts when its statement matches the paper.
               word with its fixed finite corner-table entry.
             - [x] Select, delimit, and compile the exact complete base-bend
               route direction stream directly from source symbols.
+            - [x] Combine retained carrier and base-bend direction streams at
+              the canonical numeric route-descriptor boundary.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
