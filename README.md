@@ -2122,6 +2122,8 @@ build; an imported proof counts when its statement matches the paper.
                   apply their certified clearance.
               - [x] Conclude that the compiled global stream is exactly the
                 canonical four-route block for every retained carrier lens.
+              - [x] Compose that exact carrier stream with the direct-source
+                numeric route-descriptor compiler.
             - [x] Identify every retained bend route's complete direction
               word with its fixed finite corner-table entry.
             - [x] Select, delimit, and compile the exact complete base-bend
