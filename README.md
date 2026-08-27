@@ -2089,6 +2089,9 @@ build; an imported proof counts when its statement matches the paper.
               finite block per retained variable.
             - [x] Compile the complete implication-cycle tail-record suffix
               directly from source symbols.
+            - [x] Reduce every successful direct-atlas copied-source tail to
+              a finite clause-kind, literal-index, and occurrence-slot query,
+              and compile its exact normalized tail word.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
