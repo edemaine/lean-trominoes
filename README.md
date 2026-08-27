@@ -2112,13 +2112,13 @@ build; an imported proof counts when its statement matches the paper.
                 preserve every matrix field's original global order.
               - [x] Reduce full-matrix decoding to the retained spans'
                 established geometric lower bound.
-              - [ ] Transfer that lower bound from retained carrier-lens
+              - [x] Transfer that lower bound from retained carrier-lens
                 geometry to every selected numeric rank pair.
                 - [x] Recover every selected matrix entry as an adjacent
                   pair in its stable semantic carrier-key block.
                 - [x] Identify that datum pair with adjacent physical nodes
                   in the reconstructed retained carrier chain.
-                - [ ] Transport those nodes to the semantic drawing and
+                - [x] Transport those nodes to the semantic drawing and
                   apply their certified clearance.
             - [x] Identify every retained bend route's complete direction
               word with its fixed finite corner-table entry.
