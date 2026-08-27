@@ -2085,6 +2085,10 @@ build; an imported proof counts when its statement matches the paper.
               complete direction word with its fixed local Figure 7 route.
             - [x] Prove the inherited cycle tail is exactly that fixed word
               with its clause-side direction removed.
+            - [x] Reduce all implication-cycle tail records to one constant
+              finite block per retained variable.
+            - [x] Compile the complete implication-cycle tail-record suffix
+              directly from source symbols.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
