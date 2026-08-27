@@ -2132,6 +2132,9 @@ build; an imported proof counts when its statement matches the paper.
               the canonical numeric route-descriptor boundary.
             - [x] Compose that combined stream with the direct-source numeric
               route-descriptor compiler.
+            - [x] Serialize each canonical carrier and bend block as the exact
+              binary Figure 9 tail records, dropping clause-side directions in
+              canonical clause-major order.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
