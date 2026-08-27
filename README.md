@@ -2104,6 +2104,8 @@ build; an imported proof counts when its statement matches the paper.
                 retained streams, suppressing every rejected pair.
               - [x] Decode each positive `span + 2` field into the four exact
                 route-delimited carrier-lens direction words.
+              - [x] Fold the axis into a parity tag on one sparse span stream,
+                preserving the original global retained-pair order.
             - [x] Identify every retained bend route's complete direction
               word with its fixed finite corner-table entry.
             - [x] Select, delimit, and compile the exact complete base-bend

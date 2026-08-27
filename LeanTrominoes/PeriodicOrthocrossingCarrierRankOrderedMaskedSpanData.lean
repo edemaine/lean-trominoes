@@ -63,7 +63,7 @@ def horizontalSpanCodes (descriptors : List RouteDescriptor) : List Nat :=
 def verticalSpanCodes (descriptors : List RouteDescriptor) : List Nat :=
   maskedSpanCodes (orderSpans descriptors) (verticalMaskBits descriptors)
 
-private theorem selectedValues_length (ranks sizes : List Nat) :
+theorem selectedValues_length (ranks sizes : List Nat) :
     (UnarySuccessorEqualityFilterMachine.selectedValues ranks sizes).length =
       ranks.length := by
   induction ranks generalizing sizes with
