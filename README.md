@@ -10738,6 +10738,9 @@ The representation choices for this target are:
   and [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestBatchCompiler.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestBatchCompiler.lean)
   delimit those requests and lift the one-route transducer over a complete
   batch, retaining exactly one route boundary after every normalized word.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestDelimitedReversalCompiler.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestDelimitedReversalCompiler.lean)
+  maps the linear reversal compiler independently over those delimited route
+  words and proves that every boundary is preserved exactly.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestData.lean)
   and [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestCompiler.lean)
   specialize the direction batch to the direct source's contracted edges.
