@@ -2201,6 +2201,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Factor those squares into aligned atom-equality,
                   terminal-key strict-order, and terminal-key equality
                   streams, and compile their conjunctions generically.
+                - [x] Prove positive uniform route scaling preserves both
+                  strict order and equality of certified retained terminal
+                  coordinates, reducing the final comparison streams to the
+                  unscaled coordinated source routes.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
