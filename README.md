@@ -2211,6 +2211,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Identify every successful unscaled direct-atlas
                   terminal coordinate with the finite kind/literal query
                   already emitted by the copied-clause compiler.
+                - [x] Give carrier lenses an explicit four-case terminal
+                  datum, give bends a finite-table terminal datum, and prove
+                  both equal the actual translated local incidence routes.
                 - [x] Factor terminal strict order and equality into unary
                   angular-rank and radial-length columns, prove exact
                   target-major matrix semantics, and compile both matrices
