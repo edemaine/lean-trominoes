@@ -2110,6 +2110,10 @@ build; an imported proof counts when its statement matches the paper.
                 four-route block, with zero fields still suppressed.
               - [x] Compose the tagged-span compiler with the decoder and
                 preserve every matrix field's original global order.
+              - [x] Reduce full-matrix decoding to the retained spans'
+                established geometric lower bound.
+              - [ ] Transfer that lower bound from retained carrier-lens
+                geometry to every selected numeric rank pair.
             - [x] Identify every retained bend route's complete direction
               word with its fixed finite corner-table entry.
             - [x] Select, delimit, and compile the exact complete base-bend
