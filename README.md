@@ -11628,6 +11628,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineClauseProfileTemplate.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineClauseProfileTemplate.lean)
   proves that the canonical finite profile of every nonempty width-three
   positioned clause selects exactly its concrete Figure 9 template.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionTranslation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionTranslation.lean)
+  proves that translating a selected local template and its extended
+  connector into a common clause gauge leaves their normalized finite block
+  unchanged.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalFarTailSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalFarTailSeparation.lean)
   proves that a retained normalized local route avoids its own factor-`144`
   inherited far tail, even when its endpoint is the near connector's splice
