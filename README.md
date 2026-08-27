@@ -2081,6 +2081,8 @@ build; an imported proof counts when its statement matches the paper.
               copied-source prefix and fixed implication-cycle suffix.
             - [x] Rewrite the implication-cycle tail suffix as fixed-width
               indexed blocks over the stable retained variable order.
+            - [x] Identify each final normalized implication-cycle route's
+              complete direction word with its fixed local Figure 7 route.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
