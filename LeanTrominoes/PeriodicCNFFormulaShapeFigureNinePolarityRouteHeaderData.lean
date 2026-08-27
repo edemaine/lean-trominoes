@@ -23,6 +23,55 @@ def sourceSlotNat : SourceLiteralSlot → Nat
   | .second => 1
   | .third => 2
 
+/-- Every emitted polarity descriptor selects a genuine literal of its
+source clause. -/
+theorem descriptor_sourceSlotNat_lt
+    (profile : ClauseProfile)
+    (descriptor : ClauseProfilePolarityRouteOperation.Descriptor)
+    (member : descriptor ∈
+      ClauseProfilePolarityRouteOperation.descriptors profile) :
+    sourceSlotNat descriptor.sourceSlot < profile.literals.length := by
+  rcases descriptor with ⟨sourceSlot, operation⟩
+  cases profile with
+  | unary first =>
+      by_cases compatible : first.value =
+          ClauseProfilePolarityNormalization.normalizedPolarity 0 <;>
+        simp_all [ClauseProfilePolarityRouteOperation.descriptors,
+          ClauseProfilePolarityRouteOperation.clauseRouteBlocks,
+          ClauseProfilePolarityRouteOperation.complementRouteBlocks,
+          ClauseProfilePolarityRouteOperation.normalizedDescriptor,
+          sourceSlotNat, ClauseProfile.literals];
+        cases sourceSlot <;> simp_all
+  | binary first second =>
+      by_cases firstCompatible :
+          first.value =
+            ClauseProfilePolarityNormalization.normalizedPolarity 0 <;>
+        by_cases secondCompatible :
+          second.value =
+            ClauseProfilePolarityNormalization.normalizedPolarity 1 <;>
+        simp_all [ClauseProfilePolarityRouteOperation.descriptors,
+          ClauseProfilePolarityRouteOperation.clauseRouteBlocks,
+          ClauseProfilePolarityRouteOperation.complementRouteBlocks,
+          ClauseProfilePolarityRouteOperation.normalizedDescriptor,
+          sourceSlotNat, ClauseProfile.literals] <;>
+        cases sourceSlot <;> simp_all
+  | ternary first second third =>
+      by_cases firstCompatible :
+          first.value =
+            ClauseProfilePolarityNormalization.normalizedPolarity 0 <;>
+        by_cases secondCompatible :
+          second.value =
+            ClauseProfilePolarityNormalization.normalizedPolarity 1 <;>
+        by_cases thirdCompatible :
+          third.value =
+            ClauseProfilePolarityNormalization.normalizedPolarity 2 <;>
+        simp_all [ClauseProfilePolarityRouteOperation.descriptors,
+          ClauseProfilePolarityRouteOperation.clauseRouteBlocks,
+          ClauseProfilePolarityRouteOperation.complementRouteBlocks,
+          ClauseProfilePolarityRouteOperation.normalizedDescriptor,
+          sourceSlotNat, ClauseProfile.literals] <;>
+        cases sourceSlot <;> simp_all
+
 /-- One final routed incidence header: its polarity operation together with
 the finite Figure 9 source prefix on which that operation acts. -/
 structure Header where
@@ -42,6 +91,31 @@ def headerOf (prefixes : List FormulaShapeFigureNineRoutePrefix.Descriptor)
     (polarity : ClauseProfilePolarityRouteOperation.Descriptor) :
     (headerOf prefixes polarity).polarity = polarity :=
   rfl
+
+/-- On a correctly sized Figure 9 clause-prefix block, header selection is a
+genuine list lookup rather than the total fallback. -/
+theorem headerOf_figurePrefix_eq_get
+    (profile : ClauseProfile)
+    (prefixes : List FormulaShapeFigureNineRoutePrefix.Descriptor)
+    (lengthEq : prefixes.length = profile.literals.length)
+    (polarity : ClauseProfilePolarityRouteOperation.Descriptor)
+    (member : polarity ∈
+      ClauseProfilePolarityRouteOperation.descriptors profile) :
+    let selectedIndex : Fin prefixes.length :=
+      ⟨sourceSlotNat polarity.sourceSlot, by
+        rw [lengthEq]
+        exact descriptor_sourceSlotNat_lt profile polarity member⟩
+    (headerOf prefixes polarity).figurePrefix =
+      prefixes.get selectedIndex := by
+  dsimp only
+  unfold headerOf
+  dsimp only
+  let selectedIndex : Fin prefixes.length :=
+    ⟨sourceSlotNat polarity.sourceSlot, by
+      rw [lengthEq]
+      exact descriptor_sourceSlotNat_lt profile polarity member⟩
+  change prefixes.getD selectedIndex default = prefixes.get selectedIndex
+  exact List.getD_eq_get prefixes default selectedIndex
 
 /-- Expand one Figure 9 clause's source-prefix block through polarity
 normalization. -/

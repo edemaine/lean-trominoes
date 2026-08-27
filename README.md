@@ -11941,7 +11941,9 @@ The representation choices for this target are:
   combine those prefixes with the exact per-clause polarity schedule.  Each
   final routed incidence now has an explicit finite polarity operation and
   selected Figure 9 prefix; the projection theorem recovers the complete
-  polarity descriptor stream in order.
+  polarity descriptor stream in order.  Every emitted source slot is proved
+  in bounds for its source clause, so header selection never uses its total
+  lookup fallback on a genuine aligned prefix block.
 - [`LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteHeaderData.lean`](LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteHeaderData.lean)
   and [`LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteHeaderCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteHeaderCompiler.lean)
   compose this finite expansion with the established concrete retained
