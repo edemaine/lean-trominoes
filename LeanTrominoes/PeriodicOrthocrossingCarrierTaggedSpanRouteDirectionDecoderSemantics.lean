@@ -190,5 +190,74 @@ theorem blockOutput_unaryField_odd (span : Nat) (large : 6 < span) :
     SeparatedBooleanGuard.guarded,
     CarrierSpanRouteDirections.blockOutput_unaryField_span true span large]
 
+private theorem blocksAux_append_fieldEnd
+    (reverseBlock body rest : List SourceSymbol)
+    (continues : ∀ symbol ∈ body,
+      CarrierSpanRouteDirections.isFieldEnd symbol = false) :
+    TM2EndDelimitedBlockMap.blocksAux
+        CarrierSpanRouteDirections.isFieldEnd reverseBlock
+        (body ++ UnaryFieldEncoderMachine.Symbol.delimiter :: rest) =
+      (reverseBlock.reverse ++ body ++
+          [UnaryFieldEncoderMachine.Symbol.delimiter]) ::
+        TM2EndDelimitedBlockMap.blocksAux
+          CarrierSpanRouteDirections.isFieldEnd [] rest := by
+  induction body generalizing reverseBlock with
+  | nil => simp [TM2EndDelimitedBlockMap.blocksAux,
+      CarrierSpanRouteDirections.isFieldEnd]
+  | cons symbol body induction =>
+      have symbolContinues := continues symbol (by simp)
+      have bodyContinues : ∀ other ∈ body,
+          CarrierSpanRouteDirections.isFieldEnd other = false := by
+        intro other member
+        exact continues other (by simp [member])
+      rw [List.cons_append, TM2EndDelimitedBlockMap.blocksAux]
+      simp only [symbolContinues, Bool.false_eq_true, ↓reduceIte]
+      rw [induction (symbol :: reverseBlock) bodyContinues]
+      simp [List.reverse_cons, List.append_assoc]
+
+private theorem blocksAux_unaryField_append
+    (reverseBlock : List SourceSymbol) (value : Nat)
+    (rest : List SourceSymbol) :
+    TM2EndDelimitedBlockMap.blocksAux
+        CarrierSpanRouteDirections.isFieldEnd reverseBlock
+        (UnaryFieldEncoderMachine.unaryField value ++ rest) =
+      (reverseBlock.reverse ++
+          UnaryFieldEncoderMachine.unaryField value) ::
+        TM2EndDelimitedBlockMap.blocksAux
+          CarrierSpanRouteDirections.isFieldEnd [] rest := by
+  unfold UnaryFieldEncoderMachine.unaryField
+  rw [List.append_assoc]
+  simpa [List.append_assoc] using
+    blocksAux_append_fieldEnd reverseBlock
+      (List.replicate value UnaryFieldEncoderMachine.Symbol.unit) rest
+      (by
+        intro symbol member
+        have symbolEq := List.eq_of_mem_replicate member
+        subst symbol
+        rfl)
+
+@[simp] theorem blocks_unaryFields (values : List Nat) :
+    TM2EndDelimitedBlockMap.blocks
+        CarrierSpanRouteDirections.isFieldEnd
+        (UnaryFieldEncoderMachine.unaryFields values) =
+      values.map UnaryFieldEncoderMachine.unaryField := by
+  unfold TM2EndDelimitedBlockMap.blocks
+  induction values with
+  | nil => rfl
+  | cons value values induction =>
+      rw [UnaryFieldEncoderMachine.unaryFields_cons,
+        blocksAux_unaryField_append]
+      simp only [List.reverse_nil, List.nil_append, List.map_cons]
+      exact congrArg (List.cons (UnaryFieldEncoderMachine.unaryField value))
+        induction
+
+/-- The block mapper decodes a complete unary stream field by field. -/
+theorem stream_unaryFields (values : List Nat) :
+    stream (UnaryFieldEncoderMachine.unaryFields values) =
+      values.flatMap fun value =>
+        blockOutput (UnaryFieldEncoderMachine.unaryField value) := by
+  unfold stream TM2EndDelimitedBlockMap.mappedOutput
+  rw [blocks_unaryFields, List.flatMap_map]
+
 end CarrierTaggedSpanRouteDirections
 end LeanTrominoes.PeriodicOrthocrossing
