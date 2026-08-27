@@ -2106,6 +2106,9 @@ build; an imported proof counts when its statement matches the paper.
                 route-delimited carrier-lens direction words.
               - [x] Fold the axis into a parity tag on one sparse span stream,
                 preserving the original global retained-pair order.
+              - [x] Pack the span, axis, and next-slice bit into one unary
+                field, prove the exact `4s + 4 + 2a + n` semantics, and compile
+                the packed stream in global retained-pair order.
               - [x] Decode the parity tag into the correctly oriented exact
                 four-route block, with zero fields still suppressed.
               - [x] Compose the tagged-span compiler with the decoder and
