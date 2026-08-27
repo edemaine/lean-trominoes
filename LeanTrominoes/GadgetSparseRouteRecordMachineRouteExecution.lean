@@ -158,11 +158,12 @@ def outgoing_evalsInTime (color : Gadget.WireColor)
 /-- Exact execution of a maximal direction prefix from the initial incoming
 scan to output reversal. -/
 def route_evalsInTime (color : Gadget.WireColor)
+    (state : State)
     (before : ComplementLocation) (directions : List AxisDirection)
     (stop : List InputToken) (outputReverse output : List OutputToken)
     (stops : StopsDirections stop) :
     EvalsToInTime (TM2.step program)
-      (cfg (.scanIncoming color) none
+      (cfg (.scanIncoming color) state
         (locationData (directionInput directions stop) before
           outputReverse output))
       (some (cfg .reverseOutput (stopState stop)
@@ -175,7 +176,7 @@ def route_evalsInTime (color : Gadget.WireColor)
   | nil =>
       cases stop with
       | nil =>
-          have step := oneStep (step_scanIncoming_nil none
+          have step := oneStep (step_scanIncoming_nil state
             (locationData [] before outputReverse output) color (by
               simp [locationData]))
           convert step using 1 <;>
@@ -186,7 +187,7 @@ def route_evalsInTime (color : Gadget.WireColor)
       | cons token tokens =>
           have notDirection :
               isDirectionState (inputState token) = false := stops
-          have step := oneStep (step_scanIncoming_other none
+          have step := oneStep (step_scanIncoming_other state
             (locationData (token :: tokens) before outputReverse output)
             color token tokens (by simp [locationData])
             notDirection)
@@ -199,7 +200,7 @@ def route_evalsInTime (color : Gadget.WireColor)
       let remainingInput := directionInput directions stop
       let afterScan := locationData remainingInput before outputReverse output
       let current := advanceComplementLocation before incoming
-      have scanned := oneStep (step_scanIncoming_direction none
+      have scanned := oneStep (step_scanIncoming_direction state
         (locationData (.direction incoming :: remainingInput)
           before outputReverse output)
         color incoming remainingInput (by simp [locationData]))
@@ -210,7 +211,7 @@ def route_evalsInTime (color : Gadget.WireColor)
         directions stop outputReverse output stops
       have throughAdvance := EvalsToInTime.trans (TM2.step program)
         1 (advanceTime before incoming)
-        (cfg (.scanIncoming color) none
+        (cfg (.scanIncoming color) state
           (locationData (.direction incoming :: remainingInput)
             before outputReverse output))
         (advanceCfg color incoming (inputState (.direction incoming))
@@ -222,7 +223,7 @@ def route_evalsInTime (color : Gadget.WireColor)
       have whole := EvalsToInTime.trans (TM2.step program)
         (advanceTime before incoming + 1)
         (outgoingTime current directions)
-        (cfg (.scanIncoming color) none
+        (cfg (.scanIncoming color) state
           (locationData (.direction incoming :: remainingInput)
             before outputReverse output))
         (scanOutgoingCfg color incoming
