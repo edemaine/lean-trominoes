@@ -2114,6 +2114,10 @@ build; an imported proof counts when its statement matches the paper.
                 established geometric lower bound.
               - [ ] Transfer that lower bound from retained carrier-lens
                 geometry to every selected numeric rank pair.
+                - [x] Recover every selected matrix entry as an adjacent
+                  pair in its stable semantic carrier-key block.
+                - [ ] Identify that datum pair with its physical retained
+                  carrier nodes and apply their certified clearance.
             - [x] Identify every retained bend route's complete direction
               word with its fixed finite corner-table entry.
             - [x] Select, delimit, and compile the exact complete base-bend
