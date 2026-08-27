@@ -11648,6 +11648,10 @@ The representation choices for this target are:
   converts that route equality into the exact emitter word: one normalized
   finite local-plus-connector block followed by factor-`144` repetition of
   the original source-tail directions.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineOwnRouteCompiledDirectionData.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineOwnRouteCompiledDirectionData.lean)
+  replaces that geometric prefix with its exact finite query block, giving
+  the complete inherited route word as one finite block followed by the
+  factor-`144` source-tail word.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
