@@ -11988,6 +11988,12 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteTailRecordBatchSemantics.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteTailRecordBatchSemantics.lean)
   proves that canonical record batches split at exactly those clause
   boundaries and expand to the established routed source records.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteTailRecordData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteTailRecordData.lean),
+  [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineSourceTailRecordData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineSourceTailRecordData.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteTailRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteTailRecordData.lean)
+  align one flat clause record with each directed profile and retained
+  clockwise tail table.  The direct PSPACE-source specialization is proved
+  to expand to the exact established Figure 9 header/tail stream.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge
