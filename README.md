@@ -2192,6 +2192,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Instantiate the degree-two/degree-three contraction
                   table on arbitrary compact incidence blocks and prove its
                   edge projection is exactly canonical `contractedEdges`.
+                - [x] Lift correct incidence blocks through retained and
+                  reversed through edges, reducing the complete direct stream
+                  to one correct compact block per stable incidence tag.
                 - [x] Fork framed request blocks into metadata/header and
                   incidence streams, compose contracted assembly with finite
                   rasterization, and prove that this fixed bridge emits the
@@ -11871,6 +11874,9 @@ The representation choices for this target are:
   The canonical contraction table independently turns any incidence-block
   lookup into a color-major, element-major compact edge list whose first
   projection is definitionally the authoritative `contractedEdges` order.
+  Pointwise incidence-direction correctness lifts through retained edges and
+  reversed through edges, so such a lookup already implies the complete
+  canonical raster-request stream.
 - [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean)
   and [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean)
   split each framed request into its retained raster prefix and role-tagged
