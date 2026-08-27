@@ -2593,6 +2593,7 @@ import LeanTrominoes.TilingCompactness
 import LeanTrominoes.WangPeriodicCNF
 import LeanTrominoes.WangPeriodicCNFComputability
 import LeanTrominoes.GadgetSparseRouteSegmentDirectionBlock
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineDirectionBlocks
 
 /-!
 # LeanTrominoes

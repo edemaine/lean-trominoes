@@ -2108,6 +2108,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
+                - [x] Instantiate those signed differences on the existing
+                  28 guarded affine route shapes and prove the selected shape
+                  emits the complete semantic descriptor direction word.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
