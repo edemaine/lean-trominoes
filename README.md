@@ -11928,6 +11928,14 @@ The representation choices for this target are:
   give the explicit finite source-slot/operation schedule for every
   polarity-normalized clause profile.  The schedule has exactly one route
   descriptor per generated literal and compiles by a fixed block scan.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixData.lean)
+  and [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixCompiler.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixCompiler.lean)
+  expand each finite directed source-clause profile into every Figure 9
+  incidence in presentation order.  Auxiliary incidences carry complete
+  local queries; the three genuine source roles carry their finite extended
+  query and stable source slot.  The reconstructed clause profile and every
+  active extended connector are proved equal to their semantic counterparts,
+  leaving only the matching source-tail words.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge
