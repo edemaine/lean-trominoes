@@ -11588,6 +11588,10 @@ The representation choices for this target are:
   packages the reusable fact that positive uniform scaling preserves complete
   route simplicity, needed to certify the inherited refined tail before the
   localized Figure 9 normalization.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOwnTailSeparation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOwnTailSeparation.lean)
+  proves that each translated finite connector is strictly disjoint from its
+  own inherited far tail, using the radius-`73` connector bound against the
+  factor-`144` simple-source refinement.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
