@@ -11556,6 +11556,12 @@ The representation choices for this target are:
   to the infinite periodic union of the translated gadget blocks.
 - [`LeanTrominoes/Theorem52.lean`](LeanTrominoes/Theorem52.lean) assembles
   these definitions with `LeanWang.CoREComplete` into the formal target.
+- [`LeanTrominoes/GadgetSparseRouteDirectionScalingCompiler.lean`](LeanTrominoes/GadgetSparseRouteDirectionScalingCompiler.lean)
+  turns every positive fixed polyline scale into a finite direction-stream
+  transducer: scaling by `k` is exactly repetition of each cardinal direction
+  `k` times.  This lets the remaining Theorem 5.2 route emitter compile the
+  retained construction's several fixed refinement layers without rebuilding
+  scaled route coordinates.
 
 ## Build
 
