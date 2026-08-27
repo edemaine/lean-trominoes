@@ -2189,6 +2189,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Lift the edge bridge to ordered compact block lists, so
                   whole-stream correctness needs only exact edge projection
                   and pointwise assembled-direction correctness.
+                - [x] Instantiate the degree-two/degree-three contraction
+                  table on arbitrary compact incidence blocks and prove its
+                  edge projection is exactly canonical `contractedEdges`.
                 - [x] Fork framed request blocks into metadata/header and
                   incidence streams, compose contracted assembly with finite
                   rasterization, and prove that this fixed bridge emits the
@@ -11855,6 +11858,7 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean),
+  [`LeanTrominoes/PeriodicCNFStripHorizontalContractedDirectionBlockListData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedDirectionBlockListData.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceCompiler.lean)
   frame explicit finite role requests beside each raster prefix, run compact
   incidence and contracted-edge assembly, and rasterize the result.  The
@@ -11864,6 +11868,9 @@ The representation choices for this target are:
   `contractedEdges` and pointwise direction correctness.  Any polynomial-time
   direct emitter satisfying this explicit source interface now supplies the
   canonical compact raster-request compiler automatically.
+  The canonical contraction table independently turns any incidence-block
+  lookup into a color-major, element-major compact edge list whose first
+  projection is definitionally the authoritative `contractedEdges` order.
 - [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean)
   and [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean)
   split each framed request into its retained raster prefix and role-tagged
