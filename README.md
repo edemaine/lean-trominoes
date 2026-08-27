@@ -11943,6 +11943,11 @@ The representation choices for this target are:
   dynamic route word after its clause-side point.  Sorting these records by
   the same finite clockwise key is proved to recover the established
   descriptor order while preserving exactly one tail per source literal.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteTailData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteTailData.lean)
+  uses each inherited prefix's clockwise source slot to select its dynamic
+  tail table entry, pairs every final polarity header with that tail, and
+  serializes the result as the delimited records consumed by the verified
+  tail-streaming compiler.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderData.lean)
   and [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderCompiler.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderCompiler.lean)
   combine those prefixes with the exact per-clause polarity schedule.  Each

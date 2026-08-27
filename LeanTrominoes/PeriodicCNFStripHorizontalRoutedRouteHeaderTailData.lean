@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.FiniteStateTransducerData
+import LeanTrominoes.FiniteStateTransducerSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderData
 
 /-! # Streaming dynamic tails into finite routed headers -/
@@ -88,6 +88,23 @@ private theorem scan_tailRecord (active : Bool)
       cases active <;>
         simp [FiniteStateTransducer.scan, transition, induction]
 
+private theorem scan_record (active : Bool) (header : Header)
+    (sourceTailDirections : List AxisDirection) :
+    FiniteStateTransducer.scan transition active
+        (record header sourceTailDirections) =
+      (false,
+        HorizontalRoutedRouteDirectionRequest.tokens
+          (HorizontalRoutedRouteHeader.block
+            header sourceTailDirections)) := by
+  rcases header with ⟨⟨sourceSlot, operation⟩, figurePrefix⟩
+  cases figurePrefix <;> cases operation <;>
+    simp [record, FiniteStateTransducer.scan, transition, consumesTail,
+      scan_tailRecord, HorizontalRoutedRouteHeader.tokens,
+      HorizontalRoutedRouteHeader.block,
+      HorizontalRoutedRouteHeader.operationBlock,
+      HorizontalRoutedRouteDirectionRequest.tokens,
+      HorizontalRoutedRouteDirectionRequest.sourceTokens]
+
 /-- A canonical record becomes exactly the established compact request for
 the completed routed block.  In particular, local headers ignore any
 malformed supplied tail, while inherited headers pass the whole tail. -/
@@ -97,15 +114,41 @@ malformed supplied tail, while inherited headers pass the whole tail. -/
       HorizontalRoutedRouteDirectionRequest.tokens
         (HorizontalRoutedRouteHeader.block
           header sourceTailDirections) := by
-  rcases header with ⟨⟨sourceSlot, operation⟩, figurePrefix⟩
-  cases figurePrefix <;> cases operation <;>
-    simp [output, record, FiniteStateTransducer.output,
-      FiniteStateTransducer.scan, transition, finish, consumesTail,
-      scan_tailRecord, HorizontalRoutedRouteHeader.tokens,
-      HorizontalRoutedRouteHeader.block,
-      HorizontalRoutedRouteHeader.operationBlock,
-      HorizontalRoutedRouteDirectionRequest.tokens,
-      HorizontalRoutedRouteDirectionRequest.sourceTokens]
+  unfold output FiniteStateTransducer.output
+  rw [scan_record]
+  simp [finish]
+
+/-- A complete record resets finite control before processing any following
+stream. -/
+theorem output_record_append (header : Header)
+    (sourceTailDirections : List AxisDirection) (remaining : List Token) :
+    output (record header sourceTailDirections ++ remaining) =
+      HorizontalRoutedRouteDirectionRequest.tokens
+          (HorizontalRoutedRouteHeader.block
+            header sourceTailDirections) ++
+        output remaining := by
+  unfold output FiniteStateTransducer.output
+  rw [FiniteStateTransducer.scan_append, scan_record]
+  simp [finish]
+
+/-- Serialize a list of aligned header/tail pairs as complete records. -/
+def records (values : List (Header × List AxisDirection)) : List Token :=
+  values.flatMap fun value => record value.1 value.2
+
+/-- Record streaming independently completes every aligned header/tail pair
+in presentation order. -/
+@[simp] theorem output_records
+    (values : List (Header × List AxisDirection)) :
+    output (records values) =
+      values.flatMap fun value =>
+        HorizontalRoutedRouteDirectionRequest.tokens
+          (HorizontalRoutedRouteHeader.block value.1 value.2) := by
+  induction values with
+  | nil => rfl
+  | cons value values induction =>
+      change output (record value.1 value.2 ++ records values) = _
+      rw [output_record_append, induction]
+      rfl
 
 end HorizontalRoutedRouteHeaderTail
 end PeriodicCNFStripReduction
