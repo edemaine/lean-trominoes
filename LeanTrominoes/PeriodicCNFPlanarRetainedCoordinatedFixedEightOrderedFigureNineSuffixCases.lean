@@ -131,6 +131,94 @@ theorem
       clearanceSource clearancePlacement clearanceWidth sourceRoutes
       clauseIndex literalIndex data dataLookup
 
+/-- A genuine inherited incidence's complete retained route is exactly its
+normalized local route joined to the recovered inherited fan suffix. -/
+theorem
+    retainedOrderedFixedEightComposedRawIncidenceRoutes_eq_fanInheritedRoute_of_inherited
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    (sourceAtom :
+      ThreeOccurrenceVariable
+        (WrappedPeriodicPlanarSATVariable Variable))
+    (literalSource : literal.atom = .inl (.inl sourceAtom)) :
+    ∃ data :
+        PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+          (retainedFigureNineClearancePositionedFormula source)
+          (retainedFigureNineClearancePlacement source)
+          clauseIndex literalIndex,
+      PlanarOneInThreeNoUnitsFigureNine.inheritedIncidenceData?
+          (retainedFigureNineClearancePositionedFormula source)
+          (retainedFigureNineClearancePlacement source)
+          clauseIndex literalIndex = some data ∧
+        retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawIncidenceRoutes
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty clauseIndex literalIndex =
+          joinAtEndpoint
+            (PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+              (retainedFigureNineClearancePositionedFormula source)
+              (retainedFigureNineClearancePlacement source)
+              clauseIndex literalIndex)
+            (PlanarOneInThreeNoUnitsFigureNine.fanInheritedRouteSuffix
+              (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+                (retainedFigureNineClearancePositionedFormula source)
+                (retainedFigureNineClearancePlacement source))
+              (retainedFigureNineClearancePlacement source)
+              data.sourceClause data.generatedClause
+              (PositionedPeriodicCNF.clauseExitFanData
+                data.sourceClause data.sourceClauseIndex
+                (retainedFigureNineClearanceIncidenceRoutes source))
+              (data.sourceSlot
+                (retainedFigureNineClearancePositionedFormula_widthAtMostThree
+                  source sourceWidth))
+              (retainedFigureNineClearanceIncidenceRoutes
+                source data.sourceClauseIndex data.sourceLiteralIndex)) := by
+  rcases
+      retainedOrderedFixedEightCompleteRouteSuffixes_eq_fanInheritedRouteSuffix_of_inherited
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+        sourceAtom literalSource with
+    ⟨data, dataLookup, suffixEq⟩
+  refine ⟨data, dataLookup, ?_⟩
+  change
+    joinAtEndpoint
+        (PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+          (retainedFigureNineClearancePositionedFormula source)
+          (retainedFigureNineClearancePlacement source)
+          clauseIndex literalIndex)
+        ((PlanarOneInThreeNoUnitsFigureNine.completeRouteSuffixes
+          (retainedFigureNineClearancePositionedFormula source)
+          (retainedFigureNineClearancePlacement source)
+          (retainedFigureNineClearancePositionedFormula_widthAtMostThree
+            source sourceWidth)
+          (retainedFigureNineClearancePositionedFormula_allAtomsNodup
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty)
+          (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty)).routes clauseIndex literalIndex) = _
+  rw [suffixEq]
+
 /-- Every genuine literal that is not inherited from the retained source has
 only the singleton local splice point as its completed suffix. -/
 theorem

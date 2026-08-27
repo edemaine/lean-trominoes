@@ -11662,6 +11662,9 @@ The representation choices for this target are:
   replaces that geometric prefix with its exact finite query block, giving
   the complete inherited route word as one finite block followed by the
   factor-`144` source-tail word.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineInheritedRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineInheritedRouteDirectionBlock.lean)
+  identifies every named retained inherited Figure 9 incidence with that
+  finite local-plus-connector block and repeated source-tail word.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
