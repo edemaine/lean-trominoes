@@ -11947,6 +11947,11 @@ The representation choices for this target are:
   compose this finite expansion with the established concrete retained
   descriptor compiler.  Thus the original PSPACE-source symbol stream now
   compiles directly to every final routed-incidence header.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderData.lean)
+  and [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCompiler.lean)
+  translate each finite header to the established compact horizontal request
+  format.  Local headers are complete; completing an inherited header is
+  proved to append exactly its source-tail direction tokens.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge
