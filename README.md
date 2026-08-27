@@ -11581,6 +11581,10 @@ The representation choices for this target are:
   unit-subdivided suffix unchanged.  A companion theorem derives the required
   subdivided only-common-point certificate from simplicity of an endpoint
   join.
+- [`LeanTrominoes/OrthogonalPolylineLoopErasureJoinPrefix.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureJoinPrefix.lean)
+  combines strict separation of a first prefix piece with boundary-only
+  contact for its second piece, yielding the contact condition for a complete
+  joined prefix.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineExtendedRouteDecomposition.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineExtendedRouteDecomposition.lean)
   exposes each extended Figure 9 exit connector as a simple finite connector
   followed by its two-point radial segment.  This isolates the possible
