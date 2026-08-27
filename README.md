@@ -11684,6 +11684,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteDirectionBlock.lean)
   specializes that compact classification to the concrete strip source,
   discharging all locality, width, occurrence, and nonempty-clause promises.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorDirectionData.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorDirectionData.lean)
+  identifies an assembled colored ribbon corridor with the fixed finite
+  macrocell table applied to every adjacent pair of source directions.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
