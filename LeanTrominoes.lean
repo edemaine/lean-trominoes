@@ -2776,6 +2776,8 @@ import LeanTrominoes.RetainedAngularOccurrenceTerminalCoordinate
 import LeanTrominoes.RetainedAngularOccurrenceStableSort
 import LeanTrominoes.RetainedAngularOccurrenceStableRank
 import LeanTrominoes.RetainedAngularOccurrenceBoundedStableRank
+import LeanTrominoes.RetainedAngularFanFinalCoordinatedOccurrenceStableRank
+import LeanTrominoes.RetainedAngularFanFinalCoordinatedOccurrenceStableRankSemantics
 
 /-!
 # LeanTrominoes
