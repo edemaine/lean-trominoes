@@ -36,7 +36,8 @@ def RouteShape.guardedScaledReversedDirectionWord
   else
     []
 
-local instance : Inhabited AxisDirection := ⟨.invalid⟩
+local instance scaledReversedDirectionStreamAxisDirectionInhabited :
+    Inhabited AxisDirection := ⟨.invalid⟩
 
 /-- Each guarded doubled reversed shape remains a polynomial-time streaming
 compiler. -/

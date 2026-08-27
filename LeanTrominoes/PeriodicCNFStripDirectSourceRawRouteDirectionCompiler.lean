@@ -10,6 +10,8 @@ import LeanTrominoes.PeriodicCNFStripDirectSourceRouteDescriptorPairFieldTagSema
 import LeanTrominoes.PeriodicCNFStripSourceFormula
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineDelimitedDirectionStreamCompiler
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineDirectionStreamCompiler
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineScaledReversedDelimitedDirectionStreamCompiler
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineScaledReversedDirectionStreamCompiler
 import LeanTrominoes.TM2CompositionMachine
 import LeanTrominoes.TM2PolyTimeOutputEncodingTransport
 
@@ -49,6 +51,21 @@ def directSourceRawRouteDirectionBlocks
     (symbols : List encoding.Γ) :
     List PeriodicThreeDM.NormalizationDirectionRequest.Batch.NormalizedToken :=
   RouteDescriptorPairAffine.diagonalDelimitedDirectionStream
+    (directSourceRouteDescriptorPairFieldTags decider symbols)
+
+/-- Complete direct-source raw route words after the horizontal occurrence
+construction's doubling and reversal. -/
+def directSourceScaledReversedRawRouteDirections
+    (symbols : List encoding.Γ) : List AxisDirection :=
+  RouteDescriptorPairAffine.diagonalScaledReversedDirectionStream
+    (directSourceRouteDescriptorPairFieldTags decider symbols)
+
+/-- The doubled reversed raw words with one explicit route boundary per
+source incidence. -/
+def directSourceScaledReversedRawRouteDirectionBlocks
+    (symbols : List encoding.Γ) :
+    List PeriodicThreeDM.NormalizationDirectionRequest.Batch.NormalizedToken :=
+  RouteDescriptorPairAffine.diagonalScaledReversedDelimitedDirectionStream
     (directSourceRouteDescriptorPairFieldTags decider symbols)
 
 /-- The compiled stream is exactly the complete raw semantic route word in
@@ -91,6 +108,48 @@ theorem directSourceRawRouteDirectionBlocks_eq
       exact PeriodicCNF.incidenceGraph_isLocal (sourceFormula_isLocal _))
     (directSourceFormula_isForwardLocal decider symbols)
 
+/-- The scaled-reversed direct-source stream is exactly the semantic numeric
+route family after the horizontal occurrence transform. -/
+theorem directSourceScaledReversedRawRouteDirections_eq
+    (symbols : List encoding.Γ) :
+    directSourceScaledReversedRawRouteDirections decider symbols =
+      (numericRouteDescriptors
+        (directSourceFormula decider symbols)).flatMap fun descriptor =>
+          Gadget.unitSubdivisionDirections
+            (scalePolyline 2 descriptor.route).reverse := by
+  unfold directSourceScaledReversedRawRouteDirections
+  rw [directSourceRouteDescriptorPairFieldTags_eq]
+  exact RouteDescriptorPairAffine.diagonalScaledReversedDirectionStream_numericRouteDescriptors
+    (directSourceFormula decider symbols)
+    (PeriodicCNF.incidenceGraph_isWellFormed _)
+    (directSourceFormula_incidenceGraph_degreeAtMost decider symbols)
+    (by
+      unfold directSourceFormula
+      exact PeriodicCNF.incidenceGraph_isLocal (sourceFormula_isLocal _))
+    (directSourceFormula_isForwardLocal decider symbols)
+
+/-- The delimited scaled-reversed stream has one exact semantic block per
+numeric source route. -/
+theorem directSourceScaledReversedRawRouteDirectionBlocks_eq
+    (symbols : List encoding.Γ) :
+    directSourceScaledReversedRawRouteDirectionBlocks decider symbols =
+      (numericRouteDescriptors
+        (directSourceFormula decider symbols)).flatMap fun descriptor =>
+          (Gadget.unitSubdivisionDirections
+              (scalePolyline 2 descriptor.route).reverse).map
+              PeriodicThreeDM.NormalizationDirectionRequest.Batch.NormalizedToken.direction ++
+            [.routeEnd] := by
+  unfold directSourceScaledReversedRawRouteDirectionBlocks
+  rw [directSourceRouteDescriptorPairFieldTags_eq]
+  exact RouteDescriptorPairAffine.diagonalScaledReversedDelimitedDirectionStream_numericRouteDescriptors
+    (directSourceFormula decider symbols)
+    (PeriodicCNF.incidenceGraph_isWellFormed _)
+    (directSourceFormula_incidenceGraph_degreeAtMost decider symbols)
+    (by
+      unfold directSourceFormula
+      exact PeriodicCNF.incidenceGraph_isLocal (sourceFormula_isLocal _))
+    (directSourceFormula_isForwardLocal decider symbols)
+
 /-- Direct source symbols compile to the complete raw incidence-route
 direction stream in polynomial time. -/
 noncomputable def directSourceRawRouteDirectionsComputableInPolyTime :
@@ -117,6 +176,37 @@ noncomputable def directSourceRawRouteDirectionBlocksComputableInPolyTime :
   change TM2ComputableInPolyTime id id
     (fun symbols => RouteDescriptorPairAffine.diagonalDelimitedDirectionStream
       (directSourceRouteDescriptorPairFieldTags decider symbols))
+  exact selected
+
+/-- Direct source symbols compile to all doubled reversed raw route words. -/
+noncomputable def
+    directSourceScaledReversedRawRouteDirectionsComputableInPolyTime :
+    TM2ComputableInPolyTime id id
+      (directSourceScaledReversedRawRouteDirections decider) := by
+  let tagged :=
+    directSourceRouteDescriptorPairFieldTagsComputableInPolyTime decider
+  let selected := TM2CompositionMachine.computableInPolyTime tagged
+    RouteDescriptorPairAffine.diagonalScaledReversedDirectionStreamComputableInPolyTime
+  change TM2ComputableInPolyTime id id
+    (fun symbols =>
+      RouteDescriptorPairAffine.diagonalScaledReversedDirectionStream
+        (directSourceRouteDescriptorPairFieldTags decider symbols))
+  exact selected
+
+/-- Direct source symbols compile to the route-delimited doubled reversed raw
+stream. -/
+noncomputable def
+    directSourceScaledReversedRawRouteDirectionBlocksComputableInPolyTime :
+    TM2ComputableInPolyTime id id
+      (directSourceScaledReversedRawRouteDirectionBlocks decider) := by
+  let tagged :=
+    directSourceRouteDescriptorPairFieldTagsComputableInPolyTime decider
+  let selected := TM2CompositionMachine.computableInPolyTime tagged
+    RouteDescriptorPairAffine.diagonalScaledReversedDelimitedDirectionStreamComputableInPolyTime
+  change TM2ComputableInPolyTime id id
+    (fun symbols =>
+      RouteDescriptorPairAffine.diagonalScaledReversedDelimitedDirectionStream
+        (directSourceRouteDescriptorPairFieldTags decider symbols))
   exact selected
 
 end PeriodicCNFStripReduction

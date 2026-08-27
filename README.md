@@ -2140,6 +2140,9 @@ build; an imported proof counts when its statement matches the paper.
                   the horizontal construction's scale and reversal.
                 - [x] Preserve those doubled-reversed route boundaries with
                   one delimiter per diagonal numeric descriptor.
+                - [x] Compose both doubled-reversed selectors with the direct
+                  PSPACE source tagger, yielding exact delimited and
+                  undelimited transformed raw-route compilers.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
