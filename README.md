@@ -2129,6 +2129,10 @@ build; an imported proof counts when its statement matches the paper.
                   trailing delimiter for every selected diagonal descriptor.
                 - [x] Compile the direct-source specialization of that
                   route-delimited raw direction stream.
+                - [x] Compile every fixed affine route shape after the
+                  horizontal construction's doubling and reversal directly
+                  from signed coordinate differences, without buffering and
+                  reversing a dynamically sized emitted word.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
