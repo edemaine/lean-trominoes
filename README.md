@@ -11590,6 +11590,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
+  route word.  Together with
+  [`LeanTrominoes/PositionedPeriodicCNFClauseDirectionOrderingDirections.lean`](LeanTrominoes/PositionedPeriodicCNFClauseDirectionOrderingDirections.lean),
+  it also removes clockwise clause sorting: each valid final incidence
+  recovers its original composed-raw literal index and unchanged normalized
   route word.
 
 ## Build
