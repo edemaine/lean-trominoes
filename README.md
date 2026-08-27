@@ -2144,6 +2144,9 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Decode each packed span field by its modulo-four metadata
                 residue and unary quotient into the exact retained-carrier
                 Figure 9 record block.
+              - [x] Compose the packed-field compiler with that decoder and
+                prove the complete global row-major stream has exactly one
+                record block per selected retained carrier pair.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
