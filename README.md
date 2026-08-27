@@ -2189,6 +2189,9 @@ build; an imported proof counts when its statement matches the paper.
                   all-pairs comparison square for every slot.
                 - [x] Package those ranks as one occurrence-presentation-
                   ordered numeric stream and prove its pointwise semantics.
+                - [x] Express the complete stream as same-atom strict-lower
+                  comparison-row counts plus same-atom equal-key prefix
+                  counts, matching the polynomial rank pipeline.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
