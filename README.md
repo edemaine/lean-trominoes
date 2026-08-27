@@ -2167,6 +2167,10 @@ build; an imported proof counts when its statement matches the paper.
                   compiler over incidence delimiters, and prove that each
                   canonical edge block emits its exact contracted direction
                   word with one route boundary.
+                - [x] Frame explicit finite role requests beside each raster
+                  prefix and prove that any polynomial-time emitter satisfying
+                  this source interface supplies the canonical compact
+                  raster-request compiler.
                 - [x] Fork framed request blocks into metadata/header and
                   incidence streams, compose contracted assembly with finite
                   rasterization, and prove that this fixed bridge emits the
@@ -11811,6 +11815,13 @@ The representation choices for this target are:
   maps the role compiler independently over incidence boundaries and composes
   it with contracted assembly.  Retained and through blocks compile to their
   exact contracted direction words, with one final route boundary per edge.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean),
+  [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceCompiler.lean)
+  frame explicit finite role requests beside each raster prefix, run compact
+  incidence and contracted-edge assembly, and rasterize the result.  Any
+  polynomial-time direct emitter satisfying this explicit source interface
+  now supplies the canonical compact raster-request compiler automatically.
 - [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean)
   and [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean)
   split each framed request into its retained raster prefix and role-tagged
