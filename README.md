@@ -2134,6 +2134,10 @@ build; an imported proof counts when its statement matches the paper.
                   from signed coordinate differences, without buffering and
                   reversing a dynamically sized emitted word, and prove that
                   output is the actual scaled reversed semantic route word.
+                - [x] Gate and concatenate all 28 doubled-reversed candidates,
+                  map the unique selector over the descriptor-pair stream,
+                  and identify its output with every numeric raw route after
+                  the horizontal construction's scale and reversal.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
