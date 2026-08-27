@@ -11690,6 +11690,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorDirectionCompiler.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorDirectionCompiler.lean)
   implements that adjacent-pair expansion as a finite-state polynomial-time
   transducer carrying only the preceding source direction.
+- [`LeanTrominoes/PositionedPeriodicCNFTaggedOccurrenceMembership.lean`](LeanTrominoes/PositionedPeriodicCNFTaggedOccurrenceMembership.lean)
+  recovers positioned clause/literal members from tagged indices and carries
+  those indices backward through padding scale and anchor normalization.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
