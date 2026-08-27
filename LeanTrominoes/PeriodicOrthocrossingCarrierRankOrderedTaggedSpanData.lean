@@ -26,6 +26,11 @@ def taggedSpanCodes (descriptors : List RouteDescriptor) : List Nat :=
     (maskedDoubledSpanCodes descriptors)
     (BooleanListUnaryFields.values (retainedAxisBits descriptors))
 
+/-- The tagged span fields at their unary tape representation. -/
+def taggedSpanStream (descriptors : List RouteDescriptor) :
+    List UnaryFieldEncoderMachine.Symbol :=
+  UnaryFieldEncoderMachine.unaryFields (taggedSpanCodes descriptors)
+
 @[simp] theorem doubledOrderSpans_length
     (descriptors : List RouteDescriptor) :
     (doubledOrderSpans descriptors).length =
