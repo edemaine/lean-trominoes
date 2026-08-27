@@ -11604,6 +11604,10 @@ The representation choices for this target are:
   transports that route equality to the emitter boundary: the normalized
   suffix direction word is the finite normalized connector word concatenated
   with the original far-tail word.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineExtendedDirectionCompiler.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineExtendedDirectionCompiler.lean)
+  makes the finite prefix executable: a fixed block transducer emits the
+  loop-erased extended-connector direction word from finite fan/slot metadata,
+  and a translation-invariance theorem connects it to every clause gauge.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
