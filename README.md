@@ -11628,6 +11628,10 @@ The representation choices for this target are:
   proves that a retained normalized local route avoids its own factor-`144`
   inherited far tail, even when its endpoint is the near connector's splice
   point.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineOwnRouteNormalization.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineOwnRouteNormalization.lean)
+  combines local/far separation with connector/far boundary contact to
+  normalize only the complete finite local-plus-extended prefix of an
+  inherited route, reattaching its simple far tail unchanged.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
