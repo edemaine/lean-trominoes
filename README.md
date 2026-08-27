@@ -11596,6 +11596,10 @@ The representation choices for this target are:
   proves that the extended connector and far tail have only their subdivided
   outer boundary in common.  The far tail itself is certified simple through
   all four transformations.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOwnSuffixNormalization.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOwnSuffixNormalization.lean)
+  applies the localization theorem to an inherited suffix: normalization is
+  exactly finite extended-connector normalization followed by the unchanged
+  unit-subdivided far tail.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
