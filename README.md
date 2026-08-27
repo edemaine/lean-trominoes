@@ -2166,6 +2166,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Attach bounded occurrence-slot tuples to the existing
                   finite direct-direction query alphabet, prove lossless
                   round-trip semantics, and compile through record emission.
+                - [x] Identify the erased query with the existing compiled
+                  copied-clause query and its slot projection with the exact
+                  semantic Figure 7 occurrence-slot tuple.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.

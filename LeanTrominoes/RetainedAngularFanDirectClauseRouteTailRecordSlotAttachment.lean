@@ -25,6 +25,15 @@ inductive RetainedDirectClauseOccurrenceSlots
 instance : Inhabited RetainedDirectClauseOccurrenceSlots :=
   ⟨.unary default⟩
 
+/-- Total width-three slot packing. Genuine source clauses use only the
+nonempty branches of width at most three. -/
+def RetainedDirectClauseOccurrenceSlots.ofList :
+    List RetainedTerminalSlot → RetainedDirectClauseOccurrenceSlots
+  | [] => default
+  | [first] => .unary first
+  | [first, second] => .binary first second
+  | first :: second :: third :: _ => .ternary first second third
+
 /-- One already-compiled finite direction query paired with its bounded
 presentation-ordered occurrence slots. -/
 abbrev RetainedDirectClauseRouteTailRecordSlotInput :=
@@ -75,35 +84,30 @@ def retainedDirectClauseRouteTailRecordQueriesOfSlotInputs
   inputs.flatMap fun input =>
     (retainedDirectClauseRouteTailRecordQueryOfSlotInput input).toList
 
+/-- Erase one full-tail literal back to its previously compiled finite
+direction query item. -/
+def RetainedDirectRouteTailRecordLiteralQuery.directionQueryItem
+    (query : RetainedDirectRouteTailRecordLiteralQuery) :
+    LiteralProfile × RetainedFinalCopiedSourceDirectionQuery :=
+  (query.profile,
+    .direct ⟨query.tail.kind, query.tail.literalIndex⟩)
+
 /-- Erase full-tail slots back to the previously compiled direct-direction
 query alphabet. -/
-def RetainedDirectClauseRouteTailRecordQuery.directionQuery :
-    RetainedDirectClauseRouteTailRecordQuery → RetainedFinalCopiedClauseQuery
-  | .unary first =>
-      .unary first.profile (.direct
-        ⟨first.tail.kind, first.tail.literalIndex⟩)
-  | .binary first second =>
-      .binary first.profile (.direct
-          ⟨first.tail.kind, first.tail.literalIndex⟩)
-        second.profile (.direct
-          ⟨second.tail.kind, second.tail.literalIndex⟩)
-  | .ternary first second third =>
-      .ternary first.profile (.direct
-          ⟨first.tail.kind, first.tail.literalIndex⟩)
-        second.profile (.direct
-          ⟨second.tail.kind, second.tail.literalIndex⟩)
-        third.profile (.direct
-          ⟨third.tail.kind, third.tail.literalIndex⟩)
+def RetainedDirectClauseRouteTailRecordQuery.directionQuery
+    (query : RetainedDirectClauseRouteTailRecordQuery) :
+    RetainedFinalCopiedClauseQuery :=
+  RetainedFinalCopiedClauseQuery.ofList
+    (query.literalQueries.map
+      RetainedDirectRouteTailRecordLiteralQuery.directionQueryItem)
 
 /-- Extract the bounded slot tuple from a full direct record query. -/
-def RetainedDirectClauseRouteTailRecordQuery.occurrenceSlots :
-    RetainedDirectClauseRouteTailRecordQuery →
-      RetainedDirectClauseOccurrenceSlots
-  | .unary first => .unary first.tail.slot
-  | .binary first second =>
-      .binary first.tail.slot second.tail.slot
-  | .ternary first second third =>
-      .ternary first.tail.slot second.tail.slot third.tail.slot
+def RetainedDirectClauseRouteTailRecordQuery.occurrenceSlots
+    (query : RetainedDirectClauseRouteTailRecordQuery) :
+    RetainedDirectClauseOccurrenceSlots :=
+  RetainedDirectClauseOccurrenceSlots.ofList
+    (query.literalQueries.map fun literalQuery =>
+      literalQuery.tail.slot)
 
 /-- Slot attachment is lossless on every well-formed full direct query. -/
 @[simp] theorem retainedDirectClauseRouteTailRecordQueryOfSlotInput_roundtrip
