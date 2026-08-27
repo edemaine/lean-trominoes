@@ -11612,6 +11612,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineFarTailDirectionData.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineFarTailDirectionData.lean)
   collapses the four inherited-tail transformations to one stream operation:
   repeat every direction of the original source tail exactly `144` times.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOwnSuffixCompiledDirectionData.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOwnSuffixCompiledDirectionData.lean)
+  combines the two halves into the exact source-emitter form: a finite
+  fan/slot block followed by factor-`144` repetition of the original route
+  word after its first vertex.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
