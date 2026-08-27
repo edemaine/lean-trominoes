@@ -61,5 +61,36 @@ theorem listLoopErase_append_of_disjoint
         rw [if_neg member, if_neg appendedNotMember]
         simp
 
+/-- If two point lists meet only at their advertised join boundary, loop
+erasure can be performed on the first list alone and then rejoined to the
+duplicate-free second list. -/
+theorem listLoopErase_joinAtEndpoint_of_only_common
+    {Vertex : Type*} [DecidableEq Vertex]
+    (first second : List Vertex)
+    (boundary : Vertex)
+    (secondHead : second.head? = some boundary)
+    (secondNodup : second.Nodup)
+    (onlyCommon :
+      ∀ point, point ∈ first → point ∈ second →
+        point = boundary) :
+    listLoopErase (joinAtEndpoint first second) =
+      joinAtEndpoint (listLoopErase first) second := by
+  have disjointTail : List.Disjoint first second.tail := by
+    rw [List.disjoint_left]
+    intro point firstMember secondTailMember
+    have pointEq := onlyCommon point firstMember
+      (List.mem_of_mem_tail secondTailMember)
+    subst point
+    cases second with
+    | nil => simp at secondHead
+    | cons head tail =>
+        have headEq : head = boundary := by
+          simpa using secondHead
+        subst head
+        exact (List.nodup_cons.mp secondNodup).1 secondTailMember
+  unfold joinAtEndpoint
+  exact listLoopErase_append_of_disjoint
+    first second.tail disjointTail secondNodup.tail
+
 end Computability
 end LeanTrominoes
