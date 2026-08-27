@@ -11948,6 +11948,12 @@ The representation choices for this target are:
   tail table entry, pairs every final polarity header with that tail, and
   serializes the result as the delimited records consumed by the verified
   tail-streaming compiler.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineSourceTailData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineSourceTailData.lean)
+  builds one clockwise dynamic-tail table per actual retained fixed-eight
+  source clause and combines those tables with the exact retained direction
+  descriptors.  The resulting delimited records are specialized to direct
+  PSPACE-source symbols by
+  [`LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteTailData.lean`](LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteTailData.lean).
 - [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderData.lean)
   and [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderCompiler.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderCompiler.lean)
   combine those prefixes with the exact per-clause polarity schedule.  Each
