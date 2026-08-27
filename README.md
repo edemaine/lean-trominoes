@@ -11605,6 +11605,9 @@ The representation choices for this target are:
   corresponding direction-word prefixes and suffixes.  In particular, the
   polarity-normalization split can now be compiled by fixed `take`/`drop`
   operations on the threefold-expanded incoming word.
+- [`LeanTrominoes/GadgetSparseRouteUnitSubdivisionDirectionEndpointJoin.lean`](LeanTrominoes/GadgetSparseRouteUnitSubdivisionDirectionEndpointJoin.lean)
+  proves that every nonempty endpoint join concatenates its two exact
+  segment-major direction words, including the singleton-prefix case.
 - [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteDirectionData.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteDirectionData.lean)
   applies those stream laws to the actual final polarity subdivision.
   Compatible incidences emit the full threefold-expanded source word,
