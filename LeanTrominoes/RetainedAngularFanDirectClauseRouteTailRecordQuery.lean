@@ -100,6 +100,17 @@ inductive RetainedDirectClauseRouteTailRecordQuery
 instance : Inhabited RetainedDirectClauseRouteTailRecordQuery :=
   ⟨.unary default⟩
 
+/-- Total width-three packing. The empty and over-width branches are
+fallbacks; genuine retained source clauses are nonempty and width at most
+three. -/
+def RetainedDirectClauseRouteTailRecordQuery.ofList :
+    List RetainedDirectRouteTailRecordLiteralQuery →
+      RetainedDirectClauseRouteTailRecordQuery
+  | [] => default
+  | [first] => .unary first
+  | [first, second] => .binary first second
+  | first :: second :: third :: _ => .ternary first second third
+
 /-- Literal queries in the original clause presentation order. -/
 def RetainedDirectClauseRouteTailRecordQuery.literalQueries :
     RetainedDirectClauseRouteTailRecordQuery →
@@ -107,6 +118,27 @@ def RetainedDirectClauseRouteTailRecordQuery.literalQueries :
   | .unary first => [first]
   | .binary first second => [first, second]
   | .ternary first second third => [first, second, third]
+
+/-- Packing is lossless on genuine nonempty width-three clause inputs. -/
+@[simp] theorem RetainedDirectClauseRouteTailRecordQuery.literalQueries_ofList
+    (queries : List RetainedDirectRouteTailRecordLiteralQuery)
+    (nonempty : queries ≠ []) (width : queries.length ≤ 3) :
+    (RetainedDirectClauseRouteTailRecordQuery.ofList queries).literalQueries =
+      queries := by
+  cases queries with
+  | nil => contradiction
+  | cons first rest =>
+      cases rest with
+      | nil => rfl
+      | cons second rest =>
+          cases rest with
+          | nil => rfl
+          | cons third rest =>
+              cases rest with
+              | nil => rfl
+              | cons fourth rest =>
+                  simp only [List.length] at width
+                  omega
 
 /-- Evaluate the finite literal fields to the exact directed clause profile. -/
 def RetainedDirectClauseRouteTailRecordQuery.directedProfile
