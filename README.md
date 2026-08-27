@@ -2211,6 +2211,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Identify every successful unscaled direct-atlas
                   terminal coordinate with the finite kind/literal query
                   already emitted by the copied-clause compiler.
+                - [x] Factor terminal strict order and equality into unary
+                  angular-rank and radial-length columns, prove exact
+                  target-major matrix semantics, and compile both matrices
+                  from any exact pair of column producers.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
