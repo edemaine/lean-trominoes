@@ -11577,7 +11577,9 @@ The representation choices for this target are:
   lifts this localization to the actual orthogonal-route normalizer: when a
   possibly nonsimple prefix meets a simple suffix only at their subdivided
   join boundary, normalization loop-erases only the prefix and reattaches the
-  unit-subdivided suffix unchanged.
+  unit-subdivided suffix unchanged.  A companion theorem derives the required
+  subdivided only-common-point certificate from simplicity of an endpoint
+  join.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
