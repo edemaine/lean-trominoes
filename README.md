@@ -2107,6 +2107,10 @@ build; an imported proof counts when its statement matches the paper.
                 emitter is now the only missing route-appender component.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
+                - [x] Decompose retained and suppressed-edge initial direction
+                  words into one assembled incidence word or a first word
+                  followed by the reversed second, eliminating contracted
+                  joins and periodic translations from the emitter target.
                 - [x] Compile fixed affine expansion and batched three-round
                   direction normalization to canonical unary request blocks.
                 - [x] Verify the complement-counter record machine, including
@@ -10706,6 +10710,12 @@ The representation choices for this target are:
   verify the complement-counter machine over cursor-valid batches and compose
   any exact compact source emitter into the canonical route-record appender.
   Only that compact source-side emitter remains.
+- [`LeanTrominoes/GadgetSparseRouteUnitSubdivisionDirectionJoin.lean`](LeanTrominoes/GadgetSparseRouteUnitSubdivisionDirectionJoin.lean)
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteIncidenceDirectionSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteIncidenceDirectionSemantics.lean)
+  prove that direct contracted requests can be streamed from original
+  assembled incidence direction words: one word for a retained edge, or the
+  first word followed by the reversed second for a suppressed degree-two
+  edge.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean)
   expands all three vertex-normalization rounds to the exact affine formula
   `1728 · p + (471, 471)`.  Each vertex block is thereby reduced to its
