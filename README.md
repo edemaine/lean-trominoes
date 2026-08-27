@@ -2121,6 +2121,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Concatenate all 28 guarded candidates and map the unique
                   diagonal-shape selector over complete descriptor-pair
                   streams.
+                - [x] Prove that selector suppresses every off-diagonal pair
+                  and recovers every numeric descriptor's full raw route word.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
