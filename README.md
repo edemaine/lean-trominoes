@@ -11880,10 +11880,12 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalCanonicalIncidenceDirectionBlockData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalCanonicalIncidenceDirectionBlockData.lean)
   names a total proof-oriented block selector from the established
   per-incidence existence theorem, proves it satisfies the complete stable-tag
-  lookup contract, and fixes the exact canonical compact source-token function
-  for the remaining route machine.  The use of choice only names the semantic
-  target: the outstanding compiler obligation still requires an explicit
-  polynomial-time emitter for that exact function.
+  lookup contract, and fixes a canonical semantic compact source-token target.
+  Clause-core incidences now use their explicit finite nine-set/RGB table;
+  choice remains only as a temporary variable-incidence fallback.  The
+  outstanding source machine may emit any polynomial-time compact stream with
+  the same interpreted raster requests; it need not reproduce the particular
+  block representation selected by choice.
 - [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean)
   and [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean)
   split each framed request into its retained raster prefix and role-tagged

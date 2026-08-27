@@ -62,14 +62,71 @@ theorem horizontalCanonicalIncidenceDirectionBlocks_correct
   exact horizontalCanonicalIncidenceDirectionBlock_directions
     source tag tagMember
 
+/-- Replace the choice-backed selector by the explicit finite clause table
+whenever stable triple lookup identifies a clause-core triple.  Choice now
+remains only in the variable-incidence branch. -/
+noncomputable def horizontalClauseExplicitIncidenceDirectionBlock
+    (source : PeriodicCNF Nat) (tag : IncidenceTag) :
+    HorizontalTypedIncidenceDirectionBlock :=
+  match horizontalAssembledRouteTriple?Computed (source, tag) with
+  | some (.clause _ set) => .clause (set, tag.color)
+  | _ => horizontalCanonicalIncidenceDirectionBlock source tag
+
+/-- The explicit clause branch denotes exactly the stored clause-core route. -/
+theorem horizontalClauseExplicitIncidenceDirectionBlock_directions_of_clause
+    (source : PeriodicCNF Nat) (tag : IncidenceTag)
+    (clauseIndex : Nat) (set : X3CClauseSet)
+    (lookup : horizontalAssembledRouteTriple?Computed (source, tag) =
+      some (.clause clauseIndex set)) :
+    (horizontalClauseExplicitIncidenceDirectionBlock
+        source tag).directions =
+      unitSubdivisionDirections
+        (horizontalAssembledRouteAtTagComputed (source, tag)) := by
+  rw [horizontalAssembledRouteAtTagComputed_eq_typedRoute
+    source tag _ lookup]
+  unfold horizontalClauseExplicitIncidenceDirectionBlock
+  rw [lookup]
+  simpa only [HorizontalTypedIncidenceDirectionBlock.directions,
+    horizontalTypedIncidenceRouteComputed] using
+    (unitSubdivisionDirections_horizontalClauseIncidenceRouteComputed
+      (((source, clauseIndex), set), tag.color)).symm
+
+/-- The mixed explicit/choice selector preserves the complete stable-tag
+lookup contract. -/
+theorem horizontalClauseExplicitIncidenceDirectionBlocks_correct
+    (source : PeriodicCNF Nat) :
+    HorizontalIncidenceDirectionBlocksCorrect source
+      (horizontalClauseExplicitIncidenceDirectionBlock source) := by
+  intro tag tagMember
+  cases lookup : horizontalAssembledRouteTriple?Computed (source, tag) with
+  | none =>
+      simpa [horizontalClauseExplicitIncidenceDirectionBlock, lookup] using
+        horizontalCanonicalIncidenceDirectionBlock_directions
+          source tag tagMember
+  | some triple =>
+      cases triple with
+      | ordinary atom slot variant localTriple =>
+          simpa [horizontalClauseExplicitIncidenceDirectionBlock, lookup] using
+            horizontalCanonicalIncidenceDirectionBlock_directions
+              source tag tagMember
+      | fixedRed atom slot localTriple =>
+          simpa [horizontalClauseExplicitIncidenceDirectionBlock, lookup] using
+            horizontalCanonicalIncidenceDirectionBlock_directions
+              source tag tagMember
+      | clause clauseIndex set =>
+          exact
+            horizontalClauseExplicitIncidenceDirectionBlock_directions_of_clause
+              source tag clauseIndex set lookup
+
 /-- Canonically ordered contracted edge blocks with no external lookup
-parameter. -/
+parameter.  Clause-core blocks are now selected by an explicit finite
+classifier; only variable incidences retain the temporary choice fallback. -/
 noncomputable def horizontalCanonicalContractedDirectionBlocks
     (source : PeriodicCNF Nat) :
     List DirectSparseCompactContractedEdgeBlock :=
   horizontalContractedDirectionBlocks
     (horizontalThreeDMProblemComputed source)
-    (horizontalCanonicalIncidenceDirectionBlock source)
+    (horizontalClauseExplicitIncidenceDirectionBlock source)
 
 /-- Exact proof-oriented compact source-token target for the remaining route
 emitter. -/
@@ -109,39 +166,10 @@ theorem directSparseCanonicalCompactContractedRouteSourceTokens_correct
   exact
     directSparseCompactContractedRouteEntries_mappedOutput_of_incidenceBlocks
       decider symbols
-      (horizontalCanonicalIncidenceDirectionBlock
+      (horizontalClauseExplicitIncidenceDirectionBlock
         (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
-      (horizontalCanonicalIncidenceDirectionBlocks_correct
+      (horizontalClauseExplicitIncidenceDirectionBlocks_correct
         (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
-
-variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
-variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
-
-noncomputable local instance
-    horizontalCanonicalIncidenceDirectionBlockStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
-
-/-- Concrete machine obligation left by the canonical semantic source
-target. -/
-abbrev DirectSparseCanonicalCompactContractedRouteSourceTokenCompiler :=
-  TM2ComputableInPolyTime id id
-    (directSparseCanonicalCompactContractedRouteSourceTokens decider)
-
-/-- An implementation of the canonical target supplies the abstract compact
-source interface used by all downstream route machinery. -/
-noncomputable def directSparseCompactContractedRouteRasterSourceCompilerOfCanonical
-    (compiler :
-      DirectSparseCanonicalCompactContractedRouteSourceTokenCompiler
-        decider) :
-    DirectSparseCompactContractedRouteRasterSourceCompiler decider where
-  sourceTokens :=
-    directSparseCanonicalCompactContractedRouteSourceTokens decider
-  computableInPolyTime := compiler
-  correct :=
-    directSparseCanonicalCompactContractedRouteSourceTokens_correct decider
 
 end PeriodicCNFStripReduction
 end LeanTrominoes
