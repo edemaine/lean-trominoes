@@ -2161,6 +2161,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Keep clause profiles in presentation order, stably sort
                   tail rows clockwise, and identify every successful query
                   block with its exact semantic Figure 9 clause record.
+                - [x] Lift the exact clause theorem to arbitrary indexed
+                  direct-clause families while preserving global order.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
