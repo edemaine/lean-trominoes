@@ -63,24 +63,45 @@ structure RouteDirectionConditions (input : Input)
         (trimmedMagnifiedRoute (normalizationRoute2 input edge))
         (normalizationTemplateAt (normalizationTarget2 input edge)
           (finalNormalizationTemplate input (.target edge))).reverse).head?
-  firstSourceTemplateUnitSteps :
-    (firstNormalizationTemplate input (.source edge)).IsChain
-      AxisDirection.IsUnitAxisStep
-  firstTargetTemplateReverseUnitSteps :
-    (firstNormalizationTemplate input (.target edge)).reverse.IsChain
-      AxisDirection.IsUnitAxisStep
-  secondSourceTemplateUnitSteps :
-    (secondNormalizationTemplate input (.source edge)).IsChain
-      AxisDirection.IsUnitAxisStep
-  secondTargetTemplateReverseUnitSteps :
-    (secondNormalizationTemplate input (.target edge)).reverse.IsChain
-      AxisDirection.IsUnitAxisStep
-  finalSourceTemplateUnitSteps :
-    (finalNormalizationTemplate input (.source edge)).IsChain
-      AxisDirection.IsUnitAxisStep
-  finalTargetTemplateReverseUnitSteps :
-    (finalNormalizationTemplate input (.target edge)).reverse.IsChain
-      AxisDirection.IsUnitAxisStep
+
+/-- Reversing a unit-direction template preserves its unit-step chain. -/
+private theorem reverse_unitSteps {points : List Cell}
+    (unitSteps : points.IsChain AxisDirection.IsUnitAxisStep) :
+    points.reverse.IsChain AxisDirection.IsUnitAxisStep := by
+  rw [List.isChain_reverse]
+  exact unitSteps.imp fun _ _ step => step.symm
+
+/-- Every first-round endpoint template is a unit-step chain. -/
+private theorem firstNormalizationTemplate_unitSteps
+    (input : Input) (endpoint : ContractedEndpoint) :
+    (firstNormalizationTemplate input endpoint).IsChain
+      AxisDirection.IsUnitAxisStep := by
+  exact DegreeThreeVertexNormalization.route_unitSteps
+    (omittedSideAt input endpoint.vertex)
+    (firstNormalizedPort input endpoint)
+
+/-- Every cyclic endpoint template is a unit-step chain. -/
+private theorem rotationNormalizationTemplate_unitSteps
+    (active : Bool) (port : CanonicalVertexPort) :
+    (rotationRoundPortAndRoute active port).2.IsChain
+      AxisDirection.IsUnitAxisStep := by
+  cases active <;> cases port <;> native_decide
+
+private theorem secondNormalizationTemplate_unitSteps
+    (input : Input) (endpoint : ContractedEndpoint) :
+    (secondNormalizationTemplate input endpoint).IsChain
+      AxisDirection.IsUnitAxisStep := by
+  exact rotationNormalizationTemplate_unitSteps
+    (firstRotationActive input endpoint.vertex)
+    (firstNormalizedPort input endpoint)
+
+private theorem finalNormalizationTemplate_unitSteps
+    (input : Input) (endpoint : ContractedEndpoint) :
+    (finalNormalizationTemplate input endpoint).IsChain
+      AxisDirection.IsUnitAxisStep := by
+  exact rotationNormalizationTemplate_unitSteps
+    (secondRotationActive input endpoint.vertex)
+    (secondNormalizedPort input endpoint)
 
 /-- Proof-free finite direction word for one executable final route. -/
 def finalNormalizationRouteDirections
@@ -163,12 +184,15 @@ theorem map_step_finalNormalizationRouteDirections
   rw [finalNormalizationRouteDirections]
   rw [map_step_threeRoundNormalizationDirections
     _ _ _ _ _ _ _
-    conditions.firstSourceTemplateUnitSteps
-    conditions.firstTargetTemplateReverseUnitSteps
-    conditions.secondSourceTemplateUnitSteps
-    conditions.secondTargetTemplateReverseUnitSteps
-    conditions.finalSourceTemplateUnitSteps
-    conditions.finalTargetTemplateReverseUnitSteps]
+    (firstNormalizationTemplate_unitSteps input (.source edge))
+    (reverse_unitSteps
+      (firstNormalizationTemplate_unitSteps input (.target edge)))
+    (secondNormalizationTemplate_unitSteps input (.source edge))
+    (reverse_unitSteps
+      (secondNormalizationTemplate_unitSteps input (.target edge)))
+    (finalNormalizationTemplate_unitSteps input (.source edge))
+    (reverse_unitSteps
+      (finalNormalizationTemplate_unitSteps input (.target edge)))]
   exact (finalNormalizationRouteOffsets_eq_threeRound
     input edge conditions).symm
 
