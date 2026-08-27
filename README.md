@@ -11562,6 +11562,10 @@ The representation choices for this target are:
   `k` times.  This lets the remaining Theorem 5.2 route emitter compile the
   retained construction's several fixed refinement layers without rebuilding
   scaled route coordinates.
+- [`LeanTrominoes/GadgetSparseRouteDirectionNormalization.lean`](LeanTrominoes/GadgetSparseRouteDirectionNormalization.lean)
+  proves that ordered unit subdivision preserves the complete direction word,
+  and therefore that loop-erasing normalization is direction-invisible on the
+  simple orthogonal routes used by the retained construction.
 
 ## Build
 
