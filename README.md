@@ -11609,6 +11609,9 @@ The representation choices for this target are:
   makes the finite prefix executable: a fixed block transducer emits the
   loop-erased extended-connector direction word from finite fan/slot metadata,
   and a translation-invariance theorem connects it to every clause gauge.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineFarTailDirectionData.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineFarTailDirectionData.lean)
+  collapses the four inherited-tail transformations to one stream operation:
+  repeat every direction of the original source tail exactly `144` times.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
