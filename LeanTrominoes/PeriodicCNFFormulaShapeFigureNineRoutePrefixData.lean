@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFClauseProfilePolarityRouteOperationData
 import LeanTrominoes.PeriodicCNFFormulaShapeDirectionOrderingData
+import LeanTrominoes.PeriodicCNFFormulaShapeDirectionOrderingFormulaData
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionCompiler
 
 /-! # Finite Figure 9 route-prefix descriptors from directed profiles -/
@@ -24,6 +25,29 @@ def clauseProfile : DirectedClauseProfile → ClauseProfile
   | .unary first _ => .unary first
   | .binary first _ second _ => .binary first second
   | .ternary first _ second _ third _ => .ternary first second third
+
+/-- Repackage the stable clockwise sort while retaining each literal's
+paired source-route direction.  The width-three constructors make the total
+`ofList` fallback unreachable. -/
+def orderedDirectedProfile (profile : DirectedClauseProfile) :
+    DirectedClauseProfile :=
+  DirectedClauseProfile.ofList
+    (profile.taggedLiterals.insertionSort directionLE)
+
+/-- The repackaging retains the complete sorted literal/direction list. -/
+@[simp] theorem taggedLiterals_orderedDirectedProfile :
+    ∀ profile : DirectedClauseProfile,
+      (orderedDirectedProfile profile).taggedLiterals =
+        profile.taggedLiterals.insertionSort directionLE := by
+  native_decide
+
+/-- Forgetting the directions after the paired sort is exactly the existing
+clockwise ordered literal profile. -/
+@[simp] theorem clauseProfile_orderedDirectedProfile :
+    ∀ profile : DirectedClauseProfile,
+      clauseProfile (orderedDirectedProfile profile) =
+        profile.orderedProfile := by
+  native_decide
 
 /-- Reconstruct the finite composed exit-fan lookup from a directed clause
 profile.  Inactive slots use the harmless `invalid` fallback. -/
@@ -94,10 +118,11 @@ def clauseDescriptors (profile : DirectedClauseProfile) :
         (clauseProfile profile)).incidences.length := by
   simp [clauseDescriptors]
 
-/-- Figure 9 ignores distinct-variable markers and expands every source
-clause descriptor to its complete finite incidence-prefix block. -/
+/-- Figure 9 ignores distinct-variable markers, first applies the semantic
+clockwise clause permutation, and then expands the clause to its complete
+finite incidence-prefix block. -/
 def tokenBlock : FormulaShapeDirectionOrdering.Token → List Descriptor
-  | .clause profile => clauseDescriptors profile
+  | .clause profile => clauseDescriptors (orderedDirectedProfile profile)
   | .variable => []
 
 /-- Complete finite prefix stream for a direction-aware formula shape. -/

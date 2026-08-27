@@ -11933,9 +11933,11 @@ The representation choices for this target are:
   expand each finite directed source-clause profile into every Figure 9
   incidence in presentation order.  Auxiliary incidences carry complete
   local queries; the three genuine source roles carry their finite extended
-  query and stable source slot.  The reconstructed clause profile and every
-  active extended connector are proved equal to their semantic counterparts,
-  leaving only the matching source-tail words.
+  query and stable source slot.  The incoming literal/direction pairs are
+  first put in the same stable clockwise order as the semantic source clause.
+  The reconstructed clause profile and every active extended connector are
+  proved equal to their semantic counterparts, leaving only the matching
+  source-tail words.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderData.lean)
   and [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderCompiler.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderCompiler.lean)
   combine those prefixes with the exact per-clause polarity schedule.  Each
