@@ -2238,6 +2238,8 @@ build; an imported proof counts when its statement matches the paper.
                   prefix and prove that any polynomial-time emitter satisfying
                   this source interface supplies the canonical compact
                   raster-request compiler.
+                - [x] Extend same-input compiler forks to arbitrary finite
+                  source alphabets, including the empty-alphabet case.
                 - [x] Package one compact routed edge with its metadata and
                   six finite header fields, and prove the framed pipeline
                   emits its exact canonical raster-request block.
