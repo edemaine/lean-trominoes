@@ -2095,6 +2095,9 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Prove clause-anchor translation, deduplication, and stable
               representative selection preserve every fallback source
               route's complete raw metadata direction word.
+            - [x] Identify all four retained carrier-lens route direction
+              words as explicit finite/unary tables parameterized only by
+              axis and carrier span.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
