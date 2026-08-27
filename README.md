@@ -2175,6 +2175,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Identify each retained angular occurrence fiber with
                   stable lower-rank sorting by that numeric key, preserving
                   presentation order across radial ties.
+                - [x] Identify every genuine angular occurrence's list index
+                  with its stable numeric terminal rank.
                 - [x] Lift semantic slot attachment to indexed direct-clause
                   families and expose composition from any exact slot-input
                   producer through complete Figure 9 record emission.

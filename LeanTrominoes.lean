@@ -2774,6 +2774,7 @@ import LeanTrominoes.RetainedAngularFanDirectClauseRouteTailRecordSlotAttachment
 import LeanTrominoes.RetainedAngularFanDirectClauseRouteTailRecordSlotSemantics
 import LeanTrominoes.RetainedAngularOccurrenceTerminalCoordinate
 import LeanTrominoes.RetainedAngularOccurrenceStableSort
+import LeanTrominoes.RetainedAngularOccurrenceStableRank
 
 /-!
 # LeanTrominoes
