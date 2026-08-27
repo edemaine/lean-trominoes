@@ -11942,6 +11942,11 @@ The representation choices for this target are:
   final routed incidence now has an explicit finite polarity operation and
   selected Figure 9 prefix; the projection theorem recovers the complete
   polarity descriptor stream in order.
+- [`LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteHeaderData.lean`](LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteHeaderData.lean)
+  and [`LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteHeaderCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectFigureNinePolarityRouteHeaderCompiler.lean)
+  compose this finite expansion with the established concrete retained
+  descriptor compiler.  Thus the original PSPACE-source symbol stream now
+  compiles directly to every final routed-incidence header.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge
