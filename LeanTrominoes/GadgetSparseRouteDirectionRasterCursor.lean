@@ -29,27 +29,21 @@ def routingCellTypeFromForwardDirections
     (PeriodicThreeDM.Side.ofAxisDirection outgoing)
     color
 
-/-- Two genuine forward steps determine the same routing cell as their three
-geometric lattice points. -/
+/-- Two forward steps determine the same total routing-cell classification
+as their three geometric lattice points, including the invalid fallback. -/
 theorem routingCellTypeAt_add_steps
-    (before : Cell) {incoming outgoing : AxisDirection}
-    (incomingGenuine : incoming.IsGenuine)
-    (outgoingGenuine : outgoing.IsGenuine) (color : WireColor) :
+    (before : Cell) (incoming outgoing : AxisDirection)
+    (color : WireColor) :
     PeriodicThreeDM.routingCellTypeAt before
         (Cell.add before incoming.step)
         (Cell.add (Cell.add before incoming.step) outgoing.step)
         color =
       routingCellTypeFromForwardDirections incoming outgoing color := by
-  have forwardGenuine :
-      (AxisDirection.between before
-        (Cell.add before incoming.step)).IsGenuine := by
-    rw [AxisDirection.between_add_step before incomingGenuine]
-    exact incomingGenuine
-  unfold PeriodicThreeDM.routingCellTypeAt
-    routingCellTypeFromForwardDirections
-  rw [AxisDirection.between_reverse_eq_opposite forwardGenuine]
-  rw [AxisDirection.between_add_step before incomingGenuine]
-  rw [AxisDirection.between_add_step _ outgoingGenuine]
+  rcases before with ⟨horizontal, vertical⟩
+  cases incoming <;> cases outgoing <;>
+    simp [PeriodicThreeDM.routingCellTypeAt,
+      routingCellTypeFromForwardDirections, AxisDirection.between,
+      AxisDirection.step, AxisDirection.opposite, Cell.add]
 
 /-- Emit canonical sparse assignment records while retaining only the
 already-rasterized predecessor location. -/
@@ -71,8 +65,7 @@ termination_by directions => directions.length
 exactly the records of the geometric direction cursor. -/
 theorem sparseRouteRecordBlocksFromRasterDirections_eq
     (period : Nat) (color : WireColor) (before : Cell)
-    (directions : List AxisDirection)
-    (genuine : directions.Forall AxisDirection.IsGenuine) :
+    (directions : List AxisDirection) :
     sparseRouteRecordBlocksFromRasterDirections period color
         (PeriodicThreeDM.stripRasterLocation period before) directions =
       sparseRouteRecordBlocksFromDirections period color before
@@ -87,15 +80,6 @@ theorem sparseRouteRecordBlocksFromRasterDirections_eq
         sparseRouteRecordBlocksFromDirections,
         sparseRouteTriplesFromDirections]
   | cons_cons incoming outgoing directions _ induction =>
-      have incomingGenuine : incoming.IsGenuine := by
-        exact genuine.1
-      have remainingGenuine :
-          (outgoing :: directions).Forall AxisDirection.IsGenuine := by
-        exact genuine.2
-      have outgoingGenuine : outgoing.IsGenuine := by
-        have remaining := remainingGenuine
-        rw [List.forall_cons] at remaining
-        exact remaining.1
       simp only [sparseRouteRecordBlocksFromRasterDirections,
         sparseRouteRecordBlocksFromDirections,
         sparseRouteTriplesFromDirections, List.flatMap_cons]
@@ -108,10 +92,8 @@ theorem sparseRouteRecordBlocksFromRasterDirections_eq
           period before incoming).symm
       rw [currentLocation]
       unfold sparseRouteTripleRecordBlock sparseRouteTripleAssignment
-      rw [routingCellTypeAt_add_steps before incomingGenuine
-        outgoingGenuine color]
-      rw [induction outgoing (Cell.add before incoming.step)
-        remainingGenuine]
+      rw [routingCellTypeAt_add_steps before incoming outgoing color]
+      rw [induction outgoing (Cell.add before incoming.step)]
       rfl
 
 end PeriodicCNFStripReduction
