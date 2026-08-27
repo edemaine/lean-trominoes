@@ -2144,6 +2144,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose both doubled-reversed selectors with the direct
                   PSPACE source tagger, yielding exact delimited and
                   undelimited transformed raw-route compilers.
+                - [x] Compile a finite Figure 9 local query plus optional
+                  dynamic source tail through all four polarity operations,
+                  horizontal doubling, and reversal to the exact routed
+                  occurrence source-direction word.
                 - [x] Package variable-site prefixes, clause-core routes, and
                   both occurrence endpoint stubs as finite direction queries,
                   and compile delimited or undelimited query streams by fixed
@@ -11732,6 +11736,12 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceSourceRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceSourceRouteDirectionBlock.lean)
   transports each compact stored route through factor-two padding, reversal,
   rebasing, and unit subdivision into the variable-to-clause source word.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteDirectionRequestData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteDirectionRequestData.lean)
+  and [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteDirectionRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteDirectionRequestCompiler.lean)
+  encode a finite Figure 9 query, optional inherited source-tail directions,
+  and one of four polarity operations.  Fixed expansion and polarity scans,
+  factor-two repetition, and dynamic reversal emit the exact horizontal
+  occurrence source word.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceRibbonCorridorDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceRibbonCorridorDirectionBlock.lean)
   expands that compact source word through the adjacent-direction macrocell
   table on the occurrence's computed physical ribbon lane.
