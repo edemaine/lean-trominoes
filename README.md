@@ -11938,6 +11938,11 @@ The representation choices for this target are:
   The reconstructed clause profile and every active extended connector are
   proved equal to their semantic counterparts, leaving only the matching
   source-tail words.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceTailData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceTailData.lean)
+  pairs each source literal's finite profile and first direction with the
+  dynamic route word after its clause-side point.  Sorting these records by
+  the same finite clockwise key is proved to recover the established
+  descriptor order while preserving exactly one tail per source literal.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderData.lean)
   and [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderCompiler.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderCompiler.lean)
   combine those prefixes with the exact per-clause polarity schedule.  Each
