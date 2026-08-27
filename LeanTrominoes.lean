@@ -2781,6 +2781,7 @@ import LeanTrominoes.RetainedAngularFanFinalCoordinatedOccurrenceStableRank
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedOccurrenceStableRankSemantics
 import LeanTrominoes.RetainedAngularFanDirectClauseOccurrenceSlotStableRankSemantics
 import LeanTrominoes.ListFilterTakeIdxOf
+import LeanTrominoes.RetainedAngularOccurrenceGlobalStableRank
 
 /-!
 # LeanTrominoes

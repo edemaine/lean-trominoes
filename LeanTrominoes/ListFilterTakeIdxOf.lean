@@ -12,7 +12,7 @@ namespace List
 /-- Taking a filtered list before a selected member gives exactly the
 selected values before that member in the original presentation. -/
 theorem take_idxOf_filter_eq_filter_take_idxOf
-    {Value : Type*} [DecidableEq Value]
+    {Value : Type*} [DecidableEq Value] [BEq Value] [LawfulBEq Value]
     (selected : Value → Bool) (values : List Value) (target : Value)
     (targetMember : target ∈ values)
     (targetSelected : selected target = true) :
