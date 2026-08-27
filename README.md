@@ -11632,6 +11632,10 @@ The representation choices for this target are:
   proves that translating a selected local template and its extended
   connector into a common clause gauge leaves their normalized finite block
   unchanged.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineFinitePrefixDirectionBlock.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineFinitePrefixDirectionBlock.lean)
+  identifies every actual retained inherited route prefix with the finite
+  block selected by its canonical clause profile, template incidence, fan,
+  and slot.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalFarTailSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalFarTailSeparation.lean)
   proves that a retained normalized local route avoids its own factor-`144`
   inherited far tail, even when its endpoint is the near connector's splice
