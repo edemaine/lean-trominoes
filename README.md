@@ -2106,6 +2106,8 @@ build; an imported proof counts when its statement matches the paper.
                 route-delimited carrier-lens direction words.
               - [x] Fold the axis into a parity tag on one sparse span stream,
                 preserving the original global retained-pair order.
+              - [x] Decode the parity tag into the correctly oriented exact
+                four-route block, with zero fields still suppressed.
             - [x] Identify every retained bend route's complete direction
               word with its fixed finite corner-table entry.
             - [x] Select, delimit, and compile the exact complete base-bend
