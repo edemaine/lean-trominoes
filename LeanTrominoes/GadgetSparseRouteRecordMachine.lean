@@ -59,6 +59,12 @@ inductive Label
   | restoreVertical (color : WireColor)
       (incoming outgoing : AxisDirection)
   | reverseOutput
+  | clearInput
+  | clearHorizontal
+  | clearHorizontalComplement
+  | clearVerticalPositive
+  | clearVerticalNegative
+  | clearScratch
   deriving Fintype
 
 /-- A transition temporarily retains an input token, unary unit, or output
@@ -256,9 +262,39 @@ def program : Label → TM2.Stmt Alphabet Label State
   | .reverseOutput =>
       .pop .outputReverse loadOutput
         (.branch Option.isNone
-          .halt
+          (.goto fun _ => .clearInput)
           (.push .output outputFromState
             (clearGoto .reverseOutput)))
+  | .clearInput =>
+      .pop .input loadInput
+        (.branch Option.isNone
+          (.goto fun _ => .clearHorizontal)
+          (clearGoto .clearInput))
+  | .clearHorizontal =>
+      .pop .horizontal loadUnit
+        (.branch Option.isNone
+          (.goto fun _ => .clearHorizontalComplement)
+          (clearGoto .clearHorizontal))
+  | .clearHorizontalComplement =>
+      .pop .horizontalComplement loadUnit
+        (.branch Option.isNone
+          (.goto fun _ => .clearVerticalPositive)
+          (clearGoto .clearHorizontalComplement))
+  | .clearVerticalPositive =>
+      .pop .verticalPositive loadUnit
+        (.branch Option.isNone
+          (.goto fun _ => .clearVerticalNegative)
+          (clearGoto .clearVerticalPositive))
+  | .clearVerticalNegative =>
+      .pop .verticalNegative loadUnit
+        (.branch Option.isNone
+          (.goto fun _ => .clearScratch)
+          (clearGoto .clearVerticalNegative))
+  | .clearScratch =>
+      .pop .scratch loadUnit
+        (.branch Option.isNone
+          .halt
+          (clearGoto .clearScratch))
 
 abbrev machine : FinTM2 where
   K := Stack
@@ -332,6 +368,16 @@ def restoreVerticalCfg (color : WireColor)
     (incoming outgoing : AxisDirection) (data : TapeData) :=
   labelCfg (.restoreVertical color incoming outgoing) data
 def reverseOutputCfg (data : TapeData) := labelCfg .reverseOutput data
+def clearInputCfg (state : State) (data : TapeData) :=
+  cfg .clearInput state data
+def clearHorizontalCfg (data : TapeData) := labelCfg .clearHorizontal data
+def clearHorizontalComplementCfg (data : TapeData) :=
+  labelCfg .clearHorizontalComplement data
+def clearVerticalPositiveCfg (data : TapeData) :=
+  labelCfg .clearVerticalPositive data
+def clearVerticalNegativeCfg (data : TapeData) :=
+  labelCfg .clearVerticalNegative data
+def clearScratchCfg (data : TapeData) := labelCfg .clearScratch data
 
 def haltCfg (data : TapeData) : TM2.Cfg Alphabet Label State :=
   ⟨none, none, tapes data⟩

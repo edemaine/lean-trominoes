@@ -137,12 +137,12 @@ theorem step_restoreVertical_cons (data : TapeData)
 theorem step_reverseOutput_nil (state : State) (data : TapeData)
     (reverseEq : data.outputReverse = []) :
     TM2.step program (cfg .reverseOutput state data) =
-      some (haltCfg { data with outputReverse := [] }) := by
+      some (clearInputCfg none { data with outputReverse := [] }) := by
   rcases data with ⟨input, horizontal, complement, positive, negative,
     scratch, outputReverse, output⟩
   change outputReverse = [] at reverseEq
   subst outputReverse
-  simp [TM2.step, program, haltCfg, cfg, tapes, loadOutput]
+  simp [TM2.step, program, clearInputCfg, cfg, tapes, loadOutput]
 
 theorem step_reverseOutput_cons (state : State) (data : TapeData)
     (token : OutputToken) (tail : List OutputToken)

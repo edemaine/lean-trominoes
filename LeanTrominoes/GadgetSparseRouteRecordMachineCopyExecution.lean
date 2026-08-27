@@ -377,7 +377,7 @@ def reverseOutput_evalsInTime (state : State)
     (outputReverseEq : data.outputReverse = word) :
     EvalsToInTime (TM2.step program)
       (cfg .reverseOutput state data)
-      (some (haltCfg
+      (some (clearInputCfg none
         { data with
           outputReverse := []
           output := word.reverse ++ data.output }))
@@ -398,7 +398,7 @@ def reverseOutput_evalsInTime (state : State)
       have composed := EvalsToInTime.trans (TM2.step program)
         1 (word.length + 1)
         (cfg .reverseOutput state data) (reverseOutputCfg nextData)
-        (some (haltCfg
+        (some (clearInputCfg none
           { nextData with
             outputReverse := []
             output := word.reverse ++ nextData.output })) first
