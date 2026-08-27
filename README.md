@@ -10672,6 +10672,23 @@ The representation choices for this target are:
   connect the finite stream to the executable final route: its step map is the
   exact offset word, its start is the affine normalized source vertex, and the
   direction cursor emits the canonical edge-major local-triple records.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequests.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequests.lean),
+  [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestRoundCompiler.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestRoundCompiler.lean),
+  and [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestThreeRoundCompiler.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestThreeRoundCompiler.lean)
+  package each route as six finite endpoint-template choices followed by its
+  initial unit directions.  Fixed finite-state passes expand, trim, and wrap
+  that word through all three normalization rounds, producing the exact final
+  direction stream in polynomial time.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestBatch.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestBatch.lean),
+  [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestBatchInnerCompiler.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestBatchInnerCompiler.lean),
+  and [`LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestBatchCompiler.lean`](LeanTrominoes/PeriodicThreeDMNormalizationDirectionRequestBatchCompiler.lean)
+  delimit those requests and lift the one-route transducer over a complete
+  batch, retaining exactly one route boundary after every normalized word.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestData.lean)
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteDirectionRequestCompiler.lean)
+  specialize the batch to the direct source's contracted edges.  Only the
+  compact source-side request emitter remains before the concrete batch
+  normalizer supplies every final route direction and delimiter.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean)
   expands all three vertex-normalization rounds to the exact affine formula
   `1728 · p + (471, 471)`.  Each vertex block is thereby reduced to its
