@@ -2086,6 +2086,12 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Reduce the retained canonical route appender directly to
                 that exact offset-cursor target through an opaque machine
                 boundary.
+              - [x] Characterize unit subdivision as segment-major repeated
+                cardinal-step blocks, including exact affine scaling and
+                translation laws.
+              - [x] Factor each normalization round into fixed template
+                offset words around a trimmed factor-12 block expansion, with
+                exact endpoint-splice semantics.
               - [x] Reuse the retained-planar variable-marker compiler for
                 the finite Figure 9 source-marker suffix.
               - [x] Compile the finite normalized copied-clause descriptor
