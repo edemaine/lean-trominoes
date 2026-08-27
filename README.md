@@ -11575,8 +11575,9 @@ The representation choices for this target are:
   applies those stream laws to the actual final polarity subdivision.
   Compatible incidences emit the full threefold-expanded source word,
   incompatible incidences emit its first direction, and original-variable
-  complement incidences emit the word after its first two directions; all
-  route translations vanish from these equalities.
+  complement incidences emit the word after its first two directions.  The
+  fresh-variable complement traverses the second direction backward, and the
+  final variable-gauge translation vanishes from every output direction word.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge

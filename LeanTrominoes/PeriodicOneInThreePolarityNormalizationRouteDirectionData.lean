@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.GadgetSparseRouteDirectionScalingCompiler
+import LeanTrominoes.GadgetSparseRouteDirectionReversal
 import LeanTrominoes.GadgetSparseRouteDirectionSlices
 import LeanTrominoes.GadgetSparseRouteUnitSubdivisionDirectionTranslation
 import LeanTrominoes.PeriodicOneInThreePolarityNormalizationRouteSubdivision
@@ -79,6 +80,40 @@ theorem refinedRoute_drop_two_directionWord
   · exact congrArg (List.drop 2)
       (refinedRoute_directionWord routes clauseIndex literalIndex orthogonal)
   · exact refinedRoute_unitSteps routes clauseIndex literalIndex orthogonal
+
+/-- Points two and one of a unit route traverse its second direction
+backward. -/
+theorem unitSubdivisionDirections_reverse_middle
+    (route : List Cell) (fallback : Cell)
+    (length : 3 ≤ route.length)
+    (unitSteps : route.IsChain AxisDirection.IsUnitAxisStep) :
+    unitSubdivisionDirections
+        [route.getD 2 fallback, route.getD 1 fallback] =
+      reverseDirections
+        ((unitSubdivisionDirections route).drop 1 |>.take 1) := by
+  cases route with
+  | nil => simp at length
+  | cons first rest =>
+      cases rest with
+      | nil => simp at length
+      | cons second rest =>
+          cases rest with
+          | nil => simp at length
+          | cons third tail =>
+              have firstUnit :
+                  AxisDirection.IsUnitAxisStep first second :=
+                (List.isChain_cons_cons.mp unitSteps).1
+              have secondUnit :
+                  AxisDirection.IsUnitAxisStep second third :=
+                (List.isChain_cons_cons.mp
+                  (List.isChain_cons_cons.mp unitSteps).2).1
+              have secondGenuine :=
+                AxisDirection.between_isGenuine_of_unitAxisStep secondUnit
+              simp [unitSubdivisionDirections, reverseDirections,
+                segmentLength_comm,
+                segmentLength_eq_one_of_unitAxisStep firstUnit,
+                segmentLength_eq_one_of_unitAxisStep secondUnit,
+                AxisDirection.between_reverse_eq_opposite secondGenuine]
 
 /-- A compatible main incidence emits the complete expanded source word. -/
 theorem rawRouteForMetadata_normalized_compatible_directionWord
@@ -162,6 +197,79 @@ theorem rawRouteForMetadata_complement_original_directionWord
   rw [rawRouteForMetadata_complement_original _ _ _ _ _ originEq]
   rw [unitSubdivisionDirections_translatePolyline]
   exact refinedRoute_drop_two_directionWord _ _ _ orthogonal
+
+/-- The fresh-variable complement incidence traverses the second expanded
+source direction backward. -/
+theorem rawRouteForMetadata_complement_fresh_directionWord
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    (metadata :
+      PeriodicOneInThreePolarityNormalizationPositioned.ClauseMetadata
+        Variable)
+    (sourceLiteral : PeriodicLiteral Variable)
+    (sourceLiteralIndex : Nat)
+    (originEq :
+      metadata.origin = .complement sourceLiteralIndex sourceLiteral)
+    (sourceLength : 2 ≤
+      (sourceRoutes metadata.sourceClauseIndex sourceLiteralIndex).length)
+    (orthogonal : OrthogonalPolyline
+      (sourceRoutes metadata.sourceClauseIndex sourceLiteralIndex)) :
+    unitSubdivisionDirections
+        (rawRouteForMetadata sourcePlacement sourceRoutes metadata 0) =
+      reverseDirections
+        (((repeatDirections refinementFactor
+          (unitSubdivisionDirections
+            (sourceRoutes metadata.sourceClauseIndex
+              sourceLiteralIndex))).drop 1).take 1) := by
+  rw [rawRouteForMetadata_complement_fresh _ _ _ _ _ originEq]
+  rw [unitSubdivisionDirections_translatePolyline]
+  unfold routePoint
+  let route := refinedRoute sourceRoutes
+    metadata.sourceClauseIndex sourceLiteralIndex
+  have routeLength : 3 ≤ route.length := by
+    have atLeastFour := refinedRoute_length_ge_four sourceRoutes
+      metadata.sourceClauseIndex sourceLiteralIndex sourceLength orthogonal
+    have atLeastThree : 3 ≤
+        (refinedRoute sourceRoutes metadata.sourceClauseIndex
+          sourceLiteralIndex).length := by
+      omega
+    simpa [route] using atLeastThree
+  have routeUnitSteps :
+      route.IsChain AxisDirection.IsUnitAxisStep :=
+    refinedRoute_unitSteps sourceRoutes metadata.sourceClauseIndex
+      sourceLiteralIndex orthogonal
+  rw [unitSubdivisionDirections_reverse_middle
+    route (0, 0) routeLength routeUnitSteps]
+  rw [show unitSubdivisionDirections route =
+      repeatDirections refinementFactor
+        (unitSubdivisionDirections
+          (sourceRoutes metadata.sourceClauseIndex sourceLiteralIndex)) by
+    exact refinedRoute_directionWord sourceRoutes
+      metadata.sourceClauseIndex sourceLiteralIndex orthogonal]
+
+/-- The final fresh-variable gauge is a common route translation and hence
+disappears from every genuine output incidence's direction word. -/
+theorem incidenceRoutes_directionWord_of_raw_clause_mem
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    {rawClause :
+      PositionedPeriodicClause (PolarityNormalizedVariable Variable)}
+    {clauseIndex literalIndex : Nat}
+    (clauseMember :
+      (rawClause, clauseIndex) ∈
+        (rawFormula source sourcePlacement sourceRoutes).clauses.zipIdx) :
+    unitSubdivisionDirections
+        (incidenceRoutes source sourcePlacement sourceRoutes
+          clauseIndex literalIndex) =
+      unitSubdivisionDirections
+        (rawIncidenceRoutes source sourcePlacement sourceRoutes
+          clauseIndex literalIndex) := by
+  rw [incidenceRoutes_of_raw_clause_mem source sourcePlacement sourceRoutes
+    clauseMember]
+  exact unitSubdivisionDirections_translatePolyline _ _
 
 end PeriodicOneInThreePolarityNormalizationRouteSubdivision
 end LeanTrominoes
