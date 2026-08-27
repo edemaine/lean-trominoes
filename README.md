@@ -2195,6 +2195,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Feed the two flat comparison squares through the
                   existing square reshaper, row counters, prefix counters,
                   and unary adder, proving exact stable-rank output.
+                - [x] Prove a generic polynomial-time compiler boundary from
+                  any two exact comparison-square producers to the semantic
+                  global stable-rank stream.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
