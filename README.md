@@ -11583,6 +11583,10 @@ The representation choices for this target are:
   every direction by its opposite.  This covers both the reversed middle edge
   of polarity normalization and the reversed second incidence of every
   contracted through-edge.
+- [`LeanTrominoes/PositionedPeriodicCNFVariableGaugeDirectionData.lean`](LeanTrominoes/PositionedPeriodicCNFVariableGaugeDirectionData.lean)
+  removes canonical variable gauges from valid incidence direction words.
+  The final polarity layer now uses this general translation-invariance
+  theorem, and the preceding fixed-eight gauge can use the same boundary.
 
 ## Build
 

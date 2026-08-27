@@ -8,6 +8,7 @@ import LeanTrominoes.GadgetSparseRouteDirectionReversal
 import LeanTrominoes.GadgetSparseRouteDirectionSlices
 import LeanTrominoes.GadgetSparseRouteUnitSubdivisionDirectionTranslation
 import LeanTrominoes.PeriodicOneInThreePolarityNormalizationRouteSubdivision
+import LeanTrominoes.PositionedPeriodicCNFVariableGaugeDirectionData
 
 /-! # Direction data for polarity-normalized route subdivision -/
 
@@ -267,9 +268,11 @@ theorem incidenceRoutes_directionWord_of_raw_clause_mem
       unitSubdivisionDirections
         (rawIncidenceRoutes source sourcePlacement sourceRoutes
           clauseIndex literalIndex) := by
-  rw [incidenceRoutes_of_raw_clause_mem source sourcePlacement sourceRoutes
-    clauseMember]
-  exact unitSubdivisionDirections_translatePolyline _ _
+  exact
+    PositionedPeriodicCNF.unitSubdivisionDirections_variableGaugeCanonicalIncidenceRoutes_of_clause_mem
+      (rawFormula source sourcePlacement sourceRoutes)
+      (rawPlacement sourcePlacement sourceRoutes) freshGauge
+      (rawIncidenceRoutes source sourcePlacement sourceRoutes) clauseMember
 
 end PeriodicOneInThreePolarityNormalizationRouteSubdivision
 end LeanTrominoes
