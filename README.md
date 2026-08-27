@@ -11923,6 +11923,11 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteDirectionBlock.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteDirectionBlock.lean)
   packages all four polarity route cases as fixed repeat, prefix, suffix, and
   reversed-middle operations on an arbitrary compact source direction block.
+- [`LeanTrominoes/PeriodicCNFClauseProfilePolarityRouteOperationData.lean`](LeanTrominoes/PeriodicCNFClauseProfilePolarityRouteOperationData.lean)
+  and [`LeanTrominoes/PeriodicCNFClauseProfilePolarityRouteOperationCompiler.lean`](LeanTrominoes/PeriodicCNFClauseProfilePolarityRouteOperationCompiler.lean)
+  give the explicit finite source-slot/operation schedule for every
+  polarity-normalized clause profile.  The schedule has exactly one route
+  descriptor per generated literal and compiles by a fixed block scan.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge
