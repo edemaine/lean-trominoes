@@ -99,6 +99,25 @@ def sparseRouteTriplesFromOffsets (before : Cell) :
   | _ => []
 termination_by offsets => offsets.length
 
+/-- Mapping a finite direction word to coordinate steps makes the total
+offset cursor definitionally equivalent to the direction cursor. -/
+theorem sparseRouteTriplesFromOffsets_map_step
+    (before : Cell) (directions : List AxisDirection) :
+    sparseRouteTriplesFromOffsets before
+        (directions.map AxisDirection.step) =
+      sparseRouteTriplesFromDirections before directions := by
+  induction directions using List.twoStepInduction generalizing before with
+  | nil => simp [sparseRouteTriplesFromOffsets,
+      sparseRouteTriplesFromDirections]
+  | singleton direction =>
+      simp [sparseRouteTriplesFromOffsets,
+        sparseRouteTriplesFromDirections]
+  | cons_cons first second rest _ induction =>
+      simp only [List.map_cons, sparseRouteTriplesFromOffsets,
+        sparseRouteTriplesFromDirections, List.cons.injEq, true_and]
+      simpa only [List.map_cons] using
+        induction second (Cell.add before first.step)
+
 /-- Exact offsets stream precisely the canonical triples of every nonempty
 route. -/
 theorem sparseRouteTriples_eq_from_stepOffsets
@@ -141,6 +160,19 @@ def sparseRouteRecordBlocksFromOffsets
     (offsets : List Cell) : List GadgetSparseAssignmentTokens.Token :=
   (sparseRouteTriplesFromOffsets before offsets).flatMap
     (sparseRouteTripleRecordBlock period color)
+
+/-- The two constant-state cursor presentations agree after interpreting
+each finite direction as its unit coordinate step. -/
+theorem sparseRouteRecordBlocksFromOffsets_map_step
+    (period : Nat) (color : WireColor) (before : Cell)
+    (directions : List AxisDirection) :
+    sparseRouteRecordBlocksFromOffsets period color before
+        (directions.map AxisDirection.step) =
+      sparseRouteRecordBlocksFromDirections period color before
+        directions := by
+  unfold sparseRouteRecordBlocksFromOffsets
+    sparseRouteRecordBlocksFromDirections
+  rw [sparseRouteTriplesFromOffsets_map_step]
 
 theorem sparseRouteRecordBlocks_eq_from_offsets
     (period : Nat) (color : WireColor) (route : List Cell) :
