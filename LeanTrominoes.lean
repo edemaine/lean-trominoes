@@ -2597,6 +2597,7 @@ import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineDirectionBloc
 import LeanTrominoes.UnaryFourFieldDirectionCompiler
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineDirectionCompiler
 import LeanTrominoes.SeparatedBooleanGuardCompiler
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineGuardedDirectionCompiler
 
 /-!
 # LeanTrominoes
