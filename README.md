@@ -11726,6 +11726,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionBlock.lean)
   combines ordinary, fixed-red, and finite clause-core cases into one compact
   direction-block classification for every genuine typed incidence.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalAssembledRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalAssembledRouteDirectionBlock.lean)
+  proves every genuine stable incidence tag selects a semantic typed triple
+  and transfers its compact block to the stored assembled route.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
