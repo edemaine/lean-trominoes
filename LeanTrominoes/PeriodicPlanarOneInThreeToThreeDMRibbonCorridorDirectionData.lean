@@ -102,5 +102,33 @@ theorem unitSubdivisionDirections_ribbonCorridorCore
         List.replicate_one, List.singleton_append,
         ribbonCorridorDirectionWord]
 
+/-- The adjacent-pair direction law also covers the empty, singleton, and
+one-edge source routes, whose corridor words are empty. -/
+theorem unitSubdivisionDirections_ribbonCorridorCore_of_unitSteps
+    (color : WireColor) (route : List Cell)
+    (unitSteps : route.IsChain AxisDirection.IsUnitAxisStep) :
+    unitSubdivisionDirections (ribbonCorridorCore color route) =
+      ribbonCorridorDirectionWord color
+        (unitSubdivisionDirections route) := by
+  cases route with
+  | nil =>
+      simp [ribbonCorridorCore, unitSubdivisionDirections,
+        ribbonCorridorDirectionWord]
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp [ribbonCorridorCore, unitSubdivisionDirections,
+            ribbonCorridorDirectionWord]
+      | cons second rest =>
+          cases rest with
+          | nil =>
+              have unit := (List.isChain_cons_cons.mp unitSteps).1
+              simp [unitSubdivisionDirections,
+                segmentLength_eq_one_of_unitAxisStep unit,
+                ribbonCorridorDirectionWord]
+          | cons third rest =>
+              exact unitSubdivisionDirections_ribbonCorridorCore
+                color first second third rest unitSteps
+
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes
