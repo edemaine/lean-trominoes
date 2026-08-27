@@ -2215,6 +2215,10 @@ build; an imported proof counts when its statement matches the paper.
                   angular-rank and radial-length columns, prove exact
                   target-major matrix semantics, and compile both matrices
                   from any exact pair of column producers.
+                - [x] Reduce same-atom comparison to equality of any
+                  injective unary atom-code column, then assemble the entire
+                  semantic stable-rank compiler from atom IDs, direction
+                  ranks, and radial lengths.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
