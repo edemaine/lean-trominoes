@@ -2208,6 +2208,9 @@ build; an imported proof counts when its statement matches the paper.
                   comparison producers to the unscaled coordinated routes.
                 - [x] Specialize that reduction to the exact source-scaled
                   final coordinated formula and its Figure 7 slot routes.
+                - [x] Identify every successful unscaled direct-atlas
+                  terminal coordinate with the finite kind/literal query
+                  already emitted by the copied-clause compiler.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
