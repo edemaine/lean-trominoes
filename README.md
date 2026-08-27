@@ -11985,6 +11985,9 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteTailRecordCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteTailRecordCompiler.lean)
   realizes the scans by fixed finite-state machines and maps the resulting
   polynomial-time expansion independently over complete clause records.
+  [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteTailRecordBatchSemantics.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteTailRecordBatchSemantics.lean)
+  proves that canonical record batches split at exactly those clause
+  boundaries and expand to the established routed source records.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge
