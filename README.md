@@ -11681,6 +11681,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedPolarityRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedPolarityRouteDirectionBlock.lean)
   composes the final gauged Figure 9 blocks with the four polarity stream
   operations, classifying every routed-polarity occurrence by a compact word.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteDirectionBlock.lean)
+  specializes that compact classification to the concrete strip source,
+  discharging all locality, width, occurrence, and nonempty-clause promises.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
