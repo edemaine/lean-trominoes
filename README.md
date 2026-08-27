@@ -11640,6 +11640,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/GadgetSparseRouteUnitSubdivisionDirectionEndpointJoin.lean`](LeanTrominoes/GadgetSparseRouteUnitSubdivisionDirectionEndpointJoin.lean)
   proves that every nonempty endpoint join concatenates its two exact
   segment-major direction words, including the singleton-prefix case.
+- [`LeanTrominoes/GadgetSparseRouteNormalizedJoinDirection.lean`](LeanTrominoes/GadgetSparseRouteNormalizedJoinDirection.lean)
+  turns a localized prefix-normalization equality into the corresponding
+  normalized-prefix word followed by the unchanged tail word.
 - [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteDirectionData.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteDirectionData.lean)
   applies those stream laws to the actual final polarity subdivision.
   Compatible incidences emit the full threefold-expanded source word,
