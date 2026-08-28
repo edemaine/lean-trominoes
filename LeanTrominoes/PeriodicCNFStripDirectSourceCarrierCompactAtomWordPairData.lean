@@ -89,6 +89,29 @@ theorem directSourceCarrierRetainedCompactAtomWordPairs_eq_selected
       directSourceCarrierSelectedCompactAtomWordPairs decider symbols :=
   rfl
 
+/-- The generic formula-mask target underlying the named retained compact
+carrier-pair output. -/
+def directSourceCarrierCompactAtomWordPairMaskTarget
+    (symbols : List encoding.Γ) : DelimitedBinaryWordPairs.Input :=
+  let source := directSourceFormula decider symbols
+  let descriptors := numericRouteDescriptors source
+  let period := routeDescriptorStreamGridSize descriptors
+  let datums :=
+    (routeDescriptorCarrierRankDatumsAtPeriod period descriptors).dedup
+  let entries := CarrierRankGlobal.enumeration datums
+  let nodes := entries.map fun entry => entry.1.identity.node
+  ⟨DelimitedBinaryWordPairBooleanFilter.selectedPairs
+    (CarrierRankOrderedPairs.retainedMaskBits descriptors)
+    (DelimitedBinaryWordPairProductMachine.pairs
+      (GuardedCarrierSourcePairCompactAtomWords.wordsAtPeriod
+        period nodes)).pairs⟩
+
+theorem directSourceCarrierRetainedCompactAtomWordPairs_eq_maskTarget
+    (symbols : List encoding.Γ) :
+    directSourceCarrierRetainedCompactAtomWordPairs decider symbols =
+      directSourceCarrierCompactAtomWordPairMaskTarget decider symbols :=
+  rfl
+
 end PeriodicCNFStripReduction
 end LeanTrominoes
 

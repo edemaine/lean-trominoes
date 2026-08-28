@@ -19,7 +19,7 @@ namespace FormulaShapeRetainedPlanarMetadataDirection
 
 open PeriodicOrthocrossing
 
-private theorem routeDescriptorRetainedCarrierNodes_numeric_eq
+theorem routeDescriptorRetainedCarrierNodes_numeric_eq
     {Variable : Type} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     routeDescriptorRetainedCarrierNodesAtPeriod
@@ -33,7 +33,7 @@ private theorem routeDescriptorRetainedCarrierNodes_numeric_eq
     incidenceGraph_orientedCrossingOccurrencePairs_eq_numeric,
     numericOrientedCrossingOccurrencePairs_eq_routeDescriptors]
 
-private theorem dedupDatumKeys_numeric_eq_completeKeys
+theorem dedupDatumKeys_numeric_eq_completeKeys
     {Variable : Type} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (nonempty : incidencesWithMetadata formula ≠ []) :

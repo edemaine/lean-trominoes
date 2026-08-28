@@ -97,5 +97,9 @@ noncomputable def finEncoding :
       decode_encode := decode_encode }
   ΓFin := inferInstance
 
+@[simp] theorem finEncoding_encode (input : Input) :
+    finEncoding.encode input = encode input :=
+  rfl
+
 end DelimitedBinaryWords
 end LeanTrominoes

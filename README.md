@@ -2380,7 +2380,7 @@ build; an imported proof counts when its statement matches the paper.
                   compact carrier words, compile the exact retained-link mask,
                   and filter it to the selected compact endpoint pairs in
                   polynomial time, including empty source alphabets.
-                - [ ] Expand every selected compact carrier endpoint pair to
+                - [x] Expand every selected compact carrier endpoint pair to
                   its four-word clause-occurrence block and identify the
                   resulting stream with final carrier presentation order.
                 - [x] Project each route descriptor's edge index to the exact

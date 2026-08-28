@@ -50,8 +50,8 @@ theorem pairAtPeriod_drawingGridSize
 /-- The graph-free constructor-tagged word is exactly the final compact word
 of the normalized carrier endpoint. -/
 theorem compactWordAtPeriod_drawingGridSize
-    {Variable : Type*} [DecidableEq Variable]
-    (graph : PeriodicGraph Variable) (sourceWord : Variable → List Bool)
+    {Vertex Target : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) (sourceWord : Target → List Bool)
     (node : CarrierNode) :
     compactWordAtPeriod (drawingGridSize graph) node =
       RetainedCompactAtomWords.word sourceWord
