@@ -13,7 +13,10 @@ namespace DelimitedBinaryWordFixedFieldRowExpansion
 @[simp] theorem expandedBit_length
     (width index : Nat) (bit : Bool) :
     (expandedBit width index bit).length = width := by
-  simp [expandedBit]
+  induction width generalizing index with
+  | zero => simp [expandedBit]
+  | succ width induction =>
+      cases index <;> simp [expandedBit, induction]
 
 @[simp] theorem row_length
     (width index : Nat) (bits : List Bool) :

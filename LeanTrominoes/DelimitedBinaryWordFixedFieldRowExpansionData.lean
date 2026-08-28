@@ -13,8 +13,10 @@ namespace DelimitedBinaryWordFixedFieldRowExpansion
 /-- Replace one row bit by a fixed-width block carrying that bit at exactly
 one field position. -/
 def expandedBit (width index : Nat) (bit : Bool) : List Bool :=
-  (List.range width).map fun position =>
-    if position = index then bit else false
+  match width, index with
+  | 0, _ => []
+  | width + 1, 0 => bit :: List.replicate width false
+  | width + 1, index + 1 => false :: expandedBit width index bit
 
 /-- Expand every bit of a row into the selected fixed field position. -/
 def row (width index : Nat) (bits : List Bool) : List Bool :=

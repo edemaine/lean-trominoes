@@ -1677,6 +1677,10 @@ build; an imported proof counts when its statement matches the paper.
               twelve field rows, prove exact alignment with that candidate-
               major table, and compile the resulting valid last-true lookup
               to twelve selected fields per representative.
+            - [x] Prove fixed-field lookup through expanded representative
+              rows selects each complete source-pair block, then identify the
+              compiled result with the twelve-field image of the exact
+              canonicalized crossing halo.
           - [x] Reduce every remaining retained metadata family to compact
             canonical data: two-token straight-carrier, bend-corner, and
             routed-variable equality templates, plus routed source-clause

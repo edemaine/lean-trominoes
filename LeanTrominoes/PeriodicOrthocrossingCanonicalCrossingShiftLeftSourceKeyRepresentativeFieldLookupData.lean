@@ -30,6 +30,21 @@ def alignedFieldValues (descriptors : List RouteDescriptor) : List Nat :=
   CanonicalCrossingShiftLeftSourceKeyAllFieldStream.fieldValuesWithSentinel
     (taggedDescriptors descriptors ×ˢ taggedDescriptors descriptors)
 
+/-- The twelve fields carried by one optional compact source-key pair. -/
+def sourcePairFields :
+    Option CarrierNodeSourceKeys.SourceKeyPair → List Nat
+  | none =>
+      CarrierKeyAllFieldProjector.keyFields none ++
+        CarrierKeyAllFieldProjector.keyFields none
+  | some sourcePair =>
+      CarrierKeyAllFieldProjector.keyFields (some sourcePair.1) ++
+        CarrierKeyAllFieldProjector.keyFields (some sourcePair.2)
+
+/-- Expected selected field stream of the stable compact source pairs. -/
+def semanticFields (descriptors : List RouteDescriptor) : List Nat :=
+  (CanonicalCrossingShiftLeftSourceKeyRepresentatives.values descriptors).flatMap
+    fun sourcePair => sourcePairFields (some sourcePair)
+
 /-- The twelve source-pair fields selected at each stable representative. -/
 def selectedFields (descriptors : List RouteDescriptor) : List Nat :=
   LastTrueUnaryValueLookupMachine.lookups
