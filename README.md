@@ -2254,6 +2254,10 @@ build; an imported proof counts when its statement matches the paper.
                   target-vertex field into the exact tagged on-formula
                   source-atom word and compile the resulting delimited stream
                   in polynomial time.
+                - [x] Prove those projected words agree with the compact final
+                  source-atom words for both the copied-incidence prefix and
+                  cycle-link suffix of the complete occurrence-split route
+                  stream.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
