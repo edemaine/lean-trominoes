@@ -2314,6 +2314,11 @@ build; an imported proof counts when its statement matches the paper.
                   point quotient activates.  Concatenating the blocks and
                   stable-deduplicating recovers the exact graph-free
                   `canonicalizedCrossingHalo` order.
+                - [x] Realize the same 25 guesses as a shift-major affine
+                  slot schedule: runtime physical slots stay unchanged while
+                  each fixed occurrence template and source recipe is shifted.
+                  Erasing active slots gives exactly the optional semantic
+                  common-shift candidates, including padded-slot rejection.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
