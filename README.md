@@ -2258,6 +2258,11 @@ build; an imported proof counts when its statement matches the paper.
                   source-atom words for both the copied-incidence prefix and
                   cycle-link suffix of the complete occurrence-split route
                   stream.
+                - [x] Reduce the exact atom-word columns of all five retained
+                  clause families: crossovers to fixed Figure 8(b) role
+                  templates, carrier/bend/routed-variable equalities to
+                  repeated endpoint blocks, and routed clauses to their
+                  presentation-ordered source-terminal rows.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
