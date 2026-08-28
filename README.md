@@ -2325,6 +2325,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Generalize permutation-rank lookup from single unary
                   fields to fixed-width blocks and prove that it emits every
                   complete block in duplicate-free global reference order.
+                - [x] Apply that block lookup to carrier source-key fields and
+                  prove the physical twelve-field blocks are emitted in the
+                  exact global carrier-rank enumeration on valid numeric
+                  routes.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
