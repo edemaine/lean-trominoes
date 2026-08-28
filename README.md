@@ -2335,6 +2335,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Define graph-free translation-normalized carrier source
                   pairs and prove their constructor-tagged words are exactly
                   the final compact carrier atom words at the drawing period.
+                - [x] Normalize the fixed terminal and crossing source-key
+                  recipes without changing their activation layout, and
+                  compile their exact guarded candidate-word packages in
+                  polynomial time.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
