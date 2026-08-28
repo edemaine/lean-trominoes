@@ -31,6 +31,27 @@ def sourceSide : CrossoverVariable → CrossingSide
   | .bBottom => .bottom
   | _ => .left
 
+/-- A left-boundary source key uses tag two.  The other three boundary
+roles are obtained by adding this fixed amount to its unary segment tag. -/
+def sourceSideIncrement : CrossingSide → Nat
+  | .left => 0
+  | .right => 1
+  | .top => 2
+  | .bottom => 3
+
+/-- Add a fixed amount to the second unary field of the first carrier key.
+The source pair supplied to the crossover expander is always its left-side
+pair, so this retags that pair to any other boundary side. -/
+def retagFirstSegmentAfterRoute (amount : Nat) : List Bool → List Bool
+  | [] => []
+  | false :: bits => false :: retagFirstSegmentAfterRoute amount bits
+  | true :: bits => List.replicate amount false ++ true :: bits
+
+def retagFirstSegment (amount : Nat) : List Bool → List Bool
+  | [] => []
+  | false :: bits => false :: retagFirstSegment amount bits
+  | true :: bits => true :: retagFirstSegmentAfterRoute amount bits
+
 /-- Internal constructor represented by a non-boundary crossover role. -/
 def internal? : CrossoverVariable → Option CrossoverInternal
   | .aLeft | .aRight | .bTop | .bBottom => none
@@ -58,7 +79,13 @@ def suffix (role : CrossoverVariable) : List Bool :=
 constructor data of the corresponding crossover literal role. -/
 def word (role : CrossoverVariable) : List Bool → List (List Bool)
   | true :: sourcePair =>
-      [constructorPrefix role ++ sourcePair ++ suffix role]
+      match internal? role with
+      | some internal =>
+          [[true, true] ++ sourcePair ++ crossoverInternalWord internal]
+      | none =>
+          [[false, true] ++
+            retagFirstSegment
+              (sourceSideIncrement (sourceSide role)) sourcePair]
   | _ => []
 
 /-- Expand one guarded canonical crossing key into its complete fixed

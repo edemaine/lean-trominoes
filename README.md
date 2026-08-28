@@ -2289,6 +2289,11 @@ build; an imported proof counts when its statement matches the paper.
                   final routed-variable fiber in rotated target order, and
                   compile its exact repeated compact endpoint-word block in
                   polynomial time.
+                - [x] Expand one canonical left crossing source-key pair into
+                  the fixed 58-role Figure 8(b) compact atom-word block.  A
+                  finite retagging pass produces the exact left, right, top,
+                  and bottom boundary identities; the nine internal roles
+                  retain the left site pair and append their fixed suffixes.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
