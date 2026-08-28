@@ -2282,6 +2282,10 @@ build; an imported proof counts when its statement matches the paper.
                   every base bend's four-incidence terminal direction and
                   radial blocks, prove exact numeric route/bend order, and
                   compile both unary columns in bounded-size leaves.
+                - [x] Append the crossover, carrier, bend, routed-clause,
+                  and routed-variable terminal columns in final presentation
+                  order, using a canonical unary-field append closure that
+                  also handles an empty source alphabet.
                 - [x] Give wrapped routed planar-SAT atoms a canonical
                   primitive-recursive encoding and specialize its injective
                   numeric code to the direct source.
