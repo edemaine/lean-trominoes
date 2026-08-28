@@ -2233,6 +2233,9 @@ build; an imported proof counts when its statement matches the paper.
                   and compile both unary streams in polynomial time.
                 - [x] Compose both exact carrier terminal columns with the
                   direct-source numeric route-descriptor compiler.
+                - [x] Give wrapped routed planar-SAT atoms a canonical
+                  primitive-recursive encoding and specialize its injective
+                  numeric code to the direct source.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
