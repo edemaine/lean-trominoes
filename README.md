@@ -2370,7 +2370,12 @@ build; an imported proof counts when its statement matches the paper.
                   exactly the compact carrier atom words.
                 - [x] Compose compact carrier-word emission with the direct
                   globally ranked normalized-pair compiler and identify the
-                  complete output with final carrier presentation order.
+                  complete output with global stable carrier-rank order.
+                - [x] Add a linear-time closure that aligns an arbitrarily
+                  long Boolean mask with a delimited binary-word-pair stream
+                  and retains exactly the active pairs.  This supplies the
+                  dynamic retained-link selection needed to expand ranked
+                  carrier words into final clause-occurrence order.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
