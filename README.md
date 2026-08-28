@@ -2368,7 +2368,7 @@ build; an imported proof counts when its statement matches the paper.
                   constructor bit behind the fixed leading bit by two linear
                   reversals.  The resulting polynomial-time stream pass emits
                   exactly the compact carrier atom words.
-                - [ ] Compose compact carrier-word emission with the direct
+                - [x] Compose compact carrier-word emission with the direct
                   globally ranked normalized-pair compiler and identify the
                   complete output with final carrier presentation order.
                 - [x] Project each route descriptor's edge index to the exact
