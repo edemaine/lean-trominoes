@@ -57,6 +57,11 @@ theorem mem_carrierCrossingRetentionShifts_iff
   rcases shift with ⟨horizontal, vertical⟩
   simp [carrierCrossingRetentionShifts] <;> aesop
 
+/-- The fixed retention window contains each common shift exactly once. -/
+theorem carrierCrossingRetentionShifts_nodup :
+    carrierCrossingRetentionShifts.Nodup := by
+  native_decide
+
 /-- The bounded physical orbit of every canonical oriented crossing. -/
 def retainedCrossings
     {Vertex : Type*} [DecidableEq Vertex]

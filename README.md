@@ -2306,6 +2306,11 @@ build; an imported proof counts when its statement matches the paper.
                   guarded canonical-left source-key pair per fixed slot,
                   omitting the retained 25-shift orbit and the other three
                   boundary-side copies used by the carrier pipeline.
+                - [x] Scan each physical occurrence pair through 25 fixed
+                  common-shift guesses and prove that exactly its crossing-
+                  point quotient activates.  Concatenating the blocks and
+                  stable-deduplicating recovers the exact graph-free
+                  `canonicalizedCrossingHalo` order.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
