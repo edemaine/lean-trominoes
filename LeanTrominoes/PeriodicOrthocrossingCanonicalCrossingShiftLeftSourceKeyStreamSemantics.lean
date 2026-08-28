@@ -9,6 +9,8 @@ import LeanTrominoes.PeriodicOrthocrossingCanonicalCrossingShiftLeftSourceKeyStr
 import LeanTrominoes.PeriodicOrthocrossingCanonicalCrossingShiftLeftSourceKeyStreamData
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPaddedOccurrenceSlotActiveNeighborSemantics
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotPairBlockMapSemantics
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotBinaryWordPairSemantics
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotPairFieldTagSemantics
 import LeanTrominoes.ListFilterMapFlatMap
 import LeanTrominoes.ListOptionalFilteredProduct
 
@@ -44,6 +46,25 @@ theorem guardedWords_eq_candidates
   | cons pair pairs induction =>
       simp [induction]
 
+/-- Every shifted source-key candidate is supported exactly when its slot is
+active. -/
+theorem candidates_supported_eq_isSome
+    (pairs : List (TaggedDescriptor × TaggedDescriptor)) :
+    ∀ candidate ∈ candidates pairs,
+      candidate.supported = candidate.value.isSome := by
+  intro candidate candidateMember
+  unfold candidates at candidateMember
+  rcases List.mem_flatMap.mp candidateMember with
+    ⟨pair, _pairMember, candidateMember⟩
+  unfold RouteDescriptorOccurrenceSlotCrossing.canonicalCrossingShiftLeftSourceKeyCandidates
+    at candidateMember
+  rcases List.mem_map.mp candidateMember with
+    ⟨nodeCandidate, _nodeCandidateMember, candidateEq⟩
+  subst candidate
+  rcases nodeCandidate with ⟨value, supported⟩
+  cases value <;>
+    rfl
+
 /-- Mapping the common-shift inner compiler over canonical pair blocks emits
 exactly the encoding of their concatenated guarded candidate words. -/
 @[simp] theorem emittedStream_encodeDescriptorSlotPairs
@@ -57,6 +78,18 @@ exactly the encoding of their concatenated guarded candidate words. -/
   simp only [CanonicalCrossingShiftLeftSourceKeyEmitter.emittedTokens_eq_candidates]
   unfold guardedWords DelimitedBinaryWords.encode
   rw [List.flatMap_assoc]
+
+@[simp] theorem emittedDescriptorStream_descriptorWords
+    (descriptors : List RouteDescriptor) :
+    emittedDescriptorStream (RouteDescriptorBinaryWords.words descriptors) =
+      DelimitedBinaryWords.encode
+        ⟨guardedWords
+          (taggedDescriptors descriptors ×ˢ
+            taggedDescriptors descriptors)⟩ := by
+  unfold emittedDescriptorStream
+  rw [expandedPairs_descriptorWords,
+    RouteDescriptorOccurrenceSlotPairFieldTags.inputTokens_wordPairs,
+    emittedStream_encodeDescriptorSlotPairs]
 
 /-- Removing inactive padding from the complete tagged-pair stream gives
 exactly the physical occurrence-pair common-shift scan. -/

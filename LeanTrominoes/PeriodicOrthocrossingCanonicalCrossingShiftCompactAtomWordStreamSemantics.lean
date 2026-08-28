@@ -60,32 +60,12 @@ private theorem crossoverWords_map_guardedWord_eq_filterMap
           CrossoverCompactAtomWords.wordsForRoles,
           CrossoverCompactAtomWords.word]
 
-private theorem sourceKeyCandidates_supported_eq_isSome
-    (pairs : List (TaggedDescriptor × TaggedDescriptor)) :
-    ∀ candidate ∈
-        CanonicalCrossingShiftLeftSourceKeyStream.candidates pairs,
-      candidate.supported = candidate.value.isSome := by
-  intro candidate candidateMember
-  unfold CanonicalCrossingShiftLeftSourceKeyStream.candidates at candidateMember
-  rcases List.mem_flatMap.mp candidateMember with
-    ⟨pair, _pairMember, candidateMember⟩
-  unfold RouteDescriptorOccurrenceSlotCrossing.canonicalCrossingShiftLeftSourceKeyCandidates
-    at candidateMember
-  rcases List.mem_map.mp candidateMember with
-    ⟨nodeCandidate, _nodeCandidateMember, candidateEq⟩
-  subst candidate
-  rcases nodeCandidate with ⟨value, supported⟩
-  cases value <;>
-    rfl
-
 @[simp] theorem sourceTokens_descriptorWords
     (descriptors : List RouteDescriptor) :
     sourceTokens (RouteDescriptorBinaryWords.words descriptors) =
       DelimitedBinaryWords.encode ⟨guardedSourceWords descriptors⟩ := by
   unfold sourceTokens guardedSourceWords
-  rw [expandedPairs_descriptorWords,
-    RouteDescriptorOccurrenceSlotPairFieldTags.inputTokens_wordPairs,
-    CanonicalCrossingShiftLeftSourceKeyStream.emittedStream_encodeDescriptorSlotPairs]
+  rw [CanonicalCrossingShiftLeftSourceKeyStream.emittedDescriptorStream_descriptorWords]
 
 @[simp] theorem emittedTokens_descriptorWords
     (descriptors : List RouteDescriptor) :
@@ -109,7 +89,7 @@ theorem words_eq_activeSourcePairBlocks
   unfold words guardedSourceWords
   rw [CanonicalCrossingShiftLeftSourceKeyStream.guardedWords_eq_candidates]
   exact crossoverWords_map_guardedWord_eq_filterMap _
-    (sourceKeyCandidates_supported_eq_isSome _)
+    (CanonicalCrossingShiftLeftSourceKeyStream.candidates_supported_eq_isSome _)
 
 /-- The emitted active blocks are exactly the Figure 8(b) atom words of the
 physical common-shift crossing-record scan. -/

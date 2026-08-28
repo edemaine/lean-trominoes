@@ -1653,6 +1653,13 @@ build; an imported proof counts when its statement matches the paper.
           - [x] Convert those crossing markers to the fixed Figure 8(b)
             crossover descriptor blocks and identify their exact public
             descriptor prefix.
+            - [x] Compile the full retained-shift source-pair candidate scan
+              and its fixed Figure 8(b) compact-word expansion, preserving
+              the physical multiplicities within every crossover block.
+            - [x] Compile stable last-representative rows for those shifted
+              source-pair candidates.  Prove compact carrier-key injectivity
+              on the canonical crossing halo, so the selected semantic values
+              are exactly the canonical crossing left-source stream.
           - [x] Reduce every remaining retained metadata family to compact
             canonical data: two-token straight-carrier, bend-corner, and
             routed-variable equality templates, plus routed source-clause

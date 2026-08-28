@@ -22,24 +22,15 @@ open Computability Turing
 field tagging, and the common-shift source-key emitter. -/
 def sourceTokens (input : DelimitedBinaryWords.Input) :
     List DelimitedBinaryWords.Token :=
-  CanonicalCrossingShiftLeftSourceKeyStream.emittedStream
-    (RouteDescriptorOccurrenceSlotPairFieldTags.inputTokens
-      (DelimitedBinaryWordOccurrenceSlotTags.expandedPairs input))
+  CanonicalCrossingShiftLeftSourceKeyStream.emittedDescriptorStream input
 
 noncomputable def sourceTokensComputableInPolyTime :
     TM2ComputableInPolyTime
       DelimitedBinaryWords.finEncoding.encode id sourceTokens := by
   change TM2ComputableInPolyTime
     DelimitedBinaryWords.finEncoding.encode id
-    (fun input =>
-      CanonicalCrossingShiftLeftSourceKeyStream.emittedStream
-        (RouteDescriptorOccurrenceSlotPairFieldTags.inputTokens
-          (DelimitedBinaryWordOccurrenceSlotTags.expandedPairs input)))
-  exact TM2CompositionMachine.computableInPolyTime
-    (TM2CompositionMachine.computableInPolyTime
-      DelimitedBinaryWordOccurrenceSlotTags.expandedPairsComputableInPolyTime
-      RouteDescriptorOccurrenceSlotPairFieldTags.inputTokensComputableInPolyTime)
-    CanonicalCrossingShiftLeftSourceKeyStream.emittedStreamComputableInPolyTime
+    CanonicalCrossingShiftLeftSourceKeyStream.emittedDescriptorStream
+  exact CanonicalCrossingShiftLeftSourceKeyStream.emittedDescriptorStreamComputableInPolyTime
 
 /-- Apply the fixed 58-role crossover expander to every emitted guarded
 source-key candidate. -/

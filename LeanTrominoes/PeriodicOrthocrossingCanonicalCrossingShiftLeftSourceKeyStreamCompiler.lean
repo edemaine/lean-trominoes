@@ -5,6 +5,9 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicOrthocrossingCanonicalCrossingShiftEmitterCompiler
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotPairBlockMapSemantics
+import LeanTrominoes.DelimitedBinaryWordOccurrenceSlotPairProductCompiler
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotPairFieldTagCompiler
+import LeanTrominoes.TM2CompositionMachine
 import LeanTrominoes.TM2EndDelimitedBlockMapCompiler
 
 /-! # Pair-stream compiler for common-shift canonical-left source keys -/
@@ -30,6 +33,28 @@ noncomputable def emittedStreamComputableInPolyTime :
   TM2EndDelimitedBlockMap.computableInPolyTime
     CanonicalCrossingShiftLeftSourceKeyEmitter.emittedTokensComputableInPolyTime
     RouteDescriptorOccurrenceSlotPairFieldTags.isPairEnd
+
+/-- Prepare the complete tagged descriptor-slot square directly from an
+encoded route-descriptor word list. -/
+def emittedDescriptorStream (input : DelimitedBinaryWords.Input) :
+    List DelimitedBinaryWords.Token :=
+  emittedStream
+    (RouteDescriptorOccurrenceSlotPairFieldTags.inputTokens
+      (DelimitedBinaryWordOccurrenceSlotTags.expandedPairs input))
+
+noncomputable def emittedDescriptorStreamComputableInPolyTime :
+    TM2ComputableInPolyTime
+      DelimitedBinaryWords.finEncoding.encode id emittedDescriptorStream := by
+  change TM2ComputableInPolyTime
+    DelimitedBinaryWords.finEncoding.encode id
+    (fun input => emittedStream
+      (RouteDescriptorOccurrenceSlotPairFieldTags.inputTokens
+        (DelimitedBinaryWordOccurrenceSlotTags.expandedPairs input)))
+  exact TM2CompositionMachine.computableInPolyTime
+    (TM2CompositionMachine.computableInPolyTime
+      DelimitedBinaryWordOccurrenceSlotTags.expandedPairsComputableInPolyTime
+      RouteDescriptorOccurrenceSlotPairFieldTags.inputTokensComputableInPolyTime)
+    emittedStreamComputableInPolyTime
 
 end CanonicalCrossingShiftLeftSourceKeyStream
 end LeanTrominoes.PeriodicOrthocrossing
