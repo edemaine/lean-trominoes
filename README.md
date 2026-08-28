@@ -2319,6 +2319,9 @@ build; an imported proof counts when its statement matches the paper.
                   compact source keys into its exact candidate-major
                   twelve-field unary table, including the aligned rejection
                   sentinel used by representative lookup.
+                - [x] Expand compact source-key representative rows across
+                  those twelve fields and look up the exact field block of
+                  every deduplicated carrier identity.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.

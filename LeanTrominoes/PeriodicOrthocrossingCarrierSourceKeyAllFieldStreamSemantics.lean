@@ -42,6 +42,7 @@ source-key table followed by its twelve-zero sentinel. -/
       UnaryFieldEncoderMachine.unaryFields
         (fieldValuesWithSentinel descriptors) := by
   unfold emittedFields fieldValuesWithSentinel componentKeys
+    componentKeysOfCandidates
   rw [CarrierSourceKeyComponentStream.tokens_descriptorWords_eq_componentWords,
     componentWords_eq_semanticWords,
     CarrierKeyAllFieldProjector.output_encode_semanticWords]
