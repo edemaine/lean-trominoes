@@ -89,5 +89,22 @@ def canonicalCrossingShiftLeftSourceKeyRecipeBlocks :
   canonicalCrossingShiftSlots.map fun slot =>
     occurrencePairCanonicalCrossingLeftSourceKeyRecipeBlock slot.occurrences
 
+/-- Paired-component form of the same shifted source-key recipes. -/
+def canonicalCrossingShiftLeftSourceKeyRecipePairBlocks :
+    List (List RouteDescriptorPairSourceKeyRecipePairs.RecipePair) :=
+  canonicalCrossingShiftSlots.map fun slot =>
+    occurrencePairCanonicalCrossingLeftSourceKeyRecipePairBlock
+      slot.occurrences
+
+/-- Guarded canonical-left source-key components emitted by the complete
+shift-major slot schedule. -/
+def canonicalCrossingShiftLeftSourceKeyGuardedWords
+    (tokens : List RouteDescriptorOccurrenceSlotPairFieldTags.Token) :
+    List (List Bool) :=
+  RouteDescriptorPairCarrierKeyWordRecipes.words
+    (RouteDescriptorOccurrenceSlotPairFieldTags.descriptorTokens tokens)
+    (canonicalCrossingShiftSlots.map fun slot => slot.evalTokens tokens)
+    canonicalCrossingShiftLeftSourceKeyRecipeBlocks
+
 end RouteDescriptorOccurrenceSlotCrossing
 end LeanTrominoes.PeriodicOrthocrossing

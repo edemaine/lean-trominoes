@@ -2319,6 +2319,11 @@ build; an imported proof counts when its statement matches the paper.
                   each fixed occurrence template and source recipe is shifted.
                   Erasing active slots gives exactly the optional semantic
                   common-shift candidates, including padded-slot rejection.
+                - [x] Compile the complete shifted schedule to guarded
+                  canonical-left source-key candidates.  The batched fixed-slot
+                  guard evaluator, recipe emitter, and guarded-pair merger are
+                  polynomial time, and removing inactive padding recovers the
+                  exact shift-major semantic source-pair stream.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
