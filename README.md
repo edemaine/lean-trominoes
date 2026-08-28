@@ -1684,6 +1684,9 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Reformat every selected twelve-field block with a fixed
               finite-state transducer, proving it reconstructs the exact
               guarded source-pair word stream in polynomial time.
+            - [x] Compose the unique reconstructed source-pair stream with
+              the fixed 58-role expander and identify its output with the
+              exact clause-major Figure 8(b) blocks in canonical-halo order.
           - [x] Reduce every remaining retained metadata family to compact
             canonical data: two-token straight-carrier, bend-corner, and
             routed-variable equality templates, plus routed source-clause
