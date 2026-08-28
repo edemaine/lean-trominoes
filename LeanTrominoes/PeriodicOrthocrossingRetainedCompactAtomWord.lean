@@ -40,19 +40,19 @@ crossing site. -/
 def crossingPair (crossing : CrossingRecord) : SourceKeyPair :=
   carrierPair (.boundary ⟨crossing, .left⟩)
 
-/-- Constructor-tagged compact word. Carrier prototypes use the two source
-keys already emitted by the route-descriptor pipeline; source and crossover
-branches retain their established self-delimiting payloads. -/
+/-- Constructor-tagged compact word. Terminals need only their tagged first
+source key; boundaries retain both source keys, while source and crossover
+branches keep their established self-delimiting payloads. -/
 def word
     {Variable : Type*}
     (sourceWord : Variable → List Bool)
     (atom : WrappedPeriodicPlanarSATVariable Variable) : List Bool :=
   match atom.original with
   | .terminal indexed endpoint =>
-      false :: CarrierNodeSourceKeys.word
-        (carrierPair (.terminal indexed endpoint))
+      false :: false :: CarrierKeyWords.word
+        (carrierPair (.terminal indexed endpoint)).1
   | .boundary boundary =>
-      false :: CarrierNodeSourceKeys.word
+      false :: true :: CarrierNodeSourceKeys.word
         (carrierPair (.boundary boundary))
   | .atom sourceAtom => true :: false :: sourceWord sourceAtom
   | .crossoverInternal (crossing, internal) =>
@@ -144,34 +144,28 @@ theorem word_injective_on_valid
   | terminal firstIndexed firstEndpoint =>
       cases second with
       | terminal secondIndexed secondEndpoint =>
-          have pairEq := CarrierNodeSourceKeys.word_injective
-            (List.cons.inj wordsEq).2
+          have keyEq := CarrierKeyWords.word_injective
+            (List.cons.inj (List.cons.inj wordsEq).2).2
+          have pairEq :
+              carrierPair (.terminal firstIndexed firstEndpoint) =
+                carrierPair (.terminal secondIndexed secondEndpoint) := by
+            apply Prod.ext <;>
+              simpa [carrierPair, zeroCarrierNode,
+                CarrierNodeSourceKeys.pair] using keyEq
           have carrierEq := carrierPair_injective_of_valid formula
             (.terminal firstIndexed firstEndpoint) firstValid
             (.terminal secondIndexed secondEndpoint) secondValid pairEq
           cases carrierEq
           rfl
-      | boundary secondBoundary =>
-          have pairEq := CarrierNodeSourceKeys.word_injective
-            (List.cons.inj wordsEq).2
-          have carrierEq := carrierPair_injective_of_valid formula
-            (.terminal firstIndexed firstEndpoint) firstValid
-            (.boundary secondBoundary) secondValid pairEq
-          cases carrierEq
+      | boundary secondBoundary => simp [word] at wordsEq
       | atom secondAtom => simp [word] at wordsEq
       | crossoverInternal secondInternal => simp [word] at wordsEq
   | boundary firstBoundary =>
       cases second with
-      | terminal secondIndexed secondEndpoint =>
-          have pairEq := CarrierNodeSourceKeys.word_injective
-            (List.cons.inj wordsEq).2
-          have carrierEq := carrierPair_injective_of_valid formula
-            (.boundary firstBoundary) firstValid
-            (.terminal secondIndexed secondEndpoint) secondValid pairEq
-          cases carrierEq
+      | terminal secondIndexed secondEndpoint => simp [word] at wordsEq
       | boundary secondBoundary =>
           have pairEq := CarrierNodeSourceKeys.word_injective
-            (List.cons.inj wordsEq).2
+            (List.cons.inj (List.cons.inj wordsEq).2).2
           have carrierEq := carrierPair_injective_of_valid formula
             (.boundary firstBoundary) firstValid
             (.boundary secondBoundary) secondValid pairEq
