@@ -2302,6 +2302,10 @@ build; an imported proof counts when its statement matches the paper.
                   source-key pair per crossing and prove the fixed role
                   expander yields its complete compact crossover atom-word
                   block.
+                - [x] Compile the canonical crossing-slot predicate to one
+                  guarded canonical-left source-key pair per fixed slot,
+                  omitting the retained 25-shift orbit and the other three
+                  boundary-side copies used by the carrier pipeline.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
