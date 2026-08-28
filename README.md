@@ -2362,6 +2362,15 @@ build; an imported proof counts when its statement matches the paper.
                   period-normalized source pairs of the same deduplicated
                   carrier data, and format one guarded pair word per global
                   carrier rank in polynomial time.
+                - [x] Recover the terminal/boundary constructor from each
+                  guarded source pair's reserved segment tag, retain exactly
+                  one terminal key or both boundary keys, and move the delayed
+                  constructor bit behind the fixed leading bit by two linear
+                  reversals.  The resulting polynomial-time stream pass emits
+                  exactly the compact carrier atom words.
+                - [ ] Compose compact carrier-word emission with the direct
+                  globally ranked normalized-pair compiler and identify the
+                  complete output with final carrier presentation order.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
