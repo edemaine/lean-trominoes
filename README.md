@@ -2275,6 +2275,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Specialize those compact words to the direct final source
                   and prove their equality square is the exact represented-
                   occurrence same-atom square.
+                - [x] Decompose the exact compact occurrence column into its
+                  crossover, carrier, bend, routed-clause, and routed-variable
+                  blocks in final presentation order.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
