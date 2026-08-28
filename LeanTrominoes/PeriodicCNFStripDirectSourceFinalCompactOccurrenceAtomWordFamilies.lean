@@ -7,6 +7,7 @@ import LeanTrominoes.PeriodicCNFFormulaShapeBaseBendAtomWordSemantics
 import LeanTrominoes.PeriodicCNFFormulaShapeCarrierAtomWordSemantics
 import LeanTrominoes.PeriodicCNFFormulaShapeCrossoverAtomWordSemantics
 import LeanTrominoes.PeriodicCNFFormulaShapeRoutedClauseAtomWordSemantics
+import LeanTrominoes.PeriodicCNFRouteDescriptorSourceTerminalCompactAtomWordPresentation
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCompactOccurrenceAtomWordData
 import LeanTrominoes.PeriodicThreeSATThreeRoutedVariableAtomWordSemantics
 
@@ -69,19 +70,14 @@ def directSourceFinalCompactBendAtomWordBlock
     [word link.first, word link.second,
       word link.first, word link.second]
 
-/-- Compact source-terminal atom rows of the presentation-ordered routed
-clauses. -/
+/-- Compact source-terminal atom rows projected directly from the
+presentation-ordered route descriptors. -/
 def directSourceFinalCompactRoutedClauseAtomWordBlock
     (symbols : List encoding.Γ) : List (List Bool) :=
   let source := directThreeCNFSourceFormula decider symbols
   let formula := PeriodicThreeSATThree.formula source
-  let word := directSourceFinalCompactAtomWord formula
-  formula.clauses.zipIdx.flatMap fun taggedClause =>
-    (clauseRouteOccurrencesAt formula
-      (taggedClause.2, (0, 0))).map fun occurrence =>
-        word (externalWrappedVariableNormalization formula
-          (.carrier (.terminal
-            (occurrence.sourceTerminal formula)))).1
+  (RouteDescriptorSourceTerminalCompactWords.words
+    (PeriodicCNF.numericRouteDescriptors formula)).words
 
 /-- Repeated compact normalized endpoint words of every canonical final-site
 routed-variable link. -/
@@ -170,6 +166,13 @@ theorem directSourceFinalCompactOccurrenceAtomWords_eq_blocks
       PeriodicThreeSATThree.fiveFamilyNormalizedThreeOccurrenceDecidableEq
       formula,
     PeriodicThreeSATThree.canonicalWrappedNormalizedRoutedVariableClauses_atomWords]
+  unfold directSourceFinalCompactAtomWord
+  rw [← @PeriodicCNF.numericRouteDescriptors_sourceTerminalCompactWords_eq
+    Variable
+    PeriodicThreeSATThree.fiveFamilyNormalizedThreeOccurrenceDecidableEq
+    formula
+    (PeriodicThreeSATThree.formula_incidenceGraph_isWellFormed source)
+    (DirectSourceFinalIndexedAtomWords.sourceVariableWord formula)]
   rfl
 
 end PeriodicCNFStripReduction
