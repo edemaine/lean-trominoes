@@ -2236,6 +2236,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Give wrapped routed planar-SAT atoms a canonical
                   primitive-recursive encoding and specialize its injective
                   numeric code to the direct source.
+                - [x] Identify the complete final occurrence atom-code column
+                  with the literal-wise flattening of the existing
+                  crossover/carrier/bend/routed-clause/routed-variable
+                  quotient presentation.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
