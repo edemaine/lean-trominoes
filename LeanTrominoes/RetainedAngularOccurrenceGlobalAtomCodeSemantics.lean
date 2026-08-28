@@ -21,6 +21,34 @@ def retainedOccurrenceGlobalAtomCodes
   (allOccurrenceVariables source).map fun copy =>
     atomCode copy.1
 
+/-- Atom codes are equivalently a direct map over the ordinary
+clause-major occurrence list. -/
+theorem retainedOccurrenceGlobalAtomCodes_eq_variableOccurrences
+    {Variable : Type*}
+    (source : PeriodicCNF Variable)
+    (atomCode : Variable → Nat) :
+    retainedOccurrenceGlobalAtomCodes source atomCode =
+      source.variableOccurrences.map atomCode := by
+  unfold retainedOccurrenceGlobalAtomCodes
+  rw [show
+      (allOccurrenceVariables source).map (fun copy => atomCode copy.1) =
+        ((allOccurrenceVariables source).map Prod.fst).map atomCode by
+      simp only [List.map_map, Function.comp_def]]
+  rw [allOccurrenceVariables_fst]
+
+/-- Presentation-ordered atom codes are equivalently obtained by mapping each
+clause and then flattening the resulting code blocks. -/
+theorem retainedOccurrenceGlobalAtomCodes_eq_clausewise
+    {Variable : Type*}
+    (source : PeriodicCNF Variable)
+    (atomCode : Variable → Nat) :
+    retainedOccurrenceGlobalAtomCodes source atomCode =
+      source.clauses.flatMap fun clause =>
+        clause.map fun literal => atomCode literal.atom := by
+  rw [retainedOccurrenceGlobalAtomCodes_eq_variableOccurrences]
+  unfold PeriodicCNF.variableOccurrences
+  simp only [List.map_flatMap, List.map_map, Function.comp_def]
+
 /-- Any injective numeric atom coding turns the existing unary equality
 square into the exact global same-atom stream. -/
 theorem retainedOccurrenceGlobalAtomEqualityBits_eq_codes

@@ -30,6 +30,16 @@ theorem finalCoordinatedSource_clauseLiterals_eq
   simpa [PositionedPeriodicCNF.erase] using
     positionedSource_erase_clauses_eq formula
 
+/-- Erasing the final coordinated positions exposes exactly the final
+duplicate-free normalized clause representatives. -/
+theorem finalCoordinatedSource_erase_clauses_eq
+    {Variable : Type} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    (finalCoordinatedSource formula).erase.clauses =
+      deduplicatedClauses formula := by
+  simpa [PositionedPeriodicCNF.erase] using
+    finalCoordinatedSource_clauseLiterals_eq formula
+
 /-- Final coordinated clauses have pairwise-distinct literal lists. -/
 theorem finalCoordinatedSource_clauseLiterals_nodup
     {Variable : Type} [DecidableEq Variable]
