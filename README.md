@@ -2231,6 +2231,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Decode packed retained-carrier spans into their exact
                   four-entry terminal direction-rank and radial-length columns,
                   and compile both unary streams in polynomial time.
+                - [x] Compose both exact carrier terminal columns with the
+                  direct-source numeric route-descriptor compiler.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
