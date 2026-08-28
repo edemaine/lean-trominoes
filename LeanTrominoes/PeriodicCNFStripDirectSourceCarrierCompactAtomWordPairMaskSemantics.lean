@@ -24,7 +24,7 @@ variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
-noncomputable local instance directCarrierCompactPairMaskStackFintype
+noncomputable local instance directCarrierCompactPairMaskSemanticsStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 

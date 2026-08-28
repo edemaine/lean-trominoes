@@ -2303,6 +2303,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Assemble those five reduced columns, with their exact
                   append tree and canonical-halo order, into the complete
                   direct final occurrence atom-word stream.
+                - [x] Compile all five compact atom-word blocks independently,
+                  append their canonical encodings with the same semantic
+                  tree, and transport the result to the exact final compact
+                  occurrence atom-word column.
                 - [x] Generalize atom-word equality and stable-rank compilation
                   from global injectivity to separation of the represented
                   final occurrences.
