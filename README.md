@@ -2246,6 +2246,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Define a decoder-backed injective structural word for
                   every final routed atom and align its complete scaled
                   occurrence column with that same five-family presentation.
+                - [x] Compress every on-formula routed source atom to its
+                  deduplicated target-vertex index, retaining a disjoint full
+                  structural fallback so the input-dependent word remains
+                  globally injective.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.

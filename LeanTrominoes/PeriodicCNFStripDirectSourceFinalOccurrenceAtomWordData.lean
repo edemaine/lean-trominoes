@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFStripDirectSourceFinalAtomWord
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalIndexedAtomWord
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceAtomCodeFamilies
 import LeanTrominoes.RetainedAngularOccurrenceGlobalAtomWordSemantics
 
@@ -37,7 +37,8 @@ def directSourceFinalOccurrenceAtomWords
   retainedOccurrenceGlobalAtomWords
     (retainedFinalCoordinatedScaledSource
       (directSourceFormula decider symbols)).erase
-    DirectSourceFinalAtomWords.word
+    (DirectSourceFinalIndexedAtomWords.word
+      (directSourceFormula decider symbols))
 
 /-- Source-clearance scaling changes offsets but not the aligned atom-word
 column. -/
@@ -47,7 +48,8 @@ theorem directSourceFinalOccurrenceAtomWords_eq_unscaled
       retainedOccurrenceGlobalAtomWords
         (finalCoordinatedSource
           (directSourceFormula decider symbols)).erase
-        DirectSourceFinalAtomWords.word := by
+        (DirectSourceFinalIndexedAtomWords.word
+          (directSourceFormula decider symbols)) := by
   unfold directSourceFinalOccurrenceAtomWords
     retainedOccurrenceGlobalAtomWords
     retainedFinalCoordinatedScaledSource
@@ -64,7 +66,8 @@ theorem directSourceFinalOccurrenceAtomWords_eq_deduplicatedClauses
       (PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection.deduplicatedClauses
         (directSourceFormula decider symbols)).flatMap fun clause =>
           clause.map fun literal =>
-            DirectSourceFinalAtomWords.word literal.atom := by
+            DirectSourceFinalIndexedAtomWords.word
+              (directSourceFormula decider symbols) literal.atom := by
   rw [directSourceFinalOccurrenceAtomWords_eq_unscaled]
   rw [retainedOccurrenceGlobalAtomWords_eq_clausewise]
   rw [finalCoordinatedSource_erase_clauses_eq]
@@ -76,7 +79,8 @@ theorem directSourceFinalOccurrenceAtomWords_eq_fiveFamilies
     (directSourceFinalOccurrenceAtomWords decider symbols).words =
       (directSourceFinalFiveFamilyClauses decider symbols).flatMap
         fun clause => clause.map fun literal =>
-          DirectSourceFinalAtomWords.word literal.atom := by
+          DirectSourceFinalIndexedAtomWords.word
+            (directSourceFormula decider symbols) literal.atom := by
   rw [directSourceFinalOccurrenceAtomWords_eq_deduplicatedClauses]
   rw [directSource_deduplicatedClauses_eq_fiveFamilies]
 
