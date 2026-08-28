@@ -2329,6 +2329,9 @@ build; an imported proof counts when its statement matches the paper.
                   prove the physical twelve-field blocks are emitted in the
                   exact global carrier-rank enumeration on valid numeric
                   routes.
+                - [x] Format those ranked fields back into one guarded
+                  physical source-pair word per global carrier entry, with an
+                  exact polynomial-time token compiler and numeric semantics.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
