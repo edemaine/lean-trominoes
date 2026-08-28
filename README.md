@@ -2351,6 +2351,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Project the normalized component stream to its exact
                   candidate-major twelve-field unary table, including the
                   aligned rejection sentinel.
+                - [x] Reuse the physical carrier-identity representative rows
+                  to select the corresponding normalized twelve-field blocks,
+                  and compile the exact direct-source lookup in polynomial
+                  time.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
