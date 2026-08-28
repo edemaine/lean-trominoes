@@ -2272,6 +2272,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Build compact source-key words that separate every valid
                   retained carrier, source, and crossover atom while reusing
                   the route-descriptor identities already emitted.
+                - [x] Specialize those compact words to the direct final source
+                  and prove their equality square is the exact represented-
+                  occurrence same-atom square.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
