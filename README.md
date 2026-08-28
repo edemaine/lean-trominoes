@@ -2324,6 +2324,12 @@ build; an imported proof counts when its statement matches the paper.
                   guard evaluator, recipe emitter, and guarded-pair merger are
                   polynomial time, and removing inactive padding recovers the
                   exact shift-major semantic source-pair stream.
+                - [x] Map the shifted emitter over the full tagged descriptor-
+                  slot square and compose it with the fixed 58-role Figure 8(b)
+                  expander.  Inactive padding disappears, while active output
+                  is exactly the physical common-shift crossing-record scan;
+                  periodic duplicate blocks remain aligned for stable
+                  representative selection.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
