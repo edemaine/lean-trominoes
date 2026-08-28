@@ -2228,6 +2228,9 @@ build; an imported proof counts when its statement matches the paper.
                   injective unary atom-code column, then assemble the entire
                   semantic stable-rank compiler from atom IDs, direction
                   ranks, and radial lengths.
+                - [x] Decode packed retained-carrier spans into their exact
+                  four-entry terminal direction-rank and radial-length columns,
+                  and compile both unary streams in polynomial time.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
