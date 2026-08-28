@@ -2278,6 +2278,10 @@ build; an imported proof counts when its statement matches the paper.
                   successful queries match the actual coordinated-source
                   terminals, and compose the projection with the crossover
                   and routed-family query compilers.
+                - [x] Reuse the affine bend-port predicate table to select
+                  every base bend's four-incidence terminal direction and
+                  radial blocks, prove exact numeric route/bend order, and
+                  compile both unary columns in bounded-size leaves.
                 - [x] Give wrapped routed planar-SAT atoms a canonical
                   primitive-recursive encoding and specialize its injective
                   numeric code to the direct source.
