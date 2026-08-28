@@ -2322,6 +2322,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Expand compact source-key representative rows across
                   those twelve fields and look up the exact field block of
                   every deduplicated carrier identity.
+                - [x] Generalize permutation-rank lookup from single unary
+                  fields to fixed-width blocks and prove that it emits every
+                  complete block in duplicate-free global reference order.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
