@@ -2266,6 +2266,12 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Assemble those five reduced columns, with their exact
                   append tree and canonical-halo order, into the complete
                   direct final occurrence atom-word stream.
+                - [x] Generalize atom-word equality and stable-rank compilation
+                  from global injectivity to separation of the represented
+                  final occurrences.
+                - [x] Build compact source-key words that separate every valid
+                  retained carrier, source, and crossover atom while reusing
+                  the route-descriptor identities already emitted.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
