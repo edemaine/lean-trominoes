@@ -35,6 +35,7 @@ inductive Label
   | scanPairs
   | readControl
   | scanPair
+  | clearControls
   | reverseOutput
   deriving Fintype
 
@@ -123,7 +124,7 @@ def program : Label → TM2.Stmt Alphabet Label State
   | .scanPairs =>
       .pop .input setInput
         (.branch inputIsNone
-          (.load clearInput (.goto fun _ => .reverseOutput))
+          (.load clearInput (.goto fun _ => .clearControls))
           (.branch inputIsPairStart
             (.load clearInput (.goto fun _ => .readControl))
             (.load clearInput (.goto fun _ => .scanPairs))))
@@ -150,6 +151,11 @@ def program : Label → TM2.Stmt Alphabet Label State
               (.push .outputReverse rightPairToken
                 (.load clearInput (.goto fun _ => .scanPair)))
               (.load clearInput (.goto fun _ => .scanPair)))))
+  | .clearControls =>
+      .pop .controls setControl
+        (.branch controlIsNone
+          (.load clearControl (.goto fun _ => .reverseOutput))
+          (.load clearControl (.goto fun _ => .clearControls)))
   | .reverseOutput =>
       .pop .outputReverse setOutput
         (.branch outputIsNone

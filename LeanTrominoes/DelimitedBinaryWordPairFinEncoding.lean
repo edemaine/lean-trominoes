@@ -21,6 +21,10 @@ noncomputable def finEncoding :
       decode_encode := decode_encode }
   ΓFin := inferInstance
 
+@[simp] theorem finEncoding_encode (input : Input) :
+    finEncoding.encode input = encode input :=
+  rfl
+
 /-- One semantic equality bit per encoded pair. -/
 def equalities (input : Input) : List Bool :=
   input.pairs.map fun pair => decide (pair.1 = pair.2)

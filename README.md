@@ -2376,6 +2376,13 @@ build; an imported proof counts when its statement matches the paper.
                   and retains exactly the active pairs.  This supplies the
                   dynamic retained-link selection needed to expand ranked
                   carrier words into final clause-occurrence order.
+                - [x] Form the row-major square of the direct globally ranked
+                  compact carrier words, compile the exact retained-link mask,
+                  and filter it to the selected compact endpoint pairs in
+                  polynomial time, including empty source alphabets.
+                - [ ] Expand every selected compact carrier endpoint pair to
+                  its four-word clause-occurrence block and identify the
+                  resulting stream with final carrier presentation order.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.

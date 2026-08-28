@@ -59,6 +59,12 @@ def scanPairCfg
   ⟨some .scanPair, ⟨none, active, none⟩,
     tapes input [] controls outputReverse []⟩
 
+def clearControlsCfg
+    (controls : List Bool) (outputReverse : List PairToken) :
+    TM2.Cfg Alphabet Label State :=
+  ⟨some .clearControls, initialState,
+    tapes [] [] controls outputReverse []⟩
+
 def reverseOutputCfg
     (outputReverse output : List PairToken) :
     TM2.Cfg Alphabet Label State :=
@@ -123,10 +129,10 @@ theorem step_scanPairs_start
   cases stack <;> simp [tapes, Function.update]
 
 theorem step_scanPairs_nil
-    (outputReverse : List PairToken) :
-    TM2.step program (scanPairsCfg [] [] outputReverse) =
-      some (reverseOutputCfg outputReverse []) := by
-  simp [TM2.step, program, scanPairsCfg, reverseOutputCfg, tapes,
+    (controls : List Bool) (outputReverse : List PairToken) :
+    TM2.step program (scanPairsCfg [] controls outputReverse) =
+      some (clearControlsCfg controls outputReverse) := by
+  simp [TM2.step, program, scanPairsCfg, clearControlsCfg, tapes,
     initialState, setInput, clearInput, inputIsNone]
 
 theorem step_readControl_cons
@@ -199,6 +205,25 @@ theorem step_scanPair_end
     all_goals
       funext stack
       cases stack <;> simp [tapes, Function.update]
+
+theorem step_clearControls_cons
+    (control : Bool) (controls : List Bool)
+    (outputReverse : List PairToken) :
+    TM2.step program
+        (clearControlsCfg (control :: controls) outputReverse) =
+      some (clearControlsCfg controls outputReverse) := by
+  cases control <;>
+    simp [TM2.step, program, clearControlsCfg, tapes, initialState,
+      setControl, clearControl, controlIsNone]
+  all_goals
+    funext stack
+    cases stack <;> simp [tapes, Function.update]
+
+theorem step_clearControls_nil (outputReverse : List PairToken) :
+    TM2.step program (clearControlsCfg [] outputReverse) =
+      some (reverseOutputCfg outputReverse []) := by
+  simp [TM2.step, program, clearControlsCfg, reverseOutputCfg, tapes,
+    initialState, setControl, clearControl, controlIsNone]
 
 theorem step_reverseOutput_cons
     (token : PairToken) (outputReverse output : List PairToken) :

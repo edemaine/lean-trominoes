@@ -29,6 +29,17 @@ def oneStep {Configuration : Type}
     simpa using step
   steps_le_m := Nat.le_refl 1
 
+def widenTime {Configuration : Type}
+    {transition : Configuration → Option Configuration}
+    {first : Configuration} {last : Option Configuration}
+    {smaller larger : Nat}
+    (run : EvalsToInTime transition first last smaller)
+    (bound : smaller ≤ larger) :
+    EvalsToInTime transition first last larger where
+  steps := run.steps
+  evals_in_steps := run.evals_in_steps
+  steps_le_m := run.steps_le_m.trans bound
+
 /-- Scan the left control prefix through its separator. -/
 def scanControls_evalsInTime
     (controls : List Bool) (input : List InputToken)
@@ -155,12 +166,33 @@ def scanPair_evalsInTime
             simpa [nextOutput, List.reverse_cons,
               List.append_assoc] using complete
 
+/-- Empty any unmatched suffix of the control stream. -/
+def clearControls_evalsInTime
+    (controls : List Bool) (outputReverse : List PairToken) :
+    EvalsToInTime (TM2.step program)
+      (clearControlsCfg controls outputReverse)
+      (some (reverseOutputCfg outputReverse []))
+      (controls.length + 1) := by
+  induction controls with
+  | nil =>
+      simpa using oneStep (step_clearControls_nil outputReverse)
+  | cons control controls induction =>
+      have first := oneStep
+        (step_clearControls_cons control controls outputReverse)
+      have complete := EvalsToInTime.trans (TM2.step program)
+        1 (controls.length + 1)
+        (clearControlsCfg (control :: controls) outputReverse)
+        (clearControlsCfg controls outputReverse)
+        (some (reverseOutputCfg outputReverse []))
+        first induction
+      simpa using complete
+
 /-- Consume all encoded pairs, accumulating precisely the selected output
-in reverse. -/
+in reverse. Unmatched controls are cleared and unmatched pairs are scanned
+without being copied. -/
 def scanPairs_evalsInTime
     (controls : List Bool)
     (pairs : List (List Bool × List Bool))
-    (aligned : controls.length = pairs.length)
     (outputReverse : List PairToken) :
     EvalsToInTime (TM2.step program)
       (scanPairsCfg
@@ -170,20 +202,71 @@ def scanPairs_evalsInTime
         ((DelimitedBinaryWordPairs.encode
           ⟨selectedPairs controls pairs⟩).reverse ++ outputReverse) []))
       ((DelimitedBinaryWordPairs.encode ⟨pairs⟩).length +
-        pairs.length + 1) := by
+        pairs.length + controls.length + 2) := by
   induction pairs generalizing controls outputReverse with
   | nil =>
-      have controlsNil : controls = [] := by
-        simpa using aligned
-      subst controls
-      simpa [DelimitedBinaryWordPairs.encode, selectedPairs] using
-        oneStep (step_scanPairs_nil outputReverse)
+      have first := oneStep (step_scanPairs_nil controls outputReverse)
+      have cleared := clearControls_evalsInTime controls outputReverse
+      have complete := EvalsToInTime.trans (TM2.step program)
+        1 (controls.length + 1)
+        (scanPairsCfg [] controls outputReverse)
+        (clearControlsCfg controls outputReverse)
+        (some (reverseOutputCfg outputReverse []))
+        first cleared
+      simpa [DelimitedBinaryWordPairs.encode, selectedPairs] using complete
   | cons pair pairs induction =>
       cases controls with
-      | nil => simp at aligned
+      | nil =>
+          have start := oneStep (step_scanPairs_start
+            (((pairBody pair ++
+                [DelimitedBinaryWordPairs.Token.pairEnd]) ++
+              DelimitedBinaryWordPairs.encode ⟨pairs⟩).map .right)
+            [] outputReverse)
+          have control := oneStep (step_readControl_nil
+            (((pairBody pair ++
+                [DelimitedBinaryWordPairs.Token.pairEnd]) ++
+              DelimitedBinaryWordPairs.encode ⟨pairs⟩).map .right)
+            outputReverse)
+          have pairRun := scanPair_evalsInTime
+            (pairBody pair) (pairBody_ne_end pair)
+            ((DelimitedBinaryWordPairs.encode ⟨pairs⟩).map .right)
+            [] none outputReverse
+          have pairRun' : EvalsToInTime (TM2.step program)
+              (scanPairCfg
+                (((pairBody pair ++
+                    [DelimitedBinaryWordPairs.Token.pairEnd]) ++
+                  DelimitedBinaryWordPairs.encode ⟨pairs⟩).map .right)
+                [] none outputReverse)
+              (some (scanPairsCfg
+                ((DelimitedBinaryWordPairs.encode ⟨pairs⟩).map .right)
+                [] outputReverse))
+              ((pairBody pair).length + 1) := by
+            simpa [List.map_append, List.append_assoc] using pairRun
+          have firstTwo := EvalsToInTime.trans (TM2.step program)
+            1 1 _ _ _ start control
+          have throughPairRaw := EvalsToInTime.trans (TM2.step program)
+            2 ((pairBody pair).length + 1) _ _ _ firstTwo pairRun'
+          have throughPair : EvalsToInTime (TM2.step program)
+              (scanPairsCfg
+                ((DelimitedBinaryWordPairs.encode
+                  ⟨pair :: pairs⟩).map .right)
+                [] outputReverse)
+              (some (scanPairsCfg
+                ((DelimitedBinaryWordPairs.encode ⟨pairs⟩).map .right)
+                [] outputReverse))
+              ((DelimitedBinaryWordPairs.pairTokens pair).length + 1) := by
+            simpa [pairTokens_eq, List.map_append, List.append_assoc,
+              DelimitedBinaryWordPairs.encode] using throughPairRaw
+          have rest := induction [] outputReverse
+          have complete := EvalsToInTime.trans (TM2.step program)
+            ((DelimitedBinaryWordPairs.pairTokens pair).length + 1)
+            ((DelimitedBinaryWordPairs.encode ⟨pairs⟩).length +
+              pairs.length + 2)
+            _ _ _ throughPair rest
+          convert complete using 1 <;>
+            simp [DelimitedBinaryWordPairs.encode, selectedPairs] <;>
+            omega
       | cons active controls =>
-          have tailAligned : controls.length = pairs.length := by
-            simpa using aligned
           let pairOutput :=
             if active then
               (DelimitedBinaryWordPairs.pairTokens pair).reverse ++
@@ -241,17 +324,25 @@ def scanPairs_evalsInTime
               simpa [pairOutput, pairTokens_eq, List.map_append,
                 List.reverse_append, List.append_assoc,
                 DelimitedBinaryWordPairs.encode] using throughPairRaw
-          have rest := induction controls tailAligned pairOutput
+          have rest := induction controls pairOutput
           have complete := EvalsToInTime.trans (TM2.step program)
             ((DelimitedBinaryWordPairs.pairTokens pair).length + 1)
             ((DelimitedBinaryWordPairs.encode ⟨pairs⟩).length +
-              pairs.length + 1)
+              pairs.length + controls.length + 2)
             _ _ _ throughPair rest
+          have complete' := widenTime
+            (larger :=
+              (DelimitedBinaryWordPairs.encode ⟨pair :: pairs⟩).length +
+                (pair :: pairs).length +
+                (active :: controls).length + 2)
+            complete (by
+              simp [DelimitedBinaryWordPairs.encode]
+              omega)
           cases active <;>
-            convert complete using 1 <;>
+            convert complete' using 1 <;>
               simp [pairOutput, DelimitedBinaryWordPairs.encode,
                 selectedPairs, List.reverse_append,
-                List.append_assoc] <;> omega
+                List.append_assoc]
 
 /-- Reverse the selected token accumulation onto the physical output. -/
 def reverseOutput_evalsInTime
@@ -297,12 +388,12 @@ def machine_outputsInTime
       (encodeInput input)
       (some (DelimitedBinaryWordPairs.encode
         ⟨selectedPairs input.controls input.pairs⟩))
-      (2 * input.controls.length +
+      (3 * input.controls.length +
         (DelimitedBinaryWordPairs.encode ⟨input.pairs⟩).length +
         input.pairs.length +
         (DelimitedBinaryWordPairs.encode
-          ⟨selectedPairs input.controls input.pairs⟩).length + 4) := by
-  rcases input with ⟨controls, pairs, aligned⟩
+          ⟨selectedPairs input.controls input.pairs⟩).length + 5) := by
+  rcases input with ⟨controls, pairs⟩
   dsimp only
   let pairInput : List InputToken :=
     (DelimitedBinaryWordPairs.encode ⟨pairs⟩).map
@@ -322,23 +413,24 @@ def machine_outputsInTime
         controls []))
       (2 * controls.length + 2) := by
     convert setup using 1 <;> (try simp [pairInput]) <;> omega
-  have pairsRun := scanPairs_evalsInTime controls pairs aligned []
+  have pairsRun := scanPairs_evalsInTime controls pairs []
   have throughPairs := EvalsToInTime.trans (TM2.step program)
     (2 * controls.length + 2)
     ((DelimitedBinaryWordPairs.encode ⟨pairs⟩).length +
-      pairs.length + 1)
+      pairs.length + controls.length + 2)
     _ _ _ setup' (by simpa [pairInput] using pairsRun)
   have reversed := reverseOutput_evalsInTime
     (DelimitedBinaryWordPairs.encode
       ⟨selectedPairs controls pairs⟩).reverse []
   have complete := EvalsToInTime.trans (TM2.step program)
     ((DelimitedBinaryWordPairs.encode ⟨pairs⟩).length +
-      pairs.length + 1 + (2 * controls.length + 2))
+      pairs.length + controls.length + 2 +
+        (2 * controls.length + 2))
     ((DelimitedBinaryWordPairs.encode
       ⟨selectedPairs controls pairs⟩).length + 1)
     _ _ _ throughPairs (by simpa using reversed)
   change EvalsToInTime (TM2.step program)
-    (initList machine (encodeInput ⟨controls, pairs, aligned⟩))
+    (initList machine (encodeInput ⟨controls, pairs⟩))
     (some (haltList machine
       (DelimitedBinaryWordPairs.encode
         ⟨selectedPairs controls pairs⟩))) _

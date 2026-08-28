@@ -20,13 +20,13 @@ namespace DelimitedBinaryWordPairBooleanFilterMachine
 open DelimitedBinaryWordPairBooleanFilter
 
 noncomputable def timePolynomial : Polynomial Nat :=
-  Polynomial.C 3 * Polynomial.X + Polynomial.C 1
+  Polynomial.C 3 * Polynomial.X + Polynomial.C 2
 
 @[simp] theorem timePolynomial_eval (length : Nat) :
-    timePolynomial.eval length = 3 * length + 1 := by
+    timePolynomial.eval length = 3 * length + 2 := by
   simp [timePolynomial, Polynomial.eval_add, Polynomial.eval_mul]
 
-/-- An aligned dynamically sized Boolean mask filters a delimited pair
+/-- A dynamically sized Boolean mask filters a delimited pair
 stream in linear time. -/
 noncomputable def computableInPolyTime :
     TM2ComputableInPolyTime encodeInput

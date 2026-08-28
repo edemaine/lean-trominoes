@@ -16,16 +16,14 @@ namespace LeanTrominoes.DelimitedBinaryWordPairBooleanFilter
 
 open Computability Turing
 
-/-- Equal-length Boolean controls and delimited pair streams compiled from
-one input can be aligned and filtered in polynomial time. -/
+/-- Boolean controls and delimited pair streams compiled from one input can
+be paired positionally and filtered in polynomial time. -/
 noncomputable def filteredPairsComputableInPolyTime
     {Source InputSymbol : Type}
     [Fintype InputSymbol] [Inhabited InputSymbol]
     (encodeSource : Source → List InputSymbol)
     (controls : Source → List Bool)
     (pairs : Source → DelimitedBinaryWordPairs.Input)
-    (aligned : ∀ source,
-      (controls source).length = (pairs source).pairs.length)
     (controlCompiler : TM2ComputableInPolyTime
       encodeSource id controls)
     (pairCompiler : TM2ComputableInPolyTime
@@ -39,8 +37,7 @@ noncomputable def filteredPairsComputableInPolyTime
   let prepared : TM2ComputableInPolyTime encodeSource encodeInput
       (fun source : Source =>
         { controls := controls source
-          pairs := (pairs source).pairs
-          aligned := aligned source }) :=
+          pairs := (pairs source).pairs }) :=
     TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
       forked (fun _ => rfl)
   let filtered := TM2CompositionMachine.computableInPolyTime

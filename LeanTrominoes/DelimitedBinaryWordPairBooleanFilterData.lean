@@ -22,7 +22,6 @@ def selectedPairs :
 structure Input where
   controls : List Bool
   pairs : List (List Bool × List Bool)
-  aligned : controls.length = pairs.length
 
 def output (input : Input) :
     DelimitedBinaryWordPairs.Input :=
