@@ -2306,6 +2306,9 @@ build; an imported proof counts when its statement matches the paper.
                   guarded canonical-left source-key pair per fixed slot,
                   omitting the retained 25-shift orbit and the other three
                   boundary-side copies used by the carrier pipeline.
+                - [x] Map that canonical-left inner emitter over complete
+                  descriptor-slot pair streams while preserving the exact
+                  concatenated guarded-candidate order.
                 - [x] Scan each physical occurrence pair through 25 fixed
                   common-shift guesses and prove that exactly its crossing-
                   point quotient activates.  Concatenating the blocks and
