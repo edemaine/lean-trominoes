@@ -2263,6 +2263,9 @@ build; an imported proof counts when its statement matches the paper.
                   templates, carrier/bend/routed-variable equalities to
                   repeated endpoint blocks, and routed clauses to their
                   presentation-ordered source-terminal rows.
+                - [x] Assemble those five reduced columns, with their exact
+                  append tree and canonical-halo order, into the complete
+                  direct final occurrence atom-word stream.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
