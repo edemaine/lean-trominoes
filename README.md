@@ -2250,6 +2250,10 @@ build; an imported proof counts when its statement matches the paper.
                   deduplicated target-vertex index, retaining a disjoint full
                   structural fallback so the input-dependent word remains
                   globally injective.
+                - [x] Project each direct numeric route descriptor's
+                  target-vertex field into the exact tagged on-formula
+                  source-atom word and compile the resulting delimited stream
+                  in polynomial time.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
