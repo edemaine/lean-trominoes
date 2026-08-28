@@ -17,6 +17,7 @@ open CycleLinkGroupedPortRanks
 last-occurrence order. -/
 theorem cycleLinkIncidenceAtoms_rankTwo_flatMap_eq_dedup
     {Variable Output : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable)
     (block : ThreeOccurrenceVariable Variable → List Output) :
     let atoms := (cycleLinkIncidences source).map

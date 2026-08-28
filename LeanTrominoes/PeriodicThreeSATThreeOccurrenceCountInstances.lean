@@ -14,6 +14,7 @@ namespace PeriodicThreeSATThree
 count occurrence-copy values identically. -/
 theorem occurrenceVariable_count_eq_decidable
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (value : ThreeOccurrenceVariable Variable)
     (values : List (ThreeOccurrenceVariable Variable)) :
     @List.count (ThreeOccurrenceVariable Variable) instBEqProd value values =

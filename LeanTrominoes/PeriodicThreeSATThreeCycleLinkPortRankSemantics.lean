@@ -16,6 +16,7 @@ namespace CycleLinkGroupedPortRanks
 descriptor, in incidence order. -/
 def cycleLinkIncidenceTargetPortRanks
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) : List Nat :=
   (cycleLinkIncidences source).zipIdx.map fun tagged =>
     1 + @List.count (ThreeOccurrenceVariable Variable)
@@ -25,6 +26,7 @@ def cycleLinkIncidenceTargetPortRanks
 
 theorem cycleLinkIncidenceTargetPortRanks_eq_indexedPrefixRanks
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) :
     cycleLinkIncidenceTargetPortRanks source =
       indexedPrefixRanks
@@ -39,6 +41,7 @@ theorem cycleLinkIncidenceTargetPortRanks_eq_indexedPrefixRanks
 
 theorem cycleLinkIncidenceTargetPortRanks_eq_prefixRanks
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) :
     cycleLinkIncidenceTargetPortRanks source =
       prefixRanks
@@ -51,6 +54,7 @@ theorem cycleLinkIncidenceTargetPortRanks_eq_prefixRanks
 fields for every group and every link. -/
 theorem cycleLinkIncidenceTargetPortRanks_eq_positional
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) :
     cycleLinkIncidenceTargetPortRanks source =
       (sourceVariables source).flatMap fun atom =>

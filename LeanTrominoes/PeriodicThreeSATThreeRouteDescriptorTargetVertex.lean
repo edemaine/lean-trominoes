@@ -12,7 +12,9 @@ namespace LeanTrominoes
 namespace PeriodicThreeSATThree
 
 private theorem occurrence_idxOf_decidableEq_eq
-    {Variable : Type*} [DecidableEq Variable]
+    {Variable : Type*} [BEq Variable] [LawfulBEq Variable]
+    [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (item : ThreeOccurrenceVariable Variable)
     (items : List (ThreeOccurrenceVariable Variable)) :
     @List.idxOf (ThreeOccurrenceVariable Variable)
@@ -26,7 +28,9 @@ private theorem occurrence_idxOf_decidableEq_eq
 /-- The variable endpoint of any split-formula route is indexed in the exact
 grouped-and-one-step-rotated occurrence-copy order. -/
 @[simp] theorem numericRouteDescriptor_formula_targetVertexIndex
-    {Variable : Type*} [DecidableEq Variable]
+    {Variable : Type*} [BEq Variable] [LawfulBEq Variable]
+    [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable)
     (incidence : CNFIncidence (ThreeOccurrenceVariable Variable))
     (edgeIndex : Nat) :

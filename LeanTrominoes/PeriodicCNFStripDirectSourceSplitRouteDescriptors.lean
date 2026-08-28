@@ -50,7 +50,9 @@ theorem directSource_numericRouteDescriptors_eq_splitRouteDescriptors
         directSourceSplitRouteDescriptorsStructuralVariableDecidableEq :=
     Subsingleton.elim _ _
   rw [instanceEq]
-  exact PeriodicThreeSATThree.numericRouteDescriptors_formula_eq_splitRouteDescriptors _
+  exact @PeriodicThreeSATThree.numericRouteDescriptors_formula_eq_splitRouteDescriptors
+    (ThreeCNFVariable Nat) inferInstance
+    directSourceSplitRouteDescriptorsStructuralVariableDecidableEq _
 
 /-- Replace the direct source's named equality implementation in the split
 descriptor stream by the structural implementation used by generic

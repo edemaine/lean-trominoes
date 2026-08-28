@@ -14,6 +14,7 @@ namespace PeriodicThreeSATThree
 deduplication used by the complete site stream. -/
 theorem occurrenceVariableRouteSites_filter_cycle_dedup_eq_boundaryBlocks
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable)
     (positiveOffsets : ∀ incidence ∈ occurrenceIncidences source,
       incidence.edge.offset = (0, 0) ∨

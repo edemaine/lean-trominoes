@@ -16,6 +16,7 @@ open PeriodicOrthocrossing
 each cycle-incidence atom in the rotated occurrence-copy order. -/
 theorem cycleLinkRouteDescriptors_targetVertexIndices_eq_atomStream
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) :
     (cycleLinkRouteDescriptors source).map
         RouteDescriptor.targetVertexIndex =

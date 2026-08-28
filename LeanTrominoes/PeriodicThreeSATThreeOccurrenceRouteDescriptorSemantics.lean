@@ -34,6 +34,7 @@ theorem occurrenceIncidence_tagged_mem
 descriptor at the same global edge index. -/
 theorem occurrenceIncidence_numericRouteDescriptor_eq
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable)
     (tagged : CNFIncidence Variable × Nat)
     (taggedMember : tagged ∈

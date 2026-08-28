@@ -18,6 +18,7 @@ of the surviving positive-offset boundary sites followed by one complete
 zero-offset block for each occurrence variable. -/
 theorem drawingVariableRouteSites_formula_eq_boundary_append_rotated
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable)
     (positiveOffsets : ∀ incidence ∈ occurrenceIncidences source,
       incidence.edge.offset = (0, 0) ∨

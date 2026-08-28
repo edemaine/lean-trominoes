@@ -17,6 +17,7 @@ namespace PeriodicThreeSATThree
 numeric route-descriptor enumeration of the occurrence-split formula. -/
 theorem numericRouteDescriptors_formula_eq_splitRouteDescriptors
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) :
     PeriodicCNF.numericRouteDescriptors (formula source) =
       splitRouteDescriptors source := by

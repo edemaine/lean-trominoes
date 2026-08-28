@@ -15,6 +15,7 @@ namespace PeriodicThreeSATThree
 indices enumerate the complete consecutive target range. -/
 theorem cycleLinkIncidenceAtoms_dedup_targetIndex_flatMap
     {Variable Output : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) (block : Nat → List Output) :
     (((cycleLinkIncidences source).map
         (fun incidence => incidence.literal.atom)).dedup).flatMap

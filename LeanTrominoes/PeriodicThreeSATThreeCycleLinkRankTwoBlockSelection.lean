@@ -16,6 +16,7 @@ cycle descriptors visits every occurrence-copy target index exactly once,
 in increasing target-index order. -/
 theorem cycleLinkRouteDescriptors_rankTwo_flatMap
     {Variable Output : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) (block : Nat → List Output) :
     (cycleLinkRouteDescriptors source).flatMap (fun descriptor =>
         if descriptor.targetPortRank = 2 then

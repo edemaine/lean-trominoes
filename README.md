@@ -2285,6 +2285,10 @@ build; an imported proof counts when its statement matches the paper.
                   and outgoing-start carrier keys, remove inactive sentinels,
                   and compile the exact repeated compact atom-word block in
                   polynomial time.
+                - [x] Scan the complete route-descriptor square, select each
+                  final routed-variable fiber in rotated target order, and
+                  compile its exact repeated compact endpoint-word block in
+                  polynomial time.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.

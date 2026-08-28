@@ -16,6 +16,7 @@ open PeriodicOrthocrossing
 stream is exactly its copied-incidence prefix followed by its cycle suffix. -/
 theorem drawingVariableRouteSites_formula_eq_dedup_occurrence_append_cycle
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) :
     drawingVariableRouteSites (formula source) =
       (occurrenceVariableRouteSites source ++

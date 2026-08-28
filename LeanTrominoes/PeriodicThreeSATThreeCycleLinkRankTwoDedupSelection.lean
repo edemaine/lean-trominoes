@@ -15,6 +15,7 @@ namespace PeriodicThreeSATThree
 cycle incidence of each atom. -/
 theorem cycleLinkRouteDescriptors_rankTwo_flatMap_eq_dedup
     {Variable Output : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) (block : Nat → List Output) :
     (cycleLinkRouteDescriptors source).flatMap (fun descriptor =>
         if descriptor.targetPortRank = 2 then

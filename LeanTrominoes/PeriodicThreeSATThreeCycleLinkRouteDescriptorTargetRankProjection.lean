@@ -18,6 +18,7 @@ open CycleLinkGroupedPortRanks
 one-based prefix-rank word of the cycle-incidence atoms. -/
 theorem cycleLinkRouteDescriptors_targetPortRanks_eq_prefixRanks
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) :
     (cycleLinkRouteDescriptors source).map
         RouteDescriptor.targetPortRank =

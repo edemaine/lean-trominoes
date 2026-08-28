@@ -17,6 +17,7 @@ open CycleLinkGroupedPortRanks
 and prefix-rank streams. -/
 theorem cycleLinkRouteDescriptors_rankTwo_flatMap_eq_prefixRanks
     {Variable Output : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) (block : Nat → List Output) :
     (cycleLinkRouteDescriptors source).flatMap (fun descriptor =>
         if descriptor.targetPortRank = 2 then

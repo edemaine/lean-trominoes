@@ -43,6 +43,7 @@ theorem formula_incidencesWithMetadata_offsets_zero_or_one
 implementation used by routed metadata. -/
 theorem formula_occurrencesAtMostThree_decidableEq
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) :
     @PeriodicCNF.OccurrencesAtMost
       (ThreeOccurrenceVariable Variable)

@@ -29,6 +29,7 @@ private theorem map_pair_eq_zip_maps
 each descriptor carries its incidence atom's rotated index and prefix rank. -/
 theorem cycleLinkRouteDescriptors_targetRankPairs
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) :
     (cycleLinkRouteDescriptors source).map (fun descriptor =>
         (descriptor.targetVertexIndex, descriptor.targetPortRank)) =

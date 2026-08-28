@@ -84,6 +84,7 @@ at one of the nine neighboring translations. -/
 nine-site zero-offset block for each copy, in grouped rotated order. -/
 theorem cycleLinkVariableRouteSites_dedup_eq_rotatedBlocks
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) :
     (cycleLinkVariableRouteSites source).dedup =
       rotatedVariableRouteSiteBlocks source := by

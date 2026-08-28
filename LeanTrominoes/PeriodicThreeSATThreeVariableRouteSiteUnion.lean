@@ -17,6 +17,7 @@ open PeriodicOrthocrossing
 source-site stream union the rotated full cycle-site blocks. -/
 theorem drawingVariableRouteSites_formula_eq_occurrence_union_rotated
     {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
     (source : PeriodicCNF Variable) :
     drawingVariableRouteSites (formula source) =
       decidableListUnion (occurrenceVariableRouteSites source)
