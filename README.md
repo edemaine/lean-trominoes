@@ -2342,6 +2342,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Map both normalized recipe emitters over complete
                   descriptor-pair streams, preserving the exact concatenated
                   terminal-prefix and crossing-slot candidate orders.
+                - [x] Combine the normalized terminal and crossing streams
+                  into one polynomial-time descriptor compiler and prove its
+                  exact guarded-word semantics.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
