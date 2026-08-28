@@ -27,7 +27,7 @@ def BendTemplate.compactTerminalRecipe
       else
         8 * template.incomingSegmentIndex +
           CarrierNodeSourceKeys.segmentEndTag .finish
-    translate := (0, 0)
+    translate := template.translate
     supported := true }
 
 /-- Four clause-major endpoint occurrences contributed by one bend equality. -/

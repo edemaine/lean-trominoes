@@ -2281,6 +2281,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
+                - [x] Select every affine base bend's tagged incoming-finish
+                  and outgoing-start carrier keys, remove inactive sentinels,
+                  and compile the exact repeated compact atom-word block in
+                  polynomial time.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
