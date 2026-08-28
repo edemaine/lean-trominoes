@@ -2315,6 +2315,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Decompose the exact compact occurrence column into its
                   crossover, carrier, bend, routed-clause, and routed-variable
                   blocks in final presentation order.
+                - [x] Project every padded carrier-node candidate's two
+                  compact source keys into its exact candidate-major
+                  twelve-field unary table, including the aligned rejection
+                  sentinel used by representative lookup.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
