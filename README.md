@@ -2214,6 +2214,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Give carrier lenses an explicit four-case terminal
                   datum, give bends a finite-table terminal datum, and prove
                   both equal the actual translated local incidence routes.
+                - [x] Package those fallback data as exact four-incidence
+                  direction-rank and radial-length blocks in copied-clause
+                  presentation order.
                 - [x] Factor terminal strict order and equality into unary
                   angular-rank and radial-length columns, prove exact
                   target-major matrix semantics, and compile both matrices
