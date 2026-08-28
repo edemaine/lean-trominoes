@@ -1681,6 +1681,9 @@ build; an imported proof counts when its statement matches the paper.
               rows selects each complete source-pair block, then identify the
               compiled result with the twelve-field image of the exact
               canonicalized crossing halo.
+            - [x] Reformat every selected twelve-field block with a fixed
+              finite-state transducer, proving it reconstructs the exact
+              guarded source-pair word stream in polynomial time.
           - [x] Reduce every remaining retained metadata family to compact
             canonical data: two-token straight-carrier, bend-corner, and
             routed-variable equality templates, plus routed source-clause
