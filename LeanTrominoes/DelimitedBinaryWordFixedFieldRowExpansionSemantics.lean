@@ -10,6 +10,39 @@ import LeanTrominoes.DelimitedBinaryWordFixedFieldRowExpansionCompiler
 namespace LeanTrominoes
 namespace DelimitedBinaryWordFixedFieldRowExpansion
 
+@[simp] theorem expandedBit_length
+    (width index : Nat) (bit : Bool) :
+    (expandedBit width index bit).length = width := by
+  simp [expandedBit]
+
+@[simp] theorem row_length
+    (width index : Nat) (bits : List Bool) :
+    (row width index bits).length = bits.length * width := by
+  unfold row
+  induction bits with
+  | nil => simp
+  | cons bit bits induction =>
+      simp [induction, Nat.succ_mul, Nat.add_comm]
+
+/-- Uniform input row lengths remain uniform after every fixed-field
+expansion. -/
+theorem rows_forall_length (width length : Nat)
+    (input : DelimitedBinaryWords.Input)
+    (lengths : input.words.Forall fun bits => bits.length = length) :
+    (rows width input).words.Forall fun bits =>
+      bits.length = length * width := by
+  rw [List.forall_iff_forall_mem]
+  intro expanded expandedMember
+  unfold rows at expandedMember
+  rcases List.mem_flatMap.mp expandedMember with
+    ⟨bits, bitsMember, expandedMember⟩
+  rcases List.mem_map.mp expandedMember with
+    ⟨index, _indexMember, expandedEq⟩
+  subst expanded
+  rw [row_length]
+  exact congrArg (fun value => value * width)
+    ((List.forall_iff_forall_mem.mp lengths) bits bitsMember)
+
 @[simp] theorem rowTokens_wordTokens
     (width index : Nat) (bits : List Bool) :
     rowTokens width index (DelimitedBinaryWords.wordTokens bits) =
