@@ -2294,6 +2294,10 @@ build; an imported proof counts when its statement matches the paper.
                   finite retagging pass produces the exact left, right, top,
                   and bottom boundary identities; the nine internal roles
                   retain the left site pair and append their fixed suffixes.
+                - [x] Reconstruct the physical crossing halo from graph-free
+                  occurrence pairs, normalize each record at the numeric
+                  drawing period, and prove stable deduplication gives the
+                  exact `canonicalizedCrossingHalo` presentation order.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
