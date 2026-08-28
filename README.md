@@ -2217,6 +2217,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Package those fallback data as exact four-incidence
                   direction-rank and radial-length blocks in copied-clause
                   presentation order.
+                - [x] Decode the existing packed retained-carrier matrix
+                  fields to those exact unary rank and length blocks, with
+                  inactive pairs contributing no output.
                 - [x] Factor terminal strict order and equality into unary
                   angular-rank and radial-length columns, prove exact
                   target-major matrix semantics, and compile both matrices
