@@ -1664,6 +1664,10 @@ build; an imported proof counts when its statement matches the paper.
               merging, select either component, and compile each of its six
               unary fields in exact padded-candidate alignment with a final
               representative-lookup sentinel.
+            - [x] Compile a reusable fixed-width representative-row
+              expansion: each candidate bit is placed into one chosen field
+              of a fixed block, and every input row expands to all field rows
+              in order.
           - [x] Reduce every remaining retained metadata family to compact
             canonical data: two-token straight-carrier, bend-corner, and
             routed-variable equality templates, plus routed source-clause
