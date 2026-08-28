@@ -2345,6 +2345,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Combine the normalized terminal and crossing streams
                   into one polynomial-time descriptor compiler and prove its
                   exact guarded-word semantics.
+                - [x] Prove those guarded components are exactly the
+                  period-normalized source-key pairs of the same padded
+                  terminal and active crossing carrier candidates.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
