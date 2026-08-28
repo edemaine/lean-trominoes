@@ -2298,6 +2298,10 @@ build; an imported proof counts when its statement matches the paper.
                   occurrence pairs, normalize each record at the numeric
                   drawing period, and prove stable deduplication gives the
                   exact `canonicalizedCrossingHalo` presentation order.
+                - [x] Map that ordered halo to one tagged canonical-left
+                  source-key pair per crossing and prove the fixed role
+                  expander yields its complete compact crossover atom-word
+                  block.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
