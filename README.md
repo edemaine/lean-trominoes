@@ -2355,6 +2355,9 @@ build; an imported proof counts when its statement matches the paper.
                   to select the corresponding normalized twelve-field blocks,
                   and compile the exact direct-source lookup in polynomial
                   time.
+                - [x] Reorder those normalized twelve-field blocks by the
+                  compiled global carrier ranks in polynomial time, including
+                  the empty source-alphabet case.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.

@@ -7,6 +7,7 @@ import LeanTrominoes.LastTrueUnaryValueLookupCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceCarrierNormalizedSourceKeyRepresentativeFieldData
 import LeanTrominoes.PeriodicCNFStripDirectSourceNumericRouteDescriptorCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceRouteDescriptorCrossingMarkers
+import LeanTrominoes.PeriodicCNFStripDirectSourceVariableDecidableEqInstance
 import LeanTrominoes.PeriodicOrthocrossingCarrierNormalizedSourceKeyAllFieldStreamSemantics
 import LeanTrominoes.PeriodicOrthocrossingCarrierNormalizedSourceKeyRepresentativeFieldLookupInput
 import LeanTrominoes.PeriodicOrthocrossingCarrierOrderRepresentativeLookupNumericSemantics
@@ -32,9 +33,7 @@ noncomputable local instance directNormalizedCarrierRepresentativeStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-local instance directNormalizedCarrierRepresentativeVariableDecidableEq :
-    DecidableEq Variable :=
-  directSourceVariableDecidableEq
+attribute [local instance] directSourceVariableDecidableEqInstance
 
 local instance : Inhabited DelimitedBinaryWords.finEncoding.Γ :=
   ⟨DelimitedBinaryWords.Token.wordStart⟩
