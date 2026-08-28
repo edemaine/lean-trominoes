@@ -1668,6 +1668,11 @@ build; an imported proof counts when its statement matches the paper.
               expansion: each candidate bit is placed into one chosen field
               of a fixed block, and every input row expands to all field rows
               in order.
+            - [x] Stream each guarded carrier-key word directly to its six
+              unary fields, with negative magnitudes before positive ones.
+              Applied before pair merging, this gives the exact candidate-
+              major twelve-field table and its twelve-zero rejection
+              sentinel.
           - [x] Reduce every remaining retained metadata family to compact
             canonical data: two-token straight-carrier, bend-corner, and
             routed-variable equality templates, plus routed source-clause
