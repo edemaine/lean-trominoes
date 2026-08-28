@@ -2339,6 +2339,9 @@ build; an imported proof counts when its statement matches the paper.
                   recipes without changing their activation layout, and
                   compile their exact guarded candidate-word packages in
                   polynomial time.
+                - [x] Map both normalized recipe emitters over complete
+                  descriptor-pair streams, preserving the exact concatenated
+                  terminal-prefix and crossing-slot candidate orders.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
