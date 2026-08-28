@@ -2243,6 +2243,9 @@ build; an imported proof counts when its statement matches the paper.
                   with the literal-wise flattening of the existing
                   crossover/carrier/bend/routed-clause/routed-variable
                   quotient presentation.
+                - [x] Define a decoder-backed injective structural word for
+                  every final routed atom and align its complete scaled
+                  occurrence column with that same five-family presentation.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.

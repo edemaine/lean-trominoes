@@ -20,6 +20,24 @@ def retainedOccurrenceGlobalAtomWords
     (atomWord : Variable → List Bool) : DelimitedBinaryWords.Input :=
   ⟨(allOccurrenceVariables source).map fun copy => atomWord copy.1⟩
 
+/-- Structural atom words are equivalently a clausewise flattening in the
+ordinary occurrence presentation. -/
+theorem retainedOccurrenceGlobalAtomWords_eq_clausewise
+    {Variable : Type*}
+    (source : PeriodicCNF Variable)
+    (atomWord : Variable → List Bool) :
+    (retainedOccurrenceGlobalAtomWords source atomWord).words =
+      source.clauses.flatMap fun clause =>
+        clause.map fun literal => atomWord literal.atom := by
+  unfold retainedOccurrenceGlobalAtomWords
+  rw [show
+      (allOccurrenceVariables source).map (fun copy => atomWord copy.1) =
+        ((allOccurrenceVariables source).map Prod.fst).map atomWord by
+      simp only [List.map_map, Function.comp_def]]
+  rw [allOccurrenceVariables_fst]
+  unfold PeriodicCNF.variableOccurrences
+  simp only [List.map_flatMap, List.map_map, Function.comp_def]
+
 /-- Injective structural words turn the generic word-equality square into
 the exact global same-atom stream. -/
 theorem retainedOccurrenceGlobalAtomEqualityBits_eq_words
