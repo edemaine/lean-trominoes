@@ -2348,6 +2348,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove those guarded components are exactly the
                   period-normalized source-key pairs of the same padded
                   terminal and active crossing carrier candidates.
+                - [x] Project the normalized component stream to its exact
+                  candidate-major twelve-field unary table, including the
+                  aligned rejection sentinel.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.

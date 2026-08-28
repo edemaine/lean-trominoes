@@ -16,7 +16,7 @@ namespace CarrierNormalizedSourceKeyComponentStream
 
 open RouteDescriptorOccurrenceSlotBinaryWords
 
-private def normalizedComponentPairAtPeriod
+def normalizedComponentPairAtPeriod
     (period : Nat)
     (candidate :
       PaddedSupportedLastRepresentativeEqualityRows.Candidate CarrierNode) :
