@@ -2273,6 +2273,11 @@ build; an imported proof counts when its statement matches the paper.
                   and compile both unary streams in polynomial time.
                 - [x] Compose both exact carrier terminal columns with the
                   direct-source numeric route-descriptor compiler.
+                - [x] Project finite direct-atlas clause queries to their
+                  carried unscaled terminal direction/radial columns, prove
+                  successful queries match the actual coordinated-source
+                  terminals, and compose the projection with the crossover
+                  and routed-family query compilers.
                 - [x] Give wrapped routed planar-SAT atoms a canonical
                   primitive-recursive encoding and specialize its injective
                   numeric code to the direct source.
