@@ -2358,6 +2358,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Reorder those normalized twelve-field blocks by the
                   compiled global carrier ranks in polynomial time, including
                   the empty source-alphabet case.
+                - [x] Identify the ranked normalized blocks with the
+                  period-normalized source pairs of the same deduplicated
+                  carrier data, and format one guarded pair word per global
+                  carrier rank in polynomial time.
                 - [x] Project each route descriptor's edge index to the exact
                   compact normalized source-terminal word and compile the
                   routed-clause block in polynomial time.
