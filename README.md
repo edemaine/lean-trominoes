@@ -1660,6 +1660,10 @@ build; an imported proof counts when its statement matches the paper.
               source-pair candidates.  Prove compact carrier-key injectivity
               on the canonical crossing halo, so the selected semantic values
               are exactly the canonical crossing left-source stream.
+            - [x] Preserve the two guarded carrier-key components before
+              merging, select either component, and compile each of its six
+              unary fields in exact padded-candidate alignment with a final
+              representative-lookup sentinel.
           - [x] Reduce every remaining retained metadata family to compact
             canonical data: two-token straight-carrier, bend-corner, and
             routed-variable equality templates, plus routed source-clause
