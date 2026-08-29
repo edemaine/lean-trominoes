@@ -12536,7 +12536,14 @@ The representation choices for this target are:
   [`carrier`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierQuerySlotBlockArity.lean),
   and [`bend`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendQuerySlotBlockArity.lean)
   arity leaves then cancel the crossover prefix and isolate pointwise query-
-  arity/stable-slot-block-length equality for each fallback family, and
+  arity/stable-slot-block-length equality for each fallback family.  The
+  [`crossover arity`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCrossoverQuerySlotBlockArity.lean)
+  and [`descriptor bridge`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackDescriptorSlotBlockArity.lean)
+  complete the three relevant family alignments.  Four-block mask semantics
+  then identify the global slot presentation, and
+  [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotSemantics.lean)
+  proves that the two selected streams are exactly the flattened semantic
+  carrier and bend slot blocks.  Finally,
   [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotCompiler.lean)
   selects the complete carrier and bend slot streams in polynomial time.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
