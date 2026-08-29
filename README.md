@@ -12546,6 +12546,16 @@ The representation choices for this target are:
   carrier and bend slot blocks.  Finally,
   [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotCompiler.lean)
   selects the complete carrier and bend slot streams in polynomial time.
+- [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackSuffixQueryData.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackSuffixQueryData.lean)
+  packages the direct-source carrier and bend terminal directions, header
+  roles, radial lengths, and selected stable slots into the exact compact
+  fallback-suffix queries.  A shared stable-slot/coordinate cardinality lemma
+  plus separate
+  [`carrier`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierFallbackSuffixQueryLength.lean)
+  and [`bend`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendFallbackSuffixQueryLength.lean)
+  query-length leaves prove that every zipped column is aligned.  The proofs are split
+  further by occurrence, direction, and radial column so each Lean check stays
+  within the project’s bounded-memory workflow.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise

@@ -1,0 +1,48 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierTerminalRadialSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFallbackSuffixQueryData
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalStableRankSlotCoordinateLength
+
+/-! # Carrier fallback radial-count alignment -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicEightOccurrenceSplit
+
+variable {Input : Type}
+variable {encoding : _root_.Computability.FinEncoding Input}
+variable {language : Input → Prop}
+variable (decider : Complexity.DeciderInPolySpace encoding language)
+
+noncomputable local instance directFinalCarrierFallbackRadialLengthStackFintype
+    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
+  decider.stackAlphabetFinite stack
+
+local instance directFinalCarrierFallbackRadialLengthVariableDecidableEq :
+    DecidableEq Variable :=
+  directSourceVariableDecidableEq
+
+theorem directSourceFinalCarrierRadialLengths_length_eq_coordinates
+    (symbols : List encoding.Γ) :
+    (directSourceCarrierTerminalRadialLengths decider symbols).length =
+      (directSourceFinalCarrierFallbackTerminalCoordinates
+        decider symbols).length := by
+  rw [directSourceFinalCarrierTerminalRadialLengths_eq_actual]
+  unfold directSourceFinalCarrierFallbackTerminalCoordinates
+    TerminalCoordinateComponents.radialLengths
+  simp only [List.length_map]
+  exact
+    retainedFinalTerminalCoordinatesFrom_finalRoutes_length_irrel
+      (directSourceFormula decider symbols)
+      (directSourceFinalCarrierStart decider symbols)
+      (directSourceFinalCarrierClauses decider symbols) _ _
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end
