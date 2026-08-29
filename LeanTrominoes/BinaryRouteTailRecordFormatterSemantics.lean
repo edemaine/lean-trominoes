@@ -152,6 +152,38 @@ private theorem scan_fourthRoute
       rw [scan_fourthTail firstProfile secondProfile directions]
       rfl
 
+/-- Scanning four complete route words reaches the terminal control and
+emits exactly the two corresponding binary-clause records. -/
+theorem scan_four_routes
+    (firstProfile secondProfile :
+      FormulaShapeDirectionOrdering.DirectedClauseProfile)
+    (first second third fourth : List AxisDirection) :
+    scan (transition firstProfile secondProfile) .firstHead
+        (delimitedDirections first ++
+          delimitedDirections second ++
+          delimitedDirections third ++
+          delimitedDirections fourth) =
+      (.done,
+        clauseRecord firstProfile [first.tail, second.tail] ++
+          clauseRecord secondProfile [third.tail, fourth.tail]) := by
+  rw [show delimitedDirections first ++
+          delimitedDirections second ++
+          delimitedDirections third ++
+          delimitedDirections fourth =
+        delimitedDirections first ++
+          (delimitedDirections second ++
+            (delimitedDirections third ++
+              delimitedDirections fourth)) by
+        simp [List.append_assoc]]
+  rw [scan_append, scan_firstRoute]
+  dsimp only
+  rw [scan_append, scan_secondRoute]
+  dsimp only
+  rw [scan_append, scan_thirdRoute]
+  dsimp only
+  rw [scan_fourthRoute]
+  simp [clauseRecord, taggedTailTokens, List.append_assoc]
+
 /-- The formatter has the exact two-clause semantics for any four complete
 route words, including empty words. -/
 theorem output_four_routes
