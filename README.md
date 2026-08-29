@@ -12445,6 +12445,10 @@ The representation choices for this target are:
   identifies those unscaled source-prefix words explicitly: carrier prefixes
   use four simple span-aware cases, while bend prefixes are a finite corner
   table.  Straight two-point carrier routes correctly leave an empty prefix.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierFallbackPrefixTrimmer.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierFallbackPrefixTrimmer.lean)
+  converts every four-route carrier block to those source prefixes with one
+  finite-state pass.  Its fixed positional buffers discard the two straight
+  routes and only the final two or one steps of the other routes.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
