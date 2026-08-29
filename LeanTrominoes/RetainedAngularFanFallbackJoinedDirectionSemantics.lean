@@ -54,6 +54,40 @@ theorem joined_prefixes_directions_eq
     obtain ⟨entry, entryMember, rfl⟩ := List.mem_map.mp queryMember
     exact lengthPositive entry entryMember
 
+/-- Equal-length prefix and query lists can be paired positionally before
+applying the geometric join semantics. -/
+theorem joined_prefixWords_directions_eq
+    (prefixes : List (List AxisDirection))
+    (queries : List Batch.Query)
+    (lengthEq : prefixes.length = queries.length)
+    (lengthPositive : ∀ query ∈ queries, 0 < query.rawLength) :
+    DelimitedRouteJoin.joined
+        (prefixes.flatMap DelimitedRouteJoin.delimited)
+        (Batch.directions queries) =
+      retainedJoinedDirections (prefixes.zip queries) := by
+  have firstProjection :
+      (prefixes.zip queries).map Prod.fst = prefixes :=
+    List.map_fst_zip (le_of_eq lengthEq)
+  have secondProjection :
+      (prefixes.zip queries).map Prod.snd = queries :=
+    List.map_snd_zip (le_of_eq lengthEq.symm)
+  have pairedPositive :
+      ∀ entry ∈ prefixes.zip queries, 0 < entry.2.rawLength := by
+    intro entry entryMember
+    apply lengthPositive entry.2
+    have member : entry.2 ∈ (prefixes.zip queries).map Prod.snd :=
+      List.mem_map.mpr ⟨entry, entryMember, rfl⟩
+    simpa only [secondProjection] using member
+  have prefixProjection :
+      (prefixes.zip queries).flatMap
+          (fun entry => DelimitedRouteJoin.delimited entry.1) =
+        prefixes.flatMap DelimitedRouteJoin.delimited := by
+    rw [← List.flatMap_map, firstProjection]
+  have joined := joined_prefixes_directions_eq
+    (prefixes.zip queries) pairedPositive
+  rw [prefixProjection, secondProjection] at joined
+  exact joined
+
 end FallbackSuffixDirectionCompiler
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

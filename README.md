@@ -12576,7 +12576,15 @@ The representation choices for this target are:
   followed by its exact geometric retained-fan suffix.
   [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackRouteDirectionCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackRouteDirectionCompiler.lean)
   instantiates the joiner for both direct carrier and bend streams, including
-  empty source alphabets.
+  empty source alphabets.  The affine
+  [`bend stream semantics`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionStreamSemantics.lean)
+  identifies the selected, scaled prefix blocks with every semantic bend.
+  The direct-source
+  [`prefix`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendFallbackPrefixSemantics.lean),
+  [`suffix`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendFallbackSuffixSemantics.lean),
+  and [`joined route`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendFallbackRouteDirectionSemantics.lean)
+  leaves then prove that the compiled bend stream is exactly the complete
+  geometric source-prefix-plus-retained-fan word for each aligned incidence.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
