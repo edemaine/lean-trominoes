@@ -12585,6 +12585,17 @@ The representation choices for this target are:
   and [`joined route`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendFallbackRouteDirectionSemantics.lean)
   leaves then prove that the compiled bend stream is exactly the complete
   geometric source-prefix-plus-retained-fan word for each aligned incidence.
+  The carrier analogue separates its reset-safe
+  [`scaled prefix stream`](LeanTrominoes/PeriodicOrthocrossingCarrierFallbackPrefixScalingStreamSemantics.lean)
+  from the row-major
+  [`terminal-data presentation`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierFallbackTerminalDataPresentation.lean),
+  whose direction, radial, and positivity leaves keep every Lean check within
+  the bounded-memory workflow.  Its direct-source
+  [`prefix`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierFallbackPrefixSemantics.lean),
+  [`suffix`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierFallbackSuffixSemantics.lean),
+  and [`joined route`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierFallbackRouteDirectionSemantics.lean)
+  theorems likewise identify every compiled carrier fallback with its complete
+  geometric source-prefix-plus-retained-fan direction word.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise

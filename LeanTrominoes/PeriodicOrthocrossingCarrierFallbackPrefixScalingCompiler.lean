@@ -62,6 +62,28 @@ carrier source-prefix words. -/
     FallbackPrefixDirectionScaling.output_delimitedDirections,
     FallbackPrefixDirectionScaling.output_delimitedDirections]
 
+/-- A valid canonical carrier block resets both stages before the remaining
+stream, so every later retained carrier is scaled independently. -/
+theorem output_canonicalBlock_append
+    (horizontal : Bool) (span : Nat) (large : 6 < span)
+    (rest : List Token) :
+    output (canonicalBlock horizontal span ++ rest) =
+      canonicalScaledPrefixBlock horizontal span ++ output rest := by
+  have blockEq := output_canonicalBlock horizontal span large
+  unfold output at blockEq ⊢
+  have scaledPrefixEq :
+      FallbackPrefixDirectionScaling.output
+          (CarrierFallbackPrefixTrimmer.canonicalPrefixBlock
+            horizontal span) =
+        canonicalScaledPrefixBlock horizontal span :=
+    (congrArg FallbackPrefixDirectionScaling.output
+      (CarrierFallbackPrefixTrimmer.output_canonicalBlock
+        horizontal span large)).symm.trans blockEq
+  rw [CarrierFallbackPrefixTrimmer.output_canonicalBlock_append
+      horizontal span large rest,
+    FallbackPrefixDirectionScaling.output_append,
+    scaledPrefixEq]
+
 /-- The carrier trimmer followed by fixed prefix scaling remains
 polynomial-time computable. -/
 noncomputable def outputComputableInPolyTime :
