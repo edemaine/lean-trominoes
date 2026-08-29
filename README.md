@@ -12614,6 +12614,10 @@ The representation choices for this target are:
   strictly behind it in the tangential coordinate, while the lane shift and
   inward cardinal ray remain on or ahead of it, so the two pieces meet only
   at the gate.
+- [`LeanTrominoes/RetainedAngularFanFallbackCardinalGateSuffixSeparation.lean`](LeanTrominoes/RetainedAngularFanFallbackCardinalGateSuffixSeparation.lean)
+  rejoins the radial lane, finite local adapter, and matching Figure 7 spoke.
+  A positive cardinal segment immediately behind an ordinary fallback gate
+  therefore meets the complete unit-subdivided suffix only at that gate.
 
 ## Build
 
