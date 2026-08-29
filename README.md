@@ -2255,6 +2255,10 @@ build; an imported proof counts when its statement matches the paper.
                   all-direct, recover every route choice, and equate its
                   compiled direction/radial columns with the actual unscaled
                   coordinated-source terminals.
+                - [x] Identify the exact globally indexed routed-clause query
+                  family, recover every direct route choice, and equate its
+                  compiled direction/radial columns with the actual unscaled
+                  coordinated-source terminals.
                 - [x] Give carrier lenses an explicit four-case terminal
                   datum, give bends a finite-table terminal datum, and prove
                   both equal the actual translated local incidence routes.
