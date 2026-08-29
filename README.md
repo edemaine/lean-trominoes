@@ -2351,6 +2351,8 @@ build; an imported proof counts when its statement matches the paper.
                   comparison squares through source-clearance scaling, and
                   combine them with atom equality to compile the exact global
                   stable-terminal-rank stream.
+                - [x] Convert that unary rank stream with a saturated finite
+                  counter to the exact bounded eight-way terminal-slot stream.
                 - [x] Decompose the exact compact occurrence column into its
                   crossover, carrier, bend, routed-clause, and routed-variable
                   blocks in final presentation order.
