@@ -68,7 +68,7 @@ def endTransition (control : Control) : Control × List Token :=
   | .secondNone | .secondOne | .secondTwo =>
       (thirdNone, [.routeEnd])
   | .thirdNone | .thirdOne => (discardFourth, [.routeEnd])
-  | .discardFourth => (done, [.routeEnd])
+  | .discardFourth => (initial, [.routeEnd])
   | .done => (control, [])
 
 def transition (control : Control) : Token → Control × List Token
@@ -194,7 +194,7 @@ private theorem scan_discardFourth
     (directions : List AxisDirection) :
     scan transition discardFourth
         (delimitedDirections directions) =
-      (done, [.routeEnd]) := by
+      (initial, [.routeEnd]) := by
   induction directions with
   | nil => rfl
   | cons direction directions induction =>
@@ -261,6 +261,74 @@ theorem output_canonicalBlock
     simp [canonicalPrefixBlock, delimitedDirections, directionTokens,
       carrierLensRouteDirections, carrierLensRoutePrefixDirections,
       spanThree, List.map_replicate, List.append_assoc]
+
+private theorem scan_canonicalBlock_state
+    (horizontal : Bool) (span : Nat) :
+    (scan transition initial (canonicalBlock horizontal span)).1 =
+      initial := by
+  unfold canonicalBlock
+  rw [show delimitedDirections
+          (carrierLensRouteDirections horizontal span 0 0) ++
+        delimitedDirections
+          (carrierLensRouteDirections horizontal span 0 1) ++
+        delimitedDirections
+          (carrierLensRouteDirections horizontal span 1 0) ++
+        delimitedDirections
+          (carrierLensRouteDirections horizontal span 1 1) =
+      delimitedDirections
+          (carrierLensRouteDirections horizontal span 0 0) ++
+        (delimitedDirections
+          (carrierLensRouteDirections horizontal span 0 1) ++
+        (delimitedDirections
+          (carrierLensRouteDirections horizontal span 1 0) ++
+        delimitedDirections
+          (carrierLensRouteDirections horizontal span 1 1))) by
+      simp [List.append_assoc]]
+  unfold delimitedDirections
+  rw [show directionTokens
+          (carrierLensRouteDirections horizontal span 0 0) ++
+        [.routeEnd] ++
+        (directionTokens
+          (carrierLensRouteDirections horizontal span 0 1) ++
+        [.routeEnd] ++
+        (directionTokens
+          (carrierLensRouteDirections horizontal span 1 0) ++
+        [.routeEnd] ++
+        (directionTokens
+          (carrierLensRouteDirections horizontal span 1 1) ++
+        [.routeEnd]))) =
+      directionTokens
+          (carrierLensRouteDirections horizontal span 0 0) ++
+        .routeEnd ::
+        (delimitedDirections
+          (carrierLensRouteDirections horizontal span 0 1) ++
+        (delimitedDirections
+          (carrierLensRouteDirections horizontal span 1 0) ++
+        delimitedDirections
+          (carrierLensRouteDirections horizontal span 1 1))) by
+      simp [delimitedDirections, List.append_assoc]]
+  rw [scan_discardFirst]
+  dsimp only
+  rw [scan_append, scan_second]
+  dsimp only
+  rw [scan_append, scan_third]
+  dsimp only
+  rw [scan_discardFourth]
+
+/-- A complete carrier block resets the trimmer before the following block,
+so a stream retains every carrier rather than only its first block. -/
+theorem output_canonicalBlock_append
+    (horizontal : Bool) (span : Nat) (large : 6 < span)
+    (rest : List Token) :
+    output (canonicalBlock horizontal span ++ rest) =
+      canonicalPrefixBlock horizontal span ++ output rest := by
+  have blockOutput := output_canonicalBlock horizontal span large
+  unfold output FiniteStateTransducer.output at blockOutput ⊢
+  simp only [finish, List.append_nil] at blockOutput ⊢
+  rw [scan_append]
+  dsimp only
+  rw [scan_canonicalBlock_state]
+  rw [blockOutput]
 
 /-- One fixed finite-state transducer extracts all retained carrier source
 prefixes in linear time. -/

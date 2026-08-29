@@ -12448,7 +12448,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierFallbackPrefixTrimmer.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierFallbackPrefixTrimmer.lean)
   converts every four-route carrier block to those source prefixes with one
   finite-state pass.  Its fixed positional buffers discard the two straight
-  routes and only the final two or one steps of the other routes.
+  routes and only the final two or one steps of the other routes.  The state
+  resets at each four-route boundary; an append theorem verifies that later
+  carrier blocks are preserved independently.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionCompiler.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionCompiler.lean)
   uses the existing affine bend predicates to select the corresponding finite
   table of four route-delimited source-prefix words in polynomial time.
