@@ -12604,6 +12604,11 @@ The representation choices for this target are:
   it also removes clockwise clause sorting: each valid final incidence
   recovers its original composed-raw literal index and unchanged normalized
   route word.
+- [`LeanTrominoes/RetainedAngularFanFallbackCardinalGateTangentData.lean`](LeanTrominoes/RetainedAngularFanFallbackCardinalGateTangentData.lean)
+  names the cardinal source segment immediately behind an ordinary fallback
+  gate.  Its outward coordinate is constant, while every point of the finite
+  local adapter and Figure 7 spoke lies strictly inward, proving contact-free
+  separation from both bounded suffix pieces.
 
 ## Build
 
