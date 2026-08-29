@@ -2801,6 +2801,7 @@ import LeanTrominoes.RetainedAngularOccurrenceTerminalCoordinateComponentSemanti
 import LeanTrominoes.RetainedAngularOccurrenceTerminalCoordinateComponentCompiler
 import LeanTrominoes.RetainedAngularOccurrenceGlobalAtomCodeSemantics
 import LeanTrominoes.RetainedAngularOccurrenceGlobalNumericColumnCompiler
+import LeanTrominoes.DelimitedRouteJoinSemantics
 
 /-!
 # LeanTrominoes
