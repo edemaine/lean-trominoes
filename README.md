@@ -12454,6 +12454,8 @@ The representation choices for this target are:
   table of four route-delimited source-prefix words in polynomial time.
   [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionSelection.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionSelection.lean)
   proves that exactly the matching bend-port block is selected.
+  [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionNumericSemantics.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionNumericSemantics.lean)
+  identifies that block with the semantic bend sequence of each numeric route.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
