@@ -12505,6 +12505,10 @@ The representation choices for this target are:
   producers through zero padding, pointwise addition, and query formatting.
   The resulting generic compiler emits either the exact compact batch or its
   complete route-delimited fallback-suffix directions.
+- [`LeanTrominoes/RetainedTerminalDirectionRankDecoderCompiler.lean`](LeanTrominoes/RetainedTerminalDirectionRankDecoderCompiler.lean)
+  decodes delimiter-terminated unary angular ranks to the eleven native
+  retained terminal directions.  Valid ranks round-trip exactly through
+  `angularRank`; malformed oversized fields saturate at rank ten.
 - [`LeanTrominoes/AlignedRetainedTerminalSlotFilterCompiler.lean`](LeanTrominoes/AlignedRetainedTerminalSlotFilterCompiler.lean)
   filters an aligned bounded-slot stream by compiled Boolean controls.  It
   reuses finite role/slot unary coding and decoding, avoiding a separate
