@@ -38,7 +38,8 @@ def directionTokens (directions : List AxisDirection) : List OutputToken :=
 def inwardRayUnitDirections
     (direction : RetainedTerminalDirection) : List AxisDirection :=
   Gadget.unitSubdivisionDirections
-    ((retainedTerminalFanOuterInwardRay (direction, 1)).rasterize (0, 0))
+    ((retainedTerminalFanOuterInwardRayOfLength direction 1).rasterize
+      (0, 0))
 
 /-- Repeat a primitive inward-ray staircase by a supplied count. -/
 def radialCopies

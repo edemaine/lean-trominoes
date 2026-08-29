@@ -12468,6 +12468,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanFallbackSuffixDirectionCompiler.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixDirectionCompiler.lean)
   reads a finite kind/direction/slot header plus one unary raw terminal
   length and emits the corresponding route-delimited fallback-fan suffix.
+  [`LeanTrominoes/RetainedAngularFanFallbackSuffixRayDirectionSemantics.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixRayDirectionSemantics.lean)
+  proves that the emitter's repeated primitive blocks are exactly the
+  unit-subdivision directions of every inward retained-ray raster.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
