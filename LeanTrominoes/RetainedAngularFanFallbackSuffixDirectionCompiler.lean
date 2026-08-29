@@ -63,6 +63,24 @@ private theorem scan_radial
       simp [radialDirections, directionTokens, List.map_append,
         List.append_assoc]
 
+/-- A complete query returns the transducer to its initial control while
+emitting exactly one route-delimited compiled suffix. -/
+theorem scan_queryTokens
+    (kind : RetainedFallbackFanKind)
+    (direction : RetainedTerminalDirection)
+    (rawLength : Nat)
+    (slot : RetainedTerminalSlot) :
+    scan transition initial (queryTokens kind direction rawLength slot) =
+      (initial,
+        directionTokens
+            (compiledDirections kind direction rawLength slot) ++
+          [.routeEnd]) := by
+  unfold queryTokens
+  simp only [List.cons_append, scan, transition, List.nil_append]
+  rw [scan_radial kind direction slot rawLength]
+  simp [compiledDirections, directionTokens,
+    List.map_append, List.append_assoc]
+
 /-- A compact kind/direction/slot/unary-length query emits its explicit
 route-delimited suffix word. -/
 @[simp] theorem output_queryTokens
@@ -74,11 +92,9 @@ route-delimited suffix word. -/
       directionTokens
           (compiledDirections kind direction rawLength slot) ++
         [.routeEnd] := by
-  unfold output queryTokens FiniteStateTransducer.output
-  simp only [List.cons_append, scan, transition, List.nil_append]
-  rw [scan_radial kind direction slot rawLength]
-  simp [finish, compiledDirections, directionTokens,
-    List.map_append, List.append_assoc]
+  unfold output FiniteStateTransducer.output
+  rw [scan_queryTokens]
+  simp [finish]
 
 /-- The compact suffix-query interpreter is one fixed finite-state
 transducer and hence polynomial-time computable. -/
