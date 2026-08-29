@@ -27,6 +27,10 @@ noncomputable def decodeOutputComputableInPolyTime :
   FiniteStateTransducer.computableInPolyTime
     decodeInitial decodeTransition decodeFinish
 
+noncomputable def recordProfilesComputableInPolyTime :
+    TM2ComputableInPolyTime id id recordProfiles :=
+  FiniteBlockTransducer.computableInPolyTime recordProfileBlock
+
 /-- Two same-input compilers, one for the finite clause profiles and one for
 four-route direction blocks, can be framed in polynomial time. -/
 noncomputable def framedComputableInPolyTimeOf

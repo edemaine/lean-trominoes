@@ -147,6 +147,20 @@ def blockRoutes
     delimited block.first ++ delimited block.second ++
       delimited block.third ++ delimited block.fourth
 
+def recordProfileBlock :
+    PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.Token →
+      List Profile
+  | .profile profile => [profile]
+  | _ => []
+
+/-- Extract the finite clause profiles from an existing flat route-record
+stream, discarding its old dynamic tail directions and boundaries. -/
+def recordProfiles
+    (records : List
+      PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.Token) :
+    List Profile :=
+  records.flatMap recordProfileBlock
+
 end BinaryRouteTailRecordProfileFraming
 end LeanTrominoes
 
