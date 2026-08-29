@@ -12437,6 +12437,10 @@ The representation choices for this target are:
   the already-established simplicity and boundary-contact interface.  Thus
   fallback normalization preserves the dynamic prefix and appends only the
   translation-free suffix word.
+- [`LeanTrominoes/RetainedAngularFanFallbackSourcePrefixDirectionData.lean`](LeanTrominoes/RetainedAngularFanFallbackSourcePrefixDirectionData.lean)
+  removes the fallback route's complete discarded final segment before
+  compiling the two source refinements.  The surviving raw carrier-or-bend
+  prefix becomes exactly a fixed 1152-fold direction expansion.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
