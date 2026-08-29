@@ -87,11 +87,118 @@ theorem rebuildRoute_nodup_of_linear_negative
             negative tailDirection
               (List.mem_cons_of_mem direction tailMember))
 
+/-- If every direction is tangent to a linear functional, that functional
+is constant at every point of the rebuilt route. -/
+theorem rebuildRoute_linear_eq_start
+    (normal start : Cell) (directions : List AxisDirection)
+    (zero :
+      ∀ direction ∈ directions,
+        Cell.linearValue normal direction.step = 0) :
+    ∀ point ∈ rebuildRoute start directions,
+      Cell.linearValue normal point =
+        Cell.linearValue normal start := by
+  induction directions generalizing start with
+  | nil => simp [rebuildRoute]
+  | cons direction directions induction =>
+      intro point pointMember
+      rw [rebuildRoute] at pointMember
+      rcases List.mem_cons.mp pointMember with rfl | pointMember
+      · rfl
+      · calc
+          Cell.linearValue normal point =
+              Cell.linearValue normal
+                (Cell.add start direction.step) :=
+            induction
+              (Cell.add start direction.step)
+              (fun tailDirection tailMember =>
+                zero tailDirection
+                  (List.mem_cons_of_mem direction tailMember))
+              point pointMember
+          _ = Cell.linearValue normal start := by
+            have directionZero := zero direction (by simp)
+            simp [Cell.linearValue, Cell.add] at directionZero ⊢
+            ring_nf at directionZero ⊢
+            omega
+
+/-- If every direction is weakly decreasing and the first is strictly
+decreasing, every point after the head is strictly below the head. -/
+theorem rebuildRoute_tail_linear_lt_start
+    (normal start : Cell) (directions : List AxisDirection)
+    (nonpositive :
+      ∀ direction ∈ directions,
+        Cell.linearValue normal direction.step ≤ 0)
+    (firstNegative :
+      ∀ direction,
+        directions.head? = some direction →
+          Cell.linearValue normal direction.step < 0) :
+    ∀ point ∈ (rebuildRoute start directions).tail,
+      Cell.linearValue normal point <
+        Cell.linearValue normal start := by
+  cases directions with
+  | nil => simp [rebuildRoute]
+  | cons direction directions =>
+      intro point pointMember
+      have tailBound :=
+        rebuildRoute_linear_le_start
+          normal (Cell.add start direction.step) directions
+          (fun tailDirection tailMember =>
+            nonpositive tailDirection
+              (List.mem_cons_of_mem direction tailMember))
+          point (by simpa [rebuildRoute] using pointMember)
+      have directionNegative :=
+        firstNegative direction (by simp)
+      have linearAdd :
+          Cell.linearValue normal
+              (Cell.add start direction.step) =
+            Cell.linearValue normal start +
+              Cell.linearValue normal direction.step := by
+        simp [Cell.linearValue, Cell.add]
+        ring
+      rw [linearAdd] at tailBound
+      omega
+
 end Gadget
 
 namespace AxisDirection
 
 open PeriodicOrthocrossing
+
+/-- Ordered unit subdivision is the route rebuilt from its original head
+and its complete unit-direction word. -/
+theorem unitSubdividePolyline_eq_rebuildRoute
+    (start : Cell) (rest : List Cell)
+    (orthogonal : OrthogonalPolyline (start :: rest)) :
+    unitSubdividePolyline (start :: rest) =
+      Gadget.rebuildRoute start
+        (Gadget.unitSubdivisionDirections (start :: rest)) := by
+  have subdividedHead :
+      (unitSubdividePolyline (start :: rest)).head? = some start := by
+    rw [unitSubdividePolyline_head? (by simp)]
+    rfl
+  generalize subdivisionEq :
+    unitSubdividePolyline (start :: rest) = subdivided
+  cases subdivided with
+  | nil => simp [subdivisionEq] at subdividedHead
+  | cons first tail =>
+      have firstEq : first = start := by
+        simpa [subdivisionEq] using subdividedHead
+      subst first
+      have unitSteps :
+          (start :: tail).IsChain IsUnitAxisStep := by
+        rw [← subdivisionEq]
+        exact unitSubdividePolyline_unitSteps orthogonal
+      have directionEq :
+          Gadget.routeStepDirections (start :: tail) =
+            Gadget.unitSubdivisionDirections (start :: rest) := by
+        rw [←
+          Gadget.unitSubdivisionDirections_eq_routeStepDirections_of_unitSteps
+            (start :: tail) unitSteps,
+          ← subdivisionEq]
+        exact
+          Gadget.unitSubdivisionDirections_unitSubdividePolyline
+            (start :: rest) orthogonal
+      rw [← Gadget.rebuildRoute_routeStepDirections start tail unitSteps,
+        directionEq]
 
 /-- A nonempty orthogonal polyline has duplicate-free ordered unit
 subdivision whenever one linear functional strictly decreases along every
