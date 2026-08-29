@@ -60,6 +60,27 @@ def directSourceFinalBendNormalizedFallbackGeometricSuffixDirections
   NormalizedFallbackSuffixDirectionCompiler.Batch.retainedOrdinaryDirections
     (directSourceFinalBendFallbackSemanticQueries decider symbols)
 
+/-- Every semantic fallback query for a direct-source bend uses the ordinary
+retained-fan geometry. -/
+theorem directSourceFinalBendFallbackSemanticQueries_kind
+    (symbols : List encoding.Γ) :
+    ∀ query ∈ directSourceFinalBendFallbackSemanticQueries decider symbols,
+      query.kind = .ordinary := by
+  unfold directSourceFinalBendFallbackSemanticQueries
+  exact alignedOrdinaryQueries_kind
+    (directSourceFinalBendFallbackTerminalData decider symbols)
+    (directSourceFinalBendOccurrenceSlots decider symbols)
+
+/-- Every semantic fallback query for a direct-source bend has positive
+radial length. -/
+theorem directSourceFinalBendFallbackSemanticQueries_lengthPositive
+    (symbols : List encoding.Γ) :
+    ∀ query ∈ directSourceFinalBendFallbackSemanticQueries decider symbols,
+      0 < query.rawLength := by
+  rw [← directSourceFinalBendFallbackSuffixQueries_eq]
+  exact directSourceFinalBendFallbackSuffixQueries_lengthPositive
+    decider symbols
+
 /-- The direct normalized bend-suffix compiler emits exactly the canonical
 normalized suffix word for every semantic bend query. -/
 theorem directSourceFinalBendNormalizedFallbackSuffixDirections_eq_geometric
@@ -67,28 +88,15 @@ theorem directSourceFinalBendNormalizedFallbackSuffixDirections_eq_geometric
     directSourceFinalBendNormalizedFallbackSuffixDirections decider symbols =
       directSourceFinalBendNormalizedFallbackGeometricSuffixDirections
         decider symbols := by
-  have ordinary :
-      ∀ query ∈
-          directSourceFinalBendFallbackSemanticQueries decider symbols,
-        query.kind = .ordinary := by
-    unfold directSourceFinalBendFallbackSemanticQueries
-    exact alignedOrdinaryQueries_kind
-      (directSourceFinalBendFallbackTerminalData decider symbols)
-      (directSourceFinalBendOccurrenceSlots decider symbols)
-  have positive :
-      ∀ query ∈
-          directSourceFinalBendFallbackSemanticQueries decider symbols,
-        0 < query.rawLength := by
-    rw [← directSourceFinalBendFallbackSuffixQueries_eq]
-    exact directSourceFinalBendFallbackSuffixQueries_lengthPositive
-      decider symbols
   unfold directSourceFinalBendNormalizedFallbackSuffixDirections
     directSourceFinalBendNormalizedFallbackGeometricSuffixDirections
   rw [directSourceFinalBendFallbackSuffixQueries_eq]
   exact
     NormalizedFallbackSuffixDirectionCompiler.Batch.directions_eq_retainedOrdinaryDirections
       (directSourceFinalBendFallbackSemanticQueries decider symbols)
-      ordinary positive
+      (directSourceFinalBendFallbackSemanticQueries_kind decider symbols)
+      (directSourceFinalBendFallbackSemanticQueries_lengthPositive
+        decider symbols)
 
 end LeanTrominoes.PeriodicCNFStripReduction
 
