@@ -12609,6 +12609,11 @@ The representation choices for this target are:
   gate.  Its outward coordinate is constant, while every point of the finite
   local adapter and Figure 7 spoke lies strictly inward, proving contact-free
   separation from both bounded suffix pieces.
+- [`LeanTrominoes/RetainedAngularFanFallbackCardinalGateRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanFallbackCardinalGateRadialSeparation.lean)
+  proves the complementary radial fact.  Unit points before the gate are
+  strictly behind it in the tangential coordinate, while the lane shift and
+  inward cardinal ray remain on or ahead of it, so the two pieces meet only
+  at the gate.
 
 ## Build
 
