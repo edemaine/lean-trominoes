@@ -41,6 +41,16 @@ def directSourceFinalStableRankSlotBlocksFrom
       (retainedFinalCoordinatedScaledSource formula).erase
       (retainedFinalCoordinatedScaledSourceRoutes formula))
 
+@[simp] theorem directSourceFinalStableRankSlotBlocksFrom_length
+    (symbols : List encoding.Γ)
+    (start : Nat)
+    (clauses : List
+      (PeriodicClause (WrappedPeriodicPlanarSATVariable Variable))) :
+    (directSourceFinalStableRankSlotBlocksFrom
+      decider symbols start clauses).length = clauses.length := by
+  unfold directSourceFinalStableRankSlotBlocksFrom
+  simp only [List.length_map, List.length_zipIdx]
+
 def directSourceFinalCrossoverStableRankSlotBlocks
     (symbols : List encoding.Γ) :=
   directSourceFinalStableRankSlotBlocksFrom decider symbols 0

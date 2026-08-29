@@ -41,6 +41,12 @@ theorem retainedFinalPrecomputedClauseQueries_eq_map
         List.map_cons, List.cons.injEq, true_and]
       exact induction
 
+@[simp] theorem retainedFinalPrecomputedClauseQueries_length
+    (tokens : List FormulaShapeDirectionOrdering.Token) :
+    (retainedFinalPrecomputedClauseQueries tokens).length = tokens.length := by
+  rw [retainedFinalPrecomputedClauseQueries_eq_map]
+  simp only [List.length_map]
+
 /-- Carrier and bend wrapper queries never produce direct route-tail
 records, regardless of the aligned slot list. -/
 theorem retainedDirectClauseRouteTailRecordQueriesOfSlotInputs_zip_precomputed
