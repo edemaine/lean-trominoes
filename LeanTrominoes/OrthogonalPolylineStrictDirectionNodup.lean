@@ -340,6 +340,66 @@ theorem unitSubdividePolyline_nodup_of_direction_linear_negative
       exact Gadget.rebuildRoute_nodup_of_linear_negative
         normal start _ negative
 
+/-- Weakly increasing unit directions bound every subdivided point by the
+route's advertised final endpoint. -/
+theorem unitSubdividePolyline_linear_le_last_of_direction_nonnegative
+    {points : List Cell}
+    (nonempty : points ≠ [])
+    (orthogonal : OrthogonalPolyline points)
+    (normal : Cell)
+    (nonnegative :
+      ∀ direction ∈ Gadget.unitSubdivisionDirections points,
+        0 ≤ Cell.linearValue normal direction.step)
+    {finish : Cell}
+    (last : points.getLast? = some finish) :
+    ∀ point ∈ unitSubdividePolyline points,
+      Cell.linearValue normal point ≤
+        Cell.linearValue normal finish := by
+  obtain ⟨start, rest, pointsEq⟩ := List.exists_cons_of_ne_nil nonempty
+  subst points
+  have rebuiltLast :
+      (Gadget.rebuildRoute start
+        (Gadget.unitSubdivisionDirections
+          (start :: rest))).getLast? = some finish := by
+    rw [← unitSubdividePolyline_eq_rebuildRoute start rest orthogonal,
+      unitSubdividePolyline_getLast? (by simp) orthogonal,
+      last]
+  intro point pointMember
+  rw [unitSubdividePolyline_eq_rebuildRoute
+    start rest orthogonal] at pointMember
+  exact Gadget.rebuildRoute_linear_le_last
+    normal start _ nonnegative rebuiltLast point pointMember
+
+/-- If the first weakly increasing unit direction is strictly increasing,
+every subdivided point after the head is strictly above the source. -/
+theorem unitSubdividePolyline_tail_linear_gt_head
+    {points : List Cell}
+    (nonempty : points ≠ [])
+    (orthogonal : OrthogonalPolyline points)
+    (normal : Cell)
+    {start : Cell}
+    (head : points.head? = some start)
+    (nonnegative :
+      ∀ direction ∈ Gadget.unitSubdivisionDirections points,
+        0 ≤ Cell.linearValue normal direction.step)
+    (firstPositive :
+      ∀ direction,
+        (Gadget.unitSubdivisionDirections points).head? =
+            some direction →
+          0 < Cell.linearValue normal direction.step) :
+    ∀ point ∈ (unitSubdividePolyline points).tail,
+      Cell.linearValue normal start <
+        Cell.linearValue normal point := by
+  obtain ⟨first, rest, pointsEq⟩ := List.exists_cons_of_ne_nil nonempty
+  subst points
+  have firstEq : first = start := by simpa using head
+  subst first
+  intro point pointMember
+  rw [unitSubdividePolyline_eq_rebuildRoute
+    start rest orthogonal] at pointMember
+  exact Gadget.rebuildRoute_tail_linear_gt_start
+    normal start _ nonnegative firstPositive point pointMember
+
 /-- If an orthogonal route's ordered unit subdivision is duplicate-free,
 normalization preserves its complete unit-direction word. -/
 theorem unitSubdivisionDirections_normalizeOrthogonalPolyline_of_nodup
