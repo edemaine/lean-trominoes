@@ -12459,6 +12459,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanFallbackPrefixDirectionScalingCompiler.lean`](LeanTrominoes/RetainedAngularFanFallbackPrefixDirectionScalingCompiler.lean)
   expands every retained source-prefix direction by the final fixed factor
   `1152` while preserving route delimiters, using a finite block transducer.
+  [`LeanTrominoes/PeriodicOrthocrossingCarrierFallbackPrefixScalingCompiler.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierFallbackPrefixScalingCompiler.lean)
+  composes this expansion with carrier trimming and proves its explicit
+  four-route output.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise

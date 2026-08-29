@@ -30,6 +30,10 @@ def block : Token → List Token
 def output (tokens : List Token) : List Token :=
   tokens.flatMap block
 
+@[simp] theorem output_append (first second : List Token) :
+    output (first ++ second) = output first ++ output second := by
+  simp [output]
+
 private theorem output_directionTokens (directions : List AxisDirection) :
     output (directions.map NormalizedToken.direction) =
       (repeatDirections 1152 directions).map NormalizedToken.direction := by
