@@ -40,6 +40,14 @@ def terminalDataRadialLengths
     (terminals : List RetainedTerminalData) : List Nat :=
   terminals.map Prod.snd
 
+/-- The carrier block already clamps its only span-dependent length at zero,
+so converting a signed span through `Nat` does not change the block. -/
+@[simp] theorem carrierLensRouteTerminalDataBlock_toNat
+    (horizontal : Bool) (span : Int) :
+    carrierLensRouteTerminalDataBlock horizontal span.toNat =
+      carrierLensRouteTerminalDataBlock horizontal span := by
+  cases span <;> rfl
+
 /-- Carrier direction ranks depend only on the selected axis. -/
 theorem carrierLensRouteTerminalDataBlock_directionRanks
     (horizontal : Bool) (span : Int) :

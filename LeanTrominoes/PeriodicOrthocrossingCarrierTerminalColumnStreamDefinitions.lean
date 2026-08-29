@@ -21,6 +21,14 @@ def retainedPairTerminalDataBlock
   carrierLensRouteTerminalDataBlock first.horizontal
     (second.orderCoordinate - first.orderCoordinate).toNat
 
+@[simp] theorem retainedPairTerminalDataBlock_eq_signedSpan
+    (first second : CarrierNodeRankDatum) :
+    retainedPairTerminalDataBlock first second =
+      carrierLensRouteTerminalDataBlock first.horizontal
+        (second.orderCoordinate - first.orderCoordinate) := by
+  unfold retainedPairTerminalDataBlock
+  exact carrierLensRouteTerminalDataBlock_toNat _ _
+
 /-- Selected row-major carrier terminal blocks from a deduplicated rank-data
 stream. -/
 def retainedTerminalDataBlocksFromDatums
