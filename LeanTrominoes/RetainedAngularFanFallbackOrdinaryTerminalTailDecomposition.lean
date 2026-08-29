@@ -168,5 +168,48 @@ theorem retainedFallbackFanOrdinarySuffixRouteAt_normalize_terminalSplit
   · exact retainedFallbackFanOrdinarySuffixRouteAt_terminalSplit_directions
       center terminal slot lengthPositive radialPositive
 
+/-- Ordinary suffix normalization can therefore be performed by first
+normalizing only the fixed terminal tail.  The unbounded exterior prefix is
+left as a separate streaming boundary. -/
+theorem retainedFallbackFanOrdinarySuffixRouteAt_normalize_terminalTail_right
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (lengthPositive : 0 < terminal.2)
+    (radialPositive :
+      0 < retainedTerminalFanOuterRadialLength terminal) :
+    AxisDirection.normalizeOrthogonalPolyline
+        (retainedFallbackFanSuffixRouteAt
+          .ordinary center terminal slot) =
+      AxisDirection.normalizeOrthogonalPolyline
+        (joinAtEndpoint
+          (retainedTerminalFanOuterRadialPrefix center terminal slot)
+          (AxisDirection.normalizeOrthogonalPolyline
+            (retainedFallbackFanTerminalTailRouteAt
+              center terminal.1 slot))) := by
+  rw [retainedFallbackFanOrdinarySuffixRouteAt_normalize_terminalSplit
+    center terminal slot lengthPositive radialPositive]
+  have radialPrefixHead :=
+    retainedTerminalFanOuterRadialPrefix_head?
+      center terminal slot
+  have radialPrefixNonempty :
+      retainedTerminalFanOuterRadialPrefix center terminal slot ≠ [] := by
+    intro empty
+    rw [empty] at radialPrefixHead
+    simp at radialPrefixHead
+  exact
+    AxisDirection.normalizeOrthogonalPolyline_joinAtEndpoint_normalize_right
+      radialPrefixNonempty
+      (retainedFallbackFanTerminalTailRouteAt_ne_nil
+        center terminal.1 slot)
+      (retainedTerminalFanOuterRadialPrefix_orthogonal
+        center terminal slot)
+      (retainedFallbackFanTerminalTailRouteAt_orthogonal
+        center terminal.1 slot)
+      (retainedTerminalFanOuterRadialPrefix_getLast?
+        center terminal slot radialPositive)
+      (retainedFallbackFanTerminalTailRouteAt_head?
+        center terminal.1 slot)
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
