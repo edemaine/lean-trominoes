@@ -30,6 +30,44 @@ theorem listLoopErase_eq_self_of_nodup
       have tailNodup : tail.Nodup := (List.nodup_cons.mp nodup).2
       simp [listLoopErase, induction tailNodup, headFresh]
 
+/-- Right-to-left loop erasure always returns a duplicate-free list. -/
+theorem listLoopErase_nodup
+    {Vertex : Type*} [DecidableEq Vertex]
+    (points : List Vertex) :
+    (listLoopErase points).Nodup := by
+  induction points with
+  | nil => simp [listLoopErase]
+  | cons head tail induction =>
+      simp only [listLoopErase]
+      by_cases member : head ∈ listLoopErase tail
+      · rw [if_pos member]
+        exact List.Pairwise.drop induction
+      · rw [if_neg member]
+        exact List.nodup_cons.mpr ⟨member, induction⟩
+
+/-- Applying right-to-left loop erasure twice has no further effect. -/
+@[simp] theorem listLoopErase_idempotent
+    {Vertex : Type*} [DecidableEq Vertex]
+    (points : List Vertex) :
+    listLoopErase (listLoopErase points) =
+      listLoopErase points :=
+  listLoopErase_eq_self_of_nodup (listLoopErase_nodup points)
+
+/-- A suffix may be loop-erased before processing any prefix.  This is the
+unconditional localization law supplied by the algorithm's right-to-left
+recursion. -/
+theorem listLoopErase_append_right
+    {Vertex : Type*} [DecidableEq Vertex]
+    (first second : List Vertex) :
+    listLoopErase (first ++ second) =
+      listLoopErase (first ++ listLoopErase second) := by
+  induction first with
+  | nil =>
+      simp
+  | cons head tail induction =>
+      simp only [List.cons_append, listLoopErase]
+      rw [induction]
+
 /-- A disjoint duplicate-free suffix passes through right-to-left loop
 erasure unchanged. -/
 theorem listLoopErase_append_of_disjoint
