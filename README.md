@@ -12522,8 +12522,13 @@ The representation choices for this target are:
   false or true masks respectively discard or retain every slot.
 - [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceMaskData.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceMaskData.lean)
   and its routed/bend/carrier compiler leaves build exact five-family masks
-  over the final descriptor presentation.  The separately verified length
-  bridge aligns them with the global stable-terminal slots.
+  over the final descriptor presentation.
+  [`LeanTrominoes/RetainedAngularFanFinalCopiedClauseDescriptorArityListSemantics.lean`](LeanTrominoes/RetainedAngularFanFinalCopiedClauseDescriptorArityListSemantics.lean)
+  proves pointwise arity preservation under query evaluation, while
+  [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceMaskSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceMaskSemantics.lean)
+  identifies every constant descriptor mask with one replicated Boolean per
+  represented occurrence.  The separately verified length bridge aligns the
+  full masks with the global stable-terminal slots.
   [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackQuerySlotBlockIndividualLength.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackQuerySlotBlockIndividualLength.lean)
   separates the combined fallback count into exact carrier and bend query/
   slot-block count equalities.  The
