@@ -35,7 +35,7 @@ def retainedOrdinaryJoinedDirections
 
 /-- The verified stream joiner concatenates every aligned source-prefix
 word with its normalized ordinary suffix. -/
-theorem joined_prefixes_directions_eq
+theorem joined_ordinary_prefixes_directions_eq
     (entries : List (List AxisDirection × Batch.Query))
     (ordinary : ∀ entry ∈ entries, entry.2.kind = .ordinary)
     (lengthPositive : ∀ entry ∈ entries, 0 < entry.2.rawLength) :
@@ -63,7 +63,7 @@ theorem joined_prefixes_directions_eq
 
 /-- Equal-length prefix and ordinary-query lists can be paired positionally
 before applying normalized join semantics. -/
-theorem joined_prefixWords_directions_eq
+theorem joined_ordinary_prefixWords_directions_eq
     (prefixes : List (List AxisDirection))
     (queries : List Batch.Query)
     (lengthEq : prefixes.length = queries.length)
@@ -100,7 +100,7 @@ theorem joined_prefixWords_directions_eq
           (fun entry => DelimitedRouteJoin.delimited entry.1) =
         prefixes.flatMap DelimitedRouteJoin.delimited := by
     rw [← List.flatMap_map, firstProjection]
-  have joined := joined_prefixes_directions_eq
+  have joined := joined_ordinary_prefixes_directions_eq
     (prefixes.zip queries) pairedOrdinary pairedPositive
   rw [prefixProjection, secondProjection] at joined
   exact joined

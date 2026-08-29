@@ -91,7 +91,7 @@ theorem directSourceFinalBendNormalizedFallbackRouteDirections_eq_geometric
   rw [directSourceFinalBendFallbackPrefixDirections_eq,
     directSourceFinalBendFallbackSuffixQueries_eq]
   exact
-    NormalizedFallbackSuffixDirectionCompiler.joined_prefixWords_directions_eq
+    NormalizedFallbackSuffixDirectionCompiler.joined_ordinary_prefixWords_directions_eq
       (directSourceFinalBendFallbackPrefixWords decider symbols)
       (directSourceFinalBendFallbackSemanticQueries decider symbols)
       lengthEq
