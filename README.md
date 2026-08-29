@@ -12509,6 +12509,10 @@ The representation choices for this target are:
   decodes delimiter-terminated unary angular ranks to the eleven native
   retained terminal directions.  Valid ranks round-trip exactly through
   `angularRank`; malformed oversized fields saturate at rank ten.
+- [`LeanTrominoes/RetainedAngularFanFallbackHeaderRoleCompiler.lean`](LeanTrominoes/RetainedAngularFanFallbackHeaderRoleCompiler.lean)
+  attaches the exact escaped/ordinary/ordinary/escaped policy cycle to each
+  carrier terminal block and the ordinary policy to every bend terminal.
+  Both native finite-role columns compile in polynomial time.
 - [`LeanTrominoes/AlignedRetainedTerminalSlotFilterCompiler.lean`](LeanTrominoes/AlignedRetainedTerminalSlotFilterCompiler.lean)
   filters an aligned bounded-slot stream by compiled Boolean controls.  It
   reuses finite role/slot unary coding and decoding, avoiding a separate
