@@ -12517,6 +12517,9 @@ The representation choices for this target are:
   filters an aligned bounded-slot stream by compiled Boolean controls.  It
   reuses finite role/slot unary coding and decoding, avoiding a separate
   variable-length zipper machine while proving exact positional selection.
+  [`LeanTrominoes/AlignedRetainedTerminalSlotFilterSemantics.lean`](LeanTrominoes/AlignedRetainedTerminalSlotFilterSemantics.lean)
+  proves that selection distributes over aligned append and that uniform
+  false or true masks respectively discard or retain every slot.
 - [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceMaskData.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceMaskData.lean)
   and its routed/bend/carrier compiler leaves build exact five-family masks
   over the final descriptor presentation.  The separately verified length
