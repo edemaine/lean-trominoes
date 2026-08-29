@@ -12456,6 +12456,9 @@ The representation choices for this target are:
   proves that exactly the matching bend-port block is selected.
   [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionNumericSemantics.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionNumericSemantics.lean)
   identifies that block with the semantic bend sequence of each numeric route.
+- [`LeanTrominoes/RetainedAngularFanFallbackPrefixDirectionScalingCompiler.lean`](LeanTrominoes/RetainedAngularFanFallbackPrefixDirectionScalingCompiler.lean)
+  expands every retained source-prefix direction by the final fixed factor
+  `1152` while preserving route delimiters, using a finite block transducer.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
