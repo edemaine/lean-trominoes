@@ -157,6 +157,100 @@ theorem rebuildRoute_tail_linear_lt_start
       rw [linearAdd] at tailBound
       omega
 
+/-- If every direction is weakly increasing and the first is strictly
+increasing, every point after the head is strictly above the head. -/
+theorem rebuildRoute_tail_linear_gt_start
+    (normal start : Cell) (directions : List AxisDirection)
+    (nonnegative :
+      ∀ direction ∈ directions,
+        0 ≤ Cell.linearValue normal direction.step)
+    (firstPositive :
+      ∀ direction,
+        directions.head? = some direction →
+          0 < Cell.linearValue normal direction.step) :
+    ∀ point ∈ (rebuildRoute start directions).tail,
+      Cell.linearValue normal start <
+        Cell.linearValue normal point := by
+  cases directions with
+  | nil => simp [rebuildRoute]
+  | cons direction directions =>
+      intro point pointMember
+      have tailBound :=
+        rebuildRoute_linear_le_start
+          (Cell.scale (-1 : Int) normal)
+          (Cell.add start direction.step) directions
+          (fun tailDirection tailMember => by
+            have directionNonnegative :=
+              nonnegative tailDirection
+                (List.mem_cons_of_mem direction tailMember)
+            simp [Cell.linearValue, Cell.scale] at directionNonnegative ⊢
+            nlinarith)
+          point (by simpa [rebuildRoute] using pointMember)
+      have directionPositive :=
+        firstPositive direction (by simp)
+      simp [Cell.linearValue, Cell.scale, Cell.add]
+        at tailBound directionPositive ⊢
+      ring_nf at tailBound directionPositive ⊢
+      omega
+
+/-- If every direction is weakly increasing, every rebuilt route point is
+no farther along the functional than the advertised final point. -/
+theorem rebuildRoute_linear_le_last
+    (normal start : Cell) (directions : List AxisDirection)
+    (nonnegative :
+      ∀ direction ∈ directions,
+        0 ≤ Cell.linearValue normal direction.step)
+    {finish : Cell}
+    (last : (rebuildRoute start directions).getLast? = some finish) :
+    ∀ point ∈ rebuildRoute start directions,
+      Cell.linearValue normal point ≤
+        Cell.linearValue normal finish := by
+  induction directions generalizing start with
+  | nil =>
+      simp [rebuildRoute] at last
+      subst finish
+      simp [rebuildRoute]
+  | cons direction directions induction =>
+      have tailLast :
+          (rebuildRoute
+            (Cell.add start direction.step) directions).getLast? =
+              some finish := by
+        rw [rebuildRoute,
+          List.getLast?_cons_of_ne_nil
+            (by cases directions <;> simp [rebuildRoute])] at last
+        exact last
+      intro point pointMember
+      rw [rebuildRoute] at pointMember
+      rcases List.mem_cons.mp pointMember with pointEq | pointMember
+      · subst point
+        have nextLeFinish :=
+          induction
+            (Cell.add start direction.step)
+            (fun tailDirection tailMember =>
+              nonnegative tailDirection
+                (List.mem_cons_of_mem direction tailMember))
+            tailLast
+            (Cell.add start direction.step)
+            (by cases directions <;> simp [rebuildRoute])
+        have startLeNext :
+            Cell.linearValue normal start ≤
+              Cell.linearValue normal
+                (Cell.add start direction.step) := by
+          have directionNonnegative :=
+            nonnegative direction (by simp)
+          simp [Cell.linearValue, Cell.add]
+            at directionNonnegative ⊢
+          ring_nf at directionNonnegative ⊢
+          omega
+        exact startLeNext.trans nextLeFinish
+      · exact
+          induction
+            (Cell.add start direction.step)
+            (fun tailDirection tailMember =>
+              nonnegative tailDirection
+                (List.mem_cons_of_mem direction tailMember))
+            tailLast point pointMember
+
 end Gadget
 
 namespace AxisDirection
