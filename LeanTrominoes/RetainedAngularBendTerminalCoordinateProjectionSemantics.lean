@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.RetainedAngularBendTerminalCoordinateFamily
+import LeanTrominoes.RetainedAngularBendTerminalCoordinateData
 import LeanTrominoes.RetainedAngularOccurrenceTerminalCoordinateComponentData
 
 /-! # Projections of retained bend terminal coordinates -/
@@ -46,6 +46,30 @@ theorem bendTerminalCoordinates_radialLengths
   apply List.flatMap_congr
   intro routeBend routeBendMember
   simp [List.map_map, Function.comp_def]
+
+/-- Projecting the named compiler-ordered bend coordinates recovers their
+named direction-rank stream. -/
+theorem baseBendTerminalCoordinates_directionRanks
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    directionRanks (baseBendTerminalCoordinates source) =
+      baseBendTerminalDirectionRanks source := by
+  unfold directionRanks baseBendTerminalCoordinates
+    baseBendTerminalData baseBendTerminalDirectionRanks
+    retainedTerminalDataCoordinate terminalDataDirectionRanks
+  simp [List.map_flatMap, List.map_map, Function.comp_def]
+
+/-- Projecting the named compiler-ordered bend coordinates recovers their
+named radial-length stream. -/
+theorem baseBendTerminalCoordinates_radialLengths
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    radialLengths (baseBendTerminalCoordinates source) =
+      baseBendTerminalRadialLengths source := by
+  unfold radialLengths baseBendTerminalCoordinates
+    baseBendTerminalData baseBendTerminalRadialLengths
+    retainedTerminalDataCoordinate terminalDataRadialLengths
+  simp [List.map_flatMap, List.map_map, Function.comp_def]
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

@@ -33,6 +33,28 @@ def baseBendTerminalCoordinates
   List.map retainedTerminalDataCoordinate
     (baseBendTerminalData source)
 
+/-- Direction ranks of the compiler-ordered untranslated bend stream. -/
+def baseBendTerminalDirectionRanks
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) : List Nat :=
+  (numericRouteDescriptors source).flatMap fun descriptor =>
+    (routeBends descriptor.edgeIndex (0, 0) descriptor.route).flatMap
+      fun routeBend =>
+        terminalDataDirectionRanks
+          (bendRouteTerminalDataBlock
+            routeBend.incomingPort routeBend.outgoingPort)
+
+/-- Radial lengths of the same compiler-ordered untranslated bend stream. -/
+def baseBendTerminalRadialLengths
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) : List Nat :=
+  (numericRouteDescriptors source).flatMap fun descriptor =>
+    (routeBends descriptor.edgeIndex (0, 0) descriptor.route).flatMap
+      fun routeBend =>
+        terminalDataRadialLengths
+          (bendRouteTerminalDataBlock
+            routeBend.incomingPort routeBend.outgoingPort)
+
 /-- Regrouping the numeric-route scan by its flattened bend list does not
 change the exact terminal-coordinate presentation. -/
 theorem retainedBendTerminalCoordinates_baseRouteBends_eq
