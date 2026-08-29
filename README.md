@@ -12526,7 +12526,12 @@ The representation choices for this target are:
   bridge aligns them with the global stable-terminal slots.
   [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackQuerySlotBlockIndividualLength.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackQuerySlotBlockIndividualLength.lean)
   separates the combined fallback count into exact carrier and bend query/
-  slot-block count equalities, and
+  slot-block count equalities.  The
+  [`fallback-tail`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackQuerySlotBlockArityTail.lean),
+  [`carrier`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierQuerySlotBlockArity.lean),
+  and [`bend`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendQuerySlotBlockArity.lean)
+  arity leaves then cancel the crossover prefix and isolate pointwise query-
+  arity/stable-slot-block-length equality for each fallback family, and
   [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotCompiler.lean)
   selects the complete carrier and bend slot streams in polynomial time.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
