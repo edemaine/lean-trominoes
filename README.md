@@ -2344,6 +2344,13 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Specialize those compact words to the direct final source
                   and prove their equality square is the exact represented-
                   occurrence same-atom square.
+                - [x] Identify the compiled five-family direction and radial
+                  columns with every actual unscaled final terminal, then
+                  compile the exact strict-order and equality squares.
+                - [x] Certify the direct final routes, transport both terminal
+                  comparison squares through source-clearance scaling, and
+                  combine them with atom equality to compile the exact global
+                  stable-terminal-rank stream.
                 - [x] Decompose the exact compact occurrence column into its
                   crossover, carrier, bend, routed-clause, and routed-variable
                   blocks in final presentation order.
