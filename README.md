@@ -12471,6 +12471,9 @@ The representation choices for this target are:
   [`LeanTrominoes/RetainedAngularFanFallbackSuffixRayDirectionSemantics.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixRayDirectionSemantics.lean)
   proves that the emitter's repeated primitive blocks are exactly the
   unit-subdivision directions of every inward retained-ray raster.
+  [`LeanTrominoes/RetainedAngularFanFallbackSuffixOuterDirectionSemantics.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixOuterDirectionSemantics.lean)
+  then decomposes both ordinary and escaped complete outer routes into their
+  finite prefix, dynamic radial word, and finite local adapter.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
