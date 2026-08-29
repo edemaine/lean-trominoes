@@ -12486,6 +12486,12 @@ The representation choices for this target are:
   [`LeanTrominoes/RetainedAngularFanFallbackSuffixDirectionBatchSemantics.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixDirectionBatchSemantics.lean)
   identifies every positive batch with the corresponding geometric scaled
   fallback-suffix family.
+- [`LeanTrominoes/RetainedAngularFanFallbackSuffixQueryData.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixQueryData.lean)
+  zips policy, terminal data, and occurrence slots into exact four-route
+  carrier and bend query blocks and proves all their raw lengths positive.
+  [`LeanTrominoes/RetainedAngularFanFallbackSuffixQuerySemantics.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixQuerySemantics.lean)
+  feeds those blocks through the batch compiler and recovers the public
+  route-policy-selected geometric suffixes.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
