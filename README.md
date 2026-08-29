@@ -12567,6 +12567,16 @@ The representation choices for this target are:
   [`bend`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendFallbackSuffixQueryCompiler.lean)
   counterpart compose those columns into the complete route-delimited suffix
   direction streams in polynomial time, including empty input alphabets.
+- [`LeanTrominoes/DelimitedRouteJoinSemantics.lean`](LeanTrominoes/DelimitedRouteJoinSemantics.lean)
+  verifies a total fixed machine that joins aligned route-delimited prefix
+  and suffix streams, proves its linear `9n` clock bound, and packages the
+  construction as a polynomial-time compiler.
+  [`LeanTrominoes/RetainedAngularFanFallbackJoinedDirectionSemantics.lean`](LeanTrominoes/RetainedAngularFanFallbackJoinedDirectionSemantics.lean)
+  identifies every positive-query join with the complete source-prefix word
+  followed by its exact geometric retained-fan suffix.
+  [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackRouteDirectionCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackRouteDirectionCompiler.lean)
+  instantiates the joiner for both direct carrier and bend streams, including
+  empty source alphabets.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
