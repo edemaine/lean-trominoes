@@ -12424,6 +12424,10 @@ The representation choices for this target are:
   preserves and concatenates their direction words whenever the pieces meet
   only at the boundary.  This separates each remaining fallback route into
   its dynamic carrier-or-bend source prefix and finite retained-fan suffix.
+- [`LeanTrominoes/RetainedAngularFanFallbackSuffixDirectionData.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixDirectionData.lean)
+  gives ordinary and delayed-lane fallback suffixes one common finite policy
+  interface.  Their complete direction words are translation invariant and
+  split exactly into an outer-fan word followed by the fixed Figure 7 spoke.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
