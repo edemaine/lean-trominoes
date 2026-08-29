@@ -2510,6 +2510,9 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Align final copied-clause occurrence roles with bounded
                 stable-terminal slots, compile their disjoint unary codes,
                 and decode each code back to its exact finite role/slot pair.
+              - [x] Group the decoded occurrence stream into exact unary,
+                binary, and ternary copied-clause slot tuples, with a semantic
+                identification against the full five-family query assembly.
               - [ ] Emit each contracted edge's initial unit directions and
                 six finite endpoint-template choices.  This compact source
                 emitter is now reduced to the explicit framed source-token
