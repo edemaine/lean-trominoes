@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.OrthogonalPolylineStrictDirectionNodup
-import LeanTrominoes.RetainedAngularFanFallbackEscapedRadialPrefixData
+import LeanTrominoes.RetainedAngularFanFallbackEscapedRadialPrefixEndpoint
 import LeanTrominoes.RetainedAngularFanFallbackExteriorRadialJoinNodup
 
 /-! # Duplicate-freeness of escaped fallback radial prefixes -/
@@ -239,6 +239,120 @@ theorem retainedTerminalFanOuterEscapedRadialPrefix_unitSubdivide_nodup
         retainedTerminalFanOuterInwardRayOfLength_tail_join_gt_start
           terminal.1 count shiftedPoint point countPositive rayTailMember
     exact not_lt_of_ge fixedUpper rayLower
+
+/-- Every escaped exterior-prefix point lies no farther inward in the join
+functional than its one-primitive-outside endpoint. -/
+theorem retainedTerminalFanOuterEscapedRadialPrefix_join_le_finish
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escapeStrict :
+      retainedTerminalFanOuterSourceEscapeLength <
+        retainedTerminalFanOuterRadialLength terminal)
+    (point : Cell)
+    (pointMember :
+      point ∈ AxisDirection.unitSubdividePolyline
+        (retainedTerminalFanOuterEscapedRadialPrefix
+          center terminal slot)) :
+    Cell.linearValue
+        (retainedFallbackRadialJoinNormal terminal.1) point ≤
+      Cell.linearValue
+        (retainedFallbackRadialJoinNormal terminal.1)
+        (Cell.add center
+          (Cell.add
+            (retainedTerminalFanOuterLanePortOffset terminal.1 slot)
+            terminal.1.primitive)) := by
+  let route :=
+    retainedTerminalFanOuterEscapedRadialPrefix center terminal slot
+  have routeHead :=
+    retainedTerminalFanOuterEscapedRadialPrefix_head?
+      center terminal slot
+  have routeNonempty : route ≠ [] := by
+    intro empty
+    change route.head? = _ at routeHead
+    rw [empty] at routeHead
+    simp at routeHead
+  have routeOrthogonal : OrthogonalPolyline route :=
+    retainedTerminalFanOuterEscapedRadialPrefix_orthogonal
+      center terminal slot
+  apply
+    AxisDirection.unitSubdividePolyline_linear_le_last_of_direction_nonnegative
+      routeNonempty routeOrthogonal
+      (retainedFallbackRadialJoinNormal terminal.1)
+  · intro axis axisMember
+    have directionsEq :=
+      retainedTerminalFanOuterEscapedRadialPrefix_directions
+        center terminal slot
+    change Gadget.unitSubdivisionDirections route = _ at directionsEq
+    rw [directionsEq, List.mem_append] at axisMember
+    rcases axisMember with fixedMember | radialMember
+    · exact escapedPrefixDirections_join_nonnegative
+        terminal.1 slot axis fixedMember
+    · exact radialCopies_join_nonnegative
+        (retainedTerminalFanOuterRadialLength terminal -
+          retainedTerminalFanOuterSourceEscapeLength - 1)
+        terminal.1 axis radialMember
+  · exact retainedTerminalFanOuterEscapedRadialPrefix_getLast?
+      center terminal slot escapeStrict
+  · exact pointMember
+
+/-- The escaped exterior prefix and final radial primitive meet only at
+their advertised subdivided boundary. -/
+theorem retainedTerminalFanOuterEscapedRadialPrefix_finalStub_only_common
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escapeStrict :
+      retainedTerminalFanOuterSourceEscapeLength <
+        retainedTerminalFanOuterRadialLength terminal) :
+    ∀ point,
+      point ∈ AxisDirection.unitSubdividePolyline
+        (retainedTerminalFanOuterEscapedRadialPrefix
+          center terminal slot) →
+      point ∈ AxisDirection.unitSubdividePolyline
+        (retainedTerminalFanOuterRadialFinalStubAt
+          center terminal.1 slot) →
+      point =
+        Cell.add center
+          (Cell.add
+            (retainedTerminalFanOuterLanePortOffset terminal.1 slot)
+            terminal.1.primitive) := by
+  let stub := retainedTerminalFanOuterRadialFinalStubAt
+    center terminal.1 slot
+  let boundary := Cell.add center
+    (Cell.add
+      (retainedTerminalFanOuterLanePortOffset terminal.1 slot)
+      terminal.1.primitive)
+  have stubHead : stub.head? = some boundary :=
+    retainedTerminalFanOuterRadialFinalStubAt_head?
+      center terminal.1 slot
+  have stubNonempty : stub ≠ [] := by
+    intro empty
+    rw [empty] at stubHead
+    simp at stubHead
+  have subdividedHead :
+      (AxisDirection.unitSubdividePolyline stub).head? = some boundary := by
+    rw [AxisDirection.unitSubdividePolyline_head? stubNonempty, stubHead]
+  intro point prefixMember stubMember
+  generalize subdivisionEq : AxisDirection.unitSubdividePolyline stub =
+    subdivided at subdividedHead stubMember
+  cases subdivided with
+  | nil => simp at subdividedHead
+  | cons head tail =>
+      have headEq : head = boundary := by simpa using subdividedHead
+      rcases List.mem_cons.mp stubMember with pointHead | pointTail
+      · exact pointHead.trans headEq
+      · have prefixUpper :=
+          retainedTerminalFanOuterEscapedRadialPrefix_join_le_finish
+            center terminal slot escapeStrict point prefixMember
+        have pointTail' :
+            point ∈ (AxisDirection.unitSubdividePolyline stub).tail := by
+          rw [subdivisionEq]
+          exact pointTail
+        have stubLower :=
+          retainedTerminalFanOuterRadialFinalStubAt_tail_join_gt_head
+            center terminal.1 slot point (by simpa [stub] using pointTail')
+        exact (not_lt_of_ge prefixUpper stubLower).elim
 
 end FallbackSuffixDirectionCompiler
 end PeriodicEightOccurrenceSplit

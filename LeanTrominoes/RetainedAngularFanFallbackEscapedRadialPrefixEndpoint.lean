@@ -51,6 +51,73 @@ theorem retainedTerminalFanOuterEscapedPrefixRay_vectors_add
           Cell.add, Cell.scale] at escapeStrict ⊢ <;>
         omega
 
+/-- The shortened shifted remaining raster reaches the point one primitive
+outside the selected lane port. -/
+@[simp]
+theorem retainedTerminalFanOuterEscapedRemainingPrefix_getLast?
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escapeStrict :
+      retainedTerminalFanOuterSourceEscapeLength <
+        retainedTerminalFanOuterRadialLength terminal) :
+    ((retainedTerminalFanOuterEscapedRemainingPrefixRay terminal).rasterize
+      (Cell.add
+        (retainedTerminalFanOuterSourceEscapePoint center terminal slot)
+        (retainedTerminalFanOuterLaneOffset terminal.1 slot))).getLast? =
+      some
+        (Cell.add center
+          (Cell.add
+            (retainedTerminalFanOuterLanePortOffset terminal.1 slot)
+            terminal.1.primitive)) := by
+  let gate :=
+    (retainedAngularFanOuterDemand center terminal slot).gate
+  let escapePoint :=
+    retainedTerminalFanOuterSourceEscapePoint center terminal slot
+  let shiftedEscapePoint :=
+    Cell.add escapePoint
+      (retainedTerminalFanOuterLaneOffset terminal.1 slot)
+  have escapePointEq :
+      escapePoint =
+        Cell.add gate
+          (retainedTerminalFanOuterSourceEscapeRay terminal).vector := by
+    rfl
+  rw [RetainedRay.rasterize_getLast?]
+  apply congrArg some
+  calc
+    Cell.add shiftedEscapePoint
+        (retainedTerminalFanOuterEscapedRemainingPrefixRay terminal).vector =
+      Cell.add
+        (Cell.add gate
+          (retainedTerminalFanOuterLaneOffset terminal.1 slot))
+        (retainedTerminalFanOuterInwardPrefixRay terminal).vector := by
+          change
+            Cell.add
+                (Cell.add escapePoint
+                  (retainedTerminalFanOuterLaneOffset terminal.1 slot))
+                (retainedTerminalFanOuterEscapedRemainingPrefixRay
+                  terminal).vector = _
+          rw [escapePointEq,
+            ← retainedTerminalFanOuterEscapedPrefixRay_vectors_add
+              terminal escapeStrict]
+          rcases gate with ⟨gateX, gateY⟩
+          rcases
+              (retainedTerminalFanOuterSourceEscapeRay terminal).vector with
+            ⟨escapeX, escapeY⟩
+          rcases
+              (retainedTerminalFanOuterEscapedRemainingPrefixRay
+                terminal).vector with
+            ⟨remainingX, remainingY⟩
+          rcases retainedTerminalFanOuterLaneOffset terminal.1 slot with
+            ⟨offsetX, offsetY⟩
+          simp [Cell.add]
+          constructor <;> ring
+    _ = Cell.add center
+        (Cell.add
+          (retainedTerminalFanOuterLanePortOffset terminal.1 slot)
+          terminal.1.primitive) :=
+      retainedTerminalFanOuterInwardPrefix_finish_eq
+        center terminal slot (by omega)
 /-- With a nonempty remaining radial suffix, the escaped exterior prefix
 ends one primitive outside the selected lane port. -/
 @[simp]
@@ -75,16 +142,6 @@ theorem retainedTerminalFanOuterEscapedRadialPrefix_getLast?
   let shiftedEscapePoint :=
     Cell.add escapePoint
       (retainedTerminalFanOuterLaneOffset terminal.1 slot)
-  have escapePointEq :
-      escapePoint =
-        Cell.add gate
-          (retainedTerminalFanOuterSourceEscapeRay terminal).vector := by
-    rfl
-  have shiftedEscapePointEq :
-      shiftedEscapePoint =
-        Cell.add escapePoint
-          (retainedTerminalFanOuterLaneOffset terminal.1 slot) := by
-    rfl
   have escapeLast :
       ((retainedTerminalFanOuterSourceEscapeRay terminal).rasterize
         gate).getLast? = some escapePoint := by
@@ -98,37 +155,8 @@ theorem retainedTerminalFanOuterEscapedRadialPrefix_getLast?
               (Cell.add
                 (retainedTerminalFanOuterLanePortOffset terminal.1 slot)
                 terminal.1.primitive)) := by
-    rw [RetainedRay.rasterize_getLast?]
-    apply congrArg some
-    calc
-      Cell.add shiftedEscapePoint
-          (retainedTerminalFanOuterEscapedRemainingPrefixRay
-            terminal).vector =
-        Cell.add
-          (Cell.add gate
-            (retainedTerminalFanOuterLaneOffset terminal.1 slot))
-          (retainedTerminalFanOuterInwardPrefixRay terminal).vector := by
-            rw [shiftedEscapePointEq, escapePointEq,
-              ← retainedTerminalFanOuterEscapedPrefixRay_vectors_add
-                terminal escapeStrict]
-            rcases gate with ⟨gateX, gateY⟩
-            rcases
-                (retainedTerminalFanOuterSourceEscapeRay terminal).vector with
-              ⟨escapeX, escapeY⟩
-            rcases
-                (retainedTerminalFanOuterEscapedRemainingPrefixRay
-                  terminal).vector with
-              ⟨remainingX, remainingY⟩
-            rcases retainedTerminalFanOuterLaneOffset terminal.1 slot with
-              ⟨offsetX, offsetY⟩
-            simp [Cell.add]
-            constructor <;> ring
-      _ = Cell.add center
-          (Cell.add
-            (retainedTerminalFanOuterLanePortOffset terminal.1 slot)
-            terminal.1.primitive) :=
-        retainedTerminalFanOuterInwardPrefix_finish_eq
-          center terminal slot (by omega)
+    exact retainedTerminalFanOuterEscapedRemainingPrefix_getLast?
+      center terminal slot escapeStrict
   unfold retainedTerminalFanOuterEscapedRadialPrefix
   apply joinAtEndpoint_getLast? escapeLast
   · apply joinAtEndpoint_head?
