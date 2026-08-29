@@ -12428,6 +12428,10 @@ The representation choices for this target are:
   gives ordinary and delayed-lane fallback suffixes one common finite policy
   interface.  Their complete direction words are translation invariant and
   split exactly into an outer-fan word followed by the fixed Figure 7 spoke.
+- [`LeanTrominoes/RetainedAngularFanFallbackRouteDecomposition.lean`](LeanTrominoes/RetainedAngularFanFallbackRouteDecomposition.lean)
+  regroups either public fallback policy exactly as the scaled source route
+  without its old endpoint, followed by the common fan suffix.  The equality
+  is before normalization and preserves the existing geometric route.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
