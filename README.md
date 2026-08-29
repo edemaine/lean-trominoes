@@ -12432,6 +12432,11 @@ The representation choices for this target are:
   regroups either public fallback policy exactly as the scaled source route
   without its old endpoint, followed by the common fan suffix.  The equality
   is before normalization and preserves the existing geometric route.
+- [`LeanTrominoes/RetainedAngularFanFallbackRouteNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanFallbackRouteNormalizedDirections.lean)
+  turns that decomposition into the exact normalized direction stream under
+  the already-established simplicity and boundary-contact interface.  Thus
+  fallback normalization preserves the dynamic prefix and appends only the
+  translation-free suffix word.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
