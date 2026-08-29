@@ -12618,6 +12618,12 @@ The representation choices for this target are:
   rejoins the radial lane, finite local adapter, and matching Figure 7 spoke.
   A positive cardinal segment immediately behind an ordinary fallback gate
   therefore meets the complete unit-subdivided suffix only at that gate.
+- [`LeanTrominoes/RetainedAngularFanFallbackCardinalTangentNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanFallbackCardinalTangentNormalizedDirections.lean)
+  combines that gate-only contact with strict separation of the earlier
+  source prefix.  Any simple scaled source route whose last retained segment
+  approaches a cardinal ordinary gate in the required direction therefore
+  normalizes to its unchanged source-prefix word followed by the canonical
+  finite fallback suffix word.
 
 ## Build
 
