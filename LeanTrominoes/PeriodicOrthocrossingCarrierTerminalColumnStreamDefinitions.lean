@@ -14,20 +14,32 @@ namespace CarrierRankOrderedPairs
 open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
 open CarrierPackedSpanTerminalColumns
 
-/-- One optional four-incidence terminal block per row-major carrier pair. -/
+/-- The terminal-data block determined by two retained carrier rank data. -/
+def retainedPairTerminalDataBlock
+    (first second : CarrierNodeRankDatum) :
+    List PeriodicEightOccurrenceSplit.RetainedTerminalData :=
+  carrierLensRouteTerminalDataBlock first.horizontal
+    (second.orderCoordinate - first.orderCoordinate).toNat
+
+/-- Selected row-major carrier terminal blocks from a deduplicated rank-data
+stream. -/
+def retainedTerminalDataBlocksFromDatums
+    (datums : List CarrierNodeRankDatum) :
+    List (List PeriodicEightOccurrenceSplit.RetainedTerminalData) :=
+  let entries := CarrierRankGlobal.enumeration datums
+  entries.zipIdx.flatMap fun first =>
+    entries.zipIdx.filterMap fun second =>
+      if retainedPredicate first second then
+        some (retainedPairTerminalDataBlock first.1.1 second.1.1)
+      else none
+
+/-- One four-incidence terminal block per selected row-major carrier pair. -/
 def retainedTerminalDataBlocks (descriptors : List RouteDescriptor) :
     List (List PeriodicEightOccurrenceSplit.RetainedTerminalData) :=
   let period := routeDescriptorStreamGridSize descriptors
   let datums :=
     (routeDescriptorCarrierRankDatumsAtPeriod period descriptors).dedup
-  let entries := CarrierRankGlobal.enumeration datums
-  entries.zipIdx.flatMap fun first =>
-    entries.zipIdx.map fun second =>
-      if retainedPredicate first second then
-        carrierLensRouteTerminalDataBlock first.1.1.horizontal
-          (second.1.1.orderCoordinate -
-            first.1.1.orderCoordinate).toNat
-      else []
+  retainedTerminalDataBlocksFromDatums datums
 
 /-- Selected carrier direction ranks in exact global clause presentation. -/
 def retainedTerminalDirectionRanks

@@ -949,6 +949,40 @@ def CarrierNode.HasForwardClearance
     (first.position graph).1 = (second.position graph).1 ∧
       (first.position graph).2 + 8 ≤ (second.position graph).2
 
+/-- For two nodes on the same carrier axis, forward clearance identifies
+the unsigned geometric span with the signed carrier-order difference. -/
+theorem CarrierNode.axisSpan_eq_orderCoordinate_sub_of_hasForwardClearance
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (first second : CarrierNode)
+    (sameAxis : first.isHorizontal = second.isHorizontal)
+    (clearance : first.HasForwardClearance graph second) :
+    AxisDirection.axisSpan (first.position graph) (second.position graph) =
+      second.orderCoordinate graph - first.orderCoordinate graph := by
+  cases horizontal : first.isHorizontal with
+  | false =>
+      have secondHorizontal : second.isHorizontal = false := by
+        rw [← sameAxis]
+        exact horizontal
+      simp only [CarrierNode.HasForwardClearance, horizontal,
+        Bool.false_eq_true, if_false] at clearance
+      simp only [AxisDirection.axisSpan, CarrierNode.orderCoordinate,
+        horizontal, secondHorizontal, Bool.false_eq_true, if_false]
+      rw [abs_of_nonneg (by omega : 0 ≤
+        (second.position graph).2 - (first.position graph).2)]
+      simp [clearance.1]
+  | true =>
+      have secondHorizontal : second.isHorizontal = true := by
+        rw [← sameAxis]
+        exact horizontal
+      simp only [CarrierNode.HasForwardClearance, horizontal, if_true]
+        at clearance
+      simp only [AxisDirection.axisSpan, CarrierNode.orderCoordinate,
+        horizontal, secondHorizontal, if_true]
+      rw [abs_of_nonneg (by omega : 0 ≤
+        (second.position graph).1 - (first.position graph).1)]
+      simp [clearance.1]
+
 /-- Every retained complete-carrier pair has enough physical clearance for
 the eight-cell equality lens. -/
 theorem completeCarrierPair_hasForwardClearance

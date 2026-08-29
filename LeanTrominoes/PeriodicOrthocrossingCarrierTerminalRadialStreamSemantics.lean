@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.ListOptionalBlocksFlatten
 import LeanTrominoes.PeriodicOrthocrossingCarrierTerminalColumnStreamDefinitions
 import LeanTrominoes.PeriodicOrthocrossingCarrierPackedSpanTerminalRadialMatrixSemantics
 import LeanTrominoes.PeriodicOrthocrossingCarrierRankOrderedPackedSpanNumericSemantics
@@ -49,7 +50,19 @@ theorem radialLengthStream_packedSpanStream_numericRouteDescriptors
     radialLengthStream_unaryFields]
   unfold retainedTerminalRadialLengths retainedTerminalDataBlocks
   dsimp only
-  exact decodedPackedSpanRadialMatrix_eq_canonical entries spanLarge
+  refine (decodedPackedSpanRadialMatrix_eq_canonical
+    entries spanLarge).trans ?_
+  apply congrArg UnaryFieldEncoderMachine.unaryFields
+  unfold retainedTerminalDataBlocksFromDatums
+  dsimp only
+  simpa only [retainedPairTerminalDataBlock] using
+    List.matrixOptionalBlocks_project_flatten
+      entries.zipIdx entries.zipIdx retainedPredicate
+      (fun first second =>
+        carrierLensRouteTerminalDataBlock first.1.1.horizontal
+          (second.1.1.orderCoordinate -
+            first.1.1.orderCoordinate).toNat)
+      terminalDataRadialLengths (by rfl)
 
 end CarrierRankOrderedPairs
 end LeanTrominoes.PeriodicOrthocrossing
