@@ -17,6 +17,64 @@ namespace BinaryRouteTailRecordProfileFraming
 open FiniteStateTransducer
 open PeriodicThreeDM.NormalizationDirectionRequest.Batch
 
+@[simp] theorem recordProfiles_append
+    (first second : List
+      PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.Token) :
+    recordProfiles (first ++ second) =
+      recordProfiles first ++ recordProfiles second := by
+  simp [recordProfiles]
+
+@[simp] theorem recordProfiles_flatMap {Value : Type}
+    (values : List Value)
+    (records : Value → List
+      PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.Token) :
+    recordProfiles (values.flatMap records) =
+      values.flatMap fun value => recordProfiles (records value) := by
+  simp [recordProfiles, List.flatMap_assoc]
+
+@[simp] theorem recordProfiles_tailBlock
+    (sourceSlot :
+      PeriodicCNF.ClauseProfilePolarityRouteOperation.SourceLiteralSlot)
+    (directions : List AxisDirection) :
+    recordProfiles
+        (PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.tailBlock
+          sourceSlot directions) = [] := by
+  simp [recordProfiles,
+    PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.tailBlock,
+    recordProfileBlock]
+
+@[simp] theorem recordProfiles_taggedTailTokens :
+    (tails : List (List AxisDirection)) →
+      recordProfiles
+          (PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.taggedTailTokens
+            tails) = []
+  | [] => rfl
+  | first :: tails => by
+      cases tails with
+      | nil => simp [PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.taggedTailTokens]
+      | cons second tails =>
+          cases tails with
+          | nil => simp [PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.taggedTailTokens]
+          | cons third tails =>
+              simp [PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.taggedTailTokens]
+
+/-- Profile extraction forgets all dynamic tails and the clause delimiter. -/
+@[simp] theorem recordProfiles_clauseRecord
+    (profile : Profile) (tails : List (List AxisDirection)) :
+    recordProfiles
+        (PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.clauseRecord
+      profile tails) = [profile] := by
+  rw [show
+    PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.clauseRecord
+        profile tails =
+      [.profile profile] ++
+        PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.taggedTailTokens
+          tails ++ [.clauseEnd] by
+      simp [PeriodicCNFStripReduction.HorizontalRoutedRouteTailRecord.clauseRecord]]
+  rw [recordProfiles_append, recordProfiles_append,
+    recordProfiles_taggedTailTokens]
+  simp [recordProfiles, recordProfileBlock]
+
 @[simp] theorem prefixOutput_eq_profilePrefixes
     (profiles : List Profile) :
     prefixOutput profiles = profilePrefixes profiles := by
