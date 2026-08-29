@@ -25,6 +25,14 @@ def appendZeroValues (values : List Nat) : List Nat :=
 def prependZeroValues (values : List Nat) : List Nat :=
   values.flatMap fun value => [0, value]
 
+@[simp] theorem appendZeroValues_length (values : List Nat) :
+    (appendZeroValues values).length = 2 * values.length := by
+  simp [appendZeroValues, Nat.mul_comm]
+
+@[simp] theorem prependZeroValues_length (values : List Nat) :
+    (prependZeroValues values).length = 2 * values.length := by
+  simp [prependZeroValues, Nat.mul_comm]
+
 def appendZeroBlock : Symbol → List Symbol
   | .unit => [.unit]
   | .delimiter => [.delimiter, .delimiter]

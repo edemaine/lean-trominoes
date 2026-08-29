@@ -12500,6 +12500,11 @@ The representation choices for this target are:
   decodes those alternating fields to the exact kind/direction/slot header
   and unary radial tokens expected by the batched suffix compiler.  Its
   finite-state formatter is proved correct and polynomial time.
+- [`LeanTrominoes/RetainedAngularFanFallbackSuffixQueryColumnCompiler.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixQueryColumnCompiler.lean)
+  assembles any aligned finite role, unary radial-length, and bounded-slot
+  producers through zero padding, pointwise addition, and query formatting.
+  The resulting generic compiler emits either the exact compact batch or its
+  complete route-delimited fallback-suffix directions.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
