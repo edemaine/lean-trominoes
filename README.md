@@ -2259,6 +2259,10 @@ build; an imported proof counts when its statement matches the paper.
                   family, recover every direct route choice, and equate its
                   compiled direction/radial columns with the actual unscaled
                   coordinated-source terminals.
+                - [x] Do the same for the canonical routed-variable suffix,
+                  then reassemble both routed families and identify the
+                  existing combined routed terminal-column compiler with the
+                  actual globally indexed suffix.
                 - [x] Give carrier lenses an explicit four-case terminal
                   datum, give bends a finite-table terminal datum, and prove
                   both equal the actual translated local incidence routes.
