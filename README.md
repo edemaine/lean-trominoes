@@ -12466,7 +12466,11 @@ The representation choices for this target are:
   four-route output.
   [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionScalingCompiler.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionScalingCompiler.lean)
   composes the same expansion with affine bend selection and identifies the
-  output with every semantic bend of a numeric route.
+  output with every semantic bend of a numeric route.  The direct-source
+  [`carrier`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierFallbackPrefixCompiler.lean)
+  and [`bend`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendFallbackPrefixCompiler.lean)
+  leaves instantiate these machines as the complete scaled prefix streams
+  generated from PSPACE source symbols.
 - [`LeanTrominoes/RetainedAngularFanFallbackSuffixDirectionCompiler.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixDirectionCompiler.lean)
   reads a finite kind/direction/slot header plus one unary raw terminal
   length and emits the corresponding route-delimited fallback-fan suffix.
