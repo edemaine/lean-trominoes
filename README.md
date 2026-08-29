@@ -2507,6 +2507,9 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Identify every data-only final route's affine source
                 position and, from compact geometric conditions, its exact
                 three-round direction and canonical local-triple record word.
+              - [x] Align final copied-clause occurrence roles with bounded
+                stable-terminal slots, compile their disjoint unary codes,
+                and decode each code back to its exact finite role/slot pair.
               - [ ] Emit each contracted edge's initial unit directions and
                 six finite endpoint-template choices.  This compact source
                 emitter is now reduced to the explicit framed source-token

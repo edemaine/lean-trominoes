@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.FiniteBlockTransducer
 import LeanTrominoes.RetainedAngularFanFinalCopiedClauseQuery
+import LeanTrominoes.RetainedAngularFanFinalCopiedClauseOccurrenceRoleData
 
 /-! # Expanding final copied-clause queries to occurrence roles -/
 
@@ -14,11 +15,6 @@ namespace LeanTrominoes.PeriodicEightOccurrenceSplit
 
 open Computability Turing
 open PeriodicCNF.FormulaShapeDirectionOrdering
-
-/-- One finite control token per occurrence of a final copied-clause query:
-the whole finite query together with its zero-based literal position. -/
-abbrev RetainedFinalCopiedClauseOccurrenceRole :=
-  RetainedFinalCopiedClauseQuery × Fin 3
 
 /-- Number of represented literal occurrences in one query.  A variable token
 is not a copied-clause descriptor and therefore contributes none. -/
