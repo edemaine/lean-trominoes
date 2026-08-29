@@ -12419,6 +12419,11 @@ The representation choices for this target are:
   removes canonical variable gauges from valid incidence direction words.
   The final polarity layer now uses this general translation-invariance
   theorem, and the preceding fixed-eight gauge can use the same boundary.
+- [`LeanTrominoes/GadgetSparseRouteNormalizedSimpleJoinDirection.lean`](LeanTrominoes/GadgetSparseRouteNormalizedSimpleJoinDirection.lean)
+  proves that normalizing an endpoint join of two simple orthogonal pieces
+  preserves and concatenates their direction words whenever the pieces meet
+  only at the boundary.  This separates each remaining fallback route into
+  its dynamic carrier-or-bend source prefix and finite retained-fan suffix.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
