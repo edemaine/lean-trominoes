@@ -12474,6 +12474,9 @@ The representation choices for this target are:
   [`LeanTrominoes/RetainedAngularFanFallbackSuffixOuterDirectionSemantics.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixOuterDirectionSemantics.lean)
   then decomposes both ordinary and escaped complete outer routes into their
   finite prefix, dynamic radial word, and finite local adapter.
+  [`LeanTrominoes/RetainedAngularFanFallbackSuffixDirectionSemantics.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixDirectionSemantics.lean)
+  proves that every positive compact query emits exactly the corresponding
+  complete factor-four-scaled fallback suffix, including its Figure 7 spoke.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
