@@ -34,6 +34,15 @@ def output (tokens : List Token) : List Token :=
     output (first ++ second) = output first ++ output second := by
   simp [output]
 
+@[simp] theorem output_flatMap {α : Type}
+    (values : List α) (word : α → List Token) :
+    output (values.flatMap word) =
+      values.flatMap fun value => output (word value) := by
+  induction values with
+  | nil => rfl
+  | cons value values induction =>
+      simp only [List.flatMap_cons, output_append, induction]
+
 private theorem output_directionTokens (directions : List AxisDirection) :
     output (directions.map NormalizedToken.direction) =
       (repeatDirections 1152 directions).map NormalizedToken.direction := by

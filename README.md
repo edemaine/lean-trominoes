@@ -12462,6 +12462,9 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOrthocrossingCarrierFallbackPrefixScalingCompiler.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierFallbackPrefixScalingCompiler.lean)
   composes this expansion with carrier trimming and proves its explicit
   four-route output.
+  [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionScalingCompiler.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataAffineBendRoutePrefixDirectionScalingCompiler.lean)
+  composes the same expansion with affine bend selection and identifies the
+  output with every semantic bend of a numeric route.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
