@@ -12496,6 +12496,10 @@ The representation choices for this target are:
   interleaves aligned unary columns by inserting alternating zero fields.
   Both padding orientations are finite-state and polynomial time, preparing
   compact fallback headers and radial lengths for pointwise addition.
+- [`LeanTrominoes/RetainedAngularFanFallbackSuffixQueryFormatter.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixQueryFormatter.lean)
+  decodes those alternating fields to the exact kind/direction/slot header
+  and unary radial tokens expected by the batched suffix compiler.  Its
+  finite-state formatter is proved correct and polynomial time.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
