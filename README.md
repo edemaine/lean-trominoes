@@ -12556,6 +12556,11 @@ The representation choices for this target are:
   query-length leaves prove that every zipped column is aligned.  The proofs are split
   further by occurrence, direction, and radial column so each Lean check stays
   within the project’s bounded-memory workflow.
+  [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierFallbackSuffixQueryCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierFallbackSuffixQueryCompiler.lean)
+  and its
+  [`bend`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendFallbackSuffixQueryCompiler.lean)
+  counterpart compose those columns into the complete route-delimited suffix
+  direction streams in polynomial time, including empty input alphabets.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
