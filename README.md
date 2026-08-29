@@ -12509,6 +12509,12 @@ The representation choices for this target are:
   filters an aligned bounded-slot stream by compiled Boolean controls.  It
   reuses finite role/slot unary coding and decoding, avoiding a separate
   variable-length zipper machine while proving exact positional selection.
+- [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceMaskData.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceMaskData.lean)
+  and its routed/bend/carrier compiler leaves build exact five-family masks
+  over the final descriptor presentation.  The separately verified length
+  bridge aligns them with the global stable-terminal slots, and
+  [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotCompiler.lean)
+  selects the complete carrier and bend slot streams in polynomial time.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
