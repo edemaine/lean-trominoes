@@ -2248,6 +2248,13 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Identify every successful unscaled direct-atlas
                   terminal coordinate with the finite kind/literal query
                   already emitted by the copied-clause compiler.
+                - [x] Split the final clause presentation into its five named
+                  families and inherit nonemptiness and width-three bounds
+                  for every family from the deduplicated source formula.
+                - [x] Identify the exact indexed crossover query prefix as
+                  all-direct, recover every route choice, and equate its
+                  compiled direction/radial columns with the actual unscaled
+                  coordinated-source terminals.
                 - [x] Give carrier lenses an explicit four-case terminal
                   datum, give bends a finite-table terminal datum, and prove
                   both equal the actual translated local incidence routes.
