@@ -68,6 +68,42 @@ theorem listLoopErase_append_right
       simp only [List.cons_append, listLoopErase]
       rw [induction]
 
+/-- A correctly matched endpoint join is the first route without its final
+copy of the boundary followed by the complete second route. -/
+theorem joinAtEndpoint_eq_dropLast_append
+    {Vertex : Type*}
+    {first second : List Vertex}
+    {boundary : Vertex}
+    (firstLast : first.getLast? = some boundary)
+    (secondHead : second.head? = some boundary) :
+    joinAtEndpoint first second = first.dropLast ++ second := by
+  unfold joinAtEndpoint
+  rw [← List.dropLast_append_getLast? boundary firstLast]
+  cases second with
+  | nil => simp at secondHead
+  | cons head tail =>
+      have headEq : head = boundary := by
+        simpa using secondHead
+      subst head
+      simp
+
+/-- In an endpoint join, the complete right route may be loop-erased before
+the combined route is processed. -/
+theorem listLoopErase_joinAtEndpoint_right
+    {Vertex : Type*} [DecidableEq Vertex]
+    {first second : List Vertex}
+    {boundary : Vertex}
+    (firstLast : first.getLast? = some boundary)
+    (secondHead : second.head? = some boundary)
+    (erasedSecondHead :
+      (listLoopErase second).head? = some boundary) :
+    listLoopErase (joinAtEndpoint first second) =
+      listLoopErase
+        (joinAtEndpoint first (listLoopErase second)) := by
+  rw [joinAtEndpoint_eq_dropLast_append firstLast secondHead,
+    joinAtEndpoint_eq_dropLast_append firstLast erasedSecondHead]
+  exact listLoopErase_append_right first.dropLast second
+
 /-- A disjoint duplicate-free suffix passes through right-to-left loop
 erasure unchanged. -/
 theorem listLoopErase_append_of_disjoint
