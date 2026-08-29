@@ -12492,6 +12492,10 @@ The representation choices for this target are:
   [`LeanTrominoes/RetainedAngularFanFallbackSuffixQuerySemantics.lean`](LeanTrominoes/RetainedAngularFanFallbackSuffixQuerySemantics.lean)
   feeds those blocks through the batch compiler and recovers the public
   route-policy-selected geometric suffixes.
+- [`LeanTrominoes/UnaryFieldAlternatingPaddingCompiler.lean`](LeanTrominoes/UnaryFieldAlternatingPaddingCompiler.lean)
+  interleaves aligned unary columns by inserting alternating zero fields.
+  Both padding orientations are finite-state and polynomial time, preparing
+  compact fallback headers and radial lengths for pointwise addition.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
