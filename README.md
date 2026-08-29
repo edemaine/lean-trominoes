@@ -12441,6 +12441,10 @@ The representation choices for this target are:
   removes the fallback route's complete discarded final segment before
   compiling the two source refinements.  The surviving raw carrier-or-bend
   prefix becomes exactly a fixed 1152-fold direction expansion.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataFallbackPrefixDirectionWords.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataFallbackPrefixDirectionWords.lean)
+  identifies those unscaled source-prefix words explicitly: carrier prefixes
+  use four simple span-aware cases, while bend prefixes are a finite corner
+  table.  Straight two-point carrier routes correctly leave an empty prefix.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
