@@ -47,6 +47,13 @@ theorem retainedFinalPrecomputedClauseQueries_eq_map
   rw [retainedFinalPrecomputedClauseQueries_eq_map]
   simp only [List.length_map]
 
+@[simp] theorem retainedFinalPrecomputedClauseQueries_append
+    (first second : List FormulaShapeDirectionOrdering.Token) :
+    retainedFinalPrecomputedClauseQueries (first ++ second) =
+      retainedFinalPrecomputedClauseQueries first ++
+        retainedFinalPrecomputedClauseQueries second := by
+  simp only [retainedFinalPrecomputedClauseQueries_eq_map, List.map_append]
+
 /-- Carrier and bend wrapper queries never produce direct route-tail
 records, regardless of the aligned slot list. -/
 theorem retainedDirectClauseRouteTailRecordQueriesOfSlotInputs_zip_precomputed
