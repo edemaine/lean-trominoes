@@ -12523,7 +12523,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceMaskData.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceMaskData.lean)
   and its routed/bend/carrier compiler leaves build exact five-family masks
   over the final descriptor presentation.  The separately verified length
-  bridge aligns them with the global stable-terminal slots, and
+  bridge aligns them with the global stable-terminal slots.
+  [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackQuerySlotBlockIndividualLength.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackQuerySlotBlockIndividualLength.lean)
+  separates the combined fallback count into exact carrier and bend query/
+  slot-block count equalities, and
   [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFallbackOccurrenceSlotCompiler.lean)
   selects the complete carrier and bend slot streams in polynomial time.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
