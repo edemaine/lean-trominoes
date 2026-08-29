@@ -12505,6 +12505,10 @@ The representation choices for this target are:
   producers through zero padding, pointwise addition, and query formatting.
   The resulting generic compiler emits either the exact compact batch or its
   complete route-delimited fallback-suffix directions.
+- [`LeanTrominoes/AlignedRetainedTerminalSlotFilterCompiler.lean`](LeanTrominoes/AlignedRetainedTerminalSlotFilterCompiler.lean)
+  filters an aligned bounded-slot stream by compiled Boolean controls.  It
+  reuses finite role/slot unary coding and decoding, avoiding a separate
+  variable-length zipper machine while proving exact positional selection.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
   applies that boundary to the computed retained construction, identifying
   every valid final-gauged direction word with its pre-gauge final clockwise
