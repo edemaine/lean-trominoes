@@ -104,6 +104,20 @@ def blocks : List Geometry → List RetainedTerminalSlot →
       block geometry first second third fourth :: blocks geometries slots
   | _, _ => []
 
+def queryBlocks : List Geometry → List RetainedTerminalSlot →
+    List FallbackSuffixDirectionCompiler.Batch.Query
+  | geometry :: geometries, first :: second :: third :: fourth :: slots =>
+      queryBlock geometry first second third fourth ++
+        queryBlocks geometries slots
+  | _, _ => []
+
+def routePairs : List Geometry → List RetainedTerminalSlot →
+    List (List AxisDirection ×
+      FallbackSuffixDirectionCompiler.Batch.Query)
+  | geometries, slots =>
+      (geometries.flatMap Geometry.prefixWords).zip
+        (queryBlocks geometries slots)
+
 end BendFallbackRouteTailRecords
 end PeriodicOrthocrossing
 end LeanTrominoes

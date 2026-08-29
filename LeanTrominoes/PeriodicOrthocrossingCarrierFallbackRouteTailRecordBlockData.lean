@@ -112,6 +112,25 @@ def blocks : List Geometry → List RetainedTerminalSlot →
       block geometry first second third fourth :: blocks geometries slots
   | _, _ => []
 
+/-- Consume the same four-slot groups as `blocks`, retaining the aligned
+semantic suffix queries. -/
+def queryBlocks : List Geometry → List RetainedTerminalSlot →
+    List FallbackSuffixDirectionCompiler.Batch.Query
+  | geometry :: geometries, first :: second :: third :: fourth :: slots =>
+      queryBlock geometry first second third fourth ++
+        queryBlocks geometries slots
+  | _, _ => []
+
+/-- Prefix/query pairs in the same block zipper and route order. -/
+def routePairs : List Geometry → List RetainedTerminalSlot →
+    List (List AxisDirection ×
+      FallbackSuffixDirectionCompiler.Batch.Query)
+  | geometries, slots =>
+      (geometries.flatMap fun geometry =>
+        CarrierFallbackPrefixScaling.canonicalScaledPrefixWords
+          geometry.horizontal geometry.span).zip
+        (queryBlocks geometries slots)
+
 end CarrierFallbackRouteTailRecords
 end PeriodicOrthocrossing
 end LeanTrominoes
