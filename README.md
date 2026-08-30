@@ -12624,6 +12624,10 @@ The representation choices for this target are:
   approaches a cardinal ordinary gate in the required direction therefore
   normalizes to its unchanged source-prefix word followed by the canonical
   finite fallback suffix word.
+- [`LeanTrominoes/RetainedAngularFanFallbackCardinalTangentTranslatedNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanFallbackCardinalTangentTranslatedNormalizedDirections.lean)
+  lifts that theorem through an arbitrary translation of the raw source
+  route.  The fully refined route moves by the correspondingly scaled
+  offset, while its normalized direction word remains unchanged.
 - [`LeanTrominoes/RetainedAngularFanCarrierLensHorizontalOrdinaryNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanCarrierLensHorizontalOrdinaryNormalizedDirections.lean)
   applies the cardinal-tangent theorem to both non-singleton routes in the
   horizontal carrier lens.  Their complete normalized words are exactly the
