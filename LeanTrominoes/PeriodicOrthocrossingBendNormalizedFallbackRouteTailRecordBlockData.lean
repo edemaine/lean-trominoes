@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicOrthocrossingBendFallbackRouteTailRecordBlockData
+import LeanTrominoes.RetainedAngularFanBendRouteNormalizedDirections
 import LeanTrominoes.RetainedAngularFanNormalizedFallbackJoinedDirectionAllSemantics
 
 /-! # Normalized semantic four-route record blocks for retained bends -/
@@ -16,17 +17,13 @@ open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
 open PeriodicEightOccurrenceSplit
 open BendFallbackRouteTailRecords
 
-/-- The scaled bend prefix followed by the canonical normalized ordinary
-retained-fan suffix selected by one occurrence slot. -/
+/-- Exact normalized direction word of one retained bend fallback route. -/
 def routeDirections (geometry : Geometry)
     (localClauseIndex literalIndex : Nat)
     (slot : RetainedTerminalSlot) : List AxisDirection :=
-  Gadget.repeatDirections 1152
-      (bendRoutePrefixDirections geometry.firstPort geometry.secondPort
-        localClauseIndex literalIndex) ++
-    NormalizedFallbackSuffixDirectionCompiler.Batch.Query.normalizedSuffixDirections
-      (BendFallbackRouteTailRecords.routeQuery geometry
-        localClauseIndex literalIndex slot)
+  bendRouteNormalizedFallbackDirections
+    geometry.firstPort geometry.secondPort
+    localClauseIndex literalIndex slot
 
 def routeDirectionBlock (geometry : Geometry)
     (first second third fourth : RetainedTerminalSlot) :

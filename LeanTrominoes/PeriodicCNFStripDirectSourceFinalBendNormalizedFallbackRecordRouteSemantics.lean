@@ -4,9 +4,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.BinaryRouteTailRecordBatchFormatterSemantics
+import LeanTrominoes.PeriodicCNFIncidenceRouteDescriptorBendGeometry
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalBendFallbackRecordQuerySemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalBendNormalizedFallbackRouteDirectionSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalBendNormalizedFallbackRouteTailRecordData
+import LeanTrominoes.PeriodicCNFStripDirectSourceFormulaIncidenceDegree
 import LeanTrominoes.PeriodicOrthocrossingBendNormalizedFallbackRouteTailRecordBlockSemantics
 
 /-! # Direct normalized bend fallback record-route alignment -/
@@ -39,6 +41,29 @@ private theorem directSourceFinalBendNormalizedFallbackPrefixWords_eq_geometries
   exact (directSourceFinalBendFallbackRecordGeometry_prefixWords
     decider symbols).symm
 
+private theorem directSourceFinalBendNormalizedFallbackGeometries_different
+    (symbols : List encoding.Γ) :
+    ∀ geometry ∈ directSourceFinalBendFallbackRecordGeometries
+        decider symbols,
+      geometry.firstPort ≠ geometry.secondPort := by
+  intro geometry geometryMember
+  unfold directSourceFinalBendFallbackRecordGeometries
+    BendFallbackRouteTailRecords.selectedGeometries at geometryMember
+  rcases List.mem_flatMap.mp geometryMember with
+    ⟨descriptor, descriptorMember, geometryMember⟩
+  rcases List.mem_map.mp geometryMember with
+    ⟨routeBend, routeBendMember, geometryEq⟩
+  subst geometry
+  exact
+    (PeriodicCNF.numericRouteDescriptor_routeBend_cornerGeometry
+      (directSourceFormula decider symbols)
+      (PeriodicCNF.incidenceGraph_isWellFormed _)
+      (directSourceFormula_incidenceGraph_degreeAtMost decider symbols)
+      (by
+        unfold directSourceFormula
+        exact PeriodicCNF.incidenceGraph_isLocal (sourceFormula_isLocal _))
+      descriptorMember (0, 0) routeBendMember).portsDifferent
+
 /-- The complete normalized bend compiler stream is exactly the four-route
 projection of the direct normalized declarative blocks. -/
 theorem directSourceFinalBendNormalizedFallbackRouteDirections_eq_blockRoutes
@@ -49,13 +74,16 @@ theorem directSourceFinalBendNormalizedFallbackRouteDirections_eq_blockRoutes
           decider symbols) := by
   rw [directSourceFinalBendNormalizedFallbackRouteDirections_eq_geometric]
   unfold directSourceFinalBendNormalizedFallbackGeometricDirections
+    directSourceFinalBendPreCancellationGeometricDirections
   rw [directSourceFinalBendNormalizedFallbackPrefixWords_eq_geometries,
     directSourceFinalBendFallbackSemanticQueries_eq_queryBlocks]
   unfold directSourceFinalBendNormalizedFallbackRecordBlocks
   exact
     (BendNormalizedFallbackRouteTailRecords.blockRoutes_blocks
       (directSourceFinalBendFallbackRecordGeometries decider symbols)
-      (directSourceFinalBendOccurrenceSlots decider symbols)).symm
+      (directSourceFinalBendOccurrenceSlots decider symbols)
+      (directSourceFinalBendNormalizedFallbackGeometries_different
+        decider symbols)).symm
 
 /-- Normalization changes only route fields, so the direct bend block profile
 stream agrees with the existing raw declarative blocks. -/

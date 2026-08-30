@@ -4,7 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.BinaryRouteTailRecordProfileFramingData
+import LeanTrominoes.BoundedDelimitedDirectionCancellationDelimited
 import LeanTrominoes.PeriodicOrthocrossingBendNormalizedFallbackRouteTailRecordBlockData
+import LeanTrominoes.RetainedAngularFanBendRouteCancellation
+import LeanTrominoes.RetainedAngularFanNormalizedFallbackJoinedDirectionSemantics
 
 /-! # Flattened normalized bend fallback record-block routes -/
 
@@ -46,18 +49,76 @@ theorem blockProfiles_blocks
               geometry.firstPort geometry.secondPort false false)] ++ tail)
       exact induction slots
 
-/-- Flattening normalized bend blocks gives the exact normalized ordinary
-joined stream represented by the aligned prefix/query pairs. -/
+/-- Cancellation acts pointwise on the four pre-cancellation words of one
+genuine bend block. -/
+theorem routeDirectionBlock_flatMap_delimited_eq_cancelled
+    (geometry : Geometry)
+    (different : geometry.firstPort ≠ geometry.secondPort)
+    (first second third fourth : RetainedTerminalSlot) :
+    (routeDirectionBlock geometry first second third fourth).flatMap
+        DelimitedRouteJoin.delimited =
+      (geometry.prefixWords.zip
+          (BendFallbackRouteTailRecords.queryBlock geometry
+            first second third fourth)).flatMap fun value =>
+        BoundedDelimitedDirectionCancellation.output
+          (DelimitedRouteJoin.delimited
+            (value.1 ++
+              NormalizedFallbackSuffixDirectionCompiler.Batch.Query.normalizedOrdinarySuffixDirections
+                value.2)) := by
+  simp only [routeDirectionBlock, routeDirections,
+    BendFallbackRouteTailRecords.Geometry.prefixWords,
+    BendFallbackRouteTailRecords.queryBlock,
+    BendFallbackRouteTailRecords.routeQuery,
+    NormalizedFallbackSuffixDirectionCompiler.Batch.Query.normalizedOrdinarySuffixDirections,
+    retainedAngularFanSourceClearanceFactor_eq, Prod.eta,
+    List.zip_cons_cons, List.zip_nil_left, List.flatMap_cons,
+    List.flatMap_nil, List.append_nil]
+  have cancel00 :=
+    boundedCancellation_bendRoutePreCancellationDirections
+      geometry.firstPort geometry.secondPort different
+      0 0 (by omega) (by omega) first
+  have cancel01 :=
+    boundedCancellation_bendRoutePreCancellationDirections
+      geometry.firstPort geometry.secondPort different
+      0 1 (by omega) (by omega) second
+  have cancel10 :=
+    boundedCancellation_bendRoutePreCancellationDirections
+      geometry.firstPort geometry.secondPort different
+      1 0 (by omega) (by omega) third
+  have cancel11 :=
+    boundedCancellation_bendRoutePreCancellationDirections
+      geometry.firstPort geometry.secondPort different
+      1 1 (by omega) (by omega) fourth
+  simp [bendRoutePreCancellationDirections] at cancel00
+  simp [bendRoutePreCancellationDirections] at cancel01
+  simp [bendRoutePreCancellationDirections] at cancel10
+  simp [bendRoutePreCancellationDirections] at cancel11
+  rw [cancel00, cancel01, cancel10, cancel11]
+
+/-- Flattening normalized bend blocks gives bounded junction cancellation
+of the normalized-suffix joined stream represented by the aligned pairs. -/
 theorem blockRoutes_blocks
     (geometries : List Geometry)
-    (slots : List RetainedTerminalSlot) :
+    (slots : List RetainedTerminalSlot)
+    (different : ∀ geometry ∈ geometries,
+      geometry.firstPort ≠ geometry.secondPort) :
     BinaryRouteTailRecordProfileFraming.blockRoutes
         (blocks geometries slots) =
-      NormalizedFallbackSuffixDirectionCompiler.retainedOrdinaryJoinedDirections
-        (BendFallbackRouteTailRecords.routePairs geometries slots) := by
+      BoundedDelimitedDirectionCancellation.output
+        (NormalizedFallbackSuffixDirectionCompiler.retainedOrdinaryJoinedDirections
+          (BendFallbackRouteTailRecords.routePairs geometries slots)) := by
+  unfold NormalizedFallbackSuffixDirectionCompiler.retainedOrdinaryJoinedDirections
+  rw [BoundedDelimitedDirectionCancellation.output_flatMap_delimited]
   induction geometries generalizing slots with
   | nil => rfl
   | cons geometry geometries induction =>
+      have geometryDifferent :
+          geometry.firstPort ≠ geometry.secondPort :=
+        different geometry (by simp)
+      have geometriesDifferent : ∀ member ∈ geometries,
+          member.firstPort ≠ member.secondPort := by
+        intro member memberIn
+        exact different member (by simp [memberIn])
       rcases slots with _ | ⟨first, slots⟩
       · rfl
       rcases slots with _ | ⟨second, slots⟩
@@ -74,39 +135,14 @@ theorem blockRoutes_blocks
         (by simp [BendFallbackRouteTailRecords.Geometry.prefixWords,
           BendFallbackRouteTailRecords.queryBlock])]
       dsimp only [block]
-      rw [show
-        NormalizedFallbackSuffixDirectionCompiler.retainedOrdinaryJoinedDirections
-            ((geometry.prefixWords.zip
-                (BendFallbackRouteTailRecords.queryBlock geometry
-                  first second third fourth)) ++
-              (geometries.flatMap
-                BendFallbackRouteTailRecords.Geometry.prefixWords).zip
-                (BendFallbackRouteTailRecords.queryBlocks
-                  geometries slots)) =
-          NormalizedFallbackSuffixDirectionCompiler.retainedOrdinaryJoinedDirections
-              (geometry.prefixWords.zip
-                (BendFallbackRouteTailRecords.queryBlock geometry
-                  first second third fourth)) ++
-            NormalizedFallbackSuffixDirectionCompiler.retainedOrdinaryJoinedDirections
-              ((geometries.flatMap
-                BendFallbackRouteTailRecords.Geometry.prefixWords).zip
-                (BendFallbackRouteTailRecords.queryBlocks
-                  geometries slots)) by
-        simp [NormalizedFallbackSuffixDirectionCompiler.retainedOrdinaryJoinedDirections]]
-      have tailEq := induction slots
+      rw [List.flatMap_append,
+        ← routeDirectionBlock_flatMap_delimited_eq_cancelled
+          geometry geometryDifferent first second third fourth]
+      have tailEq := induction slots geometriesDifferent
       unfold BinaryRouteTailRecordProfileFraming.blockRoutes
         BendFallbackRouteTailRecords.routePairs at tailEq
       rw [tailEq]
-      rw [show
-        NormalizedFallbackSuffixDirectionCompiler.retainedOrdinaryJoinedDirections
-            (geometry.prefixWords.zip
-              (BendFallbackRouteTailRecords.queryBlock geometry
-                first second third fourth)) =
-          (routeDirectionBlock geometry first second third fourth).flatMap
-            DelimitedRouteJoin.delimited by
-        rfl]
-      simp only [routeDirectionBlock, List.flatMap_cons,
-        List.flatMap_nil, List.append_nil, List.append_assoc]
+      simp [routeDirectionBlock, List.append_assoc]
 
 end BendNormalizedFallbackRouteTailRecords
 end LeanTrominoes.PeriodicOrthocrossing
