@@ -35,11 +35,15 @@ theorem finalCarrierRoute_normalized_fallback_directions_eq
           (PeriodicThreeSATThree.routeTerminalVector route) =
         some (scaleRetainedTerminalData
           retainedAngularFanSourceClearanceFactor
-          (carrierLensRouteTerminalData
-            (finalCarrierRouteGeometryAt
-              source taggedLink nextSlice).horizontal
-            (finalCarrierRouteGeometryAt source taggedLink nextSlice).span
-            (finalCarrierLocalClauseIndex taggedLink) literalIndex)))
+          (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
+            (AxisDirection.axisSpan
+              (CarrierNode.position
+                (PeriodicThreeSATThree.formula source).incidenceGraph
+                taggedLink.1.first)
+              (CarrierNode.position
+                (PeriodicThreeSATThree.formula source).incidenceGraph
+                taggedLink.1.second))
+            (if taggedLink.2 then 0 else 1) literalIndex)))
     (routeOrthogonal : OrthogonalPolyline route)
     (routePrefixDirections :
       Gadget.unitSubdivisionDirections
@@ -72,10 +76,13 @@ theorem finalCarrierRoute_normalized_fallback_directions_eq
       CarrierNormalizedFallbackRouteTailRecords.routeDirections
         (finalCarrierRouteGeometryAt source taggedLink nextSlice)
         (finalCarrierLocalClauseIndex taggedLink) literalIndex slot := by
+  have routeClassifiedGeometry := routeClassified
+  rw [carrierLensRouteTerminalData_finalCarrierRouteGeometryAt
+    source taggedLink nextSlice literalIndex] at routeClassifiedGeometry
   apply carrierRoute_normalized_fallback_directions_eq
     (finalCarrierRouteGeometryAt source taggedLink nextSlice)
     spanLarge (finalCarrierLocalClauseIndex taggedLink) literalIndex slot route
-    routeLength routeClassified routeOrthogonal
+    routeLength routeClassifiedGeometry routeOrthogonal
   exact routePrefixDirections.trans
     (repeatCarrierLensRoutePrefixDirections_finalCarrierRouteGeometryAt
       source taggedLink nextSlice literalIndex)
