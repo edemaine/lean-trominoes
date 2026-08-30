@@ -129,5 +129,32 @@ theorem carrierLensRoutePrefixDirections_finalCarrierRouteGeometryAt
     finalCarrierRouteGeometryAt_horizontal,
     finalCarrierLocalClauseIndex_val]
 
+/-- The fixed source-refinement repetition preserves the same actual-to-
+finite carrier prefix-table equality. -/
+theorem repeatCarrierLensRoutePrefixDirections_finalCarrierRouteGeometryAt
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (taggedLink : EqualityLink CarrierNode × Bool)
+    (nextSlice : Bool)
+    (literalIndex : Nat) :
+    Gadget.repeatDirections 1152
+        (carrierLensRoutePrefixDirections taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex) =
+      Gadget.repeatDirections 1152
+        (carrierLensRoutePrefixDirections
+          (finalCarrierRouteGeometryAt source taggedLink nextSlice).horizontal
+          (finalCarrierRouteGeometryAt source taggedLink nextSlice).span
+          (finalCarrierLocalClauseIndex taggedLink) literalIndex) :=
+  congrArg (Gadget.repeatDirections 1152)
+    (carrierLensRoutePrefixDirections_finalCarrierRouteGeometryAt
+      source taggedLink nextSlice literalIndex)
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
