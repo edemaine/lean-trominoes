@@ -12649,6 +12649,16 @@ The representation choices for this target are:
   singleton escaped fallbacks, and an eight-case theorem identifies all four
   routes in both east- and north-facing lenses with the normalized carrier
   record words.
+- The lightweight
+  [`route table`](LeanTrominoes/RetainedAngularFanCarrierLensTemplateRouteData.lean)
+  and four per-position terminal-classification leaves keep every finite
+  carrier check below the one-minute build cap.  Their
+  [`dispatcher`](LeanTrominoes/RetainedAngularFanCarrierLensTemplateClassification.lean)
+  and [`geometry bridge`](LeanTrominoes/RetainedAngularFanCarrierLensTemplateGeometry.lean)
+  recover the canonical oriented template and its public carrier metadata.
+- [`LeanTrominoes/RetainedAngularFanCarrierLensPlacedNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanCarrierLensPlacedNormalizedDirections.lean)
+  translates that complete four-route result to an arbitrary carrier origin;
+  every placed fallback still normalizes to its exact carrier record word.
 
 ## Build
 
