@@ -210,5 +210,78 @@ theorem retainedFallbackCardinalForwardTarget_noImmediateReversal
   rw [targetDirections]
   exact resultNoReversal
 
+/-- Geometric forward-cardinal fallbacks satisfy the complete bounded
+cancellation equation. -/
+theorem boundedCancellation_forwardCardinalFallback_of_geometry
+    (route : List Cell)
+    (port : Port)
+    (length : Nat)
+    (slot : RetainedTerminalSlot)
+    (distance : Nat)
+    (routeLength : 3 ≤ route.length)
+    (classified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector route) =
+        some (.compass port, length))
+    (routeOrthogonal : OrthogonalPolyline route)
+    (sourcePrefixSimple :
+      LocalIncidenceDrawing.RouteIsSimple
+        (retainedFallbackSourcePrefix route))
+    (cardinal :
+      port = .north ∨ port = .east ∨
+        port = .south ∨ port = .west)
+    (lengthLarge : 2 ≤ length)
+    (shiftStrict :
+      retainedTerminalFanOuterLaneSpacing * slot.val < distance)
+    (predecessor :
+      (retainedFallbackSourcePrefix route).dropLast.getLast? =
+        some
+          (Cell.add
+            (retainedAngularFanOuterDemand
+              (retainedFallbackFanCenter route)
+              (.compass port, length) slot).gate
+            (Cell.scale distance
+              (retainedTerminalFanOuterLaneStep
+                (.compass port)))))
+    (sourceStrict :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+        (retainedFallbackSourcePrefix route).dropLast
+        (retainedFallbackFanSuffixRouteAt
+          .ordinary (retainedFallbackFanCenter route)
+          (.compass port, length) slot)) :
+    BoundedDelimitedDirectionCancellation.output
+        (DelimitedRouteJoin.delimited
+          (Gadget.unitSubdivisionDirections
+              (retainedFallbackSourcePrefix route) ++
+            Gadget.unitSubdivisionDirections
+              (AxisDirection.normalizeOrthogonalPolyline
+                (retainedFallbackFanSuffixRouteAt
+                  .ordinary (retainedFallbackFanCenter route)
+                  (.compass port, length) slot)))) =
+      DelimitedRouteJoin.delimited
+        (retainedFallbackCardinalForwardKeptDirections
+            route port length slot distance ++
+          retainedFallbackCardinalForwardRestDirections
+            (retainedFallbackFanCenter route) port length slot) := by
+  have lengthPositive : 0 < length := by omega
+  have radialPositive :
+      0 < retainedTerminalFanOuterRadialLength
+        (.compass port, length) := by
+    rcases cardinal with rfl | rfl | rfl | rfl <;>
+      simp [retainedTerminalFanOuterRadialLength,
+        retainedTerminalFanTotalRefinement,
+        PeriodicEightOccurrenceSplitPositioned.refinementScale,
+        retainedTerminalFanRoutingRefinement,
+        retainedTerminalInterfaceMultiplier] at lengthLarge ⊢ <;>
+      omega
+  apply boundedCancellation_forwardCardinalFallback
+    route port length slot distance routeLength classified
+    routeOrthogonal cardinal lengthPositive radialPositive shiftStrict
+    predecessor
+  exact retainedFallbackCardinalForwardTarget_noImmediateReversal
+    route port length slot distance routeLength classified
+    routeOrthogonal sourcePrefixSimple cardinal lengthLarge shiftStrict
+    predecessor sourceStrict
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
