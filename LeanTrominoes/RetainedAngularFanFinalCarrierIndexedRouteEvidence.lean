@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanFinalCarrierNormalizedRouteDirectionModel
-import LeanTrominoes.RetainedAngularFanFinalCarrierScaledRouteEvidence
+import LeanTrominoes.RetainedAngularFanFinalCarrierIndexedScaledRouteEvidence
 
 /-! # Scaled-route evidence at indexed final carriers -/
 
@@ -20,12 +20,7 @@ theorem FinalCarrierIndexedOccurrence.routeDirectionEvidence
     (occurrence : FinalCarrierIndexedOccurrence Variable) :
     occurrence.RouteDirectionEvidence := by
   constructor
-  · exact finalCarrierScaledRoute_evidence
-      occurrence.source occurrence.sourceLocal occurrence.sourceWidth
-      occurrence.sourceClausesNonempty occurrence.positiveOffsets
-      occurrence.taggedLink occurrence.clauseIndex
-      occurrence.taggedLinkIndexed occurrence.clauseMember
-      occurrence.literalIndex occurrence.literalMember
+  · exact occurrence.scaledRouteEvidence
   · exact
       retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_carrier_directions_eq_model
         occurrence.source occurrence.sourceLocal occurrence.sourceWidth
@@ -33,13 +28,6 @@ theorem FinalCarrierIndexedOccurrence.routeDirectionEvidence
         occurrence.taggedLink occurrence.clauseIndex
         occurrence.taggedLinkIndexed occurrence.clauseMember
         occurrence.literalIndex occurrence.literalMember
-
-/-- The indexed-occurrence package supplies its four scaled-route facts. -/
-theorem FinalCarrierIndexedOccurrence.scaledRouteEvidence
-    {Variable : Type} [DecidableEq Variable]
-    (occurrence : FinalCarrierIndexedOccurrence Variable) :
-    occurrence.ScaledRouteEvidence :=
-  occurrence.routeDirectionEvidence.routeEvidence
 
 /-- Consume the packaged occurrence evidence without forcing downstream
 elaboration to normalize the evidence constructor's indexed result. -/
