@@ -32,6 +32,48 @@ theorem retainedTerminalFanCardinalForwardDirection_genuine
   rcases cardinal with rfl | rfl | rfl | rfl <;>
     decide
 
+/-- The kept part of a strictly longer forward tangent ends in the same
+constant direction as the overlap. -/
+theorem retainedTerminalFanCardinalForwardTangentLeadingRoute_lastDirection
+    (center : Cell)
+    (port : Port)
+    (length : Nat)
+    (slot : RetainedTerminalSlot)
+    (distance : Nat)
+    (cardinal :
+      port = .north ∨ port = .east ∨
+        port = .south ∨ port = .west)
+    (shiftStrict :
+      retainedTerminalFanOuterLaneSpacing * slot.val < distance) :
+    AxisDirection.polylineLastDirection
+        (retainedTerminalFanCardinalForwardTangentLeadingRoute
+          center port length slot distance) =
+      retainedTerminalFanCardinalForwardDirection port := by
+  rcases center with ⟨centerX, centerY⟩
+  rcases cardinal with rfl | rfl | rfl | rfl <;>
+    simp [retainedTerminalFanCardinalForwardTangentLeadingRoute,
+      retainedTerminalFanCardinalForwardDirection,
+      AxisDirection.polylineLastDirection,
+      AxisDirection.between,
+      retainedTerminalFanOuterLaneOffset,
+      retainedTerminalFanOuterLaneStep,
+      retainedTerminalFanOuterLaneSpacing,
+      retainedAngularFanOuterDemand_gate_eq_interface_ray,
+      retainedTerminalFanRefinedInterfaceOffset,
+      retainedTerminalInterfaceOffset,
+      retainedTerminalInterfaceMultiplier,
+      retainedTerminalInterfaceRadialFactor,
+      retainedTerminalFanRoutingRefinement,
+      RetainedTerminalDirection.primitive, Port.unitVector,
+      Cell.add, Cell.scale] at shiftStrict ⊢
+  all_goals
+    have shiftStrictInt :
+        8 * (slot.val : Int) < (distance : Int) := by
+      exact_mod_cast shiftStrict
+    split_ifs <;>
+      simp [AxisDirection.opposite] <;>
+      omega
+
 /-- The unit overlap traverses one constant forward-tangent direction for
 exactly one lane displacement. -/
 theorem retainedTerminalFanCardinalForwardOverlapPath_directions
