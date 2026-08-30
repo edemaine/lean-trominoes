@@ -12629,6 +12629,9 @@ The representation choices for this target are:
   horizontal carrier lens.  Their complete normalized words are exactly the
   factor-1152 source-prefix expansions followed by the canonical ordinary
   fallback suffix selected by the occurrence slot.
+- [`LeanTrominoes/RetainedAngularFanCarrierLensVerticalOrdinaryNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanCarrierLensVerticalOrdinaryNormalizedDirections.lean)
+  proves the same exact words for the north-facing quarter-turn of both
+  non-singleton carrier routes, with east- and west-facing terminal gates.
 
 ## Build
 
