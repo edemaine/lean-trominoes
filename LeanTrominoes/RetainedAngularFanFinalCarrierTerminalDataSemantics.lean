@@ -99,5 +99,36 @@ theorem finalCarrierTerminalData_eq
         taggedLink.1 taggedLinkMember
         (if taggedLink.2 then 0 else 1) literalIndex
 
+/-- The actual final terminal datum is the explicit axis-span carrier-lens
+datum, with the semantic wrapper unfolded. -/
+theorem finalCarrierTerminalData_eq_explicit
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceClausesNonempty : ∀ clause ∈ source.clauses, clause ≠ [])
+    (positiveOffsets : ∀ incidence ∈ occurrenceIncidences source,
+      incidence.edge.offset = (0, 0) ∨
+        incidence.edge.offset = (1, 0))
+    (taggedLink : EqualityLink CarrierNode × Bool)
+    (clauseIndex : Nat)
+    (taggedLinkIndexed :
+      finalCarrierTaggedLinkIndexed source taggedLink clauseIndex)
+    (literalIndex : Nat) :
+    finalCarrierActualTerminalDataAt source clauseIndex literalIndex =
+      carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
+        (AxisDirection.axisSpan
+          (CarrierNode.position
+            (PeriodicThreeSATThree.formula source).incidenceGraph
+            taggedLink.1.first)
+          (CarrierNode.position
+            (PeriodicThreeSATThree.formula source).incidenceGraph
+            taggedLink.1.second))
+        (if taggedLink.2 then 0 else 1) literalIndex := by
+  simpa only [finalCarrierSemanticTerminalDataAt] using
+    finalCarrierTerminalData_eq
+      source sourceLocal sourceWidth sourceClausesNonempty positiveOffsets
+      taggedLink clauseIndex taggedLinkIndexed literalIndex
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
