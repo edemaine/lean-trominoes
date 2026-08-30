@@ -147,5 +147,34 @@ theorem output_delimited_eq_of_noImmediateReversal
         (by decide) rest boundary restNoReversal]
       simp [finish]
 
+/-- The scan-level form of the identity theorem, before the empty finalizer
+is applied. -/
+theorem scan_empty_of_noImmediateReversal
+    (directions : List AxisDirection)
+    (noReversal : HasNoImmediateReversal directions) :
+    FiniteStateTransducer.scan transition .empty
+        (directions.map (fun direction =>
+          (.direction direction : Token)) ++ [.routeEnd]) =
+      (.empty,
+        directions.map (fun direction =>
+          (.direction direction : Token)) ++ [.routeEnd]) := by
+  cases directions with
+  | nil =>
+      simp [FiniteStateTransducer.scan, transition]
+  | cons direction rest =>
+      have boundary : CompatibleHead direction rest := by
+        cases rest with
+        | nil => trivial
+        | cons next rest => exact noReversal.1
+      have restNoReversal : HasNoImmediateReversal rest := by
+        cases rest with
+        | nil => trivial
+        | cons next rest => exact noReversal.2
+      simp only [List.map_cons, List.cons_append,
+        FiniteStateTransducer.scan, transition]
+      rw [scan_run_of_noImmediateReversal direction one
+        (by decide) rest boundary restNoReversal]
+      simp
+
 end BoundedDelimitedDirectionCancellation
 end LeanTrominoes
