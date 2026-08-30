@@ -128,5 +128,68 @@ theorem scan_run_directionBlock_opposite_of_noImmediateReversal
         rw [overflowBlock_append_residual
           direction count amount positive]
 
+/-- Once a kept prefix has been summarized by a pending final run, the
+complete transducer erases one bounded out-and-back block and preserves the
+kept prefix and compatible continuation. -/
+theorem output_prefixScan_directionBlock_opposite
+    (kept directions : List AxisDirection)
+    (direction : AxisDirection) (count amount : Count)
+    (emitted : List Token)
+    (genuine : direction.IsGenuine)
+    (positive : 0 < count.val)
+    (prefixScan :
+      FiniteStateTransducer.scan transition .empty
+          (kept.map (fun direction =>
+            (.direction direction : Token))) =
+        (.run direction count, emitted))
+    (prefixMaterialized :
+      emitted ++ buffered direction count =
+        kept.map (fun direction =>
+          (.direction direction : Token)))
+    (boundary : CompatibleHead direction directions)
+    (noReversal : HasNoImmediateReversal directions) :
+    output
+        (kept.map (fun direction =>
+            (.direction direction : Token)) ++
+          directionBlock direction amount ++
+          directionBlock direction.opposite amount ++
+          directions.map (fun direction =>
+            (.direction direction : Token)) ++ [.routeEnd]) =
+      kept.map (fun direction =>
+          (.direction direction : Token)) ++
+        directions.map (fun direction =>
+          (.direction direction : Token)) ++ [.routeEnd] := by
+  unfold output FiniteStateTransducer.output
+  rw [show
+      kept.map (fun direction =>
+            (.direction direction : Token)) ++
+          directionBlock direction amount ++
+          directionBlock direction.opposite amount ++
+          directions.map (fun direction =>
+            (.direction direction : Token)) ++ [.routeEnd] =
+        kept.map (fun direction =>
+            (.direction direction : Token)) ++
+          (directionBlock direction amount ++
+            directionBlock direction.opposite amount ++
+            directions.map (fun direction =>
+              (.direction direction : Token)) ++ [.routeEnd]) by
+      simp [List.append_assoc]]
+  rw [FiniteStateTransducer.scan_append, prefixScan]
+  simp only
+  rw [scan_run_directionBlock_opposite_of_noImmediateReversal
+      direction count amount genuine positive directions boundary
+      noReversal]
+  simp only [finish, List.append_nil, List.append_assoc]
+  calc
+    emitted ++
+          (buffered direction count ++
+            (directions.map (fun direction =>
+              (.direction direction : Token)) ++ [.routeEnd])) =
+        (emitted ++ buffered direction count) ++
+          (directions.map (fun direction =>
+            (.direction direction : Token)) ++ [.routeEnd]) := by
+      exact (List.append_assoc _ _ _).symm
+    _ = _ := by rw [prefixMaterialized]
+
 end BoundedDelimitedDirectionCancellation
 end LeanTrominoes
