@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanFinalCarrierIndexedRouteNormalization
 import LeanTrominoes.RetainedAngularFanFinalCarrierIndexedRouteEvidence
+import LeanTrominoes.RetainedAngularFanFinalCarrierIndexedSpan
 import LeanTrominoes.RetainedAngularFanFinalCarrierNormalizedRouteDirectionModel
 
 /-! # Normalized direction words of final retained-carrier routes -/
@@ -24,10 +25,7 @@ route has exactly the finite compiler direction word. -/
 theorem FinalCarrierIndexedOccurrence.publicDirections
     {Variable : Type} [DecidableEq Variable]
     (occurrence : FinalCarrierIndexedOccurrence Variable)
-    (nextSlice : Bool)
-    (spanLarge :
-      8 ≤ (finalCarrierRouteGeometryAt occurrence.source
-        occurrence.taggedLink nextSlice).span) :
+    (nextSlice : Bool) :
     occurrence.PublicDirections nextSlice := by
   constructor
   have decEq :
@@ -41,7 +39,7 @@ theorem FinalCarrierIndexedOccurrence.publicDirections
       occurrence.routeDirectionEvidence
   have semanticDirections :=
     occurrence.semanticModelDirections occurrence.scaledRouteEvidence
-      nextSlice spanLarge
+      nextSlice (occurrence.spanLarge nextSlice)
   unfold FinalCarrierIndexedOccurrence.PublicDirectionsEqSemanticModel at publicDirections
   dsimp only at publicDirections
   unfold FinalCarrierIndexedOccurrence.SemanticModelDirections
