@@ -12634,7 +12634,8 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanFallbackRouteNormalizedDirectionTranslation.lean`](LeanTrominoes/RetainedAngularFanFallbackRouteNormalizedDirectionTranslation.lean)
   proves the stronger route-level statement for either fallback policy:
   translating a valid complete splice commutes with orthogonal loop erasure
-  and leaves its entire normalized direction word unchanged.
+  and leaves its entire normalized direction word unchanged.  Its scaled
+  corollary handles translation before the factor-four source refinement.
 - [`LeanTrominoes/RetainedAngularFanCarrierLensHorizontalOrdinaryNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanCarrierLensHorizontalOrdinaryNormalizedDirections.lean)
   applies the cardinal-tangent theorem to both non-singleton routes in the
   horizontal carrier lens.  Their complete normalized words are exactly the

@@ -171,5 +171,58 @@ theorem RetainedFallbackFanKind.splicedOwnFigure7Route_translate_normalized_dire
     normalizedTranslate,
     Gadget.unitSubdivisionDirections_translatePolyline]
 
+/-- If the raw source route is translated before source-clearance scaling,
+the scaled complete fallback still has the same normalized direction word. -/
+theorem RetainedFallbackFanKind.scaledSplicedOwnFigure7Route_translate_normalized_directions
+    {factor : Nat}
+    (kind : RetainedFallbackFanKind)
+    (offset : Cell)
+    (route : List Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (factorPositive : 0 < factor)
+    (routeLength : 2 ≤ route.length)
+    (classified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector route) =
+        some terminal)
+    (routeOrthogonal : OrthogonalPolyline route)
+    (terminalLengthPositive : 0 < terminal.2)
+    (valid : kind.Valid
+      (scaleRetainedTerminalData factor terminal)) :
+    Gadget.unitSubdivisionDirections
+        (AxisDirection.normalizeOrthogonalPolyline
+          (kind.splicedOwnFigure7Route
+            (scalePolyline factor (translatePolyline offset route))
+            (scaleRetainedTerminalData factor terminal) slot)) =
+      Gadget.unitSubdivisionDirections
+        (AxisDirection.normalizeOrthogonalPolyline
+          (kind.splicedOwnFigure7Route
+            (scalePolyline factor route)
+            (scaleRetainedTerminalData factor terminal) slot)) := by
+  let scaledRoute := scalePolyline factor route
+  let scaledTerminal := scaleRetainedTerminalData factor terminal
+  have scaledLength : 2 ≤ scaledRoute.length := by
+    simpa [scaledRoute, scalePolyline] using routeLength
+  have scaledClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector scaledRoute) =
+        some scaledTerminal := by
+    simpa [scaledRoute, scaledTerminal] using
+      routeTerminalVector_scale_classified factorPositive classified
+  have scaledOrthogonal : OrthogonalPolyline scaledRoute := by
+    exact routeOrthogonal.scalePolyline
+      (by exact_mod_cast factorPositive)
+  have scaledLengthPositive : 0 < scaledTerminal.2 := by
+    change 0 < factor * terminal.2
+    exact Nat.mul_pos factorPositive terminalLengthPositive
+  have translated :=
+    kind.splicedOwnFigure7Route_translate_normalized_directions
+      (Cell.scale factor offset) scaledRoute scaledTerminal slot
+      scaledLength scaledClassified scaledOrthogonal
+      scaledLengthPositive valid
+  rw [scalePolyline_translatePolyline']
+  simpa [scaledRoute, scaledTerminal] using translated
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
