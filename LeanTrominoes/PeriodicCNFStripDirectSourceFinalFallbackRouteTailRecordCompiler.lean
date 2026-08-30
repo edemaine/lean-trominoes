@@ -5,8 +5,8 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.BinaryRouteTailRecordBatchFormatterCompiler
 import LeanTrominoes.BinaryRouteTailRecordProfileFramingSemantics
-import LeanTrominoes.PeriodicCNFStripDirectSourceBaseBendRouteTailRecordCompiler
-import LeanTrominoes.PeriodicCNFStripDirectSourceCarrierRouteTailRecordCompiler
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalBendFallbackRecordProfileCompiler
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierFallbackRecordProfileCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFallbackRouteDirectionCompiler
 import LeanTrominoes.TM2EmptyAlphabetListInputCompiler
 
@@ -26,18 +26,6 @@ variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance directFinalFallbackRecordCompilerStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
-
-def directSourceFinalCarrierFallbackCompiledRecordProfiles
-    (symbols : List encoding.Γ) :
-    List BinaryRouteTailRecordProfileFraming.Profile :=
-  BinaryRouteTailRecordProfileFraming.recordProfiles
-    (directSourceCarrierRouteTailRecordTokens decider symbols)
-
-def directSourceFinalBendFallbackCompiledRecordProfiles
-    (symbols : List encoding.Γ) :
-    List BinaryRouteTailRecordProfileFraming.Profile :=
-  BinaryRouteTailRecordProfileFraming.recordProfiles
-    (directSourceBaseBendRouteTailRecordTokens decider symbols)
 
 /-- Profile framing of the existing carrier headers with the complete final
 fallback route words. -/
@@ -70,24 +58,6 @@ def directSourceFinalBendFallbackCompiledRouteTailRecordTokens
   BinaryRouteTailRecordBatchFormatter.output
     (directSourceFinalBendFallbackCompiledRecordInputTokens
       decider symbols)
-
-noncomputable def
-    directSourceFinalCarrierFallbackCompiledRecordProfilesComputableInPolyTime :
-    TM2ComputableInPolyTime id id
-      (directSourceFinalCarrierFallbackCompiledRecordProfiles decider) := by
-  unfold directSourceFinalCarrierFallbackCompiledRecordProfiles
-  exact TM2CompositionMachine.computableInPolyTime
-    (directSourceCarrierRouteTailRecordTokensComputableInPolyTime decider)
-    BinaryRouteTailRecordProfileFraming.recordProfilesComputableInPolyTime
-
-noncomputable def
-    directSourceFinalBendFallbackCompiledRecordProfilesComputableInPolyTime :
-    TM2ComputableInPolyTime id id
-      (directSourceFinalBendFallbackCompiledRecordProfiles decider) := by
-  unfold directSourceFinalBendFallbackCompiledRecordProfiles
-  exact TM2CompositionMachine.computableInPolyTime
-    (directSourceBaseBendRouteTailRecordTokensComputableInPolyTime decider)
-    BinaryRouteTailRecordProfileFraming.recordProfilesComputableInPolyTime
 
 noncomputable def
     directSourceFinalCarrierFallbackCompiledRecordInputTokensComputableInPolyTime :

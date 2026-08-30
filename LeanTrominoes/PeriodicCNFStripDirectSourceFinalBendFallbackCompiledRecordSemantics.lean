@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalBendFallbackRecordRouteSemantics
-import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFallbackRouteTailRecordSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalBendFallbackRecordProfileSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFallbackRouteTailRecordCompiler
 
 /-! # Semantics of compiled bend fallback records -/
 

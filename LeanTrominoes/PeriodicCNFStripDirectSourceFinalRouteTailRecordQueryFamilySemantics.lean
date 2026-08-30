@@ -3,8 +3,8 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFallbackRouteTailRecordSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceRoleSlotInputFamilySemantics
+import LeanTrominoes.RetainedAngularFanDirectClauseRouteTailRecordSlotAttachmentListSemantics
 
 /-! # Direct-family semantics of final route-tail record queries -/
 
@@ -48,9 +48,24 @@ theorem directSourceFinalClauseRouteTailRecordQueries_eq_directFamilies
               ((directSourceFinalRoutedVariableStableRankSlotBlocks
                 decider symbols).map
                   RetainedDirectClauseOccurrenceSlots.ofList)) := by
+  have fallbackNil :
+      retainedDirectClauseRouteTailRecordQueriesOfSlotInputs
+          (List.zip
+            (directRetainedFinalCarrierClauseQueries decider symbols ++
+              directRetainedFinalBendClauseQueries decider symbols)
+            ((directSourceFinalCarrierStableRankSlotBlocks decider symbols ++
+                directSourceFinalBendStableRankSlotBlocks
+                  decider symbols).map
+              RetainedDirectClauseOccurrenceSlots.ofList)) = [] := by
+    unfold directRetainedFinalCarrierClauseQueries
+      directRetainedFinalBendClauseQueries
+    rw [← retainedFinalPrecomputedClauseQueries_append]
+    exact
+      retainedDirectClauseRouteTailRecordQueriesOfSlotInputs_zip_precomputed
+        _ _
   rw [directSourceFinalClauseRouteTailRecordSlotInputs_eq_families]
   simp only [retainedDirectClauseRouteTailRecordQueriesOfSlotInputs_append]
-  rw [directSourceFinalFallbackRouteTailRecordQueries_nil]
+  rw [fallbackNil]
   simp only [List.append_nil]
 
 end LeanTrominoes.PeriodicCNFStripReduction
