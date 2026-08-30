@@ -12628,6 +12628,9 @@ The representation choices for this target are:
   lifts that theorem through an arbitrary translation of the raw source
   route.  The fully refined route moves by the correspondingly scaled
   offset, while its normalized direction word remains unchanged.
+- [`LeanTrominoes/RetainedAngularFanFallbackSingletonTranslatedNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanFallbackSingletonTranslatedNormalizedDirections.lean)
+  gives the matching translation law for singleton-prefix ordinary or
+  escaped fallbacks, preserving the same canonical normalized word.
 - [`LeanTrominoes/RetainedAngularFanCarrierLensHorizontalOrdinaryNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanCarrierLensHorizontalOrdinaryNormalizedDirections.lean)
   applies the cardinal-tangent theorem to both non-singleton routes in the
   horizontal carrier lens.  Their complete normalized words are exactly the
