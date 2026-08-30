@@ -13,6 +13,19 @@ import LeanTrominoes.OrthogonalPolylineUnitSubdivisionSimplicity
 namespace LeanTrominoes
 namespace BoundedDelimitedDirectionCancellation
 
+/-- Recursive nonreversal is the usual adjacent-pair chain condition. -/
+theorem hasNoImmediateReversal_iff_isChain
+    (directions : List AxisDirection) :
+    HasNoImmediateReversal directions ↔
+      directions.IsChain fun first second =>
+        second ≠ first.opposite := by
+  induction directions using List.twoStepInduction with
+  | nil | singleton =>
+      simp [HasNoImmediateReversal]
+  | cons_cons first second rest _ induction =>
+      simp only [HasNoImmediateReversal,
+        List.isChain_cons_cons, induction second]
+
 /-- A duplicate-free unit-step point route cannot immediately retrace its
 preceding edge. -/
 theorem point_hasNoImmediateReversal_of_nodup_unitSteps
@@ -151,6 +164,23 @@ theorem HasNoImmediateReversal.drop
           cases rest with
           | nil => trivial
           | cons second rest => exact noReversal.2
+
+/-- The single newly adjacent pair at an append boundary is compatible in
+every nonreversing combined word. -/
+theorem compatibleHead_of_append
+    (kept directions : List AxisDirection)
+    (direction : AxisDirection)
+    (keptLast : kept.getLast? = some direction)
+    (noReversal : HasNoImmediateReversal (kept ++ directions)) :
+    CompatibleHead direction directions := by
+  cases directions with
+  | nil => trivial
+  | cons next rest =>
+      have chain :=
+        (hasNoImmediateReversal_iff_isChain
+          (kept ++ next :: rest)).mp noReversal
+      have boundary := (List.isChain_append.mp chain).2.2
+      exact boundary direction (by simp [keptLast]) next (by simp)
 
 end BoundedDelimitedDirectionCancellation
 end LeanTrominoes
