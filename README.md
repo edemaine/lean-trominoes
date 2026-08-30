@@ -12644,6 +12644,11 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanCarrierLensVerticalOrdinaryNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanCarrierLensVerticalOrdinaryNormalizedDirections.lean)
   proves the same exact words for the north-facing quarter-turn of both
   non-singleton carrier routes, with east- and west-facing terminal gates.
+- [`LeanTrominoes/RetainedAngularFanCarrierLensTemplateNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanCarrierLensTemplateNormalizedDirections.lean)
+  completes the canonical carrier template.  The two straight routes use
+  singleton escaped fallbacks, and an eight-case theorem identifies all four
+  routes in both east- and north-facing lenses with the normalized carrier
+  record words.
 
 ## Build
 
