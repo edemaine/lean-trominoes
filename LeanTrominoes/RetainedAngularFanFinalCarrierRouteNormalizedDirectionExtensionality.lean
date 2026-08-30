@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanCarrierRouteNormalizedDirectionExtensionality
 import LeanTrominoes.RetainedAngularFanFinalCarrierRouteGeometry
+import LeanTrominoes.RetainedAngularFanFinalCarrierScaledRouteEvidenceData
 
 /-! # Directional extensionality for final retained carriers -/
 
@@ -86,6 +87,64 @@ theorem finalCarrierRoute_normalized_fallback_directions_eq
   exact routePrefixDirections.trans
     (repeatCarrierLensRoutePrefixDirections_finalCarrierRouteGeometryAt
       source taggedLink nextSlice literalIndex)
+
+/-- The four packaged source-route facts specialize final-carrier
+extensionality in one step. -/
+theorem FinalCarrierScaledRouteEvidence.normalizedDirections
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (taggedLink : EqualityLink CarrierNode × Bool)
+    (nextSlice : Bool)
+    (spanLarge :
+      8 ≤ (finalCarrierRouteGeometryAt
+        source taggedLink nextSlice).span)
+    (literalIndex : Fin 2)
+    (slot : RetainedTerminalSlot)
+    (route : List Cell)
+    (evidence : FinalCarrierScaledRouteEvidence
+      route
+      (scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor
+        (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex))
+      (Gadget.repeatDirections 1152
+        (carrierLensRoutePrefixDirections taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex))) :
+    Gadget.unitSubdivisionDirections
+        (AxisDirection.normalizeOrthogonalPolyline
+          ((CarrierFallbackRouteTailRecords.routeKind
+              (finalCarrierLocalClauseIndex taggedLink)
+              literalIndex).splicedOwnFigure7Route
+            route
+            (scaleRetainedTerminalData
+              retainedAngularFanSourceClearanceFactor
+              (carrierLensRouteTerminalData
+                (finalCarrierRouteGeometryAt
+                  source taggedLink nextSlice).horizontal
+                (finalCarrierRouteGeometryAt source taggedLink nextSlice).span
+                (finalCarrierLocalClauseIndex taggedLink) literalIndex))
+            slot)) =
+      CarrierNormalizedFallbackRouteTailRecords.routeDirections
+        (finalCarrierRouteGeometryAt source taggedLink nextSlice)
+        (finalCarrierLocalClauseIndex taggedLink) literalIndex slot :=
+  finalCarrierRoute_normalized_fallback_directions_eq
+    source taggedLink nextSlice spanLarge literalIndex slot route
+    evidence.routeLength evidence.routeClassified
+    evidence.routeOrthogonal evidence.routePrefixDirections
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

@@ -6,6 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.RetainedAngularFanFinalCarrierRawRoutePrefixDirectionSemantics
 import LeanTrominoes.RetainedAngularFanFinalCarrierScaledClassification
 import LeanTrominoes.RetainedAngularFanFinalCarrierScaledOrthogonality
+import LeanTrominoes.RetainedAngularFanFinalCarrierScaledRouteEvidenceData
 import LeanTrominoes.RetainedAngularFanFinalThreeSATThreeScaledRouteLength
 
 /-! # Collected scaled-route evidence for final retained carriers -/
@@ -22,61 +23,6 @@ local instance finalCarrierScaledEvidenceThreeOccurrenceDecidableEq
     {Variable : Type} [DecidableEq Variable] :
     DecidableEq (ThreeOccurrenceVariable Variable) :=
   fiveFamilyNormalizedThreeOccurrenceDecidableEq
-
-/-- The four source-side facts consumed by final-carrier directional
-extensionality. -/
-structure FinalCarrierScaledRouteEvidence
-    {Variable : Type} [DecidableEq Variable]
-    (source : PeriodicCNF Variable)
-    (taggedLink : EqualityLink CarrierNode × Bool)
-    (clauseIndex : Nat)
-    (literalIndex : Fin 2) : Prop where
-  routeLength :
-    2 ≤ (scalePolyline retainedAngularFanSourceClearanceFactor
-      (finalCoordinatedSourceRoutes
-        (PeriodicThreeSATThree.formula source)
-        clauseIndex literalIndex)).length
-  routeClassified :
-    retainedTerminalDirectionClassify
-        (routeTerminalVector
-          (scalePolyline retainedAngularFanSourceClearanceFactor
-            (finalCoordinatedSourceRoutes
-              (PeriodicThreeSATThree.formula source)
-              clauseIndex literalIndex))) =
-      some (scaleRetainedTerminalData
-        retainedAngularFanSourceClearanceFactor
-        (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
-          (AxisDirection.axisSpan
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula source).incidenceGraph
-              taggedLink.1.first)
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula source).incidenceGraph
-              taggedLink.1.second))
-          (if taggedLink.2 then 0 else 1) literalIndex))
-  routeOrthogonal :
-    OrthogonalPolyline
-      (scalePolyline retainedAngularFanSourceClearanceFactor
-        (finalCoordinatedSourceRoutes
-          (PeriodicThreeSATThree.formula source)
-          clauseIndex literalIndex))
-  routePrefixDirections :
-    Gadget.unitSubdivisionDirections
-        (retainedFallbackSourcePrefix
-          (scalePolyline retainedAngularFanSourceClearanceFactor
-            (finalCoordinatedSourceRoutes
-              (PeriodicThreeSATThree.formula source)
-              clauseIndex literalIndex))) =
-      Gadget.repeatDirections 1152
-        (carrierLensRoutePrefixDirections taggedLink.1.first.isHorizontal
-          (AxisDirection.axisSpan
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula source).incidenceGraph
-              taggedLink.1.first)
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula source).incidenceGraph
-              taggedLink.1.second))
-          (if taggedLink.2 then 0 else 1) literalIndex)
 
 /-- Indexed carrier membership supplies all four source-side facts. -/
 theorem finalCarrierScaledRoute_evidence
@@ -106,25 +52,46 @@ theorem finalCarrierScaledRoute_evidence
     (literalMember :
       (literal, literalIndex.val) ∈ clause.literals.zipIdx) :
     FinalCarrierScaledRouteEvidence
-      source taggedLink clauseIndex literalIndex where
-  routeLength :=
+      (scalePolyline retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes
+          (PeriodicThreeSATThree.formula source)
+          clauseIndex literalIndex))
+      (scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor
+        (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex))
+      (Gadget.repeatDirections 1152
+        (carrierLensRoutePrefixDirections taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex)) := by
+  exact ⟨
     finalCoordinatedScaledThreeSATThreeSourceRoute_length_ge_two
       source sourceLocal sourceWidth sourceClausesNonempty
-      clauseMember literalMember
-  routeClassified :=
+      clauseMember literalMember,
     finalCoordinatedScaledCarrierSourceRoute_classified
       source sourceLocal sourceWidth sourceClausesNonempty positiveOffsets
       taggedLink clauseIndex taggedLinkIndexed clauseMember
-      literalIndex literalMember
-  routeOrthogonal :=
+      literalIndex literalMember,
     finalCoordinatedScaledCarrierSourceRoute_orthogonal
       source sourceLocal sourceWidth sourceClausesNonempty positiveOffsets
       taggedLink clauseIndex taggedLinkIndexed clauseMember
-      literalIndex literalMember
-  routePrefixDirections :=
+      literalIndex literalMember,
     finalCarrierFallbackSourcePrefix_directions_eq
       source sourceLocal sourceWidth sourceClausesNonempty positiveOffsets
-      taggedLink clauseIndex taggedLinkIndexed literalIndex
+      taggedLink clauseIndex taggedLinkIndexed literalIndex⟩
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
