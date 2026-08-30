@@ -215,6 +215,38 @@ theorem listLoopErase_outAndBack_append
           rw [if_pos (by simp)]
           simp [remainingHeadNe]
 
+/-- Loop erasure also removes an out-and-back excursion after an arbitrary
+prefix, provided the excursion and suffix are duplicate-free together and
+the route left after cancellation is duplicate-free. -/
+theorem listLoopErase_append_outAndBack_append
+    {Vertex : Type*} [DecidableEq Vertex]
+    (leading path rest : List Vertex)
+    (pathNonempty : path ≠ [])
+    (pathRestNodup : (path ++ rest).Nodup)
+    (resultNodup :
+      (leading ++ path.head pathNonempty :: rest).Nodup) :
+    listLoopErase
+        (leading ++ path ++ path.reverse.tail ++ rest) =
+      leading ++ path.head pathNonempty :: rest := by
+  rw [show
+    leading ++ path ++ path.reverse.tail ++ rest =
+      leading ++ (path ++ path.reverse.tail ++ rest) by
+    simp [List.append_assoc]]
+  calc
+    listLoopErase
+          (leading ++ (path ++ path.reverse.tail ++ rest)) =
+        listLoopErase
+          (leading ++
+            listLoopErase (path ++ path.reverse.tail ++ rest)) :=
+      listLoopErase_append_right leading
+        (path ++ path.reverse.tail ++ rest)
+    _ = listLoopErase
+          (leading ++ path.head pathNonempty :: rest) := by
+      rw [listLoopErase_outAndBack_append
+        path rest pathNonempty pathRestNodup]
+    _ = leading ++ path.head pathNonempty :: rest :=
+      listLoopErase_eq_self_of_nodup resultNodup
+
 /-- If two point lists meet only at their advertised join boundary, loop
 erasure can be performed on the first list alone and then rejoined to the
 duplicate-free second list. -/
