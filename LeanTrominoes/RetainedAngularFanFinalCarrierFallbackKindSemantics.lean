@@ -8,6 +8,7 @@ import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataCarrierRawRepr
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataRepresentativeRouteLength
 import LeanTrominoes.PeriodicOrthocrossingCarrierFallbackRouteTailRecordBlockData
 import LeanTrominoes.RetainedAngularFanFinalCarrierLookupSemantics
+import LeanTrominoes.RetainedAngularFanFinalCarrierRouteGeometry
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedRoutes
 
 /-! # Fallback policies of final retained-carrier routes -/
@@ -90,7 +91,37 @@ theorem finalCoordinatedSourceCarrierRoute_fallbackKind_eq
           Bool.false_eq_true,
           if_false, if_true] at singletonPrefix ⊢ <;>
         rcases literalIndex with (_ | _ | literalIndex) <;>
-        simp_all [CarrierFallbackRouteTailRecords.routeKind]
+      simp_all [CarrierFallbackRouteTailRecords.routeKind]
+
+/-- The same public policy equality addressed by the finite local carrier
+index. -/
+theorem finalCoordinatedSourceCarrierRoute_fallbackKind_eq_geometry
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceClausesNonempty : ∀ clause ∈ source.clauses, clause ≠ [])
+    (positiveOffsets : ∀ incidence ∈ occurrenceIncidences source,
+      incidence.edge.offset = (0, 0) ∨
+        incidence.edge.offset = (1, 0))
+    (taggedLink : EqualityLink CarrierNode × Bool)
+    (clauseIndex : Nat)
+    (taggedLinkIndexed :
+      finalCarrierTaggedLinkIndexed source taggedLink clauseIndex)
+    (literalIndex : Nat) :
+    let retained := PeriodicThreeSATThree.formula source
+    (if (finalCoordinatedSourceRoutes retained
+          clauseIndex literalIndex).dropLast.length = 1 then
+        RetainedFallbackFanKind.escaped
+      else RetainedFallbackFanKind.ordinary) =
+      CarrierFallbackRouteTailRecords.routeKind
+        (finalCarrierLocalClauseIndex taggedLink) literalIndex := by
+  dsimp only
+  have kindEq := finalCoordinatedSourceCarrierRoute_fallbackKind_eq
+    source sourceLocal sourceWidth sourceClausesNonempty positiveOffsets
+    taggedLink clauseIndex taggedLinkIndexed literalIndex
+  dsimp only at kindEq
+  simpa only [finalCarrierLocalClauseIndex_val] using kindEq
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

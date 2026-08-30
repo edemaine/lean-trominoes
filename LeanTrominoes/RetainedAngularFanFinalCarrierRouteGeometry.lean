@@ -104,5 +104,30 @@ theorem carrierLensRouteTerminalData_finalCarrierRouteGeometryAt
     finalCarrierRouteGeometryAt_horizontal,
     finalCarrierLocalClauseIndex_val]
 
+/-- Reading the equality-lens prefix table through the actual integral span
+or through the finite carrier geometry gives the same direction word. -/
+theorem carrierLensRoutePrefixDirections_finalCarrierRouteGeometryAt
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (taggedLink : EqualityLink CarrierNode × Bool)
+    (nextSlice : Bool)
+    (literalIndex : Nat) :
+    carrierLensRoutePrefixDirections taggedLink.1.first.isHorizontal
+        (AxisDirection.axisSpan
+          (CarrierNode.position
+            (PeriodicThreeSATThree.formula source).incidenceGraph
+            taggedLink.1.first)
+          (CarrierNode.position
+            (PeriodicThreeSATThree.formula source).incidenceGraph
+            taggedLink.1.second))
+        (if taggedLink.2 then 0 else 1) literalIndex =
+      carrierLensRoutePrefixDirections
+        (finalCarrierRouteGeometryAt source taggedLink nextSlice).horizontal
+        (finalCarrierRouteGeometryAt source taggedLink nextSlice).span
+        (finalCarrierLocalClauseIndex taggedLink) literalIndex := by
+  rw [finalCarrierRouteGeometryAt_span_coe_eq,
+    finalCarrierRouteGeometryAt_horizontal,
+    finalCarrierLocalClauseIndex_val]
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
