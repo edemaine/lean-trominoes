@@ -278,6 +278,47 @@ theorem retainedFallbackSourcePrefix_forward_directions
     retainedFallbackCardinalForwardKeptDirections,
     retainedFallbackCardinalForwardKeptRoute] using split
 
+/-- Trimming the overlap length from the source word leaves exactly the
+kept prefix word. -/
+theorem retainedFallbackSourcePrefix_forward_take
+    (route : List Cell)
+    (port : Port)
+    (length : Nat)
+    (slot : RetainedTerminalSlot)
+    (distance : Nat)
+    (routeLength : 3 ≤ route.length)
+    (classified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector route) =
+        some (.compass port, length))
+    (routeOrthogonal : OrthogonalPolyline route)
+    (cardinal :
+      port = .north ∨ port = .east ∨
+        port = .south ∨ port = .west)
+    (shiftStrict :
+      retainedTerminalFanOuterLaneSpacing * slot.val < distance)
+    (predecessor :
+      (retainedFallbackSourcePrefix route).dropLast.getLast? =
+        some
+          (Cell.add
+            (retainedAngularFanOuterDemand
+              (retainedFallbackFanCenter route)
+              (.compass port, length) slot).gate
+            (Cell.scale distance
+              (retainedTerminalFanOuterLaneStep
+                (.compass port))))) :
+    (Gadget.unitSubdivisionDirections
+        (retainedFallbackSourcePrefix route)).take
+        ((Gadget.unitSubdivisionDirections
+            (retainedFallbackSourcePrefix route)).length -
+          (retainedTerminalFanCardinalCancellationCount slot).val) =
+      retainedFallbackCardinalForwardKeptDirections
+        route port length slot distance := by
+  rw [retainedFallbackSourcePrefix_forward_directions
+    route port length slot distance routeLength classified
+    routeOrthogonal cardinal shiftStrict predecessor]
+  simp
+
 /-- The kept direction word is nonempty and ends in the overlap direction. -/
 theorem retainedFallbackCardinalForwardKeptDirections_getLast?
     (route : List Cell)

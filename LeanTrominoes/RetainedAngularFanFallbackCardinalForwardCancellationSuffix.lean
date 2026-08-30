@@ -132,5 +132,29 @@ theorem retainedFallbackCardinalForwardNormalizedSuffix_drop
     center port length slot lengthPositive radialPositive cardinal]
   simp
 
+/-- The translation-free canonical suffix has the same trimmed surviving
+word as its realization at any fan center. -/
+theorem retainedNormalizedFallbackFanSuffixDirections_forward_drop
+    (center : Cell)
+    (port : Port)
+    (length : Nat)
+    (slot : RetainedTerminalSlot)
+    (lengthPositive : 0 < length)
+    (radialPositive :
+      0 < retainedTerminalFanOuterRadialLength
+        (.compass port, length))
+    (cardinal :
+      port = .north ∨ port = .east ∨
+        port = .south ∨ port = .west) :
+    (retainedNormalizedFallbackFanSuffixDirections
+        .ordinary (.compass port, length) slot).drop
+        (retainedTerminalFanCardinalCancellationCount slot).val =
+      retainedFallbackCardinalForwardRestDirections
+        center port length slot := by
+  rw [← retainedFallbackFanSuffixRouteAt_normalized_directions
+    .ordinary center (.compass port, length) slot lengthPositive trivial]
+  exact retainedFallbackCardinalForwardNormalizedSuffix_drop
+    center port length slot lengthPositive radialPositive cardinal
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
