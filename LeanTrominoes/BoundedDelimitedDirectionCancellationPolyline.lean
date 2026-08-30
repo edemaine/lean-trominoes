@@ -6,6 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.BoundedDelimitedDirectionCancellationPrefix
 import LeanTrominoes.GadgetSparseRouteDirectionNormalization
 import LeanTrominoes.OrthogonalPolylineEndpointDirectionSeparation
+import LeanTrominoes.OrthogonalPolylineUnitSubdivisionJoin
 import LeanTrominoes.OrthogonalPolylineUnitSubdivisionSimplicity
 
 /-! # Nonreversal facts for unit-subdivision direction words -/
@@ -100,6 +101,77 @@ theorem routeStepDirections_hasNoImmediateReversal
           refine ⟨noReversal.1, ?_⟩
           simpa [Gadget.routeStepDirections] using
             induction second noReversal.2
+
+/-- The final symbol of a nondegenerate consecutive direction word is the
+polyline's final directed axis. -/
+theorem routeStepDirections_getLast?
+    (points : List Cell) (length : 2 ≤ points.length)
+    (orthogonal : PeriodicOrthocrossing.OrthogonalPolyline points) :
+    (Gadget.routeStepDirections points).getLast? =
+      some (AxisDirection.polylineLastDirection points) := by
+  induction points using List.twoStepInduction with
+  | nil => simp at length
+  | singleton point => simp at length
+  | cons_cons first second rest _ induction =>
+      have orthogonalParts := List.isChain_cons_cons.mp orthogonal
+      cases rest with
+      | nil =>
+          have genuine :=
+            AxisDirection.between_isGenuine_of_axisAligned
+              orthogonalParts.1
+          have reverse :=
+            AxisDirection.between_reverse_eq_opposite genuine
+          have reverseEq : AxisDirection.between first second =
+              (AxisDirection.between second first).opposite := by
+            have oppositeEq :=
+              congrArg AxisDirection.opposite reverse
+            simpa using oppositeEq.symm
+          simpa [Gadget.routeStepDirections,
+            AxisDirection.polylineLastDirection] using
+              congrArg some reverseEq
+      | cons third rest =>
+          have tailLength : 2 ≤ (second :: third :: rest).length := by
+            simp
+          have tailEq :=
+            induction second tailLength orthogonalParts.2
+          simp only [Gadget.routeStepDirections] at tailEq ⊢
+          rw [List.getLast?_cons, tailEq]
+          simp only [Option.getD_some]
+          rw [
+            AxisDirection.polylineLastDirection_cons_cons_cons]
+
+/-- The final unit-subdivision direction is the original orthogonal
+polyline's final directed axis. -/
+theorem unitSubdivisionDirections_getLast?
+    (points : List Cell)
+    (length : 2 ≤ points.length)
+    (orthogonal : PeriodicOrthocrossing.OrthogonalPolyline points) :
+    (Gadget.unitSubdivisionDirections points).getLast? =
+      some (AxisDirection.polylineLastDirection points) := by
+  let subdivided := AxisDirection.unitSubdividePolyline points
+  have subdividedUnitSteps :
+      subdivided.IsChain AxisDirection.IsUnitAxisStep :=
+    AxisDirection.unitSubdividePolyline_unitSteps orthogonal
+  have subdividedOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline subdivided :=
+    AxisDirection.orthogonalPolyline_of_unitSteps subdividedUnitSteps
+  have subdividedLength : 2 ≤ subdivided.length :=
+    AxisDirection.unitSubdividePolyline_length_ge_two_of_length_ge_two
+      length orthogonal
+  calc
+    (Gadget.unitSubdivisionDirections points).getLast? =
+        (Gadget.unitSubdivisionDirections subdivided).getLast? := by
+      rw [Gadget.unitSubdivisionDirections_unitSubdividePolyline
+        points orthogonal]
+    _ = (Gadget.routeStepDirections subdivided).getLast? := by
+      rw [Gadget.unitSubdivisionDirections_eq_routeStepDirections_of_unitSteps
+        subdivided subdividedUnitSteps]
+    _ = some (AxisDirection.polylineLastDirection subdivided) :=
+      routeStepDirections_getLast? subdivided subdividedLength
+        subdividedOrthogonal
+    _ = some (AxisDirection.polylineLastDirection points) := by
+      rw [AxisDirection.polylineLastDirection_unitSubdividePolyline
+        length orthogonal]
 
 /-- Every simple orthogonal polyline has a nonreversing complete
 unit-subdivision direction word. -/
