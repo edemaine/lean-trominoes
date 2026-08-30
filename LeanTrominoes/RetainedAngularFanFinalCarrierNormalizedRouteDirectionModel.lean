@@ -81,23 +81,10 @@ theorem retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
 direction equality without repeating its large lookup telescope. -/
 theorem FinalCarrierIndexedOccurrence.publicDirections_eq_semanticModel
     {Variable : Type} [DecidableEq Variable]
-    (occurrence : FinalCarrierIndexedOccurrence Variable) :
-    Gadget.unitSubdivisionDirections
-        (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
-          occurrence.retained occurrence.clauseIndex occurrence.literalIndex) =
-      Gadget.unitSubdivisionDirections
-        (AxisDirection.normalizeOrthogonalPolyline
-          ((CarrierFallbackRouteTailRecords.routeKind
-              (if occurrence.taggedLink.2 then 0 else 1)
-              occurrence.literalIndex).splicedOwnFigure7Route
-            occurrence.scaledRoute occurrence.scaledTerminalData
-            occurrence.slot)) :=
-  retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_carrier_directions_eq_model
-    occurrence.source occurrence.sourceLocal occurrence.sourceWidth
-    occurrence.sourceClausesNonempty occurrence.positiveOffsets
-    occurrence.taggedLink occurrence.clauseIndex
-    occurrence.taggedLinkIndexed occurrence.clauseMember
-    occurrence.literalIndex occurrence.literalMember
+    (occurrence : FinalCarrierIndexedOccurrence Variable)
+    (evidence : occurrence.RouteDirectionEvidence) :
+    occurrence.PublicDirectionsEqSemanticModel :=
+  evidence.publicDirectionsEvidence
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

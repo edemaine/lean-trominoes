@@ -255,6 +255,7 @@ theorem FinalCarrierScaledRouteEvidence.normalizedNamedSemanticModelDirections
     finalCarrierNamedSemanticModelDirections source taggedLink nextSlice
       literalIndex slot route terminalData := by
   unfold finalCarrierNamedSemanticModelDirections
+    finalCarrierSemanticDirectionWord finalCarrierModelDirectionWord
   subst terminalData
   subst prefixDirections
   exact evidence.normalizedSemanticModelDirections
@@ -298,23 +299,16 @@ theorem FinalCarrierScaledRouteEvidence.normalizedActualSemanticModelDirections
           (if taggedLink.2 then 0 else 1) literalIndex))) :
     finalCarrierNamedSemanticModelDirections source taggedLink nextSlice
       literalIndex slot route
-      (scaleRetainedTerminalData
-        retainedAngularFanSourceClearanceFactor
-        (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
-          (AxisDirection.axisSpan
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula source).incidenceGraph
-              taggedLink.1.first)
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula source).incidenceGraph
-              taggedLink.1.second))
-          (if taggedLink.2 then 0 else 1) literalIndex)) := by
-  unfold finalCarrierNamedSemanticModelDirections
+      (finalCarrierActualScaledTerminalData source taggedLink
+        literalIndex) := by
+  unfold finalCarrierActualScaledTerminalData
+    finalCarrierNamedSemanticModelDirections finalCarrierSemanticDirectionWord
+    finalCarrierModelDirectionWord
   exact evidence.normalizedSemanticModelDirections
     source taggedLink nextSlice spanLarge literalIndex slot route
 
-/-- Consume the named normalized-direction proof without asking a downstream
-module to match its expanded indexed result against an expected type. -/
+/-- Consume the actual normalized-direction proof without forcing a
+downstream module to match its expanded indexed result. -/
 theorem FinalCarrierScaledRouteEvidence.withNormalizedActualSemanticModelDirections
     {Variable : Type} [DecidableEq Variable]
     (source : PeriodicCNF Variable)
@@ -350,26 +344,17 @@ theorem FinalCarrierScaledRouteEvidence.withNormalizedActualSemanticModelDirecti
               taggedLink.1.second))
           (if taggedLink.2 then 0 else 1) literalIndex)))
     {P : Prop}
-    (consume : finalCarrierNamedSemanticModelDirections
-      source taggedLink nextSlice literalIndex slot route
-      (scaleRetainedTerminalData
-        retainedAngularFanSourceClearanceFactor
-        (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
-          (AxisDirection.axisSpan
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula source).incidenceGraph
-              taggedLink.1.first)
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula source).incidenceGraph
-              taggedLink.1.second))
-          (if taggedLink.2 then 0 else 1) literalIndex)) → P) :
+    (consume : finalCarrierNamedSemanticModelDirections source taggedLink
+      nextSlice literalIndex slot route
+      (finalCarrierActualScaledTerminalData source taggedLink
+        literalIndex) → P) :
     P :=
   consume (evidence.normalizedActualSemanticModelDirections
     source taggedLink nextSlice spanLarge literalIndex slot route)
 
 /-- A compact actual-normalization request exposes its named compiler
 direction proof. -/
-theorem FinalCarrierNormalizationRequest.directions
+theorem FinalCarrierActualNormalizationRequest.directions
     {Variable : Type} [DecidableEq Variable]
     {source : PeriodicCNF Variable}
     {taggedLink : EqualityLink CarrierNode × Bool}
@@ -377,17 +362,14 @@ theorem FinalCarrierNormalizationRequest.directions
     {literalIndex : Fin 2}
     {slot : RetainedTerminalSlot}
     {route : List Cell}
-    {terminalData : RetainedTerminalData}
-    {prefixDirections : List AxisDirection}
-    (request : FinalCarrierNormalizationRequest source taggedLink
-      nextSlice literalIndex slot route terminalData prefixDirections) :
+    (request : FinalCarrierActualNormalizationRequest source taggedLink
+      nextSlice literalIndex slot route) :
     finalCarrierNamedSemanticModelDirections source taggedLink nextSlice
-      literalIndex slot route terminalData :=
-  request.normalizationEvidence.terminalEvidence.routeEvidence.normalizedNamedSemanticModelDirections
+      literalIndex slot route
+      (finalCarrierActualScaledTerminalData source taggedLink
+        literalIndex) :=
+  request.routeEvidence.normalizedActualSemanticModelDirections
     source taggedLink nextSlice request.spanLarge literalIndex slot route
-    terminalData prefixDirections
-    request.normalizationEvidence.terminalEvidence.terminalEq
-    request.normalizationEvidence.prefixEq
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

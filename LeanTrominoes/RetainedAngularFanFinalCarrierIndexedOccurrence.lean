@@ -6,6 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.RetainedAngularFanFinalCarrierLookupSemantics
 import LeanTrominoes.RetainedAngularFanFinalCarrierNormalizedDirectionData
 import LeanTrominoes.RetainedAngularFanFinalCarrierRouteGeometry
+import LeanTrominoes.RetainedAngularFanFinalCarrierScaledTerminalGeometry
 import LeanTrominoes.RetainedAngularFanFinalCarrierScaledRouteEvidenceData
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedRoutes
 
@@ -23,6 +24,28 @@ local instance finalCarrierIndexedOccurrenceThreeOccurrenceDecidableEq
     {Variable : Type} [DecidableEq Variable] :
     DecidableEq (ThreeOccurrenceVariable Variable) :=
   fiveFamilyNormalizedThreeOccurrenceDecidableEq
+
+/-- The positively scaled source route addressed by an indexed final
+carrier. -/
+abbrev finalCarrierIndexedScaledRoute
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (clauseIndex : Nat)
+    (literalIndex : Fin 2) : List Cell :=
+  scalePolyline retainedAngularFanSourceClearanceFactor
+    (finalCoordinatedSourceRoutes
+      (PeriodicThreeSATThree.formula source) clauseIndex literalIndex)
+
+/-- The public normalized direction word addressed by an indexed final
+carrier. -/
+def finalCarrierIndexedPublicDirectionWord
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (clauseIndex : Nat)
+    (literalIndex : Fin 2) : List AxisDirection :=
+  Gadget.unitSubdivisionDirections
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+      (PeriodicThreeSATThree.formula source) clauseIndex literalIndex)
 
 /-- All source hypotheses and lookup witnesses for one genuine literal of an
 indexed final retained-carrier clause. -/
@@ -61,95 +84,173 @@ def retained
   PeriodicThreeSATThree.formula occurrence.source
 
 /-- The positively scaled raw route addressed by this occurrence. -/
-def scaledRoute
+abbrev scaledRoute
     {Variable : Type} [DecidableEq Variable]
     (occurrence : FinalCarrierIndexedOccurrence Variable) : List Cell :=
-  scalePolyline retainedAngularFanSourceClearanceFactor
-    (finalCoordinatedSourceRoutes occurrence.retained
-      occurrence.clauseIndex occurrence.literalIndex)
+  finalCarrierIndexedScaledRoute occurrence.source occurrence.clauseIndex
+    occurrence.literalIndex
 
 /-- The exact scaled semantic terminal datum addressed by this occurrence. -/
-def scaledTerminalData
+abbrev scaledTerminalData
     {Variable : Type} [DecidableEq Variable]
     (occurrence : FinalCarrierIndexedOccurrence Variable) :
     RetainedTerminalData :=
-  scaleRetainedTerminalData retainedAngularFanSourceClearanceFactor
-    (carrierLensRouteTerminalData
-      occurrence.taggedLink.1.first.isHorizontal
-      (AxisDirection.axisSpan
-        (CarrierNode.position occurrence.retained.incidenceGraph
-          occurrence.taggedLink.1.first)
-        (CarrierNode.position occurrence.retained.incidenceGraph
-          occurrence.taggedLink.1.second))
-      (if occurrence.taggedLink.2 then 0 else 1)
-      occurrence.literalIndex)
-
-/-- The named terminal datum unfolds to its semantic carrier expression. -/
-theorem scaledTerminalData_eq
-    {Variable : Type} [DecidableEq Variable]
-    (occurrence : FinalCarrierIndexedOccurrence Variable) :
-    occurrence.scaledTerminalData =
-      scaleRetainedTerminalData retainedAngularFanSourceClearanceFactor
-        (carrierLensRouteTerminalData
-          occurrence.taggedLink.1.first.isHorizontal
-          (AxisDirection.axisSpan
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
-              occurrence.taggedLink.1.first)
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
-              occurrence.taggedLink.1.second))
-          (if occurrence.taggedLink.2 then 0 else 1)
-          occurrence.literalIndex) := rfl
+  finalCarrierActualScaledTerminalData occurrence.source
+    occurrence.taggedLink occurrence.literalIndex
 
 /-- The exact scaled semantic prefix word addressed by this occurrence. -/
-def scaledPrefixDirections
+abbrev scaledPrefixDirections
     {Variable : Type} [DecidableEq Variable]
     (occurrence : FinalCarrierIndexedOccurrence Variable) :
     List AxisDirection :=
-  Gadget.repeatDirections 1152
-    (carrierLensRoutePrefixDirections
-      occurrence.taggedLink.1.first.isHorizontal
-      (AxisDirection.axisSpan
-        (CarrierNode.position occurrence.retained.incidenceGraph
-          occurrence.taggedLink.1.first)
-        (CarrierNode.position occurrence.retained.incidenceGraph
-          occurrence.taggedLink.1.second))
-      (if occurrence.taggedLink.2 then 0 else 1)
-      occurrence.literalIndex)
-
-/-- The named prefix word unfolds to its semantic carrier expression. -/
-theorem scaledPrefixDirections_eq
-    {Variable : Type} [DecidableEq Variable]
-    (occurrence : FinalCarrierIndexedOccurrence Variable) :
-    occurrence.scaledPrefixDirections =
-      Gadget.repeatDirections 1152
-        (carrierLensRoutePrefixDirections
-          occurrence.taggedLink.1.first.isHorizontal
-          (AxisDirection.axisSpan
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
-              occurrence.taggedLink.1.first)
-            (CarrierNode.position
-              (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
-              occurrence.taggedLink.1.second))
-          (if occurrence.taggedLink.2 then 0 else 1)
-          occurrence.literalIndex) := rfl
+  finalCarrierActualScaledPrefixDirections occurrence.source
+    occurrence.taggedLink occurrence.literalIndex
 
 /-- The final occurrence slot used by this carrier route. -/
-def slot
+abbrev slot
     {Variable : Type} [DecidableEq Variable]
     (occurrence : FinalCarrierIndexedOccurrence Variable) :
     RetainedTerminalSlot :=
   retainedFinalCoordinatedOccurrenceSlot occurrence.retained
     occurrence.literal occurrence.clauseIndex occurrence.literalIndex
 
-/-- The four packaged facts at this indexed occurrence. -/
-def ScaledRouteEvidence
+/-- The packaged public-to-semantic direction equality at this occurrence. -/
+abbrev PublicDirectionsEqSemanticModel
     {Variable : Type} [DecidableEq Variable]
     (occurrence : FinalCarrierIndexedOccurrence Variable) : Prop :=
-  FinalCarrierScaledRouteEvidence occurrence.scaledRoute
-    occurrence.scaledTerminalData occurrence.scaledPrefixDirections
+  let retained := PeriodicThreeSATThree.formula occurrence.source
+  let localClauseIndex := if occurrence.taggedLink.2 then 0 else 1
+  let route :=
+    scalePolyline retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes retained occurrence.clauseIndex
+        occurrence.literalIndex)
+  let terminal :=
+    scaleRetainedTerminalData retainedAngularFanSourceClearanceFactor
+      (carrierLensRouteTerminalData
+        occurrence.taggedLink.1.first.isHorizontal
+        (AxisDirection.axisSpan
+          (CarrierNode.position retained.incidenceGraph
+            occurrence.taggedLink.1.first)
+          (CarrierNode.position retained.incidenceGraph
+            occurrence.taggedLink.1.second))
+        localClauseIndex occurrence.literalIndex)
+  let slot := retainedFinalCoordinatedOccurrenceSlot retained
+    occurrence.literal occurrence.clauseIndex occurrence.literalIndex
+  Gadget.unitSubdivisionDirections
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        retained occurrence.clauseIndex occurrence.literalIndex) =
+    Gadget.unitSubdivisionDirections
+      (AxisDirection.normalizeOrthogonalPolyline
+        ((CarrierFallbackRouteTailRecords.routeKind localClauseIndex
+            occurrence.literalIndex).splicedOwnFigure7Route
+          route terminal slot))
+
+/-- The four packaged facts at this indexed occurrence. -/
+abbrev ScaledRouteEvidence
+    {Variable : Type} [DecidableEq Variable]
+    (occurrence : FinalCarrierIndexedOccurrence Variable) : Prop :=
+  FinalCarrierScaledRouteEvidence
+    (scalePolyline retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes
+        (PeriodicThreeSATThree.formula occurrence.source)
+        occurrence.clauseIndex occurrence.literalIndex))
+    (scaleRetainedTerminalData retainedAngularFanSourceClearanceFactor
+      (carrierLensRouteTerminalData
+        occurrence.taggedLink.1.first.isHorizontal
+        (AxisDirection.axisSpan
+          (CarrierNode.position
+            (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
+            occurrence.taggedLink.1.first)
+          (CarrierNode.position
+            (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
+            occurrence.taggedLink.1.second))
+        (if occurrence.taggedLink.2 then 0 else 1)
+        occurrence.literalIndex))
+    (Gadget.repeatDirections 1152
+      (carrierLensRoutePrefixDirections
+        occurrence.taggedLink.1.first.isHorizontal
+        (AxisDirection.axisSpan
+          (CarrierNode.position
+            (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
+            occurrence.taggedLink.1.first)
+          (CarrierNode.position
+            (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
+            occurrence.taggedLink.1.second))
+        (if occurrence.taggedLink.2 then 0 else 1)
+        occurrence.literalIndex))
+
+/-- The two proved route consequences carried separately from the original
+lookup package. -/
+structure RouteDirectionEvidence
+    {Variable : Type} [DecidableEq Variable]
+    (occurrence : FinalCarrierIndexedOccurrence Variable) : Prop where
+  routeEvidence : occurrence.ScaledRouteEvidence
+  publicDirectionsEvidence : occurrence.PublicDirectionsEqSemanticModel
+
+/-- Terminal classification transported to the finite carrier geometry. -/
+structure GeometryRouteClassified
+    {Variable : Type} [DecidableEq Variable]
+    (occurrence : FinalCarrierIndexedOccurrence Variable)
+    (nextSlice : Bool) : Prop where
+  evidence : FinalCarrierGeometryClassification
+        (scalePolyline retainedAngularFanSourceClearanceFactor
+          (finalCoordinatedSourceRoutes
+            (PeriodicThreeSATThree.formula occurrence.source)
+            occurrence.clauseIndex occurrence.literalIndex))
+        (finalCarrierRouteGeometryAt occurrence.source occurrence.taggedLink
+          nextSlice)
+        (finalCarrierLocalClauseIndex occurrence.taggedLink)
+        occurrence.literalIndex
+
+/-- Prefix directions transported to the finite carrier geometry. -/
+structure GeometryRoutePrefixDirections
+    {Variable : Type} [DecidableEq Variable]
+    (occurrence : FinalCarrierIndexedOccurrence Variable)
+    (nextSlice : Bool) : Prop where
+  prefixDirections : Gadget.unitSubdivisionDirections
+      (retainedFallbackSourcePrefix
+        (scalePolyline retainedAngularFanSourceClearanceFactor
+          (finalCoordinatedSourceRoutes
+            (PeriodicThreeSATThree.formula occurrence.source)
+            occurrence.clauseIndex occurrence.literalIndex))) =
+    Gadget.repeatDirections 1152
+      (carrierLensRoutePrefixDirections
+        (finalCarrierRouteGeometryAt occurrence.source
+          occurrence.taggedLink nextSlice).horizontal
+        (finalCarrierRouteGeometryAt occurrence.source
+          occurrence.taggedLink nextSlice).span
+        (finalCarrierLocalClauseIndex occurrence.taggedLink)
+        occurrence.literalIndex)
+
+/-- The compiler equality in the finite geometry coordinates used by the
+generic extensionality theorem. -/
+structure GeometryModelDirections
+    {Variable : Type} [DecidableEq Variable]
+    (occurrence : FinalCarrierIndexedOccurrence Variable)
+    (nextSlice : Bool) : Prop where
+  directions : Gadget.unitSubdivisionDirections
+      (AxisDirection.normalizeOrthogonalPolyline
+        ((CarrierFallbackRouteTailRecords.routeKind
+              (finalCarrierLocalClauseIndex occurrence.taggedLink)
+              occurrence.literalIndex).splicedOwnFigure7Route
+          (scalePolyline retainedAngularFanSourceClearanceFactor
+            (finalCoordinatedSourceRoutes
+              (PeriodicThreeSATThree.formula occurrence.source)
+              occurrence.clauseIndex occurrence.literalIndex))
+          (scaleRetainedTerminalData retainedAngularFanSourceClearanceFactor
+            (carrierLensRouteTerminalData
+              (finalCarrierRouteGeometryAt occurrence.source
+                occurrence.taggedLink nextSlice).horizontal
+              (finalCarrierRouteGeometryAt occurrence.source
+                occurrence.taggedLink nextSlice).span
+              (finalCarrierLocalClauseIndex occurrence.taggedLink)
+              occurrence.literalIndex))
+          occurrence.slot)) =
+    CarrierNormalizedFallbackRouteTailRecords.routeDirections
+      (finalCarrierRouteGeometryAt occurrence.source
+        occurrence.taggedLink nextSlice)
+      (finalCarrierLocalClauseIndex occurrence.taggedLink)
+      occurrence.literalIndex occurrence.slot
 
 /-- The exact finite compiler direction claim for the semantic carrier-route
 model at this occurrence. -/
@@ -158,11 +259,24 @@ def SemanticModelDirections
     (occurrence : FinalCarrierIndexedOccurrence Variable)
     (nextSlice : Bool) : Prop :=
   finalCarrierNamedSemanticModelDirections occurrence.source
-    occurrence.taggedLink nextSlice occurrence.literalIndex
-    occurrence.slot occurrence.scaledRoute occurrence.scaledTerminalData
+    occurrence.taggedLink nextSlice occurrence.literalIndex occurrence.slot
+    occurrence.scaledRoute occurrence.scaledTerminalData
 
-/-- Occurrence-native normalization request containing only the two facts
-that are not already named by the occurrence address. -/
+/-- The compact public-to-compiler direction claim at this occurrence. -/
+def PublicDirections
+    {Variable : Type} [DecidableEq Variable]
+    (occurrence : FinalCarrierIndexedOccurrence Variable)
+    (nextSlice : Bool) : Prop :=
+  let retained := PeriodicThreeSATThree.formula occurrence.source
+  let slot := retainedFinalCoordinatedOccurrenceSlot retained
+    occurrence.literal occurrence.clauseIndex occurrence.literalIndex
+  Gadget.unitSubdivisionDirections
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        retained occurrence.clauseIndex occurrence.literalIndex) =
+    finalCarrierModelDirectionWord occurrence.source occurrence.taggedLink
+      nextSlice occurrence.literalIndex slot
+
+/-- The compact normalization request at this occurrence. -/
 structure NormalizationRequest
     {Variable : Type} [DecidableEq Variable]
     (occurrence : FinalCarrierIndexedOccurrence Variable)
@@ -170,8 +284,7 @@ structure NormalizationRequest
   spanLarge :
     8 ≤ (finalCarrierRouteGeometryAt occurrence.source
       occurrence.taggedLink nextSlice).span
-  routeEvidence : FinalCarrierScaledRouteEvidence occurrence.scaledRoute
-    occurrence.scaledTerminalData occurrence.scaledPrefixDirections
+  evidence : occurrence.RouteDirectionEvidence
 
 end FinalCarrierIndexedOccurrence
 end PeriodicEightOccurrenceSplit
