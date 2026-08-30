@@ -30,14 +30,22 @@ local instance directFinalBendNormalizedFallbackRouteSemanticsVariableDecidableE
     DecidableEq Variable :=
   directSourceVariableDecidableEq
 
-/-- Complete canonical normalized words obtained by pairing every scaled
-semantic bend prefix with its aligned ordinary retained-fan suffix query. -/
-def directSourceFinalBendNormalizedFallbackGeometricDirections
+/-- Complete pre-cancellation words obtained by pairing every scaled prefix
+with its aligned normalized ordinary retained-fan suffix query. -/
+def directSourceFinalBendPreCancellationGeometricDirections
     (symbols : List encoding.Γ) :
     List FallbackSuffixDirectionCompiler.OutputToken :=
   NormalizedFallbackSuffixDirectionCompiler.retainedOrdinaryJoinedDirections
     ((directSourceFinalBendFallbackPrefixWords decider symbols).zip
       (directSourceFinalBendFallbackSemanticQueries decider symbols))
+
+/-- Apply bounded junction cancellation to the geometric bend-word batch. -/
+def directSourceFinalBendNormalizedFallbackGeometricDirections
+    (symbols : List encoding.Γ) :
+    List FallbackSuffixDirectionCompiler.OutputToken :=
+  BoundedDelimitedDirectionCancellation.output
+    (directSourceFinalBendPreCancellationGeometricDirections
+      decider symbols)
 
 private theorem directSourceFinalBendNormalizedFallbackPrefixWords_terminalData_length
     (symbols : List encoding.Γ) :
@@ -70,12 +78,12 @@ private theorem directSourceFinalBendNormalizedFallbackSemanticQueries_length
     directSourceFinalBendNormalizedFallbackSlots_terminalData_length]
   simp
 
-/-- The direct joined bend compiler emits exactly the complete canonical
-normalized source-prefix-plus-retained-fan word for every bend incidence. -/
-theorem directSourceFinalBendNormalizedFallbackRouteDirections_eq_geometric
+/-- The joined compiler emits exactly the geometric batch before bounded
+junction cancellation. -/
+theorem directSourceFinalBendPreCancellationRouteDirections_eq_geometric
     (symbols : List encoding.Γ) :
-    directSourceFinalBendNormalizedFallbackRouteDirections decider symbols =
-      directSourceFinalBendNormalizedFallbackGeometricDirections
+    directSourceFinalBendPreCancellationRouteDirections decider symbols =
+      directSourceFinalBendPreCancellationGeometricDirections
         decider symbols := by
   have lengthEq :
       (directSourceFinalBendFallbackPrefixWords decider symbols).length =
@@ -85,9 +93,9 @@ theorem directSourceFinalBendNormalizedFallbackRouteDirections_eq_geometric
       decider symbols).trans
         (directSourceFinalBendNormalizedFallbackSemanticQueries_length
           decider symbols).symm
-  unfold directSourceFinalBendNormalizedFallbackRouteDirections
+  unfold directSourceFinalBendPreCancellationRouteDirections
     directSourceFinalBendNormalizedFallbackSuffixDirections
-    directSourceFinalBendNormalizedFallbackGeometricDirections
+    directSourceFinalBendPreCancellationGeometricDirections
   rw [directSourceFinalBendFallbackPrefixDirections_eq,
     directSourceFinalBendFallbackSuffixQueries_eq]
   exact
@@ -98,6 +106,17 @@ theorem directSourceFinalBendNormalizedFallbackRouteDirections_eq_geometric
       (directSourceFinalBendFallbackSemanticQueries_kind decider symbols)
       (directSourceFinalBendFallbackSemanticQueries_lengthPositive
         decider symbols)
+
+/-- The composed compiler agrees with bounded cancellation of the complete
+geometric pre-cancellation batch. -/
+theorem directSourceFinalBendNormalizedFallbackRouteDirections_eq_geometric
+    (symbols : List encoding.Γ) :
+    directSourceFinalBendNormalizedFallbackRouteDirections decider symbols =
+      directSourceFinalBendNormalizedFallbackGeometricDirections
+        decider symbols := by
+  unfold directSourceFinalBendNormalizedFallbackRouteDirections
+    directSourceFinalBendNormalizedFallbackGeometricDirections
+  rw [directSourceFinalBendPreCancellationRouteDirections_eq_geometric]
 
 end LeanTrominoes.PeriodicCNFStripReduction
 
