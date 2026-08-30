@@ -12659,6 +12659,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanCarrierLensPlacedNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanCarrierLensPlacedNormalizedDirections.lean)
   translates that complete four-route result to an arbitrary carrier origin;
   every placed fallback still normalizes to its exact carrier record word.
+- [`LeanTrominoes/PeriodicOrthocrossingBendNormalizedFallbackRouteTailRecordBlockData.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizedFallbackRouteTailRecordBlockData.lean)
+  defines the matching normalized four-route target for every retained bend:
+  each factor-1152 source prefix is followed by its canonical normalized
+  ordinary-fan suffix, with the existing binary record profiles unchanged.
 
 ## Build
 

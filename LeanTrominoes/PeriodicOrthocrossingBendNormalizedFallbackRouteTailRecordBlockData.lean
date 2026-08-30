@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicOrthocrossingBendFallbackRouteTailRecordBlockData
-import LeanTrominoes.RetainedAngularFanNormalizedFallbackJoinedDirectionSemantics
+import LeanTrominoes.RetainedAngularFanNormalizedFallbackJoinedDirectionAllSemantics
 
 /-! # Normalized semantic four-route record blocks for retained bends -/
 
@@ -12,21 +12,19 @@ namespace LeanTrominoes
 namespace PeriodicOrthocrossing
 namespace BendNormalizedFallbackRouteTailRecords
 
-open PlanarThreeSAT
-open PeriodicCNF
 open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
 open PeriodicEightOccurrenceSplit
 open BendFallbackRouteTailRecords
 
-/-- The scaled bend prefix followed by its canonical normalized ordinary
-retained-fan suffix. -/
+/-- The scaled bend prefix followed by the canonical normalized ordinary
+retained-fan suffix selected by one occurrence slot. -/
 def routeDirections (geometry : Geometry)
     (localClauseIndex literalIndex : Nat)
     (slot : RetainedTerminalSlot) : List AxisDirection :=
   Gadget.repeatDirections 1152
       (bendRoutePrefixDirections geometry.firstPort geometry.secondPort
         localClauseIndex literalIndex) ++
-    NormalizedFallbackSuffixDirectionCompiler.Batch.Query.normalizedOrdinarySuffixDirections
+    NormalizedFallbackSuffixDirectionCompiler.Batch.Query.normalizedSuffixDirections
       (BendFallbackRouteTailRecords.routeQuery geometry
         localClauseIndex literalIndex slot)
 
@@ -38,8 +36,8 @@ def routeDirectionBlock (geometry : Geometry)
     routeDirections geometry 1 0 third,
     routeDirections geometry 1 1 fourth]
 
-/-- The normalized bend block preserves the raw semantic profiles and replaces
-the four route fields by canonical normalized complete words. -/
+/-- The normalized bend block stores the same two profiles as the raw block
+and its four canonical normalized complete route words. -/
 def block (geometry : Geometry)
     (first second third fourth : RetainedTerminalSlot) :
     BinaryRouteTailRecordBatchFormatter.Block where
