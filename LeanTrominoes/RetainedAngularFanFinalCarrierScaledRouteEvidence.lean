@@ -5,7 +5,6 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanFinalCarrierRawRoutePrefixDirectionSemantics
 import LeanTrominoes.RetainedAngularFanFinalCarrierScaledClassification
-import LeanTrominoes.RetainedAngularFanFinalCarrierIndexedOccurrence
 import LeanTrominoes.RetainedAngularFanFinalCarrierScaledOrthogonality
 import LeanTrominoes.RetainedAngularFanFinalCarrierScaledRouteEvidenceData
 import LeanTrominoes.RetainedAngularFanFinalThreeSATThreeScaledRouteLength
@@ -94,18 +93,66 @@ theorem finalCarrierScaledRoute_evidence
       source sourceLocal sourceWidth sourceClausesNonempty positiveOffsets
       taggedLink clauseIndex taggedLinkIndexed literalIndex⟩
 
-/-- The indexed-occurrence package supplies its four scaled-route facts. -/
-theorem FinalCarrierIndexedOccurrence.scaledRouteEvidence
+/-- Consume the raw indexed-carrier evidence without re-elaborating its
+constructor in a downstream normalization module. -/
+theorem finalCarrierScaledRoute_with_evidence
     {Variable : Type} [DecidableEq Variable]
-    (occurrence : FinalCarrierIndexedOccurrence Variable) :
-    FinalCarrierScaledRouteEvidence occurrence.scaledRoute
-      occurrence.scaledTerminalData occurrence.scaledPrefixDirections :=
-  finalCarrierScaledRoute_evidence
-    occurrence.source occurrence.sourceLocal occurrence.sourceWidth
-    occurrence.sourceClausesNonempty occurrence.positiveOffsets
-    occurrence.taggedLink occurrence.clauseIndex
-    occurrence.taggedLinkIndexed occurrence.clauseMember
-    occurrence.literalIndex occurrence.literalMember
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceClausesNonempty : ∀ clause ∈ source.clauses, clause ≠ [])
+    (positiveOffsets : ∀ incidence ∈ occurrenceIncidences source,
+      incidence.edge.offset = (0, 0) ∨
+        incidence.edge.offset = (1, 0))
+    (taggedLink : EqualityLink CarrierNode × Bool)
+    (clauseIndex : Nat)
+    (taggedLinkIndexed :
+      finalCarrierTaggedLinkIndexed source taggedLink clauseIndex)
+    {clause : PositionedPeriodicClause
+      (WrappedPeriodicPlanarSATVariable
+        (ThreeOccurrenceVariable Variable))}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource
+          (PeriodicThreeSATThree.formula source)).clauses.zipIdx)
+    {literal : PeriodicLiteral
+      (WrappedPeriodicPlanarSATVariable
+        (ThreeOccurrenceVariable Variable))}
+    (literalIndex : Fin 2)
+    (literalMember :
+      (literal, literalIndex.val) ∈ clause.literals.zipIdx)
+    {P : Prop}
+    (consume : FinalCarrierScaledRouteEvidence
+      (scalePolyline retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes
+          (PeriodicThreeSATThree.formula source)
+          clauseIndex literalIndex))
+      (scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor
+        (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex))
+      (Gadget.repeatDirections 1152
+        (carrierLensRoutePrefixDirections taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex)) → P) :
+    P :=
+  consume (finalCarrierScaledRoute_evidence
+    source sourceLocal sourceWidth sourceClausesNonempty positiveOffsets
+    taggedLink clauseIndex taggedLinkIndexed clauseMember
+    literalIndex literalMember)
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

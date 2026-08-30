@@ -4,10 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanFinalCarrierLookupSemantics
+import LeanTrominoes.RetainedAngularFanFinalCarrierNormalizedDirectionData
 import LeanTrominoes.RetainedAngularFanFinalCarrierRouteGeometry
 import LeanTrominoes.RetainedAngularFanFinalCarrierScaledRouteEvidenceData
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedRoutes
-import LeanTrominoes.PeriodicOrthocrossingCarrierNormalizedFallbackRouteTailRecordBlockData
 
 /-! # Indexed final retained-carrier occurrences -/
 
@@ -84,6 +84,24 @@ def scaledTerminalData
       (if occurrence.taggedLink.2 then 0 else 1)
       occurrence.literalIndex)
 
+/-- The named terminal datum unfolds to its semantic carrier expression. -/
+theorem scaledTerminalData_eq
+    {Variable : Type} [DecidableEq Variable]
+    (occurrence : FinalCarrierIndexedOccurrence Variable) :
+    occurrence.scaledTerminalData =
+      scaleRetainedTerminalData retainedAngularFanSourceClearanceFactor
+        (carrierLensRouteTerminalData
+          occurrence.taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
+              occurrence.taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
+              occurrence.taggedLink.1.second))
+          (if occurrence.taggedLink.2 then 0 else 1)
+          occurrence.literalIndex) := rfl
+
 /-- The exact scaled semantic prefix word addressed by this occurrence. -/
 def scaledPrefixDirections
     {Variable : Type} [DecidableEq Variable]
@@ -99,6 +117,24 @@ def scaledPrefixDirections
           occurrence.taggedLink.1.second))
       (if occurrence.taggedLink.2 then 0 else 1)
       occurrence.literalIndex)
+
+/-- The named prefix word unfolds to its semantic carrier expression. -/
+theorem scaledPrefixDirections_eq
+    {Variable : Type} [DecidableEq Variable]
+    (occurrence : FinalCarrierIndexedOccurrence Variable) :
+    occurrence.scaledPrefixDirections =
+      Gadget.repeatDirections 1152
+        (carrierLensRoutePrefixDirections
+          occurrence.taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
+              occurrence.taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula occurrence.source).incidenceGraph
+              occurrence.taggedLink.1.second))
+          (if occurrence.taggedLink.2 then 0 else 1)
+          occurrence.literalIndex) := rfl
 
 /-- The final occurrence slot used by this carrier route. -/
 def slot
@@ -121,18 +157,21 @@ def SemanticModelDirections
     {Variable : Type} [DecidableEq Variable]
     (occurrence : FinalCarrierIndexedOccurrence Variable)
     (nextSlice : Bool) : Prop :=
-  Gadget.unitSubdivisionDirections
-      (AxisDirection.normalizeOrthogonalPolyline
-        ((CarrierFallbackRouteTailRecords.routeKind
-            (if occurrence.taggedLink.2 then 0 else 1)
-            occurrence.literalIndex).splicedOwnFigure7Route
-          occurrence.scaledRoute occurrence.scaledTerminalData
-          occurrence.slot)) =
-    CarrierNormalizedFallbackRouteTailRecords.routeDirections
-      (finalCarrierRouteGeometryAt occurrence.source
-        occurrence.taggedLink nextSlice)
-      (finalCarrierLocalClauseIndex occurrence.taggedLink)
-      occurrence.literalIndex occurrence.slot
+  finalCarrierNamedSemanticModelDirections occurrence.source
+    occurrence.taggedLink nextSlice occurrence.literalIndex
+    occurrence.slot occurrence.scaledRoute occurrence.scaledTerminalData
+
+/-- Occurrence-native normalization request containing only the two facts
+that are not already named by the occurrence address. -/
+structure NormalizationRequest
+    {Variable : Type} [DecidableEq Variable]
+    (occurrence : FinalCarrierIndexedOccurrence Variable)
+    (nextSlice : Bool) : Prop where
+  spanLarge :
+    8 ≤ (finalCarrierRouteGeometryAt occurrence.source
+      occurrence.taggedLink nextSlice).span
+  routeEvidence : FinalCarrierScaledRouteEvidence occurrence.scaledRoute
+    occurrence.scaledTerminalData occurrence.scaledPrefixDirections
 
 end FinalCarrierIndexedOccurrence
 end PeriodicEightOccurrenceSplit

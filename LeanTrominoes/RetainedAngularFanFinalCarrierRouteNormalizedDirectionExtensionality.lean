@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanCarrierRouteNormalizedDirectionExtensionality
+import LeanTrominoes.RetainedAngularFanFinalCarrierNormalizedDirectionData
 import LeanTrominoes.RetainedAngularFanFinalCarrierRouteGeometry
 import LeanTrominoes.RetainedAngularFanFinalCarrierScaledRouteEvidenceData
 
@@ -251,19 +252,142 @@ theorem FinalCarrierScaledRouteEvidence.normalizedNamedSemanticModelDirections
               (PeriodicThreeSATThree.formula source).incidenceGraph
               taggedLink.1.second))
           (if taggedLink.2 then 0 else 1) literalIndex)) :
-    Gadget.unitSubdivisionDirections
-        (AxisDirection.normalizeOrthogonalPolyline
-          ((CarrierFallbackRouteTailRecords.routeKind
-              (if taggedLink.2 then 0 else 1)
-              literalIndex).splicedOwnFigure7Route
-            route terminalData slot)) =
-      CarrierNormalizedFallbackRouteTailRecords.routeDirections
-        (finalCarrierRouteGeometryAt source taggedLink nextSlice)
-        (finalCarrierLocalClauseIndex taggedLink) literalIndex slot := by
+    finalCarrierNamedSemanticModelDirections source taggedLink nextSlice
+      literalIndex slot route terminalData := by
+  unfold finalCarrierNamedSemanticModelDirections
   subst terminalData
   subst prefixDirections
   exact evidence.normalizedSemanticModelDirections
     source taggedLink nextSlice spanLarge literalIndex slot route
+
+/-- Evidence already indexed by the actual semantic terminal and prefix data
+proves the shared named carrier-direction claim directly. -/
+theorem FinalCarrierScaledRouteEvidence.normalizedActualSemanticModelDirections
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (taggedLink : EqualityLink CarrierNode × Bool)
+    (nextSlice : Bool)
+    (spanLarge :
+      8 ≤ (finalCarrierRouteGeometryAt
+        source taggedLink nextSlice).span)
+    (literalIndex : Fin 2)
+    (slot : RetainedTerminalSlot)
+    (route : List Cell)
+    (evidence : FinalCarrierScaledRouteEvidence
+      route
+      (scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor
+        (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex))
+      (Gadget.repeatDirections 1152
+        (carrierLensRoutePrefixDirections taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex))) :
+    finalCarrierNamedSemanticModelDirections source taggedLink nextSlice
+      literalIndex slot route
+      (scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor
+        (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex)) := by
+  unfold finalCarrierNamedSemanticModelDirections
+  exact evidence.normalizedSemanticModelDirections
+    source taggedLink nextSlice spanLarge literalIndex slot route
+
+/-- Consume the named normalized-direction proof without asking a downstream
+module to match its expanded indexed result against an expected type. -/
+theorem FinalCarrierScaledRouteEvidence.withNormalizedActualSemanticModelDirections
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (taggedLink : EqualityLink CarrierNode × Bool)
+    (nextSlice : Bool)
+    (spanLarge :
+      8 ≤ (finalCarrierRouteGeometryAt
+        source taggedLink nextSlice).span)
+    (literalIndex : Fin 2)
+    (slot : RetainedTerminalSlot)
+    (route : List Cell)
+    (evidence : FinalCarrierScaledRouteEvidence
+      route
+      (scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor
+        (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex))
+      (Gadget.repeatDirections 1152
+        (carrierLensRoutePrefixDirections taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex)))
+    {P : Prop}
+    (consume : finalCarrierNamedSemanticModelDirections
+      source taggedLink nextSlice literalIndex slot route
+      (scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor
+        (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex)) → P) :
+    P :=
+  consume (evidence.normalizedActualSemanticModelDirections
+    source taggedLink nextSlice spanLarge literalIndex slot route)
+
+/-- A compact actual-normalization request exposes its named compiler
+direction proof. -/
+theorem FinalCarrierNormalizationRequest.directions
+    {Variable : Type} [DecidableEq Variable]
+    {source : PeriodicCNF Variable}
+    {taggedLink : EqualityLink CarrierNode × Bool}
+    {nextSlice : Bool}
+    {literalIndex : Fin 2}
+    {slot : RetainedTerminalSlot}
+    {route : List Cell}
+    {terminalData : RetainedTerminalData}
+    {prefixDirections : List AxisDirection}
+    (request : FinalCarrierNormalizationRequest source taggedLink
+      nextSlice literalIndex slot route terminalData prefixDirections) :
+    finalCarrierNamedSemanticModelDirections source taggedLink nextSlice
+      literalIndex slot route terminalData :=
+  request.normalizationEvidence.terminalEvidence.routeEvidence.normalizedNamedSemanticModelDirections
+    source taggedLink nextSlice request.spanLarge literalIndex slot route
+    terminalData prefixDirections
+    request.normalizationEvidence.terminalEvidence.terminalEq
+    request.normalizationEvidence.prefixEq
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
