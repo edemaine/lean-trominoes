@@ -27,5 +27,21 @@ leaves its complete segment-major cardinal direction word unchanged. -/
   rw [normalizeIncidenceRoute_eq_translate]
   exact unitSubdivisionDirections_translatePolyline _ _
 
+/-- The same common translation also preserves the direction word after
+deleting the route's old variable endpoint. -/
+@[simp] theorem unitSubdivisionDirections_normalizeIncidenceRoute_dropLast
+    {Variable : Type*}
+    (placement : PeriodicVariablePlacement Variable)
+    (clause : PositionedPeriodicClause Variable)
+    (route : List Cell) :
+    unitSubdivisionDirections
+        (normalizeIncidenceRoute placement clause route).dropLast =
+      unitSubdivisionDirections route.dropLast := by
+  rw [normalizeIncidenceRoute_eq_translate]
+  simpa only [translatePolyline, List.map_dropLast] using
+    unitSubdivisionDirections_translatePolyline
+      (Cell.scale (-1) (clauseAnchorTranslation placement clause))
+      route.dropLast
+
 end PositionedPeriodicCNF
 end LeanTrominoes
