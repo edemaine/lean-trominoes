@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanFinalCarrierRawRoutePrefixDirectionSemantics
 import LeanTrominoes.RetainedAngularFanFinalCarrierScaledClassification
+import LeanTrominoes.RetainedAngularFanFinalCarrierIndexedOccurrence
 import LeanTrominoes.RetainedAngularFanFinalCarrierScaledOrthogonality
 import LeanTrominoes.RetainedAngularFanFinalCarrierScaledRouteEvidenceData
 import LeanTrominoes.RetainedAngularFanFinalThreeSATThreeScaledRouteLength
@@ -92,6 +93,19 @@ theorem finalCarrierScaledRoute_evidence
     finalCarrierFallbackSourcePrefix_directions_eq
       source sourceLocal sourceWidth sourceClausesNonempty positiveOffsets
       taggedLink clauseIndex taggedLinkIndexed literalIndex⟩
+
+/-- The indexed-occurrence package supplies its four scaled-route facts. -/
+theorem FinalCarrierIndexedOccurrence.scaledRouteEvidence
+    {Variable : Type} [DecidableEq Variable]
+    (occurrence : FinalCarrierIndexedOccurrence Variable) :
+    FinalCarrierScaledRouteEvidence occurrence.scaledRoute
+      occurrence.scaledTerminalData occurrence.scaledPrefixDirections :=
+  finalCarrierScaledRoute_evidence
+    occurrence.source occurrence.sourceLocal occurrence.sourceWidth
+    occurrence.sourceClausesNonempty occurrence.positiveOffsets
+    occurrence.taggedLink occurrence.clauseIndex
+    occurrence.taggedLinkIndexed occurrence.clauseMember
+    occurrence.literalIndex occurrence.literalMember
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
