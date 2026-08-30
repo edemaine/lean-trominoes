@@ -135,6 +135,86 @@ theorem listLoopErase_append_of_disjoint
         rw [if_neg member, if_neg appendedNotMember]
         simp
 
+/-- A duplicate-free path followed by its reverse tail is an out-and-back
+loop.  If the path and following suffix are jointly duplicate-free, right-to-
+left loop erasure removes the complete excursion and keeps its starting point
+followed by that suffix. -/
+theorem listLoopErase_outAndBack_append
+    {Vertex : Type*} [DecidableEq Vertex]
+    (path rest : List Vertex)
+    (pathNonempty : path ≠ [])
+    (joinedNodup : (path ++ rest).Nodup) :
+    listLoopErase (path ++ path.reverse.tail ++ rest) =
+      path.head pathNonempty :: rest := by
+  induction path generalizing rest with
+  | nil => exact (pathNonempty rfl).elim
+  | cons head tail induction =>
+      cases tail with
+      | nil =>
+          simpa using
+            (listLoopErase_eq_self_of_nodup joinedNodup)
+      | cons next tail =>
+          let remaining := next :: tail
+          have remainingNonempty : remaining ≠ [] := by simp [remaining]
+          have pathNodup : (head :: remaining).Nodup :=
+            (List.nodup_append'.mp joinedNodup).1
+          have restNodup : rest.Nodup :=
+            (List.nodup_append'.mp joinedNodup).2.1
+          have pathRestDisjoint : List.Disjoint (head :: remaining) rest :=
+            (List.nodup_append'.mp joinedNodup).2.2
+          have headFresh : head ∉ remaining :=
+            (List.nodup_cons.mp pathNodup).1
+          have remainingNodup : remaining.Nodup :=
+            (List.nodup_cons.mp pathNodup).2
+          have headRestFresh : head ∉ rest := by
+            intro member
+            exact pathRestDisjoint (by simp) member
+          have remainingRestDisjoint : List.Disjoint remaining rest := by
+            intro point pointMember otherMember
+            exact pathRestDisjoint (by simp [pointMember]) otherMember
+          have remainingJoinedNodup :
+              (remaining ++ head :: rest).Nodup := by
+            rw [List.nodup_append']
+            refine ⟨remainingNodup, ?_, ?_⟩
+            · exact List.nodup_cons.mpr ⟨headRestFresh, restNodup⟩
+            · intro point pointMember otherMember
+              rcases List.mem_cons.mp otherMember with rfl | otherMember
+              · exact headFresh pointMember
+              · exact remainingRestDisjoint pointMember otherMember
+          have erasedRemaining := induction (rest := head :: rest)
+            remainingNonempty remainingJoinedNodup
+          have erasedRemaining' :
+              listLoopErase
+                  (remaining ++ remaining.reverse.tail ++ head :: rest) =
+                remaining.head remainingNonempty :: head :: rest := by
+            simpa [remaining] using erasedRemaining
+          have remainingHeadNe :
+              remaining.head remainingNonempty ≠ head := by
+            intro equal
+            apply headFresh
+            rw [← equal]
+            exact List.head_mem remainingNonempty
+          have reverseTail :
+              (head :: remaining).reverse.tail =
+                remaining.reverse.tail ++ [head] := by
+            rw [List.reverse_cons,
+              List.tail_append_of_ne_nil (by simp [remaining])]
+          change
+            listLoopErase
+                ((head :: remaining) ++
+                  (head :: remaining).reverse.tail ++ rest) =
+              head :: rest
+          rw [reverseTail]
+          rw [show
+            (head :: remaining) ++
+                (remaining.reverse.tail ++ [head]) ++ rest =
+              head ::
+                (remaining ++ remaining.reverse.tail ++ head :: rest) by
+            simp [List.append_assoc]]
+          simp only [listLoopErase, erasedRemaining']
+          rw [if_pos (by simp)]
+          simp [remainingHeadNe]
+
 /-- If two point lists meet only at their advertised join boundary, loop
 erasure can be performed on the first list alone and then rejoined to the
 duplicate-free second list. -/
