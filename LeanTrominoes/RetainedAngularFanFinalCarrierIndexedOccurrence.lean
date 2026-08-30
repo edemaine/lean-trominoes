@@ -263,18 +263,19 @@ def SemanticModelDirections
     occurrence.scaledRoute occurrence.scaledTerminalData
 
 /-- The compact public-to-compiler direction claim at this occurrence. -/
-def PublicDirections
+structure PublicDirections
     {Variable : Type} [DecidableEq Variable]
     (occurrence : FinalCarrierIndexedOccurrence Variable)
-    (nextSlice : Bool) : Prop :=
-  let retained := PeriodicThreeSATThree.formula occurrence.source
-  let slot := retainedFinalCoordinatedOccurrenceSlot retained
-    occurrence.literal occurrence.clauseIndex occurrence.literalIndex
-  Gadget.unitSubdivisionDirections
-      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
-        retained occurrence.clauseIndex occurrence.literalIndex) =
-    finalCarrierModelDirectionWord occurrence.source occurrence.taggedLink
-      nextSlice occurrence.literalIndex slot
+    (nextSlice : Bool) : Prop where
+  directions :
+    let retained := PeriodicThreeSATThree.formula occurrence.source
+    let slot := retainedFinalCoordinatedOccurrenceSlot retained
+      occurrence.literal occurrence.clauseIndex occurrence.literalIndex
+    Gadget.unitSubdivisionDirections
+        (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+          retained occurrence.clauseIndex occurrence.literalIndex) =
+      finalCarrierModelDirectionWord occurrence.source occurrence.taggedLink
+        nextSlice occurrence.literalIndex slot
 
 /-- The compact normalization request at this occurrence. -/
 structure NormalizationRequest
