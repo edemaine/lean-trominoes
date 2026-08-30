@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanFinalCarrierRouteGeometry
+import LeanTrominoes.RetainedAngularFanFinalCarrierScaledRouteEvidenceData
 import LeanTrominoes.RetainedAngularTerminalDataProfile
 
 /-! # Scaled final-carrier terminals in finite geometry coordinates -/
@@ -115,6 +116,34 @@ theorem finalCarrierGeometryClassification_of_actual
     source taggedLink nextSlice literalIndex
     (value := retainedTerminalDirectionClassify
       (PeriodicThreeSATThree.routeTerminalVector route)) classified⟩
+
+/-- A scaled-route evidence package exposes its finite-geometry terminal
+classification without expanding that equality downstream. -/
+theorem FinalCarrierScaledRouteEvidence.geometryClassification
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (taggedLink : EqualityLink CarrierNode × Bool)
+    (nextSlice : Bool)
+    (literalIndex : Fin 2)
+    {route : List Cell}
+    {prefixDirections : List AxisDirection}
+    (evidence : FinalCarrierScaledRouteEvidence route
+      (scaleRetainedTerminalData retainedAngularFanSourceClearanceFactor
+        (carrierLensRouteTerminalData taggedLink.1.first.isHorizontal
+          (AxisDirection.axisSpan
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.first)
+            (CarrierNode.position
+              (PeriodicThreeSATThree.formula source).incidenceGraph
+              taggedLink.1.second))
+          (if taggedLink.2 then 0 else 1) literalIndex))
+      prefixDirections) :
+    FinalCarrierGeometryClassification route
+      (finalCarrierRouteGeometryAt source taggedLink nextSlice)
+      (finalCarrierLocalClauseIndex taggedLink) literalIndex :=
+  finalCarrierGeometryClassification_of_actual source taggedLink nextSlice
+    literalIndex route evidence.routeClassified
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
