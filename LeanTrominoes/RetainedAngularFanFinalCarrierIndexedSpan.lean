@@ -28,8 +28,7 @@ theorem FinalCarrierIndexedOccurrence.spanLarge
   have taggedLinkMember : occurrence.taggedLink ∈
       (retainedDrawingCompleteCarrierLinks
         occurrence.retained.incidenceGraph).product [true, false] := by
-    have indexed := occurrence.taggedLinkIndexed
-    unfold finalCarrierTaggedLinkIndexed at indexed
+    have indexed := occurrence.taggedLinkIndexed.member
     exact List.fst_mem_of_mem_zipIdx indexed
   have linkMember : occurrence.taggedLink.1 ∈
       retainedDrawingCompleteCarrierLinks

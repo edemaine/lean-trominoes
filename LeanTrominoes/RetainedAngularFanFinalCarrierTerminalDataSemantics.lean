@@ -63,8 +63,7 @@ theorem finalCarrierTerminalData_eq
       finalCarrierSemanticTerminalDataAt
         source taggedLink literalIndex := by
   let retained := PeriodicThreeSATThree.formula source
-  have taggedLinkIndexed' := taggedLinkIndexed
-  unfold finalCarrierTaggedLinkIndexed at taggedLinkIndexed'
+  have taggedLinkIndexed' := taggedLinkIndexed.member
   have taggedLinkMember : taggedLink.1 ∈
       retainedDrawingCompleteCarrierLinks retained.incidenceGraph :=
     (List.mem_product.mp

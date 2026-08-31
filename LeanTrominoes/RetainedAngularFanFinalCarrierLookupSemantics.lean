@@ -23,12 +23,12 @@ local instance finalCarrierLookupThreeOccurrenceDecidableEq
 
 /-- The global final-carrier index relation between a tagged semantic link
 and its clause position after the crossover prefix. -/
-def finalCarrierTaggedLinkIndexed
+structure finalCarrierTaggedLinkIndexed
     {Variable : Type} [DecidableEq Variable]
     (source : PeriodicCNF Variable)
     (taggedLink : EqualityLink CarrierNode × Bool)
-    (clauseIndex : Nat) : Prop :=
-  (taggedLink, clauseIndex) ∈
+    (clauseIndex : Nat) : Prop where
+  member : (taggedLink, clauseIndex) ∈
     ((retainedDrawingCompleteCarrierLinks
         (PeriodicThreeSATThree.formula source).incidenceGraph).product
           [true, false]).zipIdx
@@ -66,7 +66,7 @@ theorem finalCarrierClause_metadata_lookups
   let metadata := carrierClauseMetadataAt
     (Variable := ThreeOccurrenceVariable Variable)
       taggedLink.1 taggedLink.2
-  unfold finalCarrierTaggedLinkIndexed at taggedLinkIndexed
+  have taggedLinkIndexed := taggedLinkIndexed.member
   have taggedLinkMember : taggedLink ∈ taggedLinks :=
     List.fst_mem_of_mem_zipIdx taggedLinkIndexed
   have taggedClauseIndexed : (clause, clauseIndex) ∈
