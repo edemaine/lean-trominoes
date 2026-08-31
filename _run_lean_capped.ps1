@@ -23,7 +23,7 @@ try {
     PassThru = $true
   }
   $process = Start-Process @startArguments
-  if (-not $process.WaitForExit(60000)) {
+  if (-not $process.WaitForExit(300000)) {
     & taskkill.exe /PID $process.Id /T /F | Out-Null
     $exitCode = 124
   } else {
