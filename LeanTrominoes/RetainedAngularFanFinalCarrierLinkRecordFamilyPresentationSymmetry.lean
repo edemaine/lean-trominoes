@@ -37,6 +37,31 @@ theorem finalCarrierTaggedLinkValues_eq_physicalProduct
   unfold finalCarrierTaggedLinkValues finalCarrierPhysicalLinks
   rfl
 
+/-- The generic tagged-link family is the indexed Boolean-product
+presentation of the named physical links. -/
+theorem finalCarrierTaggedLinks_eq_physicalPresentation
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    finalCarrierTaggedLinks source =
+      ((finalCarrierPhysicalLinks source).product [true, false]).zipIdx
+        (finalCarrierStart source) := by
+  unfold finalCarrierTaggedLinks finalCarrierTaggedLinksFrom
+  rw [finalCarrierTaggedLinkValues_eq_physicalProduct]
+
+/-- Membership in the named physical-link presentation supplies the generic
+global carrier index relation. -/
+theorem finalCarrierTaggedLinkIndexed_of_physical_mem
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (tagged : (EqualityLink CarrierNode × Bool) × Nat)
+    (taggedMember : tagged ∈
+      ((finalCarrierPhysicalLinks source).product [true, false]).zipIdx
+        (finalCarrierStart source)) :
+    finalCarrierTaggedLinkIndexed source tagged.1 tagged.2 := by
+  apply finalCarrierTaggedLinkIndexed_of_mem
+  rw [finalCarrierTaggedLinks_eq_physicalPresentation]
+  exact taggedMember
+
 /-- Clause-major tagged-link slots flatten to the recursive physical-link
 slot presentation. -/
 theorem product_eq_finalCarrierSemanticOccurrenceSlotsFrom
