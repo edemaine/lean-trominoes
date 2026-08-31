@@ -54,7 +54,9 @@ private theorem scan_binaryTailBody (swap : Bool)
   rw [FiniteStateTransducer.scan_append, scan_tailBlock]
   simp [FiniteStateTransducer.scan, transition]
 
-private theorem scan_clauseRecord_pair
+/-- Scanning one complete canonical binary record resets the relabeler's
+finite control and emits its relabeled record. -/
+theorem scan_clauseRecord_pair
     (profile : DirectedClauseProfile)
     (first second : List AxisDirection) :
     FiniteStateTransducer.scan transition initial
