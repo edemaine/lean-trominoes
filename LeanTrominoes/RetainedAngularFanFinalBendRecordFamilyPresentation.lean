@@ -28,6 +28,62 @@ def finalBendSemanticOccurrenceSlotAt
     (finalBendNormalizedLiteralAt formula taggedBend literalIndex)
     clauseIndex literalIndex
 
+/-- Clause-based semantic slot blocks with independently named equality
+implementations for clause normalization and route-slot evaluation. -/
+def finalBendSemanticOccurrenceSlotBlocksAt
+    {Variable : Type}
+    (clauseEquality slotEquality : DecidableEq Variable)
+    (formula : PeriodicCNF Variable)
+    (taggedBends : List ((RouteBend × Bool) × Nat)) :
+    List (List RetainedTerminalSlot) :=
+  (taggedBends.map fun tagged =>
+    (@normalizedBendClauseAt Variable clauseEquality
+      formula tagged.1, tagged.2)).map fun taggedClause =>
+        taggedClause.1.zipIdx.map fun taggedLiteral =>
+          @retainedFinalCoordinatedOccurrenceSlot Variable slotEquality
+            formula taggedLiteral.1 taggedClause.2 taggedLiteral.2
+
+/-- Named two-slot semantic blocks over the same indexed tagged-bend
+presentation. -/
+def finalBendNamedSemanticOccurrenceSlotBlocksAt
+    {Variable : Type}
+    (equality : DecidableEq Variable)
+    (formula : PeriodicCNF Variable)
+    (taggedBends : List ((RouteBend × Bool) × Nat)) :
+    List (List RetainedTerminalSlot) :=
+  taggedBends.map fun tagged =>
+    [@finalBendSemanticOccurrenceSlotAt Variable equality
+        formula tagged.1 tagged.2 0,
+      @finalBendSemanticOccurrenceSlotAt Variable equality
+        formula tagged.1 tagged.2 1]
+
+/-- With a common equality implementation, clause-based slot blocks reduce
+pointwise to their two named semantic slots. -/
+theorem finalBendSemanticOccurrenceSlotBlocksAt_eq_named
+    {Variable : Type}
+    (equality : DecidableEq Variable)
+    (formula : PeriodicCNF Variable)
+    (taggedBends : List ((RouteBend × Bool) × Nat)) :
+    finalBendSemanticOccurrenceSlotBlocksAt
+        equality equality formula taggedBends =
+      finalBendNamedSemanticOccurrenceSlotBlocksAt
+        equality formula taggedBends := by
+  induction taggedBends with
+  | nil => rfl
+  | cons tagged taggedBends induction =>
+      simp only [finalBendSemanticOccurrenceSlotBlocksAt,
+        finalBendNamedSemanticOccurrenceSlotBlocksAt, List.map_cons]
+      rw [@normalizedBendClauseAt_zipIdx_eq_literal_pair Variable
+        equality formula tagged.1]
+      simp only [List.map_cons, List.map_nil]
+      change _ :: finalBendSemanticOccurrenceSlotBlocksAt
+          equality equality formula taggedBends =
+        _ :: finalBendNamedSemanticOccurrenceSlotBlocksAt
+          equality formula taggedBends
+      rw [induction]
+      simp only [finalBendSemanticOccurrenceSlotAt,
+        Fin.val_zero, Fin.val_one]
+
 /-- The four semantic occurrence slots of each physical bend, recursively
 aligned with its forward and backward global clause indices. -/
 def finalBendSemanticOccurrenceSlotsFrom
