@@ -3,9 +3,9 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierStartUnfoldedData
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierStartGenericData
 
-/-! # Unfolding the raw direct-source final carrier start -/
+/-! # Raw unfolding of the direct structural carrier start -/
 
 noncomputable section
 
@@ -16,14 +16,14 @@ variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
-noncomputable local instance directFinalCarrierStartUnfoldingStackFintype
+noncomputable local instance directFinalCarrierStructuralStartRawStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-/-- The raw start unfolds to its original equality-parameterized computation. -/
-theorem directSourceFinalCarrierStart_unfolded
+/-- The direct structural start unfolds to the shared raw computation. -/
+theorem directSourceFinalCarrierStructuralStart_raw
     (symbols : List encoding.Γ) :
-    DirectSourceFinalCarrierStartUnfolded decider symbols := by
+    DirectSourceFinalCarrierStructuralStartRaw decider symbols := by
   constructor
   rfl
 

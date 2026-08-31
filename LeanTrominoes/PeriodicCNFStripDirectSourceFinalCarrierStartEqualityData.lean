@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierStartData
-import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierStartUnfoldedData
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierStartOriginalData
 
 /-! # Equality-implementation certificates for the final carrier start -/
 
@@ -31,4 +31,3 @@ structure DirectSourceFinalCarrierStartEqualityIndependent
 end LeanTrominoes.PeriodicCNFStripReduction
 
 end
-

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierStartUnfolding
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierStartPublicUnfolding
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierStartData
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierStartEqualitySemantics
 
@@ -39,9 +40,10 @@ theorem directSourceFinalCarrierStart_structural
     (symbols : List encoding.Γ) :
     DirectSourceFinalCarrierStartStructural decider symbols := by
   constructor
-  exact (directSourceFinalCarrierStart_unfolded decider symbols).eq.trans
-    (directSourceFinalCarrierStart_equalityIndependent
-      decider symbols).eq
+  exact (directSourceFinalCarrierStart_raw decider symbols).eq.trans
+    ((directSourceFinalCarrierStart_unfolded decider symbols).eq.trans
+      (directSourceFinalCarrierStart_equalityIndependent
+        decider symbols).eq)
 
 end LeanTrominoes.PeriodicCNFStripReduction
 

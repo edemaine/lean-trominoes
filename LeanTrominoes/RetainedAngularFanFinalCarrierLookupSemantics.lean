@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataCarrierRepresentativeMetadataLookup
 import LeanTrominoes.PeriodicThreeSATThreeCarrierClauseLookup
+import LeanTrominoes.RetainedAngularFanFinalCarrierTaggedLinkData
 
 /-! # Exact final clause and metadata lookup for retained carriers -/
 
@@ -20,20 +21,6 @@ local instance finalCarrierLookupThreeOccurrenceDecidableEq
     {Variable : Type} [DecidableEq Variable] :
     DecidableEq (ThreeOccurrenceVariable Variable) :=
   fiveFamilyNormalizedThreeOccurrenceDecidableEq
-
-/-- The global final-carrier index relation between a tagged semantic link
-and its clause position after the crossover prefix. -/
-structure finalCarrierTaggedLinkIndexed
-    {Variable : Type} [DecidableEq Variable]
-    (source : PeriodicCNF Variable)
-    (taggedLink : EqualityLink CarrierNode × Bool)
-    (clauseIndex : Nat) : Prop where
-  member : (taggedLink, clauseIndex) ∈
-    ((retainedDrawingCompleteCarrierLinks
-        (PeriodicThreeSATThree.formula source).incidenceGraph).product
-          [true, false]).zipIdx
-      (crossoverMetadataNormalizedClausesDedup
-        (PeriodicThreeSATThree.formula source)).length
 
 /-- A tagged carrier implication at its global carrier-family index has both
 the exact final normalized-clause lookup and the exact raw metadata lookup. -/

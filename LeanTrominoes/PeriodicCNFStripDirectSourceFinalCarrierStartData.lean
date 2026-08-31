@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierStartFamilyData
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierEqualityData
 
 /-! # Structural final-carrier start certificates -/
 
@@ -31,7 +32,7 @@ local instance directFinalCarrierStartDataBaseDecidableEq :
 def directSourceFinalCarrierStructuralStart
     (symbols : List encoding.Γ) : Nat :=
   directSourceFinalCarrierStartFamily decider symbols
-    fiveFamilyNormalizedThreeOccurrenceDecidableEq
+    directSourceFinalStructuralVariableDecidableEq
 
 /-- Opaque certificate that the public carrier start uses the structural
 equality implementation of the generic crossover prefix. -/

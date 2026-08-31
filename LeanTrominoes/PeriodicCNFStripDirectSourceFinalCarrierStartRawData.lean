@@ -5,7 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceAtomCodeFamilies
 
-/-! # Equality-parameterized final carrier starts -/
+/-! # Raw crossover-prefix start of direct final carriers -/
 
 noncomputable section
 
@@ -18,18 +18,18 @@ variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
-noncomputable local instance directFinalCarrierStartFamilyDataStackFintype
+noncomputable local instance directFinalCarrierStartRawDataStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-/-- The generic crossover-prefix length as a named function of the equality
-implementation for final direct-source variables. -/
-def directSourceFinalCarrierStartFamily
-    (symbols : List encoding.Γ)
-    (equality : DecidableEq Variable) : Nat :=
-  (@crossoverMetadataNormalizedClausesDedup Variable equality
-    (PeriodicThreeSATThree.formula
-      (directThreeCNFSourceFormula decider symbols))).length
+/-- The raw duplicate-free crossover-prefix length under the original direct
+variable equality. -/
+def directSourceFinalCarrierRawStart
+    (symbols : List encoding.Γ) : Nat :=
+  (@crossoverMetadataNormalizedClausesDedup Variable
+    directSourceVariableDecidableEq
+      (PeriodicThreeSATThree.formula
+        (directThreeCNFSourceFormula decider symbols))).length
 
 end LeanTrominoes.PeriodicCNFStripReduction
 
