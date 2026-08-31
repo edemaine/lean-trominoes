@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierOccurrenceSlotBlockFamilySemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierTaggedClauseSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierEqualityData
 import LeanTrominoes.RetainedAngularFinalRouteDecidableEqIrrelevance
 import LeanTrominoes.RetainedAngularFanFinalCarrierLinkRecordFamilyPresentation
 
@@ -33,6 +34,11 @@ local instance directFinalCarrierSemanticSlotBlockVariableDecidableEq :
     DecidableEq Variable :=
   directSourceVariableDecidableEq
 
+attribute [local implicit_reducible]
+  directSourceFinalStructuralBaseDecidableEq
+attribute [local instance]
+  directSourceFinalStructuralBaseDecidableEq
+
 private theorem semanticOccurrenceSlot_eq_named
     (symbols : List encoding.Γ)
     (tagged : (EqualityLink CarrierNode × Bool) × Nat)
@@ -48,8 +54,20 @@ private theorem semanticOccurrenceSlot_eq_named
       finalCarrierSemanticOccurrenceSlotAt
         (directThreeCNFSourceFormula decider symbols)
         tagged.1 tagged.2 literalIndex := by
-  unfold directSourceFinalNormalizedFormula
-    finalCarrierSemanticOccurrenceSlotAt
+  have formulaEq :
+      directSourceFinalNormalizedFormula decider symbols =
+        @PeriodicThreeSATThree.formula (ThreeCNFVariable Nat)
+          directSourceFinalStructuralBaseDecidableEq
+          (directThreeCNFSourceFormula decider symbols) := by
+    unfold directSourceFinalNormalizedFormula
+    exact decidableEq_application_irrel
+      (fun equality : DecidableEq (ThreeCNFVariable Nat) =>
+        @PeriodicThreeSATThree.formula (ThreeCNFVariable Nat) equality
+          (directThreeCNFSourceFormula decider symbols))
+      directSourceFinalOriginalBaseDecidableEq
+      directSourceFinalStructuralBaseDecidableEq
+  rw [formulaEq]
+  unfold finalCarrierSemanticOccurrenceSlotAt
   let formula := PeriodicThreeSATThree.formula
     (directThreeCNFSourceFormula decider symbols)
   calc
