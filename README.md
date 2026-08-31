@@ -12659,6 +12659,17 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanCarrierLensPlacedNormalizedDirections.lean`](LeanTrominoes/RetainedAngularFanCarrierLensPlacedNormalizedDirections.lean)
   translates that complete four-route result to an arbitrary carrier origin;
   every placed fallback still normalizes to its exact carrier record word.
+- The final-carrier record modules from
+  [`semantic slots`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierOccurrenceSlotLinkPresentation.lean)
+  through
+  [`normalized blocks`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierNormalizedBlockSemantics.lean),
+  [`decoded records`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierDecodedRecordSemantics.lean),
+  and
+  [`compiled batching`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCarrierCompiledBatchedRecordSemantics.lean)
+  identify every indexed physical carrier with its two directed clauses and
+  four occurrence routes.  The normalized formatter, clockwise relabeler,
+  and routed-record batch expander now form one verified polynomial-time
+  emitter for the exact direct carrier-family semantic records.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizedFallbackRouteTailRecordBlockData.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizedFallbackRouteTailRecordBlockData.lean)
   defines the matching normalized four-route target for every retained bend:
   each factor-1152 source prefix is followed by its canonical normalized
