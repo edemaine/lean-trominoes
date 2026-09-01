@@ -2499,6 +2499,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Expand the exact copied-clause descriptor prefix into
                   parent-grouped final occurrence blocks and compile each
                   block's parent-relative atom-equality square.
+                - [x] Identify those blocks with the exact header projection
+                  of the canonical copied records and split the complete
+                  occurrence stream at the copied/cycle boundary.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
@@ -12734,6 +12737,14 @@ The representation choices for this target are:
   [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedOccurrenceBlockCompiler.lean)
   composes both outputs with the exact five-family copied-clause descriptor
   compiler.
+- The corresponding
+  [generic stream semantics](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceBlockSemantics.lean)
+  prove that header projection after record expansion is independent of all
+  dynamic tail tables.  The
+  [direct copied-prefix semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedOccurrenceBlockSemantics.lean)
+  identify that expansion with the canonical copied Figure 9 records and
+  split the complete compiled occurrence stream into its copied prefix and
+  implication-cycle suffix.
 
 ## Build
 
