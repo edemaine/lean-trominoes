@@ -2578,6 +2578,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Identify numeric-code ranks and multiplicities with the
                   compiled length-word versions, then prove every compiled
                   fan query key occurs in the candidate-key column.
+                - [x] Prove generically that stable base-three occurrence
+                  keys are duplicate-free whenever every identity occurs at
+                  most three times.
                 - [x] Use those keys to select and decode exactly three finite
                   connector-kind, polarity, and first-direction records per
                   final occurrence.
@@ -13006,6 +13009,11 @@ The representation choices for this target are:
   prove that every rank strictly below a value's multiplicity appears in the
   `3 * value + rank` key column.  This supplies the finite keyed lookup with a
   witness for every active fan slot.
+- Their
+  [`bounded uniqueness theorem`](LeanTrominoes/StableOccurrenceRankCandidateKeyNodup.lean)
+  proves that equal value/rank pairs identify the same presentation position
+  and that the complete base-three key column is duplicate-free under the
+  semantic at-most-three multiplicity promise.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
