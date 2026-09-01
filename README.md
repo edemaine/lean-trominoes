@@ -13119,6 +13119,10 @@ The representation choices for this target are:
   compact source words.  Thus different retained variables have different
   numeric identities before their implication-cycle blocks are broadcast.
 - The
+  [`local implication-cycle inherited-slot bound`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCycleInheritedRingAtomCodeLocalBound.lean)
+  evaluates the fixed nine-clause Figure 7 table after inherited-position
+  selection.  Each of its nine ring slots occurs exactly twice.
+- The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
   counts from injective length words back to the numeric identity column.
