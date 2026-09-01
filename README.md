@@ -13308,6 +13308,17 @@ The representation choices for this target are:
   [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceDataSemantics.lean)
   recover exactly the uniquely aligned record at each key and preserve one
   output per distinct active occurrence.
+- The
+  [`grouped occurrence-index compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexCompiler.lean)
+  recovers each grouped key's original clause-major position.  A generic
+  [`three-block ordinal compiler`](LeanTrominoes/UnaryFieldThreeBlockOrdinalCompiler.lean)
+  expands every such position to its consecutive red, green, and blue block
+  numbers.  The
+  [`grouped colored-direction compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedColoredOccurrenceDirectionBlockCompiler.lean)
+  then uses indexed delimited-block lookup to select every complete routed
+  direction block in identity-major, stable-rank-minor, color-minor order;
+  its semantics prove the exact block ordinals and query-major token
+  selection.
 
 ## Build
 
