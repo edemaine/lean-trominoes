@@ -13438,7 +13438,10 @@ The representation choices for this target are:
   then uses indexed delimited-block lookup to select every complete routed
   direction block in identity-major, stable-rank-minor, color-minor order;
   its semantics prove the exact block ordinals and query-major token
-  selection.
+  selection.  The
+  [`grouped block-list semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedColoredOccurrenceDirectionBlockListSemantics.lean)
+  strengthen this to selection of whole bodies from the explicit colored
+  occurrence list, including every closing delimiter.
 - The
   [`grouped routed-incidence key compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceKeyCompiler.lean)
   maps each grouped finite occurrence to width three or seven, prefix-sums

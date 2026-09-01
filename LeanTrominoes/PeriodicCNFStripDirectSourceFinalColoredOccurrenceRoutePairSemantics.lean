@@ -130,20 +130,26 @@ theorem directSourceFinalColoredOccurrenceRequestTokensExpected_eq_paired
       directSourceFinalColoredOccurrenceRoutePairs_map_snd]
   rw [routeBodies]
 
+/-- Exact direction body of every aligned colored occurrence. -/
+def directSourceFinalColoredOccurrenceDirectionBodies
+    (symbols : List encoding.Γ) : List (List AxisDirection) :=
+  (directSourceFinalColoredOccurrenceRoutePairs decider symbols).map
+    fun pair =>
+      HorizontalOccurrenceRoutedRequest.output
+        (DirectFinalOccurrenceEndpointFrame.routedTokens pair.1 pair.2)
+
 /-- The compiled direction stream is exactly the complete delimited
 occurrence-direction body for every paired endpoint frame and route block. -/
 theorem directSourceFinalColoredOccurrenceDirectionTokens_eq_blocks
     (symbols : List encoding.Γ) :
     directSourceFinalColoredOccurrenceDirectionTokens decider symbols =
       FiniteAlphabetDelimitedBlockJoin.blocks
-        ((directSourceFinalColoredOccurrenceRoutePairs decider symbols).map
-          fun pair =>
-            HorizontalOccurrenceRoutedRequest.output
-              (DirectFinalOccurrenceEndpointFrame.routedTokens
-                pair.1 pair.2)) := by
+        (directSourceFinalColoredOccurrenceDirectionBodies
+          decider symbols) := by
   rw [directSourceFinalColoredOccurrenceDirectionTokens_eq_expected]
   unfold directSourceFinalColoredOccurrenceDirectionTokensExpected
   rw [directSourceFinalColoredOccurrenceRequestTokensExpected_eq_paired]
+  unfold directSourceFinalColoredOccurrenceDirectionBodies
   exact coloredOccurrenceDirectionTokens_paired
     (directSourceFinalColoredOccurrenceRoutePairs decider symbols)
 
