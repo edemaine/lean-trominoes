@@ -13483,6 +13483,14 @@ The representation choices for this target are:
   explicit list of header/tail pairs.  Projecting occurrence metadata from
   that stream is therefore ordinary mapping over the same pair list, ready
   for complete-block reasoning about the compiled routed requests.
+- The generic
+  [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
+  prove that explicitly framed payloads split back into their original
+  complete blocks and that fixed copying acts independently on those blocks.
+  Their
+  [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredRoutedRequestBlockSemantics.lean)
+  identifies the compiled colored Figure 9 route stream as exactly three
+  complete copies of every explicit header/tail request block.
 
 ## Build
 
