@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderPresentationAtomScopeCompiler
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedLocalAtomCodeCompiler
 
 /-! # Local final-atom occurrence bounds in one routed parent block -/
 
@@ -42,6 +42,52 @@ theorem parentLocalAtoms_count_le_three
     simpa only [decide_eq_true_eq] using checked
   · rw [List.count_eq_zero_of_not_mem member]
     omega
+
+/-- Canonical quotient codes at the same parent-local positions. -/
+noncomputable def parentLocalCodes (profile : DirectedClauseProfile) :
+    List ParentLocalAtomCode :=
+  (clauseBlock profile).filterMap fun scope =>
+    match scope with
+    | .inherited _ => none
+    | .parentLocal control => some (parentLocalAtomCode control)
+
+private theorem parentLocalCodes_count_mk
+    (profile : DirectedClauseProfile) (control : AtomControl) :
+    (parentLocalCodes profile).count (parentLocalAtomCode control) =
+      (parentLocalAtoms profile).count control.representedAtom := by
+  unfold parentLocalCodes parentLocalAtoms
+  generalize clauseBlock profile = scopes
+  induction scopes with
+  | nil => rfl
+  | cons scope scopes induction =>
+      cases scope with
+      | inherited sourceSlot =>
+          simpa using induction
+      | parentLocal current =>
+          by_cases representedEq :
+              current.representedAtom = control.representedAtom
+          · have codeEq :
+                parentLocalAtomCode current =
+                  parentLocalAtomCode control :=
+              (parentLocalAtomCode_eq_iff current control).mpr representedEq
+            simp [codeEq, representedEq, induction]
+          · have codeNe :
+                parentLocalAtomCode current ≠
+                  parentLocalAtomCode control := by
+              exact fun equality => representedEq
+                ((parentLocalAtomCode_eq_iff current control).mp equality)
+            simp [codeNe, representedEq, induction]
+
+/-- The canonical local quotient used by the numeric compiler preserves the
+same at-most-three bound. -/
+theorem parentLocalCodes_count_le_three
+    (profile : DirectedClauseProfile) (code : ParentLocalAtomCode) :
+    (parentLocalCodes profile).count code <= 3 := by
+  refine Quotient.inductionOn code (fun control => ?_)
+  change
+    (parentLocalCodes profile).count (parentLocalAtomCode control) <= 3
+  rw [parentLocalCodes_count_mk]
+  exact parentLocalAtoms_count_le_three profile control.representedAtom
 
 /-- The finite checker only scans controls that actually occur in the
 selected block.  This avoids enumerating the much larger ambient descriptor
