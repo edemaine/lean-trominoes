@@ -13102,6 +13102,11 @@ The representation choices for this target are:
   uses compact-word separation to recover semantic atom equality from equal
   numeric identities.  The actual `(compact identity, bounded slot)` source
   column is therefore duplicate-free.
+- Its
+  [`base-nine ring-code corollary`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPreFigureNineInheritedRingAtomCodeNodup.lean)
+  proves every bounded slot is below the nine-vertex ring base and maps the
+  duplicate-free pairs injectively.  Thus the complete pre-Figure9 inherited
+  ring-code candidate column is duplicate-free.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
