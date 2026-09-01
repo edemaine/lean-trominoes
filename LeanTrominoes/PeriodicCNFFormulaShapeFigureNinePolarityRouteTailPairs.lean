@@ -28,6 +28,42 @@ def sourcePairs :
       sourceClausePairs profile (tailTables.headD []) ++
         sourcePairs source tailTables.tail
 
+@[simp] theorem sourceClausePairs_map_fst
+    (profile : DirectedClauseProfile)
+    (orderedTails : List (List AxisDirection)) :
+    (sourceClausePairs profile orderedTails).map Prod.fst =
+      FormulaShapeFigureNinePolarityRouteHeader.sourceClauseHeaders
+        profile := by
+  unfold sourceClausePairs
+  rw [List.map_map]
+  change
+    (FormulaShapeFigureNinePolarityRouteHeader.sourceClauseHeaders
+      profile).map id = _
+  exact List.map_id _
+
+/-- Forgetting dynamic tails recovers the exact finite header stream; in
+particular tail-table contents cannot change occurrence order. -/
+@[simp] theorem sourcePairs_map_fst
+    (descriptors : List FormulaShapeDirectionOrdering.Token)
+    (tailTables : List (List (List AxisDirection))) :
+    (sourcePairs descriptors tailTables).map Prod.fst =
+      FormulaShapeFigureNinePolarityRouteHeader.sourceHeaders
+        descriptors := by
+  induction descriptors generalizing tailTables with
+  | nil => rfl
+  | cons descriptor descriptors induction =>
+      cases descriptor with
+      | «variable» =>
+          simpa [sourcePairs,
+            FormulaShapeFigureNinePolarityRouteHeader.sourceHeaders,
+            FormulaShapeFigureNinePolarityRouteHeader.tokenBlock] using
+            induction tailTables
+      | clause profile =>
+          simp [sourcePairs,
+            FormulaShapeFigureNinePolarityRouteHeader.sourceHeaders,
+            FormulaShapeFigureNinePolarityRouteHeader.tokenBlock,
+            induction]
+
 /-- The recursive token generator is exactly serialization of its explicit
 header/tail pair list. -/
 theorem sourceRecords_eq_records

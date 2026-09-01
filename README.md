@@ -13482,7 +13482,11 @@ The representation choices for this target are:
   expose the recursive final route-record source as serialization of an
   explicit list of header/tail pairs.  Projecting occurrence metadata from
   that stream is therefore ordinary mapping over the same pair list, ready
-  for complete-block reasoning about the compiled routed requests.
+  for complete-block reasoning about the compiled routed requests.  The
+  [`route-pair header alignment`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRoutePairHeaderSemantics.lean)
+  further proves that the compiled copied/cycle descriptor prefix and the
+  retained descriptor stream expand to exactly the same header list, which
+  is also the header column of the compiled occurrence frames.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
