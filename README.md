@@ -13220,6 +13220,15 @@ The representation choices for this target are:
   preserve exactly one complete frame per final routed occurrence.  The
   reusable finite-index/slot decoder keeps the concrete product order
   explicit instead of depending on an arbitrary finite-type enumeration.
+- The
+  [`colored occurrence-endpoint compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceEndpointFrameCompiler.lean)
+  expands each complete frame in red/green/blue order.  Every emitted finite
+  record contains the exact variable-fan query, physical ribbon lane,
+  clause-fan query, and retained route header needed to surround one compact
+  routed source word.  Its
+  [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceEndpointFrameSemantics.lean)
+  prove exact expansion of the declaratively assembled occurrence frames and
+  exactly three endpoint records per final occurrence.
 
 ## Build
 
