@@ -12830,7 +12830,14 @@ The representation choices for this target are:
   adds its presentation-relative inherited slot.  Its
   [structural semantics](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedSourcePositionSemantics.lean)
   identify every emitted unary query with the exact position in the compact
-  pre-Figure9 source column and prove every query is in range.
+  pre-Figure9 source column and prove every query is in range.  The
+  [direct position specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedSourcePositionCompiler.lean)
+  aligns these queries with the canonical copied prefix, while the
+  [inherited-identity lookup](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedInheritedAtomIdentityCompiler.lean)
+  and its
+  [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedInheritedAtomIdentitySemantics.lean)
+  select the corresponding compact source identities in polynomial time and
+  recover ordinary list lookup exactly.
 
 ## Build
 

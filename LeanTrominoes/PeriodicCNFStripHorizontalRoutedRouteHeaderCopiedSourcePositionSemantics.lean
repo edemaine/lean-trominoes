@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedSourcePositionCompiler
+import LeanTrominoes.UnaryIndexedValueLookupSemantics
 
 /-! # Semantics of copied-clause compact-source positions -/
 
@@ -359,6 +360,34 @@ theorem positions_forall_lt (source : List Token) :
       position < totalSourceWordCount source := by
   rw [positions_eq_expected]
   simpa [expected] using expectedAux_forall_lt 0 source
+
+/-- Select a candidate identity at every compiled source position. -/
+def selectedValues (source : List Token)
+    (candidateValues : List Nat) : List Nat :=
+  UnaryIndexedValueLookup.values (positions source) candidateValues
+
+@[simp] theorem selectedValues_length (source : List Token)
+    (candidateValues : List Nat) :
+    (selectedValues source candidateValues).length =
+      (HorizontalRoutedRouteHeaderOccurrenceBlock.output source).length := by
+  rw [selectedValues, UnaryIndexedValueLookup.values_length,
+    positions_length]
+
+/-- A correctly sized candidate column turns every compiled source-position
+query into ordinary zero-based lookup, preserving duplicates and order. -/
+theorem selectedValues_eq_map_getD (source : List Token)
+    (candidateValues : List Nat)
+    (candidateLength : candidateValues.length =
+      totalSourceWordCount source) :
+    selectedValues source candidateValues =
+      (positions source).map fun position =>
+        candidateValues.getD position 0 := by
+  unfold selectedValues
+  apply UnaryIndexedValueLookup.values_eq_map_getD_of_forall_lt
+  intro position positionMember
+  have positionLt := (List.forall_iff_forall_mem.mp
+    (positions_forall_lt source)) position positionMember
+  simpa [candidateLength] using positionLt
 
 end HorizontalRoutedRouteHeaderCopiedSourcePosition
 end PeriodicCNFStripReduction
