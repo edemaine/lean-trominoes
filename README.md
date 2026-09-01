@@ -2708,9 +2708,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Instantiate the degree-two/degree-three contraction
                   table on arbitrary compact incidence blocks and prove its
                   edge projection is exactly canonical `contractedEdges`.
-                - [x] Compile the canonical element-degree column and the
-                  variable-local portion of the canonical structural-code
-                  column, with identical element order and length.
+                - [x] Compile aligned canonical element-degree and complete
+                  RGB structural-code columns, using disjoint variable-local
+                  and clause internal/terminal identities.
                 - [x] Lift correct incidence blocks through retained and
                   reversed through edges, reducing the complete direct stream
                   to one correct compact block per stable incidence tag.
@@ -12394,8 +12394,7 @@ The representation choices for this target are:
   the same degree controls emit the matching through or retained roles.
   [`LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceSemantics.lean`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceSemantics.lean)
   proves the exact element-major query and role blocks.  It remains to supply
-  the direct source's clause portion of the canonical element-code column and
-  its aligned incidence-element-code column.
+  the direct source's aligned incidence-element-code column.
 - [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeCompiler.lean)
   supplies the counted contraction's canonical degree column.  It expands
   each variable module to one or three degree-two elements, each clause to
@@ -12411,6 +12410,13 @@ The representation choices for this target are:
   [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalVariableElementCodeSemantics.lean)
   identify the exact occurrence-major code blocks and prove their length
   equals the existing variable-element degree column.
+- [`LeanTrominoes/UnaryFieldFourSlotRankCompiler.lean`](LeanTrominoes/UnaryFieldFourSlotRankCompiler.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementCodeCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementCodeCompiler.lean),
+  and its [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementCodeSemantics.lean)
+  complete that column.  Consecutive clause indices expand to color-disjoint
+  internal/top/left/right tags `16–19`, `20–23`, and `24–27`; appending them
+  after the variable-local codes in each color gives the exact RGB canonical
+  length already prescribed by the degree column.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean),
