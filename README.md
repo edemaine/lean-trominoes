@@ -12832,6 +12832,13 @@ The representation choices for this target are:
   return one datum per distinct word in stable `List.dedup` order, which is
   the order required by the appended implication-cycle blocks.
 - The
+  [`direct distinct-atom identity compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalDistinctAtomIdentityCompiler.lean)
+  applies that representative lookup to the compact last-index identity
+  column.  Its
+  [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalDistinctAtomIdentitySemantics.lean)
+  emit exactly one canonical numeric identity per distinct compact source
+  atom, in the marker order needed by the cycle suffix.
+- The
   [`aligned unary Boolean-choice compiler`](LeanTrominoes/AlignedUnaryBooleanChoiceCompiler.lean)
   reuses alternating zero padding to interleave two aligned unary columns,
   then selects field `2i` or `2i+1` from a Boolean control stream.  This gives
