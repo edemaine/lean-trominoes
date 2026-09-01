@@ -2569,6 +2569,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Assign every final occurrence the base-three candidate
                   key `3 * globalIdentity + stableRank`, with exact decoding
                   for semantic ranks below three.
+                - [x] Prove generically that every rank below an identity's
+                  multiplicity occurs in the stable-ranked candidate-key
+                  column, providing the coverage needed by keyed lookup.
                 - [x] Compile three fan query keys per final occurrence,
                   repeating the last active rank in each inactive finite fan
                   slot exactly as the semantic fan builder does.
@@ -12995,6 +12998,11 @@ The representation choices for this target are:
   `3 * identity + rank`.  It proves exact base-three recovery of both fields
   for ranks below three and emits one aligned candidate key per final
   occurrence in polynomial time.
+- The generic
+  [`stable occurrence candidate-key semantics`](LeanTrominoes/StableOccurrenceRankCandidateKeys.lean)
+  prove that every rank strictly below a value's multiplicity appears in the
+  `3 * value + rank` key column.  This supplies the finite keyed lookup with a
+  witness for every active fan slot.
 - [`LeanTrominoes/UnaryFieldFixedCopiesCompiler.lean`](LeanTrominoes/UnaryFieldFixedCopiesCompiler.lean)
   supplies fixed repetition of complete delimiter-terminated unary fields.
   The
