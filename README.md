@@ -13280,6 +13280,15 @@ The representation choices for this target are:
   finite-alphabet blocks in polynomial time; the
   [`wrapper semantics`](LeanTrominoes/FiniteAlphabetIndexedDelimitedBlockLookupSemantics.lean)
   reduce the result to exact query-major keyed selection.
+- The
+  [`delimiter-preserving occurrence batch compiler`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceRoutedRequestDelimitedBatchCompiler.lean)
+  appends one explicit block end after each independently compiled occurrence
+  word.  Its
+  [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceDirectionBlockCompiler.lean)
+  emits the final routed directions as one complete block per occurrence and
+  color, and the
+  [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceDirectionBlockSemantics.lean)
+  identify every block with the exact established routed-occurrence output.
 
 ## Build
 
