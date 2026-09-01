@@ -2489,6 +2489,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Stream those complete delimited records through the
                   fixed header/tail transducer to compile the exact compact
                   Figure 9 routed-request token stream.
+                - [x] Project every compiled route header to its finite final
+                  connector kind, polarity, and header-derived first-direction
+                  datum in exact record order.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
@@ -12705,6 +12708,13 @@ The representation choices for this target are:
   composes that record compiler with the fixed header/tail streamer, producing
   the exact canonical compact Figure 9 routed-request tokens in polynomial
   time.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceData.lean),
+  its [stream compiler](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceCompiler.lean),
+  and the [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCompiledOccurrenceData.lean)
+  project every compiled header to the finite connector kind, output polarity,
+  and header-derived first direction needed by the variable-fan frame.  The
+  projection is polynomial-time and preserves the canonical Figure 9 record
+  order.
 
 ## Build
 
