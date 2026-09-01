@@ -12837,7 +12837,10 @@ The representation choices for this target are:
   column.  Its
   [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalDistinctAtomIdentitySemantics.lean)
   emit exactly one canonical numeric identity per distinct compact source
-  atom, in the marker order needed by the cycle suffix.
+  atom, in the marker order needed by the cycle suffix.  A generic
+  [deduplication lemma](LeanTrominoes/RetainedAngularOccurrenceGlobalDistinctAtomWordSemantics.lean)
+  then proves that this identity column has exactly the same length as the
+  Figure 9 variable-marker column.
 - The
   [`aligned unary Boolean-choice compiler`](LeanTrominoes/AlignedUnaryBooleanChoiceCompiler.lean)
   reuses alternating zero padding to interleave two aligned unary columns,
