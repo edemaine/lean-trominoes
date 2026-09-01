@@ -13243,6 +13243,16 @@ The representation choices for this target are:
   [`block semantics`](LeanTrominoes/FiniteAlphabetDelimitedBlockJoinSemantics.lean)
   prove that two aligned families of complete blocks are concatenated
   pointwise while retaining exactly one delimiter per result block.
+- The
+  [`colored occurrence-request compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceRequestCompiler.lean)
+  uses two such joins to insert each variable-length routed word between its
+  matching endpoint opening and trailing query.  Its
+  [`paired semantics`](LeanTrominoes/PeriodicCNFStripDirectFinalColoredOccurrenceRequestSemantics.lean)
+  produce exactly the established compact occurrence-request tokens for each
+  aligned frame/route pair, while the
+  [`direct semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceRequestSemantics.lean)
+  identify the compiled inputs with the declarative endpoint frames and
+  three-colored retained Figure 9 route blocks.
 
 ## Build
 
