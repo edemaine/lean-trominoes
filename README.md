@@ -12838,6 +12838,14 @@ The representation choices for this target are:
   [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedInheritedAtomIdentitySemantics.lean)
   select the corresponding compact source identities in polynomial time and
   recover ordinary list lookup exactly.
+- The
+  [`copied terminal-slot lookup`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedTerminalSlotCompiler.lean)
+  reuses those presentation positions to select the bounded source terminal
+  slot for every expanded copied occurrence.  Its
+  [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedTerminalSlotSemantics.lean)
+  prove exact alignment and ordinary zero-based lookup, providing the port
+  component needed to distinguish the eight fixed copies of each source
+  atom.
 
 ## Build
 
