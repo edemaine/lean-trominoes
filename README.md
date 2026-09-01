@@ -13253,6 +13253,15 @@ The representation choices for this target are:
   [`direct semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceRequestSemantics.lean)
   identify the compiled inputs with the declarative endpoint frames and
   three-colored retained Figure 9 route blocks.
+- The
+  [`batched occurrence compiler`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceRoutedRequestBatchCompiler.lean)
+  resets the established routed-occurrence transducer at every aligned block
+  boundary.  The
+  [`direct direction compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceDirectionCompiler.lean)
+  therefore emits all colored final occurrence direction words in polynomial
+  time, and its
+  [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceDirectionSemantics.lean)
+  reduce an explicit alignment to the independent exact occurrence outputs.
 
 ## Build
 
