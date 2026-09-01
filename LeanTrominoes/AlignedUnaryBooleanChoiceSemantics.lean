@@ -22,6 +22,26 @@ def indexedQueriesAux : Nat → List Bool → List Nat
       (start * 2 + BooleanListUnaryFields.bitNat control) ::
         indexedQueriesAux (start + 1) controls
 
+/-- Total lookup in the explicit query list exposes its paired-field row and
+Boolean column. -/
+theorem indexedQueriesAux_getD (start : Nat) (controls : List Bool)
+    (index : Nat) (indexLt : index < controls.length) :
+    (indexedQueriesAux start controls).getD index 0 =
+      (start + index) * 2 +
+        BooleanListUnaryFields.bitNat (controls.getD index false) := by
+  induction controls generalizing start index with
+  | nil => simp at indexLt
+  | cons control controls induction =>
+      cases index with
+      | zero => simp [indexedQueriesAux]
+      | succ index =>
+          have tailLt : index < controls.length := by simpa using indexLt
+          rw [indexedQueriesAux]
+          simp only [List.getD_cons_succ]
+          rw [induction (start + 1) index tailLt]
+          congr 2
+          omega
+
 private theorem sums_doubledRange
     (start : Nat) (controls : List Bool) :
     UnaryAlignedAddMachine.sums
@@ -91,6 +111,35 @@ theorem candidateValues_eq_interleaved (first second : List Nat) :
           rw [induction]
           simp
 
+/-- Indexing one genuine paired row chooses its first or second component
+according to the Boolean control. -/
+theorem interleaved_getD (first second : List Nat)
+    (lengthEq : first.length = second.length)
+    (index : Nat) (indexLt : index < first.length)
+    (control : Bool) :
+    (interleaved first second).getD
+        (index * 2 + BooleanListUnaryFields.bitNat control) 0 =
+      if control then second.getD index 0 else first.getD index 0 := by
+  induction first generalizing second index with
+  | nil => simp at indexLt
+  | cons first firsts induction =>
+      cases second with
+      | nil => simp at lengthEq
+      | cons second seconds =>
+          have tailLength : firsts.length = seconds.length := by
+            simpa using lengthEq
+          cases index with
+          | zero =>
+              cases control <;>
+                simp [interleaved, BooleanListUnaryFields.bitNat]
+          | succ index =>
+              have tailLt : index < firsts.length := by
+                simpa using indexLt
+              have tail := induction seconds tailLength index tailLt
+              cases control <;>
+                simpa [interleaved, BooleanListUnaryFields.bitNat,
+                  Nat.succ_mul, Nat.add_assoc] using tail
+
 private theorem indexedQueriesAux_forall_lt
     (start : Nat) (controls : List Bool) :
     (indexedQueriesAux start controls).Forall fun query =>
@@ -134,5 +183,46 @@ theorem selectedValues_eq_map_getD
   exact (List.forall_iff_forall_mem.mp
     (queries_forall_lt_candidateValues_length
       controls first second controlsFirst firstSecond)) query queryMember
+
+/-- At every aligned position, total lookup of the compiled result is the
+Boolean-selected component of that row. -/
+theorem selectedValues_getD
+    (controls : List Bool) (first second : List Nat)
+    (controlsFirst : controls.length = first.length)
+    (firstSecond : first.length = second.length)
+    (index : Nat) (indexLt : index < controls.length) :
+    (selectedValues controls first second).getD index 0 =
+      if controls.getD index false then
+        second.getD index 0
+      else first.getD index 0 := by
+  rw [selectedValues_eq_map_getD controls first second
+    controlsFirst firstSecond]
+  have queryLength :
+      (queries controls first).length = controls.length :=
+    queries_length controls first controlsFirst
+  have mappedLt : index <
+      ((queries controls first).map fun query =>
+        (candidateValues first second).getD query 0).length := by
+    simpa [queryLength] using indexLt
+  rw [List.getD_eq_getElem _ _ mappedLt, List.getElem_map]
+  have queryLt : index < (queries controls first).length := by
+    simpa [queryLength] using indexLt
+  have queryGetD :
+      (queries controls first).getD index 0 =
+        index * 2 + BooleanListUnaryFields.bitNat
+          (controls.getD index false) := by
+    rw [queries_eq_indexedQueriesAux controls first controlsFirst,
+      indexedQueriesAux_getD 0 controls index indexLt]
+    simp
+  have queryGetElem :
+      (queries controls first)[index] =
+        index * 2 + BooleanListUnaryFields.bitNat
+          (controls.getD index false) := by
+    rw [← List.getD_eq_getElem _ _ queryLt]
+    exact queryGetD
+  rw [queryGetElem, candidateValues_eq_interleaved]
+  exact interleaved_getD first second firstSecond index
+    (by simpa [controlsFirst] using indexLt)
+    (controls.getD index false)
 
 end LeanTrominoes.AlignedUnaryBooleanChoice

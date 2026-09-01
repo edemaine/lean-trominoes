@@ -12861,6 +12861,14 @@ The representation choices for this target are:
   [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedInheritedRingAtomCodeSemantics.lean)
   identify the result with pointwise source-identity/port pairing and prove
   that base-nine codes agree exactly when both components agree.
+- The
+  [`copied atom-identity compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedAtomIdentityCompiler.lean)
+  maps presentation-relative scopes to Boolean choices, reserves even codes
+  for inherited ring variables and odd codes for parent-local auxiliaries,
+  and selects one globally scoped identity at every copied final occurrence.
+  Its [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedAtomIdentitySemantics.lean)
+  prove the exact pointwise scope choice and the disjointness of the two
+  parity namespaces.
 
 ## Build
 
