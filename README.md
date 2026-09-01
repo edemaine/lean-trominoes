@@ -13087,6 +13087,12 @@ The representation choices for this target are:
   an at-most-eight source converts ranks to the eight terminal slots without
   collisions.
 - The
+  [`direct scaled-source occurrence bound`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalScaledSourceOccurrenceBound.lean)
+  packages the direct formula's local width-three, three-occurrence source
+  facts into the retained-planar certificate and proves that the exact
+  source-scaled formula used for stable terminal ranking has at most eight
+  occurrences per atom.
+- The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
   counts from injective length words back to the numeric identity column.
