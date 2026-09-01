@@ -2569,6 +2569,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Assign every final occurrence the base-three candidate
                   key `3 * globalIdentity + stableRank`, with exact decoding
                   for semantic ranks below three.
+                - [x] Compile three fan query keys per final occurrence,
+                  repeating the last active rank in each inactive finite fan
+                  slot exactly as the semantic fan builder does.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -12983,6 +12986,13 @@ The representation choices for this target are:
   `3 * identity + rank`.  It proves exact base-three recovery of both fields
   for ranks below three and emits one aligned candidate key per final
   occurrence in polynomial time.
+- [`LeanTrominoes/UnaryFieldFixedCopiesCompiler.lean`](LeanTrominoes/UnaryFieldFixedCopiesCompiler.lean)
+  supplies fixed repetition of complete delimiter-terminated unary fields.
+  The
+  [`final fan query-key compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFanQueryKeyCompiler.lean)
+  uses it to repeat each global identity base three times, pairs those bases
+  with rank blocks `[0,0,0]`, `[0,1,1]`, or `[0,1,2]` according to the fan
+  count, and emits exactly three composite lookup keys per final occurrence.
 
 ## Build
 
