@@ -2558,6 +2558,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Convert those unary ranks through a verified three-state
                   saturating counter to the finite first/second/third
                   occurrence-slot alphabet.
+                - [x] Count the total multiplicity of every final global atom
+                  identity and repeat that unary group size at each aligned
+                  occurrence.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -12946,6 +12949,12 @@ The representation choices for this target are:
   runs those unary ranks through a verified three-state saturating counter.
   It emits one first/second/third slot per final occurrence and preserves the
   exact numeric index whenever the semantic at-most-three bound applies.
+- The
+  [`final occurrence-group-size compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceGroupSizeCompiler.lean)
+  true-counts the same global identity equality rows.  It emits one unary
+  multiplicity per final occurrence, exactly equal to the total number of
+  occurrences carrying that identity and aligned with the rank, slot, and
+  routed-request streams.
 
 ## Build
 
