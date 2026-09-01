@@ -12825,6 +12825,13 @@ The representation choices for this target are:
   its [semantics](LeanTrominoes/UnaryIndexedValueLookupSemantics.lean) recover
   ordinary list lookup for every in-range query.
 - The
+  [`binary-word representative value lookup`](LeanTrominoes/DelimitedBinaryWordRepresentativeValueLookupCompiler.lean)
+  applies the last-representative equality rows of a compiled word stream to
+  any aligned unary column.  Its
+  [semantics](LeanTrominoes/DelimitedBinaryWordRepresentativeValueLookupSemantics.lean)
+  return one datum per distinct word in stable `List.dedup` order, which is
+  the order required by the appended implication-cycle blocks.
+- The
   [`aligned unary Boolean-choice compiler`](LeanTrominoes/AlignedUnaryBooleanChoiceCompiler.lean)
   reuses alternating zero padding to interleave two aligned unary columns,
   then selects field `2i` or `2i+1` from a Boolean control stream.  This gives
