@@ -2581,6 +2581,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove generically that stable base-three occurrence
                   keys are duplicate-free whenever every identity occurs at
                   most three times.
+                - [x] Prove from the fixed Figure 9 and polarity tables that
+                  every parent-local final atom occurs at most three times
+                  within its globally scoped parent-clause block.
                 - [x] Prove that keyed lookup over any duplicate-free aligned
                   candidate column returns the value at the queried key's
                   unique presentation index.
@@ -13020,6 +13023,12 @@ The representation choices for this target are:
   proves that equal value/rank pairs identify the same presentation position
   and that the complete base-three key column is duplicate-free under the
   semantic at-most-three multiplicity promise.
+- The fixed-table
+  [`parent-local occurrence bound`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBound.lean)
+  checks only controls that actually occur in each finite Figure 9/polarity
+  block and proves that every represented parent-local atom has multiplicity
+  at most three.  Global parent indices then isolate these local bounds from
+  one another.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
