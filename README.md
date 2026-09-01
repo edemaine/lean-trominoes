@@ -12913,6 +12913,13 @@ The representation choices for this target are:
   Its [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedAtomIdentitySemantics.lean)
   prove the exact pointwise scope choice and the disjointness of the two
   parity namespaces.
+- The
+  [`complete final atom-identity compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalAtomIdentityCompiler.lean)
+  applies the same parity split to the combined copied-plus-cycle inherited
+  and parent-local columns.  Its
+  [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalAtomIdentitySemantics.lean)
+  prove exact final-occurrence alignment, pointwise scope selection, and
+  inherited/local namespace disjointness.
 
 ## Build
 
