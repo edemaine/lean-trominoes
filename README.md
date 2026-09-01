@@ -13122,6 +13122,11 @@ The representation choices for this target are:
   [`local implication-cycle inherited-slot bound`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCycleInheritedRingAtomCodeLocalBound.lean)
   evaluates the fixed nine-clause Figure 7 table after inherited-position
   selection.  Each of its nine ring slots occurs exactly twice.
+- Generic
+  [`finite block-index lookup semantics`](LeanTrominoes/FiniteBlockIndexLookupSemantics.lean)
+  identify lookup at a nonempty block-index stream with ordinary blockwise
+  broadcasting of the aligned source values.  This exposes the cycle
+  identity compiler as one constant-identity block per retained variable.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
