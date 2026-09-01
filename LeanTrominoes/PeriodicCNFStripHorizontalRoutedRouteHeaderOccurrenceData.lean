@@ -18,6 +18,9 @@ open PeriodicCNF.FormulaShapeFigureNinePolarityRouteHeader
 open PeriodicCNF.FormulaShapeFigureNineRoutePrefix
 open PeriodicOrthocrossing
 
+abbrev PrefixDescriptor :=
+  PeriodicCNF.FormulaShapeFigureNineRoutePrefix.Descriptor
+
 /-- Literal position occupied by one polarity-normalized output occurrence.
 The main normalized clause preserves the selected source slot, while the two
 positions of a complement clause are fixed. -/
@@ -42,21 +45,64 @@ def outputFirstDirection (header : Header) : AxisDirection :=
   ((block header []).directions
     RetainedFigureNineRouteDirectionBlock.directions).headD .invalid
 
+/-- Recover the finite-template atom selected by one Figure 9 prefix.  The
+codomain itself contains an unbounded clause-index field, but every value read
+through this finite descriptor alphabet belongs to a fixed template. -/
+def prefixAtom : PrefixDescriptor →
+    PlanarOneInThreeNoUnitsFigureNine.FigureNineNoUnitsVariable
+  | .local query =>
+      ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+        query.1).incidenceAt query.2).literal.1
+  | .inherited _ query =>
+      ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+        query.1).incidenceAt query.2.1).literal.1
+
+/-- Finite final-variable control relative to one parent source clause.  The
+original branch compares the template atoms selected by its descriptors; the
+fresh branch compares source-incidence descriptors themselves. -/
+inductive AtomControl
+  | original (sourceOccurrence : PrefixDescriptor)
+  | fresh (sourceOccurrence : PrefixDescriptor)
+  deriving DecidableEq, Fintype, Inhabited
+
+/-- Parent-relative final variable control carried by one routed header. -/
+def outputAtomControl (header : Header) : AtomControl :=
+  match header.polarity.operation with
+  | .compatible | .complementOriginal =>
+      .original header.figurePrefix
+  | .incompatible | .complementFresh =>
+      .fresh header.figurePrefix
+
+/-- Equality test for final variables generated inside the same parent source
+clause.  Original variables compare their selected Figure 9 atoms; a fresh
+variable is scoped to its exact pre-polarity source occurrence. -/
+def AtomControl.sameAtom : AtomControl → AtomControl → Bool
+  | .original first, .original second =>
+      decide (prefixAtom first = prefixAtom second)
+  | .fresh first, .fresh second => decide (first = second)
+  | _, _ => false
+
 /-- The finite local occurrence fields needed to assemble a variable fan. -/
 structure OccurrenceData where
+  atomControl : AtomControl
   kind : VariableConnectorKind
   polarity : Bool
   direction : AxisDirection
   deriving DecidableEq, Fintype
 
 instance : Inhabited OccurrenceData :=
-  ⟨⟨.fixedRed, false, .invalid⟩⟩
+  ⟨⟨default, .fixedRed, false, .invalid⟩⟩
 
 /-- Project all finite local occurrence fields from one routed header. -/
 def occurrenceData (header : Header) : OccurrenceData where
+  atomControl := outputAtomControl header
   kind := outputConnectorKind header
   polarity := outputPolarity header
   direction := outputFirstDirection header
+
+@[simp] theorem occurrenceData_atomControl (header : Header) :
+    (occurrenceData header).atomControl = outputAtomControl header :=
+  rfl
 
 @[simp] theorem occurrenceData_kind (header : Header) :
     (occurrenceData header).kind = outputConnectorKind header :=

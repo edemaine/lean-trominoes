@@ -2492,6 +2492,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Project every compiled route header to its finite final
                   connector kind, polarity, and header-derived first-direction
                   datum in exact record order.
+                - [x] Classify each header's parent-relative variable as an
+                  original Figure 9 atom or occurrence-local fresh complement,
+                  with a finite comparator proved equal to represented-atom
+                  equality.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
@@ -12712,11 +12716,12 @@ The representation choices for this target are:
   its [stream compiler](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceCompiler.lean),
   [clause semantics](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceSemantics.lean),
   and the [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCompiledOccurrenceData.lean)
-  project every compiled header to the finite connector kind, output polarity,
-  and header-derived first direction needed by the variable-fan frame.  The
-  projection is polynomial-time and preserves the canonical Figure 9 record
-  order; the connector and polarity projections are exactly the literal-wise
-  fields of the generated normalized and complement clauses.
+  project every compiled header to a parent-relative final-atom control, the
+  finite connector kind, output polarity, and header-derived first direction
+  needed by the variable-fan frame.  The projection is polynomial-time and
+  preserves the canonical Figure 9 record order; its atom comparator is exact,
+  and the connector and polarity projections are the literal-wise fields of
+  the generated normalized and complement clauses.
 
 ## Build
 

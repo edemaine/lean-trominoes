@@ -52,6 +52,32 @@ def descriptorOutputPolarity
     outputPolarity header = descriptorOutputPolarity header.polarity := by
   rfl
 
+/-- Explicit final variable represented by a header, relative to its parent
+source clause.  The right summand is the occurrence-local fresh-variable
+tag; the left summand is the selected finite Figure 9 atom. -/
+abbrev ParentRelativeAtom :=
+  Sum PlanarOneInThreeNoUnitsFigureNine.FigureNineNoUnitsVariable
+    PrefixDescriptor
+
+def outputParentRelativeAtom (header : Header) : ParentRelativeAtom :=
+  match header.polarity.operation with
+  | .compatible | .complementOriginal =>
+      .inl (prefixAtom header.figurePrefix)
+  | .incompatible | .complementFresh =>
+      .inr header.figurePrefix
+
+/-- The finite atom-control comparator is exactly equality of the represented
+parent-relative final variables. -/
+theorem outputAtomControl_sameAtom (first second : Header) :
+    (outputAtomControl first).sameAtom (outputAtomControl second) =
+      decide
+        (outputParentRelativeAtom first = outputParentRelativeAtom second) := by
+  rcases first with ⟨⟨firstSlot, firstOperation⟩, firstPrefix⟩
+  rcases second with ⟨⟨secondSlot, secondOperation⟩, secondPrefix⟩
+  cases firstOperation <;> cases secondOperation <;>
+    simp [outputAtomControl, AtomControl.sameAtom,
+      outputParentRelativeAtom]
+
 /-- Connector-kind fields of a finite clause profile in literal order. -/
 def clauseConnectorKinds (profile : ClauseProfile) :
     List VariableConnectorKind :=
