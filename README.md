@@ -2505,6 +2505,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile the constant implication-cycle occurrence phase
                   and each cycle clause's exact parent-relative atom-equality
                   square, yielding a named copied-plus-cycle decomposition.
+                - [x] Classify the complete final occurrence stream into
+                  genuine inherited source slots and parent-local Figure 9 or
+                  polarity atoms, and compile that finite scope stream.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
@@ -12755,6 +12758,13 @@ The representation choices for this target are:
   compiles exact parent-relative atom-equality squares for all of its clauses.
   Together with the copied-prefix semantics, this gives a polynomial-time
   copied-plus-cycle decomposition of the complete final occurrence stream.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderAtomScopeData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderAtomScopeData.lean)
+  proves the finite scope classification needed to globalize those local atom
+  controls: genuine inherited Figure 9 atoms select a parent source-literal
+  slot, while auxiliaries and fresh complement variables remain parent-local.
+  The [finite projector](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderAtomScopeCompiler.lean)
+  and its [direct composition](LeanTrominoes/PeriodicCNFStripDirectSourceFinalAtomScopeCompiler.lean)
+  compile one such control per canonical final occurrence.
 
 ## Build
 
