@@ -13482,6 +13482,12 @@ The representation choices for this target are:
   degree-three retained triples, and its incidence lookup keys as the stable
   base-three occurrence keys of the compiled incidence identities.
 - The generic
+  [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
+  now reduce any aligned complete incidence-body stream to the established
+  role/direction assembler whenever its stable occurrence keys are unique and
+  cover every requested element/rank key.  This isolates those two finite-key
+  facts as the remaining source-specific contraction obligation.
+- The generic
   [`keyed delimited-block semantics`](LeanTrominoes/FiniteAlphabetKeyedDelimitedBlockLookupBlockSemantics.lean)
   identify delimiter-derived token ordinals with ordinary finite-block
   indices.  Consequently an aligned arbitrary key column is repeated exactly
