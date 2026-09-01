@@ -2751,6 +2751,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Lift those local selector permutations across all
                   grouped occurrences, obtaining the complete expected
                   variable-incidence element-code multiset.
+                - [x] Reorder that expected multiset into its variable-local
+                  cycle/private contribution and its parent-clause terminal
+                  contribution.
                 - [x] Prove generically that assembling consecutive triples
                   whose count predecessor is repeated three times recovers
                   the original fan-count column.
