@@ -2549,6 +2549,9 @@ build; an imported proof counts when its statement matches the paper.
                 six finite endpoint-template choices.  This compact source
                 emitter is now reduced to the explicit framed source-token
                 stream and is the only missing route-appender component.
+                - [x] Preserve one explicit request boundary for every
+                  compiled final Figure 9 header/tail record while streaming
+                  exactly its compact routed request.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -12920,6 +12923,12 @@ The representation choices for this target are:
   [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalAtomIdentitySemantics.lean)
   prove exact final-occurrence alignment, pointwise scope selection, and
   inherited/local namespace disjointness.
+- The
+  [`boundary-preserving final routed-request compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCompiledRoutedRequestBlockCompiler.lean)
+  streams the completed Figure 9 header/tail records through the established
+  compact request transducer while retaining one explicit end marker per
+  final occurrence.  Its record semantics give the later finite frame columns
+  an exact one-block-per-occurrence alignment boundary.
 
 ## Build
 
