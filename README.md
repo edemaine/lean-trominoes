@@ -2502,6 +2502,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Identify those blocks with the exact header projection
                   of the canonical copied records and split the complete
                   occurrence stream at the copied/cycle boundary.
+                - [x] Compile the constant implication-cycle occurrence phase
+                  and each cycle clause's exact parent-relative atom-equality
+                  square, yielding a named copied-plus-cycle decomposition.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
@@ -12745,6 +12748,13 @@ The representation choices for this target are:
   identify that expansion with the canonical copied Figure 9 records and
   split the complete compiled occurrence stream into its copied prefix and
   implication-cycle suffix.
+- The
+  [`cycle occurrence-block compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCycleOccurrenceBlockCompiler.lean)
+  projects the constant record block emitted for every retained-variable
+  marker, identifies one block with the nine finite cycle descriptors, and
+  compiles exact parent-relative atom-equality squares for all of its clauses.
+  Together with the copied-prefix semantics, this gives a polynomial-time
+  copied-plus-cycle decomposition of the complete final occurrence stream.
 
 ## Build
 

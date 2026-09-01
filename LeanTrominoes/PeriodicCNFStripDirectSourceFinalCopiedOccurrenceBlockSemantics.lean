@@ -7,6 +7,7 @@ import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineCopiedDirectionSem
 import LeanTrominoes.PeriodicCNFStripDirectFigureNinePolarityRouteTailRecordData
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCompiledOccurrenceData
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCopiedOccurrenceBlockCompiler
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCycleOccurrenceBlockCompiler
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceBlockSemantics
 import LeanTrominoes.RetainedAngularFinalRouteDecidableEqIrrelevance
 
@@ -82,13 +83,14 @@ theorem directSourceFinalCompiledOccurrenceData_eq_copied_cycle
     (symbols : List encoding.Γ) :
     directSourceFinalCompiledOccurrenceData decider symbols =
       directSourceFinalCopiedOccurrenceData decider symbols ++
-        HorizontalRoutedRouteHeaderOccurrence.output
-          (directSourceFinalCycleCompiledBatchedRecords decider symbols) := by
+        directSourceFinalCycleOccurrenceData decider symbols := by
   unfold directSourceFinalCompiledOccurrenceData
     directSourceFinalCompiledRouteTailRecords
+    directSourceFinalCycleCompiledBatchedRecords
   rw [HorizontalRoutedRouteHeaderOccurrence.output_append,
     directSourceFinalFiveFamilyCompiledRecords_eq_copied,
-    ← directSourceFinalCopiedOccurrenceData_eq_canonical]
+    ← directSourceFinalCopiedOccurrenceData_eq_canonical,
+    ← directSourceFinalCycleOccurrenceData_eq_canonical]
 
 end LeanTrominoes.PeriodicCNFStripReduction
 
