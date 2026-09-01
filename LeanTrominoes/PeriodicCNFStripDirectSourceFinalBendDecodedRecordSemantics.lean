@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalBendNormalizedBlockSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalBendBatchedRecordSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalBendIndexedPresentation
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierSourceInput
 import LeanTrominoes.RetainedAngularFanFinalBendDecodedRecordSemantics
@@ -133,6 +134,23 @@ theorem directSourceFinalBendSourceClauseRecords_eq_decodedRecords
     derivedEquality directSourceFinalOriginalVariableDecidableEq
   change statement directSourceFinalOriginalVariableDecidableEq
   exact equalityIrrel ▸ derived
+
+/-- The existing batched semantic input therefore equals the decoding of the
+declarative normalized bend blocks. -/
+theorem directSourceFinalBendBatchedSemanticRecords_eq_decodedRecords
+    (symbols : List encoding.Γ) :
+    HorizontalRoutedRouteTailRecord.batchedRecords
+        (retainedFinalNormalizedClauseSemanticRouteTailRecordTokens
+          (directSourceFormula decider symbols)
+          (directSourceFinalBendStart decider symbols)
+          (directSourceFinalBendClauses decider symbols)) =
+      BinaryRouteTailRecordClockwiseRelabel.decodedRecords
+        (directSourceFinalBendNormalizedFallbackRecordBlocks
+          decider symbols) :=
+  (directSourceFinalBendBatchedSemanticRecords_eq_sourceClauseRecords
+    decider symbols).trans
+      (directSourceFinalBendSourceClauseRecords_eq_decodedRecords
+        decider symbols)
 
 end LeanTrominoes.PeriodicCNFStripReduction
 

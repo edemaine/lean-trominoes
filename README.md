@@ -12674,6 +12674,15 @@ The representation choices for this target are:
   defines the matching normalized four-route target for every retained bend:
   each factor-1152 source prefix is followed by its canonical normalized
   ordinary-fan suffix, with the existing binary record profiles unchanged.
+- The final-bend record modules now connect that target back to the indexed
+  direct-source geometry.  Their
+  [`decoded semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendDecodedRecordSemantics.lean)
+  identify every normalized block with the corresponding semantic source
+  clauses, while
+  [`compiled batching`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBendCompiledBatchedRecordSemantics.lean)
+  composes normalized formatting, clockwise source-slot relabeling, and
+  routed-record expansion into a verified polynomial-time emitter for the
+  exact direct bend-family semantic records.
 
 ## Build
 
