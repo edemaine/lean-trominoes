@@ -2575,6 +2575,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile three fan query keys per final occurrence,
                   repeating the last active rank in each inactive finite fan
                   slot exactly as the semantic fan builder does.
+                - [x] Identify numeric-code ranks and multiplicities with the
+                  compiled length-word versions, then prove every compiled
+                  fan query key occurs in the candidate-key column.
                 - [x] Use those keys to select and decode exactly three finite
                   connector-kind, polarity, and first-direction records per
                   final occurrence.
@@ -13003,6 +13006,16 @@ The representation choices for this target are:
   prove that every rank strictly below a value's multiplicity appears in the
   `3 * value + rank` key column.  This supplies the finite keyed lookup with a
   witness for every active fan slot.
+- The
+  [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
+  transfer stable ranks, multiplicities, candidate keys, and bounded fan
+  counts from injective length words back to the numeric identity column.
+  Generic
+  [`fan rank-key coverage`](LeanTrominoes/FinalFanQueryRankKeyCoverage.lean)
+  and its
+  [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFanQueryKeySemantics.lean)
+  then prove that every one of the three compiled fan queries has a matching
+  occurrence candidate.
 - [`LeanTrominoes/UnaryFieldFixedCopiesCompiler.lean`](LeanTrominoes/UnaryFieldFixedCopiesCompiler.lean)
   supplies fixed repetition of complete delimiter-terminated unary fields.
   The
@@ -13026,8 +13039,9 @@ The representation choices for this target are:
   repeats each finite count predecessor three times, adds it as the decoded
   slot of each selected occurrence record, and invokes the triple assembler.
   It emits exactly one finite fan record per final routed occurrence in
-  polynomial time; the remaining semantic bridge must identify the keyed
-  selections with the corresponding final variables.
+  polynomial time; query coverage is established, and the remaining semantic
+  bridge must identify the selected values with the corresponding final
+  variables.
 
 ## Build
 

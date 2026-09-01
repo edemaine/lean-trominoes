@@ -28,6 +28,22 @@ theorem ranks_getElem? (values : List Value) (index : Nat) :
   rw [ranks_eq_map_zipIdx, List.getElem?_map, List.getElem?_zipIdx]
   simp [Function.comp_def]
 
+/-- Injectively relabeling values preserves every stable occurrence rank. -/
+theorem ranks_map_injective
+    {Target : Type*} [DecidableEq Target]
+    (values : List Value) (relabel : Value → Target)
+    (injective : Function.Injective relabel) :
+    ranks (values.map relabel) = ranks values := by
+  apply List.ext_getElem?
+  intro index
+  rw [ranks_getElem?, ranks_getElem?, List.getElem?_map]
+  cases valueAt : values[index]? with
+  | none => simp
+  | some value =>
+      simp only [Option.map_some]
+      rw [← List.map_take,
+        List.count_map_of_injective _ relabel injective value]
+
 private theorem count_take_findIdxNth
     (values : List Value) (value : Value) (rank : Nat)
     (rankLt : rank < values.count value) :
