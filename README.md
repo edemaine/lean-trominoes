@@ -2729,6 +2729,12 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Expose that compiled column as explicit per-occurrence
                   selector blocks supplied with their current, cyclic-next,
                   and parent identities.
+                - [x] Exhaustively verify every active finite variable-fan
+                  selector block: two cycle references, paired private
+                  variable references, and one RGB parent-terminal reference.
+                - [x] Prove generically that assembling consecutive triples
+                  whose count predecessor is repeated three times recovers
+                  the original fan-count column.
                 - [x] Compile descriptor-indexed clause-core incidence codes
                   from the finite colored internal/top/left/right reference
                   table, with exact direction-query length alignment.
