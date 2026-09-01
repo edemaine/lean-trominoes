@@ -75,4 +75,27 @@ theorem expected_lookup_eq_broadcastValues
     expectedAux_lookup_eq_broadcastValues blockLength default []
       source values lengthEq positive
 
+/-- Broadcasting over a repeated copy of one source item is ordinary
+flat-mapping of its constant-sized value blocks. -/
+theorem broadcastValues_replicate
+    {Source Value : Type*} (blockLength : Source → Nat)
+    (item : Source) (values : List Value) :
+    broadcastValues blockLength
+        (List.replicate values.length item) values =
+      values.flatMap fun value =>
+        List.replicate (blockLength item) value := by
+  induction values with
+  | nil => rfl
+  | cons value values induction =>
+      rw [show List.replicate (value :: values).length item =
+          item :: List.replicate values.length item by
+        simp [List.replicate_succ]]
+      change List.replicate (blockLength item) value ++
+          broadcastValues blockLength
+            (List.replicate values.length item) values =
+        List.replicate (blockLength item) value ++
+          values.flatMap fun later =>
+            List.replicate (blockLength item) later
+      rw [induction]
+
 end LeanTrominoes.FiniteBlockIndices
