@@ -13461,6 +13461,13 @@ The representation choices for this target are:
   its global routed-incidence key, preparing keyed insertion into the full
   incidence stream.
 - The
+  [`sparse suffix block semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceSuffixBlockSemantics.lean)
+  prove that those routed candidates, together with one default delimiter at
+  every full variable-incidence key, serialize as exactly one complete suffix
+  body per incidence.  Thus missing routes contribute an empty block while
+  matching routed occurrences contribute their entire direction body without
+  losing the block boundary.
+- The
   [`direct counted-contraction plan semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCountedContractionPlanSemantics.lean)
   specialize the generic contraction laws to the compiled final source.
   They identify its query stream as the canonical element-major two- or

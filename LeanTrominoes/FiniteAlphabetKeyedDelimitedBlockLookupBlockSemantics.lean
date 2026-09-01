@@ -162,7 +162,7 @@ private theorem zip_replicate_length
   | cons token tokens induction =>
       simp [List.replicate_succ, induction]
 
-private theorem broadcastKeys_blocks_zip
+theorem broadcastKeys_blocks_zip
     [Fintype Alphabet]
     (blockKeys : List Nat) (bodies : List (List Alphabet))
     (aligned : bodies.length = blockKeys.length) :
