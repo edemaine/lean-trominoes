@@ -2575,6 +2575,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Use those keys to select and decode exactly three finite
                   connector-kind, polarity, and first-direction records per
                   final occurrence.
+                - [x] Assemble consecutive decoded occurrence triples into
+                  finite `VariableRibbonFanData` records with exact slotwise
+                  field projections.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -13002,6 +13005,11 @@ The representation choices for this target are:
   codes per final occurrence through keyed lookup, and decodes their connector
   kinds, polarities, and first directions.  The decoded stream has exact
   length `3N`, including the established inactive-slot fallback copies.
+- [`LeanTrominoes/FinalFanDataTripleAssembler.lean`](LeanTrominoes/FinalFanDataTripleAssembler.lean)
+  is a finite-state consecutive-triple grouper.  It recovers the fan count
+  predecessor stored in the first decoded slot and constructs one
+  `VariableRibbonFanData` whose kind, polarity, and direction functions are
+  exactly the three selected occurrence records.
 
 ## Build
 
