@@ -13197,9 +13197,11 @@ The representation choices for this target are:
   repeats each finite count predecessor three times, adds it as the decoded
   slot of each selected occurrence record, and invokes the triple assembler.
   It emits exactly one finite fan record per final routed occurrence in
-  polynomial time; query coverage is established, and the remaining semantic
-  bridge must identify the selected values with the corresponding final
-  variables.
+  polynomial time.  Its
+  [`semantic normal form`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableFanDataSemantics.lean)
+  proves that count-slot addition and finite decoding recover the exact
+  uniquely keyed occurrence records and original count predecessor before
+  consecutive triples are assembled.
 
 ## Build
 
