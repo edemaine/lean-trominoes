@@ -2584,6 +2584,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove generically that stable base-three occurrence
                   keys are duplicate-free whenever every identity occurs at
                   most three times.
+                - [x] Prove generically that advancing every such key to the
+                  cyclic successor rank permutes the complete stable-key
+                  column.
                 - [x] Prove from the fixed Figure 9 and polarity tables that
                   every parent-local final atom occurs at most three times
                   within its globally scoped parent-clause block.
