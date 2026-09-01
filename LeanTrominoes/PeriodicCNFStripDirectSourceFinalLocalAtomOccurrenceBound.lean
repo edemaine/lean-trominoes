@@ -125,6 +125,64 @@ theorem directSourceFinalSelectedLocalAtomCodes_count_le_three
     HorizontalRoutedRouteHeaderGlobalLocalAtomCode.selectedLocalCodes_codes_count_le_three
       (directSourceFinalClauseDescriptors decider symbols) target
 
+private theorem booleanSelected_map
+    {Value Output : Type} (mapValue : Value → Output)
+    (controls : List Bool) (values : List Value) :
+    DelimitedBinaryWordBooleanFilter.selected controls
+        (values.map mapValue) =
+      (DelimitedBinaryWordBooleanFilter.selected controls values).map
+        mapValue := by
+  induction controls generalizing values with
+  | nil => rfl
+  | cons active controls induction =>
+      cases values with
+      | nil => rfl
+      | cons value values =>
+          cases active <;>
+            simp [DelimitedBinaryWordBooleanFilter.selected, induction]
+
+/-- The selected odd local identities are the selected base local codes
+under the final injective namespace map `code ↦ 2 * code + 1`. -/
+theorem directSourceFinalSelectedOddLocalAtomCodes_eq_map
+    (symbols : List encoding.Γ) :
+    DelimitedBinaryWordBooleanFilter.selected
+        (directSourceFinalAtomScopeBits decider symbols)
+        (directSourceFinalOddLocalAtomCodes decider symbols) =
+      (DelimitedBinaryWordBooleanFilter.selected
+        (directSourceFinalAtomScopeBits decider symbols)
+        (directSourceFinalLocalAtomCodes decider symbols)).map
+          fun code => code * 2 + 1 := by
+  rw [directSourceFinalOddLocalAtomCodes_eq_map]
+  exact booleanSelected_map _ _ _
+
+private theorem oddLocalCode_injective :
+    Function.Injective (fun code : Nat => code * 2 + 1) := by
+  intro first second equality
+  have products : first * 2 = second * 2 :=
+    Nat.add_right_cancel equality
+  apply Nat.mul_left_cancel (by omega : 0 < 2)
+  simpa [Nat.mul_comm] using products
+
+/-- Consequently every odd identity in the selected local namespace still
+occurs at most three times. -/
+theorem directSourceFinalSelectedOddLocalAtomCodes_count_le_three
+    (symbols : List encoding.Γ) (target : Nat) :
+    (DelimitedBinaryWordBooleanFilter.selected
+      (directSourceFinalAtomScopeBits decider symbols)
+      (directSourceFinalOddLocalAtomCodes decider symbols)).count target <= 3 := by
+  rw [directSourceFinalSelectedOddLocalAtomCodes_eq_map]
+  by_cases member : target ∈
+      (DelimitedBinaryWordBooleanFilter.selected
+        (directSourceFinalAtomScopeBits decider symbols)
+        (directSourceFinalLocalAtomCodes decider symbols)).map
+          fun code => code * 2 + 1
+  · rcases List.mem_map.mp member with ⟨code, codeMember, rfl⟩
+    rw [List.count_map_of_injective _ _ oddLocalCode_injective code]
+    exact directSourceFinalSelectedLocalAtomCodes_count_le_three
+      decider symbols code
+  · rw [List.count_eq_zero_of_not_mem member]
+    omega
+
 end PeriodicCNFStripReduction
 end LeanTrominoes
 

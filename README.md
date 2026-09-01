@@ -2594,6 +2594,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove presentation-relative slot remapping preserves
                   the compiled scope bits, and specialize the selected local
                   bound to the complete direct final occurrence stream.
+                - [x] Transfer the selected direct local bound through the
+                  injective odd-namespace map `code ↦ 2 * code + 1`.
                 - [x] Prove that keyed lookup over any duplicate-free aligned
                   candidate column returns the value at the queried key's
                   unique presentation index.
@@ -13054,7 +13056,8 @@ The representation choices for this target are:
   [`direct final specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalLocalAtomOccurrenceBound.lean)
   proves that presentation-relative inherited-slot remapping leaves the
   scope bit unchanged.  Thus the actual final Boolean scope column selects
-  precisely those bounded local codes over the complete descriptor stream.
+  precisely those bounded local codes over the complete descriptor stream;
+  its injective odd-namespace map preserves the same multiplicity bound.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
