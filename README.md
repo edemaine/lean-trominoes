@@ -13246,7 +13246,15 @@ The representation choices for this target are:
   and its
   [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFanQueryKeySemantics.lean)
   then prove that every one of the three compiled fan queries has a matching
-  occurrence candidate.
+  occurrence candidate.  The stronger generic
+  [`fan rank-key permutation theorem`](LeanTrominoes/FinalFanQueryRankKeyPermutation.lean)
+  proves that, under the multiplicity-three promise, stable deduplication of
+  those active-or-fallback queries covers every candidate key exactly once.
+  Its
+  [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalUniqueFanQueryKeyPermutation.lean)
+  therefore identifies the variable-major distinct fan keys as a permutation
+  of the complete clause-major final occurrence-key column: regrouping loses
+  and duplicates no genuine occurrence.
 - [`LeanTrominoes/UnaryFieldFixedCopiesCompiler.lean`](LeanTrominoes/UnaryFieldFixedCopiesCompiler.lean)
   supplies fixed repetition of complete delimiter-terminated unary fields.
   The
