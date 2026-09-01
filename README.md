@@ -2558,6 +2558,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Convert those unary ranks through a verified three-state
                   saturating counter to the finite first/second/third
                   occurrence-slot alphabet.
+                - [x] Prove every bounded stable-rank slot is active for its
+                  at-most-three occurrence group, align that bound with the
+                  compiled fan count, and preserve it through regrouping.
                 - [x] Count the total multiplicity of every final global atom
                   identity and repeat that unary group size at each aligned
                   occurrence.
