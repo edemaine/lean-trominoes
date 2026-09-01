@@ -14,6 +14,35 @@ namespace HorizontalRoutedRouteHeaderPresentationAtomScope
 open PeriodicCNF.FormulaShapeDirectionOrdering
 open HorizontalRoutedRouteHeader
 
+/-- Represented parent-relative atoms at the parent-local positions of one
+final routed block. -/
+def parentLocalAtoms (profile : DirectedClauseProfile) :
+    List ParentRelativeAtom :=
+  (clauseBlock profile).filterMap fun scope =>
+    match scope with
+    | .inherited _ => none
+    | .parentLocal control => some control.representedAtom
+
+/-- As above, the checker scans only atoms that occur in its finite block. -/
+private theorem parentLocalAtoms_count_check
+    (profile : DirectedClauseProfile) :
+    (parentLocalAtoms profile).all fun atom =>
+      decide ((parentLocalAtoms profile).count atom <= 3) := by
+  cases profile <;> native_decide +revert
+
+/-- Quotienting the several descriptors that can represent the same local
+atom still leaves multiplicity at most three. -/
+theorem parentLocalAtoms_count_le_three
+    (profile : DirectedClauseProfile) (atom : ParentRelativeAtom) :
+    (parentLocalAtoms profile).count atom <= 3 := by
+  by_cases member : atom ∈ parentLocalAtoms profile
+  · have checked :=
+      (List.all_eq_true.mp (parentLocalAtoms_count_check profile))
+        atom member
+    simpa only [decide_eq_true_eq] using checked
+  · rw [List.count_eq_zero_of_not_mem member]
+    omega
+
 /-- The finite checker only scans controls that actually occur in the
 selected block.  This avoids enumerating the much larger ambient descriptor
 alphabet. -/
