@@ -13319,6 +13319,13 @@ The representation choices for this target are:
   direction block in identity-major, stable-rank-minor, color-minor order;
   its semantics prove the exact block ordinals and query-major token
   selection.
+- The
+  [`grouped routed-incidence key compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceKeyCompiler.lean)
+  maps each grouped finite occurrence to width three or seven, prefix-sums
+  those widths to global variable-triple starts, and adds the finite routed
+  RGB offsets.  It emits the three global `3 * tripleIndex + color` keys per
+  occurrence in polynomial time; its semantics reduce the implementation to
+  exact pointwise addition of the global bases and local table offsets.
 
 ## Build
 
