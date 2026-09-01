@@ -12868,6 +12868,15 @@ The representation choices for this target are:
   [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCycleInheritedAtomIdentitySemantics.lean)
   give the exact pointwise lookup column.
 - The
+  [`cycle ring-slot compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCycleRingVertexSlotCompiler.lean)
+  assigns the existing east-first slots `0…7` to the eight port copies and
+  slot `8` to the separator, following the presentation-relative inherited
+  literal of every expanded cycle occurrence.  The
+  [`cycle inherited ring-code compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCycleInheritedRingAtomCodeCompiler.lean)
+  pairs these slots with the broadcast identities in base nine, and the
+  [`complete inherited-code compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalInheritedRingAtomCodeCompiler.lean)
+  appends them to the copied prefix in exact final occurrence order.
+- The
   [`copied source-position compiler`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedSourcePositionCompiler.lean)
   prefix-sums one bounded source advance per expanded copied-clause block and
   adds its presentation-relative inherited slot.  Its
