@@ -2572,6 +2572,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile three fan query keys per final occurrence,
                   repeating the last active rank in each inactive finite fan
                   slot exactly as the semantic fan builder does.
+                - [x] Use those keys to select and decode exactly three finite
+                  connector-kind, polarity, and first-direction records per
+                  final occurrence.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -12993,6 +12996,12 @@ The representation choices for this target are:
   uses it to repeat each global identity base three times, pairs those bases
   with rank blocks `[0,0,0]`, `[0,1,1]`, or `[0,1,2]` according to the fan
   count, and emits exactly three composite lookup keys per final occurrence.
+- The
+  [`final fan occurrence-data compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFanOccurrenceDataCompiler.lean)
+  packs every finite occurrence record into a unary role code, selects three
+  codes per final occurrence through keyed lookup, and decodes their connector
+  kinds, polarities, and first directions.  The decoded stream has exact
+  length `3N`, including the established inactive-slot fallback copies.
 
 ## Build
 
