@@ -12,6 +12,16 @@ noncomputable section
 
 namespace LeanTrominoes.PeriodicCNFStripReduction
 
+/-- Flattening pointwise singleton blocks is ordinary mapping. -/
+private theorem flatMap_singletons_eq_map {Source Target : Type*}
+    (value : Source → Target) (source : List Source) :
+    source.flatMap (fun item => [value item]) = source.map value := by
+  induction source with
+  | nil => rfl
+  | cons item source induction =>
+      simp only [List.flatMap_cons, List.map_cons,
+        List.singleton_append, induction]
+
 /-- Packing preserves the finite base index and structural tag. -/
 @[simp] theorem variableIncidenceElementSelector_val
     (base : VariableIncidenceElementBase) (tag : Fin 32) :
@@ -53,11 +63,27 @@ incidence query. -/
       selectors.length := by
   simp [directSourceFinalVariableIncidenceNextControls]
 
+/-- Singleton block expansion is the ordinary pointwise next-base map. -/
+theorem directSourceFinalVariableIncidenceNextControls_eq_map
+    (selectors : List VariableIncidenceElementSelector) :
+    directSourceFinalVariableIncidenceNextControls selectors =
+      selectors.map VariableIncidenceElementSelector.usesNext := by
+  exact flatMap_singletons_eq_map
+    VariableIncidenceElementSelector.usesNext selectors
+
 @[simp] theorem directSourceFinalVariableIncidenceParentControls_length
     (selectors : List VariableIncidenceElementSelector) :
     (directSourceFinalVariableIncidenceParentControls selectors).length =
       selectors.length := by
   simp [directSourceFinalVariableIncidenceParentControls]
+
+/-- Singleton block expansion is the ordinary pointwise parent-base map. -/
+theorem directSourceFinalVariableIncidenceParentControls_eq_map
+    (selectors : List VariableIncidenceElementSelector) :
+    directSourceFinalVariableIncidenceParentControls selectors =
+      selectors.map VariableIncidenceElementSelector.usesParent := by
+  exact flatMap_singletons_eq_map
+    VariableIncidenceElementSelector.usesParent selectors
 
 @[simp] theorem directSourceFinalVariableIncidenceTags_length
     (selectors : List VariableIncidenceElementSelector) :
