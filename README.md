@@ -13477,6 +13477,12 @@ The representation choices for this target are:
   delimiter-derived token indices.  Indexed reordering is therefore the
   consecutive-key special case of complete block selection, which applies
   directly to the variable-major colored occurrence-direction stream.
+- The
+  [`Figure 9 route-tail pair semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteTailPairs.lean)
+  expose the recursive final route-record source as serialization of an
+  explicit list of header/tail pairs.  Projecting occurrence metadata from
+  that stream is therefore ordinary mapping over the same pair list, ready
+  for complete-block reasoning about the compiled routed requests.
 
 ## Build
 
