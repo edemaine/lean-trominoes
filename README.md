@@ -13319,7 +13319,11 @@ The representation choices for this target are:
   [`grouped fan/slot compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableFanSlotCompiler.lean)
   combines those aligned columns through bounded unary role/slot codes; its
   semantics prove that decoding recovers the exact pointwise fan record and
-  active occurrence slot.
+  active occurrence slot.  The
+  [`grouped variable-incidence prefix compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidencePrefixCompiler.lean)
+  expands each pair to its three- or seven-triple local module in stable
+  triple-major, RGB-minor order and compiles every finite table query to one
+  independently delimited direction block.
 - The
   [`grouped occurrence-index compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexCompiler.lean)
   recovers each grouped key's original clause-major position.  A generic
