@@ -2578,6 +2578,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Assemble consecutive decoded occurrence triples into
                   finite `VariableRibbonFanData` records with exact slotwise
                   field projections.
+                - [x] Compose repeated fan counts, decoded selected records,
+                  and triple assembly into one polynomial-time finite fan
+                  record per final occurrence.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -13010,6 +13013,13 @@ The representation choices for this target are:
   predecessor stored in the first decoded slot and constructs one
   `VariableRibbonFanData` whose kind, polarity, and direction functions are
   exactly the three selected occurrence records.
+- The
+  [`direct final variable-fan compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableFanDataCompiler.lean)
+  repeats each finite count predecessor three times, adds it as the decoded
+  slot of each selected occurrence record, and invokes the triple assembler.
+  It emits exactly one finite fan record per final routed occurrence in
+  polynomial time; the remaining semantic bridge must identify the keyed
+  selections with the corresponding final variables.
 
 ## Build
 

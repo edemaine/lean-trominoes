@@ -161,6 +161,40 @@ def output (pairs : List Pair) : List FanData :=
     output pairs = grouped pairs := by
   simp [output, FiniteStateTransducer.output, scan_empty, finish]
 
+theorem grouped_length_of_length_eq (pairs : List Pair) (count : Nat)
+    (lengthEq : pairs.length = 3 * count) :
+    (grouped pairs).length = count := by
+  induction count generalizing pairs with
+  | zero =>
+      have pairsNil : pairs = [] :=
+        List.eq_nil_of_length_eq_zero (by omega)
+      subst pairs
+      rfl
+  | succ count induction =>
+      cases pairs with
+      | nil => simp at lengthEq
+      | cons first pairs =>
+          cases pairs with
+          | nil =>
+              simp only [List.length_cons, List.length_nil] at lengthEq
+              omega
+          | cons second pairs =>
+              cases pairs with
+              | nil =>
+                  simp only [List.length_cons, List.length_nil] at lengthEq
+                  omega
+              | cons third remaining =>
+                  rw [grouped, List.length_cons]
+                  rw [induction remaining (by
+                    simp only [List.length_cons] at lengthEq
+                    omega)]
+
+theorem output_length_of_length_eq (pairs : List Pair) (count : Nat)
+    (lengthEq : pairs.length = 3 * count) :
+    (output pairs).length = count := by
+  rw [output_eq_grouped]
+  exact grouped_length_of_length_eq pairs count lengthEq
+
 /-- Consecutive finite occurrence triples assemble into finite fan records in
 linear time. -/
 noncomputable def computableInPolyTime :
