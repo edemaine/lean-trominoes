@@ -2602,6 +2602,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Lift inherited position uniqueness through total
                   source lookup, preserving any duplicate-free pre-Figure9
                   candidate column.
+                - [x] Prove semantically that global `(atom, stable terminal
+                  rank)` pairs are duplicate-free in every occurrence
+                  presentation.
                 - [x] Prove that keyed lookup over any duplicate-free aligned
                   candidate column returns the value at the queried key's
                   unique presentation index.
@@ -13071,6 +13074,10 @@ The representation choices for this target are:
   compiler using disjoint parent-clause intervals.  Their lookup theorem
   then preserves duplicate-freedom of any aligned pre-Figure9 candidate
   column.
+- The generic
+  [`global stable atom/rank uniqueness theorem`](LeanTrominoes/RetainedAngularOccurrenceGlobalStableRankPairNodup.lean)
+  proves that stable terminal ranking is injective inside each semantic atom
+  fiber, so the complete `(atom, rank)` presentation is duplicate-free.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
