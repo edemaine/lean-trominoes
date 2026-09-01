@@ -13157,6 +13157,11 @@ The representation choices for this target are:
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
   counts from injective length words back to the numeric identity column.
+  The
+  [`candidate-key uniqueness theorem`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceCandidateKeyNodup.lean)
+  combines the final multiplicity-three bound with stable-rank injectivity,
+  proving that every compiled base-three occurrence key has one presentation
+  position.
   Generic
   [`fan rank-key coverage`](LeanTrominoes/FinalFanQueryRankKeyCoverage.lean)
   and its
@@ -13176,6 +13181,12 @@ The representation choices for this target are:
   codes per final occurrence through keyed lookup, and decodes their connector
   kinds, polarities, and first directions.  The decoded stream has exact
   length `3N`, including the established inactive-slot fallback copies.
+- Its
+  [`lookup semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFanOccurrenceDataSemantics.lean)
+  use candidate-key uniqueness and query coverage to identify every selected
+  unary code with the occurrence record at the query key's unique candidate
+  position.  Decoding therefore returns exactly those three uniquely keyed
+  final occurrence records.
 - [`LeanTrominoes/FinalFanDataTripleAssembler.lean`](LeanTrominoes/FinalFanDataTripleAssembler.lean)
   is a finite-state consecutive-triple grouper.  It recovers the fan count
   predecessor stored in the first decoded slot and constructs one
