@@ -12800,6 +12800,13 @@ The representation choices for this target are:
   [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedParentIndexCompiler.lean)
   is aligned with the direct copied occurrence stream and emits unary fields
   in polynomial time.
+- [`LeanTrominoes/UnaryFieldConstantScaleCompiler.lean`](LeanTrominoes/UnaryFieldConstantScaleCompiler.lean)
+  supplies fixed-factor unary-field multiplication.  The
+  [`copied local-atom code compiler`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedLocalAtomCodeCompiler.lean)
+  uses it to combine each parent index with the canonical finite local atom
+  quotient, proves equality of these numeric codes is exactly equality of
+  parent and represented atom, and compiles the aligned direct-source column
+  in polynomial time.
 
 ## Build
 
