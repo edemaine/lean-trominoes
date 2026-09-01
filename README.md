@@ -2588,6 +2588,9 @@ build; an imported proof counts when its statement matches the paper.
                   proving that globally unique parent indices and the
                   compiler's injective numeric local code preserve the
                   at-most-three multiplicity bound.
+                - [x] Identify the actual prefix-sum local-code compiler with
+                  those explicit parent-indexed blocks, so selecting its
+                  parent-local positions inherits the same bound.
                 - [x] Prove that keyed lookup over any duplicate-free aligned
                   candidate column returns the value at the queried key's
                   unique presentation index.
@@ -13038,6 +13041,12 @@ The representation choices for this target are:
   concatenates those local quotient-code blocks with explicit parent indices,
   proves by suffix induction that blocks cannot collide, and transfers the
   resulting global bound through the compiler's injective arithmetic code.
+- The
+  [`global local-code compiler semantics`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderGlobalLocalAtomCodeSemantics.lean)
+  identify the implemented prefix-summed parent indices and aligned local
+  offsets with those explicit semantic blocks.  Selecting exactly the
+  parent-local positions of the real compiler therefore preserves the
+  at-most-three bound.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan

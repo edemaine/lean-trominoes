@@ -14,6 +14,12 @@ namespace HorizontalRoutedRouteHeaderPresentationAtomScope
 open PeriodicCNF.FormulaShapeDirectionOrdering
 open HorizontalRoutedRouteHeader
 
+/-- Every genuine clause descriptor expands to a nonempty final occurrence
+block, so the parent-index prefix sum advances exactly once per clause. -/
+theorem clauseBlock_length_pos (profile : DirectedClauseProfile) :
+    0 < (clauseBlock profile).length := by
+  cases profile <;> native_decide +revert
+
 /-- Represented parent-relative atoms at the parent-local positions of one
 final routed block. -/
 def parentLocalAtoms (profile : DirectedClauseProfile) :
