@@ -35,6 +35,46 @@ def directSourceFinalPreFigureNineInheritedRingAtomCodes
     decider symbols).map fun pair =>
       inheritedRingAtomCode pair.1 pair.2
 
+private theorem map_zipWith_mk
+    {First Second Output : Type*}
+    (mapPair : First × Second → Output)
+    (first : List First) (second : List Second) :
+    (List.zipWith Prod.mk first second).map mapPair =
+      List.zipWith (fun left right => mapPair (left, right)) first second := by
+  induction first generalizing second with
+  | nil => rfl
+  | cons value values induction =>
+      cases second with
+      | nil => rfl
+      | cons other others => simp [induction]
+
+/-- The candidate code list is exactly the pointwise base-nine zip of the
+compact identity and bounded terminal-slot compiler columns. -/
+theorem directSourceFinalPreFigureNineInheritedRingAtomCodes_eq_zipWith
+    (symbols : List encoding.Γ) :
+    directSourceFinalPreFigureNineInheritedRingAtomCodes decider symbols =
+      List.zipWith inheritedRingAtomCode
+        (directSourceFinalCompactOccurrenceAtomIdentityIndices decider symbols)
+        (directSourceFinalTerminalSlotValues decider symbols) := by
+  unfold directSourceFinalPreFigureNineInheritedRingAtomCodes
+    directSourceFinalPreFigureNineInheritedAtomPairs
+  exact map_zipWith_mk _ _ _
+
+/-- The pre-Figure9 candidate code list has exactly the source arity consumed
+by copied Figure 9 blocks. -/
+theorem directSourceFinalPreFigureNineInheritedRingAtomCodes_length_eq_total
+    (symbols : List encoding.Γ) :
+    (directSourceFinalPreFigureNineInheritedRingAtomCodes
+      decider symbols).length =
+      HorizontalRoutedRouteHeaderCopiedSourcePosition.totalSourceWordCount
+        (directRetainedFigureNineCopiedClauseDescriptors
+          decider symbols) := by
+  rw [directSourceFinalPreFigureNineInheritedRingAtomCodes_eq_zipWith,
+    List.length_zipWith,
+    directSourceFinalCompactOccurrenceAtomIdentityIndices_length_eq_total,
+    directSourceFinalTerminalSlotValues_length_eq_total]
+  exact Nat.min_self _
+
 /-- Every semantic bounded stable slot lies below the nine-vertex ring base. -/
 private theorem retainedOccurrenceGlobalBoundedStableAtomRankPairs_slot_lt
     {Atom : Type*} [DecidableEq Atom]

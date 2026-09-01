@@ -13108,6 +13108,12 @@ The representation choices for this target are:
   duplicate-free pairs injectively.  Thus the complete pre-Figure9 inherited
   ring-code candidate column is duplicate-free.
 - The
+  [`copied inherited-code uniqueness theorem`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedInheritedRingAtomCodeNodup.lean)
+  proves common source-position lookup commutes with pointwise base-nine
+  pairing.  The actual copied ring-code column is therefore selection from
+  that candidate column, and its inherited-scope subsequence is
+  duplicate-free.
+- The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
   counts from injective length words back to the numeric identity column.
