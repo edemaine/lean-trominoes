@@ -13352,7 +13352,11 @@ The representation choices for this target are:
   [`canonical incidence-direction compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalIncidenceDirectionCompiler.lean)
   appends the complete grouped variable family and this clause family in the
   planar 3DM presentation's stable incidence order, yielding the full direct
-  end-delimited route stream in polynomial time.
+  end-delimited route stream in polynomial time.  Its parallel
+  [`canonical incidence-key compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalIncidenceKeyCompiler.lean)
+  emits exactly the consecutive range of the same complete variable-prefix/
+  clause-suffix query count, so every candidate block has its stable global
+  `3 * tripleIndex + color` key for later contraction-order lookup.
 - The
   [`grouped occurrence-index compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexCompiler.lean)
   recovers each grouped key's original clause-major position.  A generic
