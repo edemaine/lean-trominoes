@@ -2719,6 +2719,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile one finite current/successor/parent element
                   selector and canonical structural tag for every grouped
                   variable incidence, aligned with its direction-query block.
+                - [x] Broadcast the current occurrence key, cyclic-successor
+                  key, and parent-clause index over those exact finite
+                  incidence blocks.
                 - [x] Lift correct incidence blocks through retained and
                   reversed through edges, reducing the complete direct stream
                   to one correct compact block per stable incidence tag.
