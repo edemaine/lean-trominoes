@@ -13262,6 +13262,16 @@ The representation choices for this target are:
   time, and its
   [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceDirectionSemantics.lean)
   reduce an explicit alignment to the independent exact occurrence outputs.
+- The generic
+  [`finite-alphabet keyed selector`](LeanTrominoes/FiniteAlphabetKeyedValueLookupCompiler.lean)
+  compares arbitrary unary keys, masks its equality square to
+  query-row/candidate-column positions, and recovers the aligned finite
+  candidate tokens in polynomial time.  Its
+  [`semantics`](LeanTrominoes/FiniteAlphabetKeyedValueLookupSemantics.lean)
+  prove exact query-major selection, including repeated queries and duplicate
+  candidate keys.  This supplies the order-changing lookup needed to place
+  occurrence-major routed direction blocks into the canonical incidence
+  stream.
 
 ## Build
 
