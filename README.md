@@ -13455,6 +13455,13 @@ The representation choices for this target are:
   applies this layer to pair every grouped occurrence-direction token with
   its global routed-incidence key, preparing keyed insertion into the full
   incidence stream.
+- The
+  [`direct counted-contraction plan semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCountedContractionPlanSemantics.lean)
+  specialize the generic contraction laws to the compiled final source.
+  They identify its query stream as the canonical element-major two- or
+  three-key blocks, its role stream as degree-two through pairs or
+  degree-three retained triples, and its incidence lookup keys as the stable
+  base-three occurrence keys of the compiled incidence identities.
 
 ## Build
 
