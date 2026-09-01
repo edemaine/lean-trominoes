@@ -2584,6 +2584,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove from the fixed Figure 9 and polarity tables that
                   every parent-local final atom occurs at most three times
                   within its globally scoped parent-clause block.
+                - [x] Lift the local bound over arbitrary descriptor streams,
+                  proving that globally unique parent indices and the
+                  compiler's injective numeric local code preserve the
+                  at-most-three multiplicity bound.
                 - [x] Prove that keyed lookup over any duplicate-free aligned
                   candidate column returns the value at the queried key's
                   unique presentation index.
@@ -13029,6 +13033,11 @@ The representation choices for this target are:
   block and proves that every represented parent-local atom has multiplicity
   at most three.  Global parent indices then isolate these local bounds from
   one another.
+- Its
+  [`global parent-indexed lift`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderGlobalLocalOccurrenceBound.lean)
+  concatenates those local quotient-code blocks with explicit parent indices,
+  proves by suffix induction that blocks cannot collide, and transfers the
+  resulting global bound through the compiler's injective arithmetic code.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
