@@ -2617,6 +2617,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Assemble consecutive decoded occurrence triples into
                   finite `VariableRibbonFanData` records with exact slotwise
                   field projections.
+                - [x] Prove that projecting each assembled fan's finite count
+                  predecessor exactly recovers the compiled occurrence-count
+                  column.
                 - [x] Compose repeated fan counts, decoded selected records,
                   and triple assembly into one polynomial-time finite fan
                   record per final occurrence.
