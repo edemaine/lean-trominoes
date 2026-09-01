@@ -13326,6 +13326,15 @@ The representation choices for this target are:
   RGB offsets.  It emits the three global `3 * tripleIndex + color` keys per
   occurrence in polynomial time; its semantics reduce the implementation to
   exact pointwise addition of the global bases and local table offsets.
+- The generic
+  [`keyed delimited-block lookup`](LeanTrominoes/FiniteAlphabetKeyedDelimitedBlockLookupCompiler.lean)
+  broadcasts an arbitrary compiled key across every token of its aligned
+  variable-length block, including the delimiter, and selects complete blocks
+  in query order.  The
+  [`direct routed token-key compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedDirectionTokenKeyCompiler.lean)
+  applies this layer to pair every grouped occurrence-direction token with
+  its global routed-incidence key, preparing keyed insertion into the full
+  incidence stream.
 
 ## Build
 
