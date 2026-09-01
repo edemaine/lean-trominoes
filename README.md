@@ -13490,7 +13490,11 @@ The representation choices for this target are:
   [`occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceOccurrenceKeySemantics.lean)
   prove both facts from a duplicate-free element-code column and a permutation
   equating the incidence-code column with the element codes repeated by their
-  declared degrees.
+  declared degrees.  The
+  [`canonical code uniqueness proof`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementCodeNodup.lean)
+  discharges the first premise by factoring every code into a unique identity
+  and one of six disjoint finite RGB variable/clause tag ranges below the
+  common stride 32.
 - The generic
   [`keyed delimited-block semantics`](LeanTrominoes/FiniteAlphabetKeyedDelimitedBlockLookupBlockSemantics.lean)
   identify delimiter-derived token ordinals with ordinary finite-block
