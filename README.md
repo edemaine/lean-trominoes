@@ -13210,6 +13210,16 @@ The representation choices for this target are:
   [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseFrameCompiler.lean)
   composes with the complete parent-descriptor compiler and proves there is
   exactly one such finite frame per compiled final occurrence.
+- The
+  [`complete final occurrence-frame compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceFrameCompiler.lean)
+  combines each compiled variable fan, stable occurrence slot, and
+  clause-local frame into one explicit mixed-radix code, then decodes it in
+  polynomial time.  Its
+  [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceFrameSemantics.lean)
+  prove exact pointwise equality with the declarative three-column zip and
+  preserve exactly one complete frame per final routed occurrence.  The
+  reusable finite-index/slot decoder keeps the concrete product order
+  explicit instead of depending on an arbitrary finite-type enumeration.
 
 ## Build
 
