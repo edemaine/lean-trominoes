@@ -13323,7 +13323,10 @@ The representation choices for this target are:
   [`grouped variable-incidence prefix compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidencePrefixCompiler.lean)
   expands each pair to its three- or seven-triple local module in stable
   triple-major, RGB-minor order and compiles every finite table query to one
-  independently delimited direction block.
+  independently delimited direction block.  Its
+  [`consecutive incidence-key compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceKeyCompiler.lean)
+  emits exactly `0, ..., n - 1` for those blocks, giving both routed and local
+  incidences a common lookup domain for sparse suffix insertion.
 - The
   [`grouped occurrence-index compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexCompiler.lean)
   recovers each grouped key's original clause-major position.  A generic
