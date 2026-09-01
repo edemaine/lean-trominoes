@@ -12374,6 +12374,14 @@ The representation choices for this target are:
   maps the role compiler independently over incidence boundaries and composes
   it with contracted assembly.  Retained and through blocks compile to their
   exact contracted direction words, with one final route boundary per edge.
+- [`LeanTrominoes/PeriodicCNFStripKeyedContractedIncidenceCompiler.lean`](LeanTrominoes/PeriodicCNFStripKeyedContractedIncidenceCompiler.lean)
+  and [`LeanTrominoes/PeriodicCNFStripKeyedContractedIncidenceSemantics.lean`](LeanTrominoes/PeriodicCNFStripKeyedContractedIncidenceSemantics.lean)
+  select complete canonical incidence blocks by arbitrary compiled keys,
+  prepend an aligned retained/through role to each selected block, and run
+  the established contracted assembler.  The pointwise join theorem proves
+  that exact keyed selection yields exactly the requested role/direction
+  pairs with one incidence delimiter, providing the executable boundary for
+  the direct color-major contraction scan.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean),
