@@ -12710,11 +12710,13 @@ The representation choices for this target are:
   time.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceData.lean),
   its [stream compiler](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceCompiler.lean),
+  [clause semantics](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceSemantics.lean),
   and the [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCompiledOccurrenceData.lean)
   project every compiled header to the finite connector kind, output polarity,
   and header-derived first direction needed by the variable-fan frame.  The
   projection is polynomial-time and preserves the canonical Figure 9 record
-  order.
+  order; the connector and polarity projections are exactly the literal-wise
+  fields of the generated normalized and complement clauses.
 
 ## Build
 
