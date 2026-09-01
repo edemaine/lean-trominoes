@@ -2511,6 +2511,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Transport every copied inherited slot through the exact
                   stable clockwise permutation back to its pre-Figure9 clause
                   presentation position, aligned with the compact atom words.
+                - [x] Quotient parent-local controls by represented-atom
+                  equality and prove a separating final-word format from an
+                  inherited source word or parent-index/local-code pair.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
@@ -12776,6 +12779,12 @@ The representation choices for this target are:
   [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedPresentationAtomScopeCompiler.lean)
   composes this finite expansion with the exact copied descriptor compiler and
   proves one-for-one alignment with the copied occurrence-data stream.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderParentLocalAtomCode.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderParentLocalAtomCode.lean)
+  quotients finite atom controls by equality of their represented
+  parent-relative atoms and proves that the established custom comparator is
+  exactly quotient-code equality.  Its scoped binary words separate inherited
+  source words from parent-indexed local codes and characterize equality in
+  every branch.
 
 ## Build
 
