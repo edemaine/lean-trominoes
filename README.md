@@ -2555,6 +2555,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile each final occurrence's stable within-atom rank
                   from the complete global identity column, aligned one-for-
                   one with the boundary-preserving request blocks.
+                - [x] Convert those unary ranks through a verified three-state
+                  saturating counter to the finite first/second/third
+                  occurrence-slot alphabet.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -12938,6 +12941,11 @@ The representation choices for this target are:
   their equality square, and prefix-counts each row.  The result is exactly
   each occurrence's zero-based rank among earlier equal identities, with one
   unary field per final occurrence.
+- The
+  [`final occurrence-slot compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceSlotCompiler.lean)
+  runs those unary ranks through a verified three-state saturating counter.
+  It emits one first/second/third slot per final occurrence and preserves the
+  exact numeric index whenever the semantic at-most-three bound applies.
 
 ## Build
 
