@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanFinalBendIndexedOccurrence
+import LeanTrominoes.RetainedAngularFanFinalBendTaggedLiteralOccurrenceData
 import LeanTrominoes.RetainedAngularFanFinalBendTaggedBendInputLookup
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedSourceClauses
 
@@ -34,7 +35,8 @@ noncomputable def FinalBendTaggedLiteralInput.occurrence
     {literalIndex : Fin 2}
     (input : FinalBendTaggedLiteralInput source taggedBend clauseIndex
       literal literalIndex) :
-    FinalBendIndexedOccurrence Variable := by
+    FinalBendTaggedLiteralOccurrence source taggedBend clauseIndex
+      literal literalIndex := by
   let retained := PeriodicThreeSATThree.formula source
   let normalizedClause := normalizedBendClauseAt retained taggedBend
   have mappedLookup :
@@ -56,7 +58,7 @@ noncomputable def FinalBendTaggedLiteralInput.occurrence
             positionedClause.literals.zipIdx := by
         rw [mappedLookup]
         simpa only [retained, normalizedClause] using input.literalMember
-      exact
+      let occurrence : FinalBendIndexedOccurrence Variable :=
         { source := source
           sourceLocal :=
             input.bendInput.sourceInput.sourceFacts.nonemptyFacts.widthFacts.localFacts.sourceLocal
@@ -75,6 +77,13 @@ noncomputable def FinalBendTaggedLiteralInput.occurrence
           literal := literal
           literalIndex := literalIndex
           literalMember := positionedLiteralMember }
+      exact
+        { occurrence := occurrence
+          source_eq := rfl
+          taggedBend_eq := rfl
+          clauseIndex_eq := rfl
+          literal_eq := rfl
+          literalIndex_eq := rfl }
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
