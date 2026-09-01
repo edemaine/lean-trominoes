@@ -2716,6 +2716,9 @@ build; an imported proof counts when its statement matches the paper.
                   count, avoiding a dynamic list rotation.
                 - [x] Compile zero-based parent-clause indices and reorder
                   them beside the grouped variable occurrence stream.
+                - [x] Compile one finite current/successor/parent element
+                  selector and canonical structural tag for every grouped
+                  variable incidence, aligned with its direction-query block.
                 - [x] Lift correct incidence blocks through retained and
                   reversed through edges, reducing the complete direct stream
                   to one correct compact block per stable incidence tag.
