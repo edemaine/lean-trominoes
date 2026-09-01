@@ -13340,7 +13340,11 @@ The representation choices for this target are:
   [`final clause-incidence compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceDirectionCompiler.lean)
   separately expands every final parent descriptor to all nine clause-core
   triples and their RGB incidences, compiling the resulting 27 exact finite
-  direction blocks in stable clause-major order.
+  direction blocks in stable clause-major order.  The
+  [`canonical incidence-direction compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalIncidenceDirectionCompiler.lean)
+  appends the complete grouped variable family and this clause family in the
+  planar 3DM presentation's stable incidence order, yielding the full direct
+  end-delimited route stream in polynomial time.
 - The
   [`grouped occurrence-index compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexCompiler.lean)
   recovers each grouped key's original clause-major position.  A generic
