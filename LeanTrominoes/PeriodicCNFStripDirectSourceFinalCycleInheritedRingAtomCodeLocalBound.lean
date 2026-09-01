@@ -37,4 +37,11 @@ theorem directSourceFinalLocalCycleSelectedInheritedRingVertexSlot_count_eq_two 
         slot.val = 2 := by
   native_decide
 
+/-- Every selected local value is a genuine slot in the base-nine ring
+namespace. -/
+theorem directSourceFinalLocalCycleSelectedInheritedRingVertexSlotValues_forall_lt :
+    directSourceFinalLocalCycleSelectedInheritedRingVertexSlotValues.Forall
+      fun slot => slot < fixedEightRingVertexCount := by
+  native_decide
+
 end LeanTrominoes.PeriodicCNFStripReduction

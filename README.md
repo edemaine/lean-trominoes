@@ -13135,6 +13135,11 @@ The representation choices for this target are:
   tables.  After inherited-position selection, the compiled cycle codes are
   exactly one mapped copy of the twice-per-slot local table for each distinct
   source identity.
+- Their
+  [`global cycle occurrence bound`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCycleInheritedRingAtomCodeOccurrenceBound.lean)
+  uses base-nine separation and distinct source identities to keep different
+  variable blocks disjoint.  Hence every selected inherited ring code occurs
+  at most twice in the entire implication-cycle suffix.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
