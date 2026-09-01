@@ -2563,6 +2563,9 @@ build; an imported proof counts when its statement matches the paper.
                   occurrence.
                 - [x] Convert each positive group size through a verified
                   four-state counter to the fan's finite `countPred` field.
+                - [x] Compile repeated keyed unary lookup, so composite
+                  atom-identity/slot queries can select aligned finite fan
+                  fields from the complete occurrence column.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -12963,6 +12966,14 @@ The representation choices for this target are:
   the finite `Fin 3` field used by variable-fan records.  On every positive
   multiplicity at most three, the emitted predecessor plus one is exactly the
   original group size.
+- The generic
+  [`keyed unary-value compiler`](LeanTrominoes/UnaryKeyedValueLookupCompiler.lean)
+  combines repeated numeric query keys with arbitrary aligned candidate
+  key/value columns, forms and filters their equality square, and performs
+  last-true lookup in polynomial time.  Its
+  [semantics](LeanTrominoes/UnaryKeyedValueLookupSemantics.lean) remove the
+  zero-valued query prefix and prove exact mapped-value selection whenever a
+  query key is present.
 
 ## Build
 
