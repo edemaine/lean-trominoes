@@ -13141,6 +13141,11 @@ The representation choices for this target are:
   variable blocks disjoint.  Hence every selected inherited ring code occurs
   at most twice in the entire implication-cycle suffix.
 - The
+  [`complete inherited-code occurrence bound`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalInheritedRingAtomCodeOccurrenceBound.lean)
+  aligns the full presentation scope stream with the copied-plus-cycle split.
+  Combining the copied bound of one with the cycle bound of two gives at most
+  three occurrences, preserved by the final even-namespace map.
+- The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
   counts from injective length words back to the numeric identity column.
