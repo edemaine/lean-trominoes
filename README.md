@@ -12793,6 +12793,13 @@ The representation choices for this target are:
   [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedScopedAtomWordData.lean)
   proves exact source-column exhaustion and one output word per copied final
   occurrence.
+- The
+  [`copied parent-index compiler`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedParentIndexCompiler.lean)
+  marks the end of every finite occurrence block and prefix-sums those marks,
+  yielding the exact zero-based parent index at every copied occurrence.  Its
+  [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedParentIndexCompiler.lean)
+  is aligned with the direct copied occurrence stream and emits unary fields
+  in polynomial time.
 
 ## Build
 
