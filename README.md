@@ -13326,7 +13326,12 @@ The representation choices for this target are:
   independently delimited direction block.  Its
   [`consecutive incidence-key compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceKeyCompiler.lean)
   emits exactly `0, ..., n - 1` for those blocks, giving both routed and local
-  incidences a common lookup domain for sparse suffix insertion.
+  incidences a common lookup domain for sparse suffix insertion.  The
+  [`sparse suffix compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceSuffixCompiler.lean)
+  overlays the keyed routed words on that full domain and installs one
+  default empty suffix block at every key.  Its query-major semantics retain
+  routed directions only at matching incidences and exactly distinguish the
+  routed blocks' discarded ends from the default closing ends.
 - The
   [`grouped occurrence-index compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexCompiler.lean)
   recovers each grouped key's original clause-major position.  A generic
