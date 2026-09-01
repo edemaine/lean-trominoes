@@ -12824,6 +12824,13 @@ The representation choices for this target are:
   square, then looks up repeated source-column indices in polynomial time;
   its [semantics](LeanTrominoes/UnaryIndexedValueLookupSemantics.lean) recover
   ordinary list lookup for every in-range query.
+- The
+  [`copied source-position compiler`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedSourcePositionCompiler.lean)
+  prefix-sums one bounded source advance per expanded copied-clause block and
+  adds its presentation-relative inherited slot.  Its
+  [structural semantics](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedSourcePositionSemantics.lean)
+  identify every emitted unary query with the exact position in the compact
+  pre-Figure9 source column and prove every query is in range.
 
 ## Build
 
