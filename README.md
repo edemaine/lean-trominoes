@@ -2714,6 +2714,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile each grouped variable occurrence's cyclic
                   successor key directly from its finite active slot and fan
                   count, avoiding a dynamic list rotation.
+                - [x] Compile zero-based parent-clause indices and reorder
+                  them beside the grouped variable occurrence stream.
                 - [x] Lift correct incidence blocks through retained and
                   reversed through edges, reducing the complete direct stream
                   to one correct compact block per stable incidence tag.
@@ -12427,6 +12429,11 @@ The representation choices for this target are:
   grouped fan record, combines it with the reordered base-three atom base,
   and stays within the five-minute single-thread resource cap without a
   proof-heavy dynamic rotation.
+- [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedParentIndexCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedParentIndexCompiler.lean)
+  and its [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedParentIndexSemantics.lean)
+  compile the zero-based parent clause of every final occurrence and reorder
+  it into the same variable-major stream.  This supplies the clause-terminal
+  identity base needed by variable-side connector incidences.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean),
