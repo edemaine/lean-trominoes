@@ -2486,6 +2486,9 @@ build; an imported proof counts when its statement matches the paper.
                   routed copied-clause phases, then append the compiled fixed
                   implication-cycle suffix to obtain the complete canonical
                   Figure 9 header/tail record stream.
+                - [x] Stream those complete delimited records through the
+                  fixed header/tail transducer to compile the exact compact
+                  Figure 9 routed-request token stream.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
@@ -12698,6 +12701,10 @@ The representation choices for this target are:
   appends the independently compiled implication-cycle suffix and proves the
   resulting polynomial-time stream is the complete canonical retained Figure
   9 header/tail record list.
+- [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalCompiledRoutedRequestSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCompiledRoutedRequestSemantics.lean)
+  composes that record compiler with the fixed header/tail streamer, producing
+  the exact canonical compact Figure 9 routed-request tokens in polynomial
+  time.
 
 ## Build
 
