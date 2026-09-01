@@ -13229,6 +13229,13 @@ The representation choices for this target are:
   [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceEndpointFrameSemantics.lean)
   prove exact expansion of the declaratively assembled occurrence frames and
   exactly three endpoint records per final occurrence.
+- The generic
+  [`fixed end-delimited block copier`](LeanTrominoes/EndDelimitedBlockFixedCopiesCompiler.lean)
+  repeats arbitrary complete variable-length blocks in polynomial time.  Its
+  [`direct routed-request specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredRoutedRequestBlockCompiler.lean)
+  emits three copies of every completed final Figure 9 route block, aligned
+  with the red, green, and blue endpoint-frame expansion without expanding
+  the routed geometry.
 
 ## Build
 
