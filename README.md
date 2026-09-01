@@ -2605,6 +2605,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove semantically that global `(atom, stable terminal
                   rank)` pairs are duplicate-free in every occurrence
                   presentation.
+                - [x] Prove each stable rank is below its atom multiplicity,
+                  so the established at-most-eight bound makes conversion to
+                  a bounded terminal slot lossless and duplicate-free.
                 - [x] Prove that keyed lookup over any duplicate-free aligned
                   candidate column returns the value at the queried key's
                   unique presentation index.
@@ -13078,6 +13081,11 @@ The representation choices for this target are:
   [`global stable atom/rank uniqueness theorem`](LeanTrominoes/RetainedAngularOccurrenceGlobalStableRankPairNodup.lean)
   proves that stable terminal ranking is injective inside each semantic atom
   fiber, so the complete `(atom, rank)` presentation is duplicate-free.
+- Its
+  [`bounded-slot corollary`](LeanTrominoes/RetainedAngularOccurrenceGlobalBoundedStableRankPairNodup.lean)
+  bounds every genuine rank by its semantic atom multiplicity.  Consequently
+  an at-most-eight source converts ranks to the eight terminal slots without
+  collisions.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
