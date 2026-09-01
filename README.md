@@ -2566,6 +2566,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile repeated keyed unary lookup, so composite
                   atom-identity/slot queries can select aligned finite fan
                   fields from the complete occurrence column.
+                - [x] Assign every final occurrence the base-three candidate
+                  key `3 * globalIdentity + stableRank`, with exact decoding
+                  for semantic ranks below three.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -12974,6 +12977,12 @@ The representation choices for this target are:
   [semantics](LeanTrominoes/UnaryKeyedValueLookupSemantics.lean) remove the
   zero-valued query prefix and prove exact mapped-value selection whenever a
   query key is present.
+- The
+  [`final occurrence candidate-key compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceCandidateKeyCompiler.lean)
+  combines the complete global identity and stable-rank columns pointwise as
+  `3 * identity + rank`.  It proves exact base-three recovery of both fields
+  for ranks below three and emits one aligned candidate key per final
+  occurrence in polynomial time.
 
 ## Build
 
