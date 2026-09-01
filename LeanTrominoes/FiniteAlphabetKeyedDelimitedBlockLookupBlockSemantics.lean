@@ -87,6 +87,29 @@ def expectedBlocks
     (blockKeys.zip bodies).flatMap fun candidate =>
       if query = candidate.1 then block candidate.2 else []
 
+/-- The abstract body list selected by the same query-major keyed lookup. -/
+def expectedBodyList
+    (queries blockKeys : List Nat) (bodies : List (List Alphabet)) :
+    List (List Alphabet) :=
+  queries.flatMap fun query =>
+    (blockKeys.zip bodies).flatMap fun candidate =>
+      if query = candidate.1 then [candidate.2] else []
+
+/-- The relational token specification is exactly serialization of its
+query-major matching body list. -/
+theorem expectedBlocks_eq_blocks
+    (queries blockKeys : List Nat) (bodies : List (List Alphabet)) :
+    expectedBlocks queries blockKeys bodies =
+      blocks (expectedBodyList queries blockKeys bodies) := by
+  unfold expectedBlocks expectedBodyList blocks
+  rw [List.flatMap_assoc]
+  apply List.flatMap_congr
+  intro query queryMember
+  rw [List.flatMap_assoc]
+  apply List.flatMap_congr
+  intro candidate candidateMember
+  by_cases same : query = candidate.1 <;> simp [same, block]
+
 private theorem zip_replicate_length
     (key : Nat) (tokens : List (Token Alphabet)) :
     (List.replicate tokens.length key).zip tokens =
