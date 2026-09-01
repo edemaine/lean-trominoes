@@ -2581,6 +2581,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove generically that stable base-three occurrence
                   keys are duplicate-free whenever every identity occurs at
                   most three times.
+                - [x] Prove that keyed lookup over any duplicate-free aligned
+                  candidate column returns the value at the queried key's
+                  unique presentation index.
                 - [x] Use those keys to select and decode exactly three finite
                   connector-kind, polarity, and first-direction records per
                   final occurrence.
@@ -12997,7 +13000,10 @@ The representation choices for this target are:
   last-true lookup in polynomial time.  Its
   [semantics](LeanTrominoes/UnaryKeyedValueLookupSemantics.lean) remove the
   zero-valued query prefix and prove exact mapped-value selection whenever a
-  query key is present.
+  query key is present.  The
+  [`unique-key semantics`](LeanTrominoes/UnaryKeyedValueLookupUniqueSemantics.lean)
+  further recover an arbitrary aligned candidate value at its key's exact
+  presentation index whenever the candidate keys are duplicate-free.
 - The
   [`final occurrence candidate-key compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceCandidateKeyCompiler.lean)
   combines the complete global identity and stable-rank columns pointwise as
