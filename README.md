@@ -13296,6 +13296,18 @@ The representation choices for this target are:
   [`semantics`](LeanTrominoes/UnaryFieldStableDedupSemantics.lean) prove that
   the result is exactly `List.dedup`, preserving first-presentation order for
   the occurrence-route reindexing step.
+- The
+  [`distinct fan-query key compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalUniqueFanQueryKeyCompiler.lean)
+  applies that operation to the three-slot fan queries, producing a
+  duplicate-free active-occurrence key stream while preserving
+  identity-major, stable-rank-minor order.  Every key is proved to occur in
+  the unique candidate column.  The
+  [`grouped occurrence-data compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceDataCompiler.lean)
+  uses finite keyed lookup to reorder the corresponding connector records;
+  its
+  [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceDataSemantics.lean)
+  recover exactly the uniquely aligned record at each key and preserve one
+  output per distinct active occurrence.
 
 ## Build
 
