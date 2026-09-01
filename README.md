@@ -13407,6 +13407,10 @@ The representation choices for this target are:
   combines those aligned columns through bounded unary role/slot codes; its
   semantics prove that decoding recovers the exact pointwise fan record and
   active occurrence slot.  The
+  [`grouped fan/slot permutation theorem`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableFanSlotPermutation.lean)
+  strengthens this pointwise description: the complete paired records are a
+  permutation of the original clause-major fan and occurrence-slot columns,
+  so reordering preserves every finite local record attached to its key.  The
   [`grouped variable-incidence prefix compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidencePrefixCompiler.lean)
   expands each pair to its three- or seven-triple local module in stable
   triple-major, RGB-minor order and compiles every finite table query to one
