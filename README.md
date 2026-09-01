@@ -12858,6 +12858,15 @@ The representation choices for this target are:
   identify that expansion with the canonical copied-plus-cycle occurrence
   data, so local auxiliary identities are globally disjoint and exactly
   aligned.
+- The generic
+  [`finite block-index compiler`](LeanTrominoes/FiniteBlockIndexCompiler.lean)
+  broadcasts each nonempty source block's zero-based index over all of its
+  output positions.  The
+  [`cycle inherited-identity compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCycleInheritedAtomIdentityCompiler.lean)
+  uses those indices to look up the retained source identity at every cycle
+  occurrence; its
+  [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCycleInheritedAtomIdentitySemantics.lean)
+  give the exact pointwise lookup column.
 - The
   [`copied source-position compiler`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedSourcePositionCompiler.lean)
   prefix-sums one bounded source advance per expanded copied-clause block and
