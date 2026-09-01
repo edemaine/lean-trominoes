@@ -145,6 +145,12 @@ stream, including its block delimiters. -/
         encoded_append, encoded_block, induction]
       rfl
 
+omit [Fintype Alphabet] in
+@[simp] theorem blocks_append
+    (firsts seconds : List (List Alphabet)) :
+    blocks (firsts ++ seconds) = blocks firsts ++ blocks seconds := by
+  simp [blocks]
+
 /-- Corresponding complete blocks are concatenated pointwise.  Presenting
 the alignment as a list of pairs makes equal block counts explicit. -/
 @[simp] theorem joined_pairedBlocks

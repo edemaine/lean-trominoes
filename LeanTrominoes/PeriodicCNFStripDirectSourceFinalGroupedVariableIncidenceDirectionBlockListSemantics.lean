@@ -54,6 +54,13 @@ def directSourceFinalGroupedVariableIncidenceBodies
     (directSourceFinalGroupedVariableIncidencePrefixBodies decider symbols)
     (directSourceFinalGroupedVariableIncidenceSuffixBodies decider symbols)
 
+@[simp] theorem directSourceFinalGroupedVariableIncidenceBodies_length
+    (symbols : List encoding.Γ) :
+    (directSourceFinalGroupedVariableIncidenceBodies decider symbols).length =
+      (directSourceFinalGroupedVariableIncidencePrefixQueries
+        decider symbols).length := by
+  simp [directSourceFinalGroupedVariableIncidenceBodies]
+
 /-- The compiled grouped variable-incidence stream serializes exactly the
 pointwise prefix-plus-suffix body list. -/
 theorem directSourceFinalGroupedVariableIncidenceDirectionTokens_eq_blocks
