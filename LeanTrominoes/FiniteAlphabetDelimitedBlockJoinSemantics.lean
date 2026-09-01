@@ -170,6 +170,36 @@ the alignment as a list of pairs makes equal block counts explicit. -/
   unfold joined
   rw [encodedJoin, decoded_encoded]
 
+/-- Corresponding complete blocks can equivalently be presented as two
+aligned body lists and joined pointwise with `List.zipWith`. -/
+@[simp] theorem joined_blocks_zipWith
+    (firsts seconds : List (List Alphabet))
+    (aligned : firsts.length = seconds.length) :
+    joined (blocks firsts) (blocks seconds) =
+      blocks (List.zipWith (fun first second => first ++ second)
+        firsts seconds) := by
+  let pairs := firsts.zip seconds
+  have firstProjection : pairs.map Prod.fst = firsts := by
+    exact List.map_fst_zip (by omega)
+  have secondProjection : pairs.map Prod.snd = seconds := by
+    exact List.map_snd_zip (by omega)
+  have combined :
+      pairs.map (fun pair => pair.1 ++ pair.2) =
+        List.zipWith (fun first second => first ++ second)
+          firsts seconds := by
+    unfold pairs
+    rw [show
+      (fun pair : List Alphabet × List Alphabet => pair.1 ++ pair.2) =
+        Function.uncurry
+          (fun first second : List Alphabet => first ++ second) by
+      funext pair
+      cases pair
+      rfl]
+    exact List.map_uncurry_zip_eq_zipWith
+  have joinedPairs := joined_pairedBlocks (Alphabet := Alphabet) pairs
+  rw [firstProjection, secondProjection, combined] at joinedPairs
+  exact joinedPairs
+
 end LeanTrominoes.FiniteAlphabetDelimitedBlockJoin
 
 end

@@ -13416,6 +13416,9 @@ The representation choices for this target are:
   and applies the verified pointwise delimited join.  Its semantics preserve
   each finite table direction word exactly and expose the sparse suffix
   selection at the join boundary.  The
+  [`complete body-list semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceDirectionBlockListSemantics.lean)
+  then identify the result with the exact pointwise prefix-plus-suffix body
+  list, retaining one delimiter for every grouped variable incidence.  The
   [`final clause-incidence compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceDirectionCompiler.lean)
   separately expands every final parent descriptor to all nine clause-core
   triples and their RGB incidences, compiling the resulting 27 exact finite
