@@ -13236,6 +13236,13 @@ The representation choices for this target are:
   emits three copies of every completed final Figure 9 route block, aligned
   with the red, green, and blue endpoint-frame expansion without expanding
   the routed geometry.
+- The generic
+  [`finite-alphabet delimited joiner`](LeanTrominoes/FiniteAlphabetDelimitedBlockJoinCompiler.lean)
+  losslessly transports arbitrary finite payloads through the verified route
+  join machine.  Its
+  [`block semantics`](LeanTrominoes/FiniteAlphabetDelimitedBlockJoinSemantics.lean)
+  prove that two aligned families of complete blocks are concatenated
+  pointwise while retaining exactly one delimiter per result block.
 
 ## Build
 
