@@ -218,6 +218,54 @@ theorem selectedInheritedValues_positions_nodup (source : List Token) :
   rw [positions_eq_expected]
   exact selected_expectedAux_nodup 0 source
 
+private theorem map_getD_nodup_of_indices_nodup
+    {Value : Type} (indices : List Nat) (values : List Value)
+    (default : Value) (indicesNodup : indices.Nodup)
+    (indicesLt : indices.Forall fun index => index < values.length)
+    (valuesNodup : values.Nodup) :
+    (indices.map fun index => values.getD index default).Nodup := by
+  induction indices with
+  | nil => simp
+  | cons index indices induction =>
+      rw [List.nodup_cons] at indicesNodup
+      rw [List.forall_cons] at indicesLt
+      simp only [List.map_cons, List.nodup_cons]
+      constructor
+      · intro headMember
+        rcases List.mem_map.mp headMember with
+          ⟨later, laterMember, valuesEqual⟩
+        have laterLt := (List.forall_iff_forall_mem.mp indicesLt.2)
+          later laterMember
+        rw [List.getD_eq_getElem _ _ indicesLt.1,
+          List.getD_eq_getElem _ _ laterLt] at valuesEqual
+        have indexEqual : index = later :=
+          (valuesNodup.getElem_inj_iff).mp valuesEqual.symm
+        exact indicesNodup.1 (indexEqual.symm ▸ laterMember)
+      · exact induction indicesNodup.2 indicesLt.2
+
+/-- Looking up a duplicate-free candidate column at the selected inherited
+source positions preserves duplicate-freedom. -/
+theorem selectedInheritedValues_selectedValues_nodup
+    (source : List Token) (candidateValues : List Nat)
+    (candidateLength :
+      candidateValues.length = totalSourceWordCount source)
+    (candidateNodup : candidateValues.Nodup) :
+    (selectedInheritedValues
+        (HorizontalRoutedRouteHeaderPresentationAtomScope.output source)
+        (HorizontalRoutedRouteHeaderCopiedSourcePosition.selectedValues
+          source candidateValues)).Nodup := by
+  rw [HorizontalRoutedRouteHeaderCopiedSourcePosition.selectedValues_eq_map_getD
+    source candidateValues candidateLength]
+  rw [selectedInheritedValues_map]
+  apply map_getD_nodup_of_indices_nodup
+  · exact selectedInheritedValues_positions_nodup source
+  · have selectedLt := selectedInheritedValues_forall
+        (fun position => position < totalSourceWordCount source)
+        (HorizontalRoutedRouteHeaderPresentationAtomScope.output source)
+        (positions source) (positions_forall_lt source)
+    simpa [candidateLength] using selectedLt
+  · exact candidateNodup
+
 end HorizontalRoutedRouteHeaderInheritedSourceSelection
 end PeriodicCNFStripReduction
 end LeanTrominoes

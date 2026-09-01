@@ -2599,6 +2599,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove that inherited source-position queries are
                   duplicate-free within each finite Figure 9 block and
                   remain separated across parent-clause intervals.
+                - [x] Lift inherited position uniqueness through total
+                  source lookup, preserving any duplicate-free pre-Figure9
+                  candidate column.
                 - [x] Prove that keyed lookup over any duplicate-free aligned
                   candidate column returns the value at the queried key's
                   unique presentation index.
@@ -13065,7 +13068,9 @@ The representation choices for this target are:
   [`inherited source-selection semantics`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemantics.lean)
   check the finite Figure 9 tables for duplicate-free inherited offsets and
   lift that property through the actual prefix-summed source-position
-  compiler using disjoint parent-clause intervals.
+  compiler using disjoint parent-clause intervals.  Their lookup theorem
+  then preserves duplicate-freedom of any aligned pre-Figure9 candidate
+  column.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
