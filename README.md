@@ -13114,6 +13114,11 @@ The representation choices for this target are:
   that candidate column, and its inherited-scope subsequence is
   duplicate-free.
 - The
+  [`distinct compact-identity uniqueness theorem`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalDistinctAtomIdentityNodup.lean)
+  proves that representative lookup remains injective on the deduplicated
+  compact source words.  Thus different retained variables have different
+  numeric identities before their implication-cycle blocks are broadcast.
+- The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
   counts from injective length words back to the numeric identity column.
