@@ -2725,6 +2725,11 @@ build; an imported proof counts when its statement matches the paper.
                   count, avoiding a dynamic list rotation.
                 - [x] Identify the occurrence-indexed grouped identity bases
                   with unique keyed lookup beside the grouped current keys.
+                - [x] Recover each grouped slot as `key % 3` and its attached
+                  fan count as the multiplicity of `key / 3`.
+                - [x] Identify the compiled successor keys with cyclic
+                  advancement of the current keys and prove the successor
+                  column is a permutation of the current-key column.
                 - [x] Compile zero-based parent-clause indices and reorder
                   them beside the grouped variable occurrence stream.
                 - [x] Compile one finite current/successor/parent element
