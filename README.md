@@ -13471,6 +13471,12 @@ The representation choices for this target are:
   physical keyed lookup with query-major selection of complete matching
   bodies, including their delimiters, exposing the blockwise lookup used by
   contraction.
+- The corresponding
+  [`indexed delimited-block semantics`](LeanTrominoes/FiniteAlphabetIndexedDelimitedBlockLookupBlockSemantics.lean)
+  prove that broadcasting the consecutive body ordinals recovers the exact
+  delimiter-derived token indices.  Indexed reordering is therefore the
+  consecutive-key special case of complete block selection, which applies
+  directly to the variable-major colored occurrence-direction stream.
 
 ## Build
 
