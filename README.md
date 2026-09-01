@@ -13087,6 +13087,11 @@ The representation choices for this target are:
   an at-most-eight source converts ranks to the eight terminal slots without
   collisions.
 - The
+  [`direct pre-Figure9 inherited-pair data semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPreFigureNineInheritedAtomPairData.lean)
+  align the compiled compact identity and terminal-slot columns and identify
+  their pointwise zip with the semantic bounded `(atom, stable slot)`
+  presentation after applying the compact numeric atom identity.
+- The
   [`direct scaled-source occurrence bound`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalScaledSourceOccurrenceBound.lean)
   packages the direct formula's local width-three, three-occurrence source
   facts into the retained-planar certificate and proves that the exact
