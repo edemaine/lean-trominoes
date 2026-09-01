@@ -2729,6 +2729,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile descriptor-indexed clause-core incidence codes
                   from the finite colored internal/top/left/right reference
                   table, with exact direction-query length alignment.
+                - [x] Append the grouped variable and clause-core families
+                  into the complete canonical incidence element-code column,
+                  one identity per independently delimited direction query.
                 - [x] Lift correct incidence blocks through retained and
                   reversed through edges, reducing the complete direct stream
                   to one correct compact block per stable incidence tag.
