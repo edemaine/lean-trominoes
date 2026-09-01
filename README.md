@@ -13486,7 +13486,11 @@ The representation choices for this target are:
   now reduce any aligned complete incidence-body stream to the established
   role/direction assembler whenever its stable occurrence keys are unique and
   cover every requested element/rank key.  This isolates those two finite-key
-  facts as the remaining source-specific contraction obligation.
+  facts as the remaining source-specific contraction obligation.  The
+  [`occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceOccurrenceKeySemantics.lean)
+  prove both facts from a duplicate-free element-code column and a permutation
+  equating the incidence-code column with the element codes repeated by their
+  declared degrees.
 - The generic
   [`keyed delimited-block semantics`](LeanTrominoes/FiniteAlphabetKeyedDelimitedBlockLookupBlockSemantics.lean)
   identify delimiter-derived token ordinals with ordinary finite-block
