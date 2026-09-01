@@ -122,6 +122,34 @@ private theorem directSourceFinalTerminalSlotValues_eq_map
   unfold directSourceFinalTerminalSlotValues
   exact retainedOccurrenceGlobalBoundedSlotValues_eq_map _ _
 
+/-- Every occurrence contributes its atom word to the abstract aligned word
+column. -/
+private theorem retainedOccurrenceGlobalAtomWords_mem
+    {Atom : Type*} (source : PeriodicCNF Atom)
+    (atomWord : Atom → List Bool)
+    (copy : ThreeOccurrenceVariable Atom)
+    (copyMember : copy ∈ allOccurrenceVariables source) :
+    atomWord copy.1 ∈
+      (retainedOccurrenceGlobalAtomWords source atomWord).words := by
+  unfold retainedOccurrenceGlobalAtomWords
+  exact List.mem_map.mpr ⟨copy, copyMember, rfl⟩
+
+/-- Every represented direct occurrence contributes its compact atom word to
+the aligned pre-Figure9 word column. -/
+theorem directSourceFinalCompactOccurrenceAtomWords_mem
+    (symbols : List encoding.Γ)
+    (copy : ThreeOccurrenceVariable
+      (WrappedPeriodicPlanarSATVariable Variable))
+    (copyMember : copy ∈ allOccurrenceVariables
+      (retainedFinalCoordinatedScaledSource
+        (directSourceFormula decider symbols)).erase) :
+    directSourceFinalCompactAtomWord
+        (directSourceFormula decider symbols) copy.1 ∈
+      (directSourceFinalCompactOccurrenceAtomWords
+        decider symbols).words := by
+  unfold directSourceFinalCompactOccurrenceAtomWords
+  exact retainedOccurrenceGlobalAtomWords_mem _ _ copy copyMember
+
 /-- The compiled pre-Figure9 pair column is the semantic bounded atom/rank
 presentation with compact numeric identity applied to its atom component. -/
 theorem directSourceFinalPreFigureNineInheritedAtomPairs_eq_map

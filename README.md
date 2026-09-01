@@ -13097,6 +13097,11 @@ The representation choices for this target are:
   facts into the retained-planar certificate and proves that the exact
   source-scaled formula used for stable terminal ranking has at most eight
   occurrences per atom.
+- Combining those results, the
+  [`direct pre-Figure9 inherited-pair uniqueness theorem`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPreFigureNineInheritedAtomPairNodup.lean)
+  uses compact-word separation to recover semantic atom equality from equal
+  numeric identities.  The actual `(compact identity, bounded slot)` source
+  column is therefore duplicate-free.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
