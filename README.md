@@ -2508,6 +2508,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Classify the complete final occurrence stream into
                   genuine inherited source slots and parent-local Figure 9 or
                   polarity atoms, and compile that finite scope stream.
+                - [x] Transport every copied inherited slot through the exact
+                  stable clockwise permutation back to its pre-Figure9 clause
+                  presentation position, aligned with the compact atom words.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
@@ -12765,6 +12768,14 @@ The representation choices for this target are:
   The [finite projector](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderAtomScopeCompiler.lean)
   and its [direct composition](LeanTrominoes/PeriodicCNFStripDirectSourceFinalAtomScopeCompiler.lean)
   compile one such control per canonical final occurrence.
+- The
+  [`presentation-relative scope compiler`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderPresentationAtomScopeCompiler.lean)
+  retains original source-slot payloads through the same stable clockwise sort
+  used by Figure 9, then remaps inherited controls back to the pre-Figure9
+  clause presentation.  Its
+  [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedPresentationAtomScopeCompiler.lean)
+  composes this finite expansion with the exact copied descriptor compiler and
+  proves one-for-one alignment with the copied occurrence-data stream.
 
 ## Build
 
