@@ -2711,6 +2711,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile aligned canonical element-degree and complete
                   RGB structural-code columns, using disjoint variable-local
                   and clause internal/terminal identities.
+                - [x] Compile each grouped variable occurrence's cyclic
+                  successor key directly from its finite active slot and fan
+                  count, avoiding a dynamic list rotation.
                 - [x] Lift correct incidence blocks through retained and
                   reversed through edges, reducing the complete direct stream
                   to one correct compact block per stable incidence tag.
@@ -12417,6 +12420,13 @@ The representation choices for this target are:
   internal/top/left/right tags `16–19`, `20–23`, and `24–27`; appending them
   after the variable-local codes in each color gives the exact RGB canonical
   length already prescribed by the degree column.
+- [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedNextOccurrenceKeyCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedNextOccurrenceKeyCompiler.lean)
+  and its [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedNextOccurrenceKeySemantics.lean)
+  compile the cyclic successor occurrence identity needed by red variable
+  cycle links.  The compiler computes `(slot + 1) mod count` from each finite
+  grouped fan record, combines it with the reordered base-three atom base,
+  and stays within the five-minute single-thread resource cap without a
+  proof-heavy dynamic rotation.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean),
