@@ -13331,7 +13331,12 @@ The representation choices for this target are:
   overlays the keyed routed words on that full domain and installs one
   default empty suffix block at every key.  Its query-major semantics retain
   routed directions only at matching incidences and exactly distinguish the
-  routed blocks' discarded ends from the default closing ends.
+  routed blocks' discarded ends from the default closing ends.  The
+  [`complete grouped variable-incidence compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceDirectionCompiler.lean)
+  converts every finite prefix to the same generic direction-block alphabet
+  and applies the verified pointwise delimited join.  Its semantics preserve
+  each finite table direction word exactly and expose the sparse suffix
+  selection at the join boundary.
 - The
   [`grouped occurrence-index compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexCompiler.lean)
   recovers each grouped key's original clause-major position.  A generic
