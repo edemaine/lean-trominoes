@@ -2552,6 +2552,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Preserve one explicit request boundary for every
                   compiled final Figure 9 header/tail record while streaming
                   exactly its compact routed request.
+                - [x] Compile each final occurrence's stable within-atom rank
+                  from the complete global identity column, aligned one-for-
+                  one with the boundary-preserving request blocks.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -12929,6 +12932,12 @@ The representation choices for this target are:
   compact request transducer while retaining one explicit end marker per
   final occurrence.  Its record semantics give the later finite frame columns
   an exact one-block-per-occurrence alignment boundary.
+- The
+  [`final occurrence stable-rank compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceStableRankCompiler.lean)
+  converts complete global atom identities to injective length words, forms
+  their equality square, and prefix-counts each row.  The result is exactly
+  each occurrence's zero-based rank among earlier equal identities, with one
+  unary field per final occurrence.
 
 ## Build
 
