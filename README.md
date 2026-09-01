@@ -12391,8 +12391,15 @@ The representation choices for this target are:
   the same degree controls emit the matching through or retained roles.
   [`LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceSemantics.lean`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceSemantics.lean)
   proves the exact element-major query and role blocks.  It remains to supply
-  the direct source's aligned canonical element-code, degree, and
+  the direct source's aligned canonical element-code and
   incidence-element-code columns.
+- [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeCompiler.lean)
+  supplies the counted contraction's canonical degree column.  It expands
+  each variable module to one or three degree-two elements, each clause to
+  its internal/top/left/right degree pattern, and repeats the common pattern
+  in red/green/blue order.  Its
+  [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeSemantics.lean)
+  prove that every emitted degree is exactly two or three.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean),
