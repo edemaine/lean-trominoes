@@ -13467,7 +13467,10 @@ The representation choices for this target are:
   identify delimiter-derived token ordinals with ordinary finite-block
   indices.  Consequently an aligned arbitrary key column is repeated exactly
   across every payload token and closing delimiter of its corresponding
-  variable-length body, exposing the blockwise lookup used by contraction.
+  variable-length body.  The resulting selection theorem identifies the
+  physical keyed lookup with query-major selection of complete matching
+  bodies, including their delimiters, exposing the blockwise lookup used by
+  contraction.
 
 ## Build
 

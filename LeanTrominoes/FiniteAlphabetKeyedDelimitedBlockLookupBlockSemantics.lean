@@ -79,4 +79,94 @@ theorem broadcastKeys_blocks
       (by simpa [candidateKeys_blocks] using member)
     simpa only [aligned] using queryLt
 
+/-- Relational block-level specification of keyed lookup. -/
+def expectedBlocks
+    (queries blockKeys : List Nat) (bodies : List (List Alphabet)) :
+    List (Token Alphabet) :=
+  queries.flatMap fun query =>
+    (blockKeys.zip bodies).flatMap fun candidate =>
+      if query = candidate.1 then block candidate.2 else []
+
+private theorem zip_replicate_length
+    (key : Nat) (tokens : List (Token Alphabet)) :
+    (List.replicate tokens.length key).zip tokens =
+      tokens.map fun token => (key, token) := by
+  induction tokens with
+  | nil => rfl
+  | cons token tokens induction =>
+      simp [List.replicate_succ, induction]
+
+private theorem broadcastKeys_blocks_zip
+    [Fintype Alphabet]
+    (blockKeys : List Nat) (bodies : List (List Alphabet))
+    (aligned : bodies.length = blockKeys.length) :
+    (broadcastKeys blockKeys (blocks bodies)).zip (blocks bodies) =
+      (blockKeys.zip bodies).flatMap fun candidate =>
+        (block candidate.2).map fun token => (candidate.1, token) := by
+  rw [broadcastKeys_blocks blockKeys bodies aligned]
+  unfold FiniteBlockIndices.broadcastValues
+  induction bodies generalizing blockKeys with
+  | nil =>
+      have keysNil : blockKeys = [] :=
+        List.eq_nil_of_length_eq_zero aligned.symm
+      subst blockKeys
+      rfl
+  | cons body bodies induction =>
+      cases blockKeys with
+      | nil => simp at aligned
+      | cons key blockKeys =>
+          have tailAligned : bodies.length = blockKeys.length := by
+            simpa using aligned
+          simp only [List.zipWith_cons_cons, List.flatten_cons,
+            List.zip_cons_cons, List.flatMap_cons]
+          rw [show blocks (body :: bodies) =
+              block body ++ blocks bodies by rfl]
+          rw [List.zip_append (by
+            simp [delimitedBlockLength, block])]
+          rw [show List.replicate (delimitedBlockLength body) key =
+              List.replicate (block body).length key by
+            simp [delimitedBlockLength, block]]
+          rw [zip_replicate_length, induction blockKeys tailAligned]
+
+private theorem flatMap_map_key
+    (query key : Nat) (tokens : List (Token Alphabet)) :
+    (tokens.map fun token => (key, token)).flatMap (fun candidate =>
+        if query = candidate.1 then [candidate.2] else []) =
+      if query = key then tokens else [] := by
+  induction tokens with
+  | nil => simp
+  | cons token tokens induction =>
+      simp only [List.map_cons, List.flatMap_cons]
+      rw [induction]
+      by_cases same : query = key <;> simp [same]
+
+private theorem flatMap_candidateTokens
+    (query : Nat) (candidates : List (Nat × List Alphabet)) :
+    (candidates.flatMap (fun candidate =>
+        (block candidate.2).map fun token =>
+          (candidate.1, token))).flatMap (fun candidate =>
+            if query = candidate.1 then [candidate.2] else []) =
+      candidates.flatMap fun candidate =>
+        if query = candidate.1 then block candidate.2 else [] := by
+  induction candidates with
+  | nil => rfl
+  | cons candidate candidates induction =>
+      simp only [List.flatMap_cons, List.flatMap_append]
+      rw [flatMap_map_key, induction]
+
+/-- Keyed token lookup is exactly query-major selection of complete matching
+bodies; no token from a selected body or its delimiter is lost. -/
+theorem selected_blocks
+    [Fintype Alphabet]
+    (queries blockKeys : List Nat) (bodies : List (List Alphabet))
+    (aligned : bodies.length = blockKeys.length) :
+    selected queries blockKeys (blocks bodies) =
+      expectedBlocks queries blockKeys bodies := by
+  rw [selected_eq_expected]
+  unfold expected FiniteAlphabetKeyedValueLookup.expected expectedBlocks
+  rw [broadcastKeys_blocks_zip blockKeys bodies aligned]
+  apply List.flatMap_congr
+  intro query _
+  exact flatMap_candidateTokens query (blockKeys.zip bodies)
+
 end LeanTrominoes.FiniteAlphabetKeyedDelimitedBlockLookup
