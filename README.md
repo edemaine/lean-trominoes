@@ -13272,6 +13272,14 @@ The representation choices for this target are:
   candidate keys.  This supplies the order-changing lookup needed to place
   occurrence-major routed direction blocks into the canonical incidence
   stream.
+- Its
+  [`indexed delimited-block wrapper`](LeanTrominoes/FiniteAlphabetIndexedDelimitedBlockLookupCompiler.lean)
+  derives a block ordinal by prefix-summing end markers and broadcasts that
+  ordinal across every token, including the terminating delimiter.  Repeated
+  unary queries can therefore select and reorder complete variable-length
+  finite-alphabet blocks in polynomial time; the
+  [`wrapper semantics`](LeanTrominoes/FiniteAlphabetIndexedDelimitedBlockLookupSemantics.lean)
+  reduce the result to exact query-major keyed selection.
 
 ## Build
 
