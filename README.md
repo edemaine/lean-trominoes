@@ -2732,6 +2732,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Append the grouped variable and clause-core families
                   into the complete canonical incidence element-code column,
                   one identity per independently delimited direction query.
+                - [x] Instantiate counted degree-two/degree-three contraction
+                  on the complete direct final element, degree, incidence-
+                  identity, and incidence-direction compilers.
                 - [x] Lift correct incidence blocks through retained and
                   reversed through edges, reducing the complete direct stream
                   to one correct compact block per stable incidence tag.
