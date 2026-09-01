@@ -161,13 +161,57 @@ noncomputable def firstWordsComputableInPolyTime :
       rw [DelimitedBinaryWordPairs.finEncoding_encode, firstTokens_encode]
       exact (DelimitedBinaryWords.finEncoding_encode _).symm
 
-/-- Retain exactly the words whose aligned Boolean controls are true.  Extra
-controls and extra words are ignored. -/
+/-- Retain exactly the aligned values whose Boolean controls are true.  Extra
+controls and extra values are ignored. -/
+def selected {Value : Type*} : List Bool → List Value → List Value
+  | active :: controls, value :: values =>
+      (if active then [value] else []) ++ selected controls values
+  | _, _ => []
+
+theorem selected_forall {Value : Type*} (predicate : Value → Prop)
+    (controls : List Bool) (values : List Value)
+    (all : values.Forall predicate) :
+    (selected controls values).Forall predicate := by
+  induction controls generalizing values with
+  | nil => simp [selected]
+  | cons active controls induction =>
+      cases values with
+      | nil => simp [selected]
+      | cons value values =>
+          rw [List.forall_cons] at all
+          cases active <;>
+            simp [selected, all.1, induction values all.2]
+
 def selectedWords (controls : List Bool)
     (input : DelimitedBinaryWords.Input) : DelimitedBinaryWords.Input :=
-  firstWords
-    ⟨DelimitedBinaryWordPairBooleanFilter.selectedPairs controls
-      (emptySecondPairs input).pairs⟩
+  ⟨selected controls input.words⟩
+
+private theorem selectedPairs_emptySecond
+    (controls : List Bool) (words : List (List Bool)) :
+    (DelimitedBinaryWordPairBooleanFilter.selectedPairs controls
+        (words.map fun word => (word, []))).map Prod.fst =
+      selected controls words := by
+  induction controls generalizing words with
+  | nil => simp [DelimitedBinaryWordPairBooleanFilter.selectedPairs, selected]
+  | cons active controls induction =>
+      cases words with
+      | nil => simp [DelimitedBinaryWordPairBooleanFilter.selectedPairs,
+          selected]
+      | cons word words =>
+          cases active <;>
+            simp [DelimitedBinaryWordPairBooleanFilter.selectedPairs,
+              selected, induction]
+
+private theorem firstWords_selectedPairs_emptySecond
+    (controls : List Bool) (input : DelimitedBinaryWords.Input) :
+    firstWords
+        ⟨DelimitedBinaryWordPairBooleanFilter.selectedPairs controls
+          (emptySecondPairs input).pairs⟩ =
+      selectedWords controls input := by
+  cases input with
+  | mk words =>
+      exact congrArg DelimitedBinaryWords.Input.mk
+        (selectedPairs_emptySecond controls words)
 
 /-- Any compiled word stream can be filtered by any compiled aligned Boolean
 stream in polynomial time. -/
@@ -189,8 +233,12 @@ noncomputable def selectedWordsComputableInPolyTime
     DelimitedBinaryWordPairBooleanFilter.filteredPairsComputableInPolyTime
       encodeSource controls (fun source => emptySecondPairs (words source))
       controlCompiler pairCompiler
-  exact TM2CompositionMachine.computableInPolyTime
+  let projected := TM2CompositionMachine.computableInPolyTime
     filtered firstWordsComputableInPolyTime
+  exact TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
+    projected fun source => congrArg DelimitedBinaryWords.finEncoding.encode
+      (firstWords_selectedPairs_emptySecond
+        (controls source) (words source))
 
 end LeanTrominoes.DelimitedBinaryWordBooleanFilter
 

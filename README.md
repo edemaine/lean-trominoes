@@ -12816,6 +12816,14 @@ The representation choices for this target are:
   [direct compact-atom specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCompactAtomIdentityCompiler.lean)
   compiles one such unary identity for every pre-Figure9 source occurrence,
   aligned with the copied descriptor arity sum.
+- [`LeanTrominoes/DelimitedBinaryWordBooleanFilterCompiler.lean`](LeanTrominoes/DelimitedBinaryWordBooleanFilterCompiler.lean)
+  lifts positional Boolean filtering to arbitrary delimited binary-word
+  streams.  The
+  [`repeated unary indexed-lookup compiler`](LeanTrominoes/UnaryIndexedValueLookupCompiler.lean)
+  uses that filter to select every query row from a shared numeric equality
+  square, then looks up repeated source-column indices in polynomial time;
+  its [semantics](LeanTrominoes/UnaryIndexedValueLookupSemantics.lean) recover
+  ordinary list lookup for every in-range query.
 
 ## Build
 
