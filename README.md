@@ -13462,6 +13462,12 @@ The representation choices for this target are:
   three-key blocks, its role stream as degree-two through pairs or
   degree-three retained triples, and its incidence lookup keys as the stable
   base-three occurrence keys of the compiled incidence identities.
+- The generic
+  [`keyed delimited-block semantics`](LeanTrominoes/FiniteAlphabetKeyedDelimitedBlockLookupBlockSemantics.lean)
+  identify delimiter-derived token ordinals with ordinary finite-block
+  indices.  Consequently an aligned arbitrary key column is repeated exactly
+  across every payload token and closing delimiter of its corresponding
+  variable-length body, exposing the blockwise lookup used by contraction.
 
 ## Build
 
