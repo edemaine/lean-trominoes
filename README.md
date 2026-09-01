@@ -12824,10 +12824,14 @@ The representation choices for this target are:
   square, then looks up repeated source-column indices in polynomial time;
   its [semantics](LeanTrominoes/UnaryIndexedValueLookupSemantics.lean) recover
   ordinary list lookup for every in-range query.
-- [`LeanTrominoes/UnaryFieldValueZeroInterleaveCompiler.lean`](LeanTrominoes/UnaryFieldValueZeroInterleaveCompiler.lean)
-  turns each unary field into adjacent candidate fields `[value, 0]` by a
-  fixed linear-time transduction, preparing aligned values for positional
-  Boolean masking without changing their order.
+- The
+  [`aligned unary Boolean-choice compiler`](LeanTrominoes/AlignedUnaryBooleanChoiceCompiler.lean)
+  reuses alternating zero padding to interleave two aligned unary columns,
+  then selects field `2i` or `2i+1` from a Boolean control stream.  This gives
+  a position-preserving polynomial-time multiplexer for final atom scopes;
+  its [semantics](LeanTrominoes/AlignedUnaryBooleanChoiceSemantics.lean) prove
+  the exact indexed queries, interleaved candidate column, and in-range list
+  lookup.
 - The
   [`copied source-position compiler`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedSourcePositionCompiler.lean)
   prefix-sums one bounded source advance per expanded copied-clause block and
