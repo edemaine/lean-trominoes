@@ -13289,6 +13289,13 @@ The representation choices for this target are:
   color, and the
   [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceDirectionBlockSemantics.lean)
   identify every block with the exact established routed-occurrence output.
+- The generic
+  [`stable unary-field dedup compiler`](LeanTrominoes/UnaryFieldStableDedupCompiler.lean)
+  converts arbitrary compiled unary values to length-coded binary words and
+  selects one representative per distinct value in polynomial time.  Its
+  [`semantics`](LeanTrominoes/UnaryFieldStableDedupSemantics.lean) prove that
+  the result is exactly `List.dedup`, preserving first-presentation order for
+  the occurrence-route reindexing step.
 
 ## Build
 
