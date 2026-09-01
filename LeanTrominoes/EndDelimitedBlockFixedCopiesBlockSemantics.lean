@@ -14,6 +14,19 @@ def completeBlock {Symbol : Type} (blockEnd : Symbol)
     (body : List Symbol) : List Symbol :=
   body ++ [blockEnd]
 
+/-- Repeating one physical block is the same as mapping that block over a
+fixed-size list of copies of its semantic value. -/
+theorem copiedBlock_eq_replicate_flatMap
+    {Value Symbol : Type} (copies : Nat) (value : Value)
+    (block : Value → List Symbol) :
+    copiedBlock copies (block value) =
+      (List.replicate copies value).flatMap block := by
+  induction copies with
+  | zero => rfl
+  | succ copies induction =>
+      rw [copiedBlock_succ, List.replicate_succ,
+        List.flatMap_cons, induction]
+
 private theorem blocksAux_completeBlock_append
     {Symbol : Type} (isEnd : Symbol → Bool) (blockEnd : Symbol)
     (ends : isEnd blockEnd = true)

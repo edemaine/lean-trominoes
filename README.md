@@ -13495,6 +13495,14 @@ The representation choices for this target are:
   [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredRoutedRequestBlockSemantics.lean)
   identifies the compiled colored Figure 9 route stream as exactly three
   complete copies of every explicit header/tail request block.
+- The
+  [`explicit colored route-block list`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredRoutedRequestBlockListSemantics.lean)
+  reinterprets those physical copies as the canonical serialization of
+  actual routed direction blocks.  The
+  [`colored endpoint/route pairing`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceRoutePairSemantics.lean)
+  proves that this RGB block list is exactly aligned with the compiled
+  endpoint frames and identifies the resulting occurrence-direction stream
+  with its complete delimited body list.
 
 ## Build
 
