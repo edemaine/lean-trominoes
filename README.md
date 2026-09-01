@@ -2738,6 +2738,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Exhaustively verify every active finite variable-fan
                   selector block: two cycle references, paired private
                   variable references, and one RGB parent-terminal reference.
+                - [x] Lift those local selector permutations across all
+                  grouped occurrences, obtaining the complete expected
+                  variable-incidence element-code multiset.
                 - [x] Prove generically that assembling consecutive triples
                   whose count predecessor is repeated three times recovers
                   the original fan-count column.
