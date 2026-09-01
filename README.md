@@ -2754,6 +2754,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Reorder that expected multiset into its variable-local
                   cycle/private contribution and its parent-clause terminal
                   contribution.
+                - [x] Interpret packed current/next/parent selectors as their
+                  exact dynamic identity and structural tag.
+                - [x] Identify every private occurrence block with two
+                  references to each canonical non-cycle variable element.
                 - [x] Prove generically that assembling consecutive triples
                   whose count predecessor is repeated three times recovers
                   the original fan-count column.

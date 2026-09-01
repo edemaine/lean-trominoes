@@ -22,6 +22,46 @@ variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
+/-- The finite count predecessor beside each grouped key is the bounded
+predecessor of the multiplicity of the identity recovered by quotient. -/
+theorem directSourceFinalGroupedVariableFanCountPreds_eq_map_countPred
+    (symbols : List encoding.Γ) :
+    (directSourceFinalGroupedVariableFanData decider symbols).map
+        (fun fan => fan.countPred) =
+      (directSourceFinalUniqueFanQueryKeys decider symbols).map fun key =>
+        BoundedPositiveCountPreds.boundedPositiveCountPred
+          ((directSourceFinalAtomIdentityCodes decider symbols).count
+            (key / 3)) := by
+  rw [directSourceFinalGroupedVariableFanData_eq_map_alignedDatum]
+  have projected :=
+    FiniteAlphabetKeyedValueLookup.map_alignedDatum_projection
+      (directSourceFinalUniqueFanQueryKeys decider symbols)
+      (directSourceFinalOccurrenceCandidateKeys decider symbols)
+      (directSourceFinalVariableFanData decider symbols)
+      (fun fan => fan.countPred)
+      (by rw [directSourceFinalOccurrenceCandidateKeys_length,
+        directSourceFinalVariableFanData_length])
+      (fun query queryMember =>
+        directSourceFinalUniqueFanQueryKey_mem_candidateKeys
+          decider symbols query queryMember)
+  rw [directSourceFinalVariableFanData_countPreds] at projected
+  rw [projected]
+  apply List.map_congr_left
+  intro query queryMember
+  have queryCandidate' : query ∈ StableOccurrenceRanks.candidateKeys
+      (directSourceFinalAtomIdentityCodes decider symbols) := by
+    rw [← directSourceFinalOccurrenceCandidateKeys_eq_candidateKeys]
+    exact directSourceFinalUniqueFanQueryKey_mem_candidateKeys
+      decider symbols query queryMember
+  rw [directSourceFinalOccurrenceCandidateKeys_eq_candidateKeys,
+    directSourceFinalOccurrenceCountPreds_eq_identityCodes]
+  exact StableOccurrenceRanks.alignedCountPred_eq
+    (directSourceFinalAtomIdentityCodes decider symbols)
+    (fun value _valueMember =>
+      directSourceFinalAtomIdentityCodes_count_le_three
+        decider symbols value)
+    query queryCandidate'
+
 /-- The active count of the fan beside each grouped key is the multiplicity
 of the identity recovered by base-three quotient. -/
 theorem directSourceFinalGroupedVariableFanCounts_eq_map_count
