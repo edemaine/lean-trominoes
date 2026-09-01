@@ -12846,6 +12846,13 @@ The representation choices for this target are:
   prove exact alignment and ordinary zero-based lookup, providing the port
   component needed to distinguish the eight fixed copies of each source
   atom.
+- The
+  [`copied inherited ring-code compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedInheritedRingAtomCodeCompiler.lean)
+  scales every inherited source identity by nine and adds its copied terminal
+  slot.  Its
+  [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedInheritedRingAtomCodeSemantics.lean)
+  identify the result with pointwise source-identity/port pairing and prove
+  that base-nine codes agree exactly when both components agree.
 
 ## Build
 
