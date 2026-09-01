@@ -2591,6 +2591,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Identify the actual prefix-sum local-code compiler with
                   those explicit parent-indexed blocks, so selecting its
                   parent-local positions inherits the same bound.
+                - [x] Prove presentation-relative slot remapping preserves
+                  the compiled scope bits, and specialize the selected local
+                  bound to the complete direct final occurrence stream.
                 - [x] Prove that keyed lookup over any duplicate-free aligned
                   candidate column returns the value at the queried key's
                   unique presentation index.
@@ -13047,6 +13050,11 @@ The representation choices for this target are:
   offsets with those explicit semantic blocks.  Selecting exactly the
   parent-local positions of the real compiler therefore preserves the
   at-most-three bound.
+- Their
+  [`direct final specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalLocalAtomOccurrenceBound.lean)
+  proves that presentation-relative inherited-slot remapping leaves the
+  scope bit unchanged.  Thus the actual final Boolean scope column selects
+  precisely those bounded local codes over the complete descriptor stream.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
