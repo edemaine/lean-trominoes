@@ -2726,6 +2726,9 @@ build; an imported proof counts when its statement matches the paper.
                   finite passes, apply the common stride, and append the
                   canonical tag to compile every variable-incidence element
                   code.
+                - [x] Compile descriptor-indexed clause-core incidence codes
+                  from the finite colored internal/top/left/right reference
+                  table, with exact direction-query length alignment.
                 - [x] Lift correct incidence blocks through retained and
                   reversed through edges, reducing the complete direct stream
                   to one correct compact block per stable incidence tag.
