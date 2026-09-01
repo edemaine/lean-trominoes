@@ -2496,6 +2496,9 @@ build; an imported proof counts when its statement matches the paper.
                   original Figure 9 atom or occurrence-local fresh complement,
                   with a finite comparator proved equal to represented-atom
                   equality.
+                - [x] Expand the exact copied-clause descriptor prefix into
+                  parent-grouped final occurrence blocks and compile each
+                  block's parent-relative atom-equality square.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
@@ -12722,6 +12725,15 @@ The representation choices for this target are:
   preserves the canonical Figure 9 record order; its atom comparator is exact,
   and the connector and polarity projections are the literal-wise fields of
   the generated normalized and complement clauses.
+- The
+  [`parent-clause occurrence-block compiler`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderOccurrenceBlockCompiler.lean)
+  expands each finite directed clause descriptor into its final Figure 9 and
+  polarity-normalized occurrence fields and compiles a block-local atom
+  equality square proved equal to equality of explicit parent-relative atoms.
+  Its
+  [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedOccurrenceBlockCompiler.lean)
+  composes both outputs with the exact five-family copied-clause descriptor
+  compiler.
 
 ## Build
 
