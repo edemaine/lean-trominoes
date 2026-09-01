@@ -13311,7 +13311,11 @@ The representation choices for this target are:
   [`grouped occurrence-slot compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceSlotCompiler.lean)
   performs the same verified reordering on the finite `.first`, `.second`,
   or `.third` fan-slot column.  Thus each grouped occurrence retains the slot
-  required to select its variable-incidence prefix table.
+  required to select its variable-incidence prefix table.  The
+  [`grouped variable-fan compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableFanDataCompiler.lean)
+  likewise carries the complete three-slot finite fan record into this
+  ordering, including every connector kind, polarity, and endpoint direction
+  used by that table.
 - The
   [`grouped occurrence-index compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexCompiler.lean)
   recovers each grouped key's original clause-major position.  A generic
