@@ -12382,6 +12382,17 @@ The representation choices for this target are:
   that exact keyed selection yields exactly the requested role/direction
   pairs with one incidence delimiter, providing the executable boundary for
   the direct color-major contraction scan.
+- [`LeanTrominoes/UnaryFieldBooleanFilterCompiler.lean`](LeanTrominoes/UnaryFieldBooleanFilterCompiler.lean),
+  [`LeanTrominoes/UnaryFieldStableOccurrenceKeyCompiler.lean`](LeanTrominoes/UnaryFieldStableOccurrenceKeyCompiler.lean),
+  and [`LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceCompiler.lean`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceCompiler.lean)
+  compile the numeric contraction schedule around that keyed boundary.
+  Canonical element codes expand to three stable base-three keys, an aligned
+  degree column removes the third key exactly for degree-two elements, and
+  the same degree controls emit the matching through or retained roles.
+  [`LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceSemantics.lean`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceSemantics.lean)
+  proves the exact element-major query and role blocks.  It remains to supply
+  the direct source's aligned canonical element-code, degree, and
+  incidence-element-code columns.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean),
