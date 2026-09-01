@@ -2723,6 +2723,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile each grouped variable occurrence's cyclic
                   successor key directly from its finite active slot and fan
                   count, avoiding a dynamic list rotation.
+                - [x] Identify the occurrence-indexed grouped identity bases
+                  with unique keyed lookup beside the grouped current keys.
                 - [x] Compile zero-based parent-clause indices and reorder
                   them beside the grouped variable occurrence stream.
                 - [x] Compile one finite current/successor/parent element
