@@ -2561,6 +2561,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Count the total multiplicity of every final global atom
                   identity and repeat that unary group size at each aligned
                   occurrence.
+                - [x] Convert each positive group size through a verified
+                  four-state counter to the fan's finite `countPred` field.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
@@ -12955,6 +12957,12 @@ The representation choices for this target are:
   multiplicity per final occurrence, exactly equal to the total number of
   occurrences carrying that identity and aligned with the rank, slot, and
   routed-request streams.
+- The
+  [`final occurrence count-predecessor compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceCountPredCompiler.lean)
+  maps those unary multiplicities through a four-state saturating counter to
+  the finite `Fin 3` field used by variable-fan records.  On every positive
+  multiplicity at most three, the emitted predecessor plus one is exactly the
+  original group size.
 
 ## Build
 
