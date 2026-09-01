@@ -12824,6 +12824,10 @@ The representation choices for this target are:
   square, then looks up repeated source-column indices in polynomial time;
   its [semantics](LeanTrominoes/UnaryIndexedValueLookupSemantics.lean) recover
   ordinary list lookup for every in-range query.
+- [`LeanTrominoes/UnaryFieldValueZeroInterleaveCompiler.lean`](LeanTrominoes/UnaryFieldValueZeroInterleaveCompiler.lean)
+  turns each unary field into adjacent candidate fields `[value, 0]` by a
+  fixed linear-time transduction, preparing aligned values for positional
+  Boolean masking without changing their order.
 - The
   [`copied source-position compiler`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedSourcePositionCompiler.lean)
   prefix-sums one bounded source advance per expanded copied-clause block and
