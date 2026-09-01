@@ -13145,6 +13145,14 @@ The representation choices for this target are:
   aligns the full presentation scope stream with the copied-plus-cycle split.
   Combining the copied bound of one with the cycle bound of two gives at most
   three occurrences, preserved by the final even-namespace map.
+- Generic
+  [`Boolean-choice occurrence semantics`](LeanTrominoes/AlignedUnaryBooleanChoiceOccurrenceSemantics.lean)
+  split a compiled choice column's target count into its false- and
+  true-selected branches.  The
+  [`complete direct identity occurrence bound`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalAtomIdentityOccurrenceBound.lean)
+  applies that split to the even inherited and odd parent-local namespaces;
+  parity makes one branch vanish, so every final numeric atom identity occurs
+  at most three times.
 - The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
