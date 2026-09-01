@@ -12785,6 +12785,14 @@ The representation choices for this target are:
   exactly quotient-code equality.  Its scoped binary words separate inherited
   source words from parent-indexed local codes and characterize equality in
   every branch.
+- The
+  [`copied scoped-word merger`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedScopedAtomWordData.lean)
+  consumes the pre-Figure9 compact atom-word column clause by clause, remaps
+  inherited occurrences through the presentation-relative scope controls, and
+  assigns parent-indexed quotient codes to local atoms.  Its
+  [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedScopedAtomWordData.lean)
+  proves exact source-column exhaustion and one output word per copied final
+  occurrence.
 
 ## Build
 
