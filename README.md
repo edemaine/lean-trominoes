@@ -13202,6 +13202,14 @@ The representation choices for this target are:
   proves that count-slot addition and finite decoding recover the exact
   uniquely keyed occurrence records and original count predecessor before
   consecutive triples are assembled.
+- The generic
+  [`clause-local occurrence-frame compiler`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderClauseFrameData.lean)
+  regroups each finite Figure 9/polarity header block by its generated final
+  clause, attaching the common clause fan and terminal group while preserving
+  exact header order.  Its
+  [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseFrameCompiler.lean)
+  composes with the complete parent-descriptor compiler and proves there is
+  exactly one such finite frame per compiled final occurrence.
 
 ## Build
 
