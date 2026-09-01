@@ -13130,6 +13130,12 @@ The representation choices for this target are:
   exposes the cycle identity compiler as one constant-identity block per
   retained variable.
 - The
+  [`cycle inherited-code block semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCycleInheritedRingAtomCodeBlockSemantics.lean)
+  align those repeated identities with the repeated ring-slot and scope
+  tables.  After inherited-position selection, the compiled cycle codes are
+  exactly one mapped copy of the twice-per-slot local table for each distinct
+  source identity.
+- The
   [`final occurrence-key semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics.lean)
   transfer stable ranks, multiplicities, candidate keys, and bounded fan
   counts from injective length words back to the numeric identity column.

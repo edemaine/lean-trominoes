@@ -28,7 +28,8 @@ def selectedInheritedValues {Value : Type} :
   | .parentLocal _ :: scopes, _ :: values =>
       selectedInheritedValues scopes values
 
-private theorem selectedInheritedValues_append
+/-- Inherited-value selection distributes over aligned concatenation. -/
+theorem selectedInheritedValues_append
     {Value : Type} (firstScopes secondScopes : List AtomScopeControl)
     (firstValues secondValues : List Value)
     (lengthEq : firstScopes.length = firstValues.length) :
@@ -50,6 +51,28 @@ private theorem selectedInheritedValues_append
           cases scope <;>
             simp [selectedInheritedValues,
               induction values tailLength]
+
+/-- Inherited-value selection distributes blockwise over two aligned flat
+maps. -/
+theorem selectedInheritedValues_flatMap
+    {Item Value : Type} (items : List Item)
+    (scopeBlock : Item → List AtomScopeControl)
+    (valueBlock : Item → List Value)
+    (lengthEq : ∀ item ∈ items,
+      (scopeBlock item).length = (valueBlock item).length) :
+    selectedInheritedValues
+        (items.flatMap scopeBlock) (items.flatMap valueBlock) =
+      items.flatMap fun item =>
+        selectedInheritedValues (scopeBlock item) (valueBlock item) := by
+  induction items with
+  | nil => rfl
+  | cons item items induction =>
+      simp only [List.flatMap_cons]
+      rw [selectedInheritedValues_append _ _ _ _
+        (lengthEq item (by simp))]
+      rw [induction]
+      intro later laterMember
+      exact lengthEq later (by simp [laterMember])
 
 theorem selectedInheritedValues_map
     {Value Output : Type} (mapValue : Value → Output)
