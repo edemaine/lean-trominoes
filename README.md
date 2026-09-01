@@ -13336,7 +13336,11 @@ The representation choices for this target are:
   converts every finite prefix to the same generic direction-block alphabet
   and applies the verified pointwise delimited join.  Its semantics preserve
   each finite table direction word exactly and expose the sparse suffix
-  selection at the join boundary.
+  selection at the join boundary.  The
+  [`final clause-incidence compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceDirectionCompiler.lean)
+  separately expands every final parent descriptor to all nine clause-core
+  triples and their RGB incidences, compiling the resulting 27 exact finite
+  direction blocks in stable clause-major order.
 - The
   [`grouped occurrence-index compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexCompiler.lean)
   recovers each grouped key's original clause-major position.  A generic

@@ -27,7 +27,7 @@ direction body in the generic delimited alphabet. -/
   simp [variableIncidencePrefixDirectionTokenBlock]
   rw [← List.map_eq_flatMap]
 
-private theorem convertedQueryBlocks
+theorem variableIncidenceConvertedQueryBlocks
     (queries : List HorizontalFiniteIncidenceDirectionQuery) :
     (queries.flatMap HorizontalFiniteIncidenceDirectionQuery.block).flatMap
         variableIncidencePrefixDirectionTokenBlock =
@@ -57,7 +57,7 @@ theorem directSourceFinalGroupedVariableIncidencePrefixDelimitedTokens_eq_blocks
             HorizontalFiniteIncidenceDirectionQuery.directions) := by
   unfold directSourceFinalGroupedVariableIncidencePrefixDelimitedTokens
   rw [directSourceFinalGroupedVariableIncidencePrefixDirectionTokens_eq]
-  exact convertedQueryBlocks _
+  exact variableIncidenceConvertedQueryBlocks _
 
 /-- The complete stream is definitionally the verified pointwise join of
 those exact finite prefixes and the exact sparse suffix selection. -/
