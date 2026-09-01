@@ -13307,7 +13307,11 @@ The representation choices for this target are:
   its
   [`semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceDataSemantics.lean)
   recover exactly the uniquely aligned record at each key and preserve one
-  output per distinct active occurrence.
+  output per distinct active occurrence.  The parallel
+  [`grouped occurrence-slot compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceSlotCompiler.lean)
+  performs the same verified reordering on the finite `.first`, `.second`,
+  or `.third` fan-slot column.  Thus each grouped occurrence retains the slot
+  required to select its variable-incidence prefix table.
 - The
   [`grouped occurrence-index compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexCompiler.lean)
   recovers each grouped key's original clause-major position.  A generic
