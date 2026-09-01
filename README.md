@@ -2761,6 +2761,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove generically that assembling consecutive triples
                   whose count predecessor is repeated three times recovers
                   the original fan-count column.
+                - [x] Prove the one-occurrence cycle fallback equals the
+                  compiled cyclic-successor key, so every second cycle
+                  reference uses one uniform successor column.
                 - [x] Compile descriptor-indexed clause-core incidence codes
                   from the finite colored internal/top/left/right reference
                   table, with exact direction-query length alignment.
