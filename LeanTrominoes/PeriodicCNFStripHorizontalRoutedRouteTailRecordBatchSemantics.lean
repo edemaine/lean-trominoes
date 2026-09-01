@@ -125,6 +125,25 @@ def clauseRecords
       simp only [List.reverse_nil, List.nil_append, List.map_cons]
       rw [induction]
 
+/-- A complete canonical clause-record prefix leaves the block splitter reset
+at the start of the remaining token stream. -/
+@[simp] theorem blocks_clauseRecords_append
+    (clauses : List (DirectedClauseProfile × List (List AxisDirection)))
+    (rest : List Token) :
+    TM2EndDelimitedBlockMap.blocks isClauseEnd
+        (clauseRecords clauses ++ rest) =
+      clauses.map (fun clause => clauseRecord clause.1 clause.2) ++
+        TM2EndDelimitedBlockMap.blocks isClauseEnd rest := by
+  unfold TM2EndDelimitedBlockMap.blocks clauseRecords
+  induction clauses with
+  | nil => rfl
+  | cons clause clauses induction =>
+      rw [List.flatMap_cons, List.append_assoc,
+        blocksAux_clauseRecord_append [] clause.1 clause.2]
+      simp only [List.reverse_nil, List.nil_append, List.map_cons,
+        List.cons_append]
+      rw [induction]
+
 /-- The physical batched compiler has the established routed-record semantics
 on every canonical sequence of clockwise source clauses. -/
 @[simp] theorem batchedRecords_clauseRecords
@@ -137,6 +156,17 @@ on every canonical sequence of clockwise source clauses. -/
   apply List.flatMap_congr
   intro clause _
   exact expandedRecords_clauseRecord clause.1 clause.2
+
+/-- Batched expansion distributes across any complete canonical clause-record
+prefix, even when the remaining token stream is not known to be complete. -/
+@[simp] theorem batchedRecords_clauseRecords_append
+    (clauses : List (DirectedClauseProfile × List (List AxisDirection)))
+    (rest : List Token) :
+    batchedRecords (clauseRecords clauses ++ rest) =
+      batchedRecords (clauseRecords clauses) ++ batchedRecords rest := by
+  unfold batchedRecords TM2EndDelimitedBlockMap.mappedOutput
+  rw [blocks_clauseRecords_append, blocks_clauseRecords,
+    List.flatMap_append]
 
 end HorizontalRoutedRouteTailRecord
 end PeriodicCNFStripReduction

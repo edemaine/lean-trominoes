@@ -12683,6 +12683,13 @@ The representation choices for this target are:
   composes normalized formatting, clockwise source-slot relabeling, and
   routed-record expansion into a verified polynomial-time emitter for the
   exact direct bend-family semantic records.
+- The
+  [`five-family record assembly`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFiveFamilyCompiledRecordSemantics.lean)
+  batches the direct crossover and routed phases and inserts the independently
+  compiled carrier and bend phases between them.  A reset lemma for complete
+  clause-record prefixes verifies that this polynomial-time append tree is
+  exactly the expanded copied-clause prefix of the canonical Figure 9 record
+  stream, in crossover/carrier/bend/routed-clause/routed-variable order.
 
 ## Build
 

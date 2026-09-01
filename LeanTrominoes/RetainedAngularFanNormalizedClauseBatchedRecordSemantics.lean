@@ -65,5 +65,45 @@ theorem batchedRecords_retainedFinalNormalizedClauseSemantic
   unfold clauseData taggedClauses
   rw [List.flatMap_map]
 
+/-- A normalized semantic clause-family stream is a complete batching prefix,
+so it can be expanded independently of every following record family. -/
+@[simp] theorem
+    batchedRecords_retainedFinalNormalizedClauseSemantic_append
+    {Variable : Type} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (start : Nat)
+    (clauses : List
+      (PeriodicClause (WrappedPeriodicPlanarSATVariable Variable)))
+    (rest : List HorizontalRoutedRouteTailRecord.Token) :
+    HorizontalRoutedRouteTailRecord.batchedRecords
+        (retainedFinalNormalizedClauseSemanticRouteTailRecordTokens
+          formula start clauses ++ rest) =
+      HorizontalRoutedRouteTailRecord.batchedRecords
+          (retainedFinalNormalizedClauseSemanticRouteTailRecordTokens
+            formula start clauses) ++
+        HorizontalRoutedRouteTailRecord.batchedRecords rest := by
+  let taggedClauses : List
+      (PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable) × Nat) :=
+    (clauses.zipIdx start).map fun taggedClause =>
+      (⟨(0, 0), taggedClause.1⟩, taggedClause.2)
+  let clauseData := taggedClauses.map fun taggedClause =>
+    (routedCopiedClauseProfile formula taggedClause.2 taggedClause.1,
+      orderedTailDirections
+        (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+          formula)
+        taggedClause.2
+        (copiedOccurrenceClause formula taggedClause.2 taggedClause.1))
+  have inputEq :
+      retainedFinalNormalizedClauseSemanticRouteTailRecordTokens
+          formula start clauses =
+        HorizontalRoutedRouteTailRecord.clauseRecords clauseData := by
+    unfold retainedFinalNormalizedClauseSemanticRouteTailRecordTokens
+      retainedFinalDirectClauseSemanticRouteTailRecordTokens
+      HorizontalRoutedRouteTailRecord.clauseRecords clauseData taggedClauses
+    simp only [List.map_map, List.flatMap_map, Function.comp_apply]
+  rw [inputEq,
+    HorizontalRoutedRouteTailRecord.batchedRecords_clauseRecords_append]
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
