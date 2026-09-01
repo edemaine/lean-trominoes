@@ -110,6 +110,49 @@ theorem expectedBlocks_eq_blocks
   intro candidate candidateMember
   by_cases same : query = candidate.1 <;> simp [same, block]
 
+private theorem matchingBodies_length_eq_count
+    (query : Nat) (candidates : List (Nat × List Alphabet)) :
+    (candidates.flatMap fun candidate =>
+      if query = candidate.1 then [candidate.2] else []).length =
+        (candidates.map Prod.fst).count query := by
+  induction candidates with
+  | nil => rfl
+  | cons candidate candidates induction =>
+      rw [List.flatMap_cons, List.length_append, induction,
+        List.map_cons]
+      by_cases same : query = candidate.1
+      · simp [same, Nat.add_comm]
+      · have reverse : candidate.1 ≠ query := Ne.symm same
+        simp [same, reverse]
+
+/-- With aligned duplicate-free keys covering every query, exactly one
+abstract body is selected for each query. -/
+theorem expectedBodyList_length
+    (queries blockKeys : List Nat) (bodies : List (List Alphabet))
+    (aligned : bodies.length = blockKeys.length)
+    (keysNodup : blockKeys.Nodup)
+    (present : ∀ query ∈ queries, query ∈ blockKeys) :
+    (expectedBodyList queries blockKeys bodies).length = queries.length := by
+  unfold expectedBodyList
+  have candidateKeys :
+      ((blockKeys.zip bodies).map Prod.fst) = blockKeys :=
+    List.map_fst_zip (by omega)
+  induction queries with
+  | nil => rfl
+  | cons query queries induction =>
+      have queryPresent : query ∈ blockKeys :=
+        present query (by simp)
+      have remainingPresent : ∀ other ∈ queries,
+          other ∈ blockKeys := by
+        intro other member
+        exact present other (by simp [member])
+      rw [List.flatMap_cons, List.length_append,
+        matchingBodies_length_eq_count, candidateKeys,
+        List.count_eq_one_of_mem keysNodup queryPresent,
+        induction remainingPresent]
+      simp only [List.length_cons]
+      omega
+
 private theorem zip_replicate_length
     (key : Nat) (tokens : List (Token Alphabet)) :
     (List.replicate tokens.length key).zip tokens =

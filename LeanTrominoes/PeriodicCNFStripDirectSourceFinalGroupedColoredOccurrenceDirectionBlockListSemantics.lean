@@ -6,6 +6,8 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.FiniteAlphabetIndexedDelimitedBlockLookupBlockSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalColoredOccurrenceRoutePairSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedColoredOccurrenceDirectionBlockSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedOccurrenceDataSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceKeySemantics
 
 /-! # Complete block semantics of grouped colored occurrence directions -/
 
@@ -27,6 +29,56 @@ noncomputable def directSourceFinalGroupedColoredOccurrenceDirectionBodies
       (directSourceFinalColoredOccurrenceDirectionBodies
         decider symbols).length)
     (directSourceFinalColoredOccurrenceDirectionBodies decider symbols)
+
+/-- Every compiled RGB block ordinal names a genuine clause-major colored
+occurrence body. -/
+theorem directSourceFinalGroupedColoredOccurrenceDirectionBlockOrdinal_lt
+    (symbols : List encoding.Γ) (ordinal : Nat)
+    (member : ordinal ∈
+      directSourceFinalGroupedColoredOccurrenceDirectionBlockOrdinals
+        decider symbols) :
+    ordinal <
+      (directSourceFinalColoredOccurrenceDirectionBodies
+        decider symbols).length := by
+  rw [directSourceFinalGroupedColoredOccurrenceDirectionBlockOrdinals_eq]
+    at member
+  obtain ⟨index, indexMember, ordinalMember⟩ :=
+    List.mem_flatMap.mp member
+  simp only [List.mem_cons, List.not_mem_nil, or_false] at ordinalMember
+  have indexLt := directSourceFinalGroupedOccurrenceIndex_lt
+    decider symbols index indexMember
+  rw [directSourceFinalColoredOccurrenceDirectionBodies_length]
+  rcases ordinalMember with rfl | rfl | rfl <;> omega
+
+@[simp] theorem
+    directSourceFinalGroupedColoredOccurrenceDirectionBodies_length
+    (symbols : List encoding.Γ) :
+    (directSourceFinalGroupedColoredOccurrenceDirectionBodies
+      decider symbols).length =
+      3 * (directSourceFinalUniqueFanQueryKeys decider symbols).length := by
+  unfold directSourceFinalGroupedColoredOccurrenceDirectionBodies
+  rw [FiniteAlphabetKeyedDelimitedBlockLookup.expectedBodyList_length]
+  · exact
+      directSourceFinalGroupedColoredOccurrenceDirectionBlockOrdinals_length
+        decider symbols
+  · simp
+  · exact List.nodup_range
+  · intro ordinal member
+    exact List.mem_range.mpr
+      (directSourceFinalGroupedColoredOccurrenceDirectionBlockOrdinal_lt
+        decider symbols ordinal member)
+
+/-- The grouped routed-incidence key column is aligned one-for-one with the
+explicit grouped direction bodies. -/
+theorem
+    directSourceFinalGroupedColoredOccurrenceDirectionBodies_length_eq_keys
+    (symbols : List encoding.Γ) :
+    (directSourceFinalGroupedColoredOccurrenceDirectionBodies
+      decider symbols).length =
+      (directSourceFinalGroupedRoutedIncidenceKeys decider symbols).length := by
+  rw [directSourceFinalGroupedColoredOccurrenceDirectionBodies_length,
+    directSourceFinalGroupedRoutedIncidenceKeys_length,
+    directSourceFinalGroupedOccurrenceData_length]
 
 /-- Indexed regrouping selects whole RGB occurrence-direction bodies from
 the explicit clause-major source, with every delimiter preserved. -/

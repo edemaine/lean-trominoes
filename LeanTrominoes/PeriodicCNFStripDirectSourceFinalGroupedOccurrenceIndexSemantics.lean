@@ -35,6 +35,37 @@ theorem directSourceFinalGroupedOccurrenceIndices_eq_map_alignedDatum
     exact directSourceFinalUniqueFanQueryKey_mem_candidateKeys
       decider symbols query queryMember
 
+/-- Every regrouped occurrence position comes from the canonical
+clause-major candidate-index range. -/
+theorem directSourceFinalGroupedOccurrenceIndex_mem_candidateIndices
+    (symbols : List encoding.Γ) (index : Nat)
+    (member : index ∈
+      directSourceFinalGroupedOccurrenceIndices decider symbols) :
+    index ∈ directSourceFinalOccurrenceCandidateIndices decider symbols := by
+  rw [directSourceFinalGroupedOccurrenceIndices_eq_map_alignedDatum]
+    at member
+  obtain ⟨query, queryMember, rfl⟩ := List.mem_map.mp member
+  apply UnaryKeyedValueLookup.alignedDatum_mem_candidateValues
+  · simp [directSourceFinalOccurrenceCandidateIndices,
+      UnaryFieldRange.values]
+  · exact directSourceFinalUniqueFanQueryKey_mem_candidateKeys
+      decider symbols query queryMember
+
+/-- Hence every regrouped position is a genuine index of the original
+clause-major occurrence stream. -/
+theorem directSourceFinalGroupedOccurrenceIndex_lt
+    (symbols : List encoding.Γ) (index : Nat)
+    (member : index ∈
+      directSourceFinalGroupedOccurrenceIndices decider symbols) :
+    index < (directSourceFinalCompiledOccurrenceData decider symbols).length := by
+  have candidateMember :=
+    directSourceFinalGroupedOccurrenceIndex_mem_candidateIndices
+      decider symbols index member
+  unfold directSourceFinalOccurrenceCandidateIndices
+    UnaryFieldRange.values at candidateMember
+  rw [directSourceFinalOccurrenceCandidateKeys_length] at candidateMember
+  exact List.mem_range.mp candidateMember
+
 @[simp] theorem directSourceFinalGroupedOccurrenceIndices_length
     (symbols : List encoding.Γ) :
     (directSourceFinalGroupedOccurrenceIndices decider symbols).length =

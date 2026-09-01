@@ -13441,7 +13441,9 @@ The representation choices for this target are:
   selection.  The
   [`grouped block-list semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedColoredOccurrenceDirectionBlockListSemantics.lean)
   strengthen this to selection of whole bodies from the explicit colored
-  occurrence list, including every closing delimiter.
+  occurrence list, including every closing delimiter.  They also prove every
+  selected RGB ordinal is in range and that the resulting body list is
+  aligned one-for-one with the routed-incidence key column.
 - The
   [`grouped routed-incidence key compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceKeyCompiler.lean)
   maps each grouped finite occurrence to width three or seven, prefix-sums

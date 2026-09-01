@@ -138,6 +138,36 @@ def directSourceFinalColoredOccurrenceDirectionBodies
       HorizontalOccurrenceRoutedRequest.output
         (DirectFinalOccurrenceEndpointFrame.routedTokens pair.1 pair.2)
 
+@[simp] theorem directSourceFinalColoredOccurrenceDirectionBodies_length
+    (symbols : List encoding.Γ) :
+    (directSourceFinalColoredOccurrenceDirectionBodies
+      decider symbols).length =
+      3 * (directSourceFinalCompiledOccurrenceData decider symbols).length := by
+  unfold directSourceFinalColoredOccurrenceDirectionBodies
+  rw [List.length_map]
+  have coloredLength :
+      (directSourceFinalColoredOccurrenceRoutePairs decider symbols).length =
+        (directFigureNinePolarityColoredRouteBlocks
+          decider symbols).length := by
+    unfold directSourceFinalColoredOccurrenceRoutePairs
+    rw [List.length_zip,
+      occurrenceEndpointFramesExpected_length_eq_routeBlocks,
+      min_self]
+  rw [coloredLength,
+    directFigureNinePolarityColoredRouteBlocks_length]
+  have pairLength :
+      (directFigureNinePolarityRoutePairs decider symbols).length =
+        (directSourceFinalCompiledOccurrenceData decider symbols).length := by
+    calc
+      _ = (directSourceFinalOccurrenceFramesExpected
+            decider symbols).length :=
+        (occurrenceFramesExpected_length_eq_routePairs
+          decider symbols).symm
+      _ = _ := by
+        rw [← directSourceFinalOccurrenceFrames_eq_expected,
+          directSourceFinalOccurrenceFrames_length]
+  rw [pairLength]
+
 /-- The compiled direction stream is exactly the complete delimited
 occurrence-direction body for every paired endpoint frame and route block. -/
 theorem directSourceFinalColoredOccurrenceDirectionTokens_eq_blocks

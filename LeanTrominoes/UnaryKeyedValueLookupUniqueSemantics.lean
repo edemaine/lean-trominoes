@@ -29,6 +29,21 @@ theorem candidateValues_eq_map_alignedDatum
   rw [keysNodup.idxOf_getElem index (by simpa [aligned] using valueIndexLt)]
   exact (List.getD_eq_getElem candidateValues 0 valueIndexLt).symm
 
+/-- A present key's recovered aligned datum belongs to the aligned candidate
+value column. -/
+theorem alignedDatum_mem_candidateValues
+    (candidateKeys candidateValues : List Nat)
+    (aligned : candidateKeys.length = candidateValues.length)
+    (key : Nat) (keyMember : key ∈ candidateKeys) :
+    alignedDatum candidateKeys candidateValues key ∈ candidateValues := by
+  unfold alignedDatum
+  have keyIndexLt : candidateKeys.idxOf key < candidateKeys.length :=
+    List.idxOf_lt_length_iff.mpr keyMember
+  have valueIndexLt : candidateKeys.idxOf key < candidateValues.length := by
+    simpa [← aligned] using keyIndexLt
+  rw [List.getD_eq_getElem candidateValues 0 valueIndexLt]
+  exact List.getElem_mem _
+
 /-- Index recovery at a duplicate-free aligned key returns its exact aligned
 candidate value. -/
 theorem alignedDatum_getElem
