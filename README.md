@@ -12807,6 +12807,15 @@ The representation choices for this target are:
   quotient, proves equality of these numeric codes is exactly equality of
   parent and represented atom, and compiles the aligned direct-source column
   in polynomial time.
+- The
+  [`last-index word-identity compiler`](LeanTrominoes/DelimitedBinaryWordLastIndexIdentityCompiler.lean)
+  assigns every delimited binary word the last presentation index carrying an
+  equal word.  Its
+  [semantics](LeanTrominoes/DelimitedBinaryWordLastIndexIdentitySemantics.lean)
+  prove that two numeric identities agree exactly when their words agree.  The
+  [direct compact-atom specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCompactAtomIdentityCompiler.lean)
+  compiles one such unary identity for every pre-Figure9 source occurrence,
+  aligned with the copied descriptor arity sum.
 
 ## Build
 
