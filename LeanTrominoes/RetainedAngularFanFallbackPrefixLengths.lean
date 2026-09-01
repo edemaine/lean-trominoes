@@ -135,6 +135,18 @@ private theorem
     EmbeddedCNFIncidenceDrawing.mapPoints,
     cornerEqualityDrawing] using singleton
 
+/-- Public finite corollary: no local bend-corner incidence route has a
+singleton deleted-final-point prefix. -/
+theorem bendCornerIncidenceRoute_prefix_length_ne_one
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (routeBend : RouteBend)
+    (clauseIndex literalIndex : Nat) :
+    ((drawingPlanarSATBendCornerIncidenceDrawing formula routeBend).routes
+      clauseIndex literalIndex).dropLast.length ≠ 1 :=
+  drawingPlanarSATBendCornerIncidenceDrawing_prefix_length_ne_one
+    formula routeBend clauseIndex literalIndex
+
 /-- A physical final witness has the same deleted-prefix length as its
 metadata-selected finite local route. -/
 theorem
