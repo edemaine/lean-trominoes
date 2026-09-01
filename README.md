@@ -12850,6 +12850,15 @@ The representation choices for this target are:
   the exact indexed queries, interleaved candidate column, and in-range list
   lookup.
 - The
+  [`complete final clause-descriptor compiler`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseDescriptorCompiler.lean)
+  appends the repeated nine-clause implication-cycle suffix to the copied
+  clause prefix, then assigns parent-local atom codes over the combined
+  stream.  Its
+  [semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseDescriptorSemantics.lean)
+  identify that expansion with the canonical copied-plus-cycle occurrence
+  data, so local auxiliary identities are globally disjoint and exactly
+  aligned.
+- The
   [`copied source-position compiler`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedSourcePositionCompiler.lean)
   prefix-sums one bounded source advance per expanded copied-clause block and
   adds its presentation-relative inherited slot.  Its
