@@ -2482,6 +2482,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Lift semantic slot attachment to indexed direct-clause
                   families and expose composition from any exact slot-input
                   producer through complete Figure 9 record emission.
+                - [x] Batch and assemble the crossover, carrier, bend, and
+                  routed copied-clause phases, then append the compiled fixed
+                  implication-cycle suffix to obtain the complete canonical
+                  Figure 9 header/tail record stream.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
@@ -12690,6 +12694,10 @@ The representation choices for this target are:
   clause-record prefixes verifies that this polynomial-time append tree is
   exactly the expanded copied-clause prefix of the canonical Figure 9 record
   stream, in crossover/carrier/bend/routed-clause/routed-variable order.
+- [`LeanTrominoes/PeriodicCNFStripDirectSourceFinalCompiledRouteTailRecordSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCompiledRouteTailRecordSemantics.lean)
+  appends the independently compiled implication-cycle suffix and proves the
+  resulting polynomial-time stream is the complete canonical retained Figure
+  9 header/tail record list.
 
 ## Build
 
