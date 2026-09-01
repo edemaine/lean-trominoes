@@ -2726,6 +2726,9 @@ build; an imported proof counts when its statement matches the paper.
                   finite passes, apply the common stride, and append the
                   canonical tag to compile every variable-incidence element
                   code.
+                - [x] Expose that compiled column as explicit per-occurrence
+                  selector blocks supplied with their current, cyclic-next,
+                  and parent identities.
                 - [x] Compile descriptor-indexed clause-core incidence codes
                   from the finite colored internal/top/left/right reference
                   table, with exact direction-query length alignment.
@@ -12453,6 +12456,20 @@ The representation choices for this target are:
   compile the zero-based parent clause of every final occurrence and reorder
   it into the same variable-major stream.  This supplies the clause-terminal
   identity base needed by variable-side connector incidences.
+- Generic
+  [`four-column zip semantics`](LeanTrominoes/ListZipWithFourSemantics.lean)
+  and
+  [`block-broadcast semantics`](LeanTrominoes/ListZipWithFourFlatMapSemantics.lean)
+  keep the remaining incidence audit in small independently compiled list
+  lemmas.  The direct
+  [`selected-identity semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableIncidenceSelectedIdentitySemantics.lean),
+  [`pointwise code semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableIncidenceElementCodeBlockSemantics.lean),
+  and
+  [`occurrence-block semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableIncidenceElementCodeOccurrenceBlockSemantics.lean)
+  successively expose the two Boolean choices, stride/tag arithmetic, and
+  final flattened stream.  Every grouped occurrence is now an explicit
+  finite selector block supplied with its current key, cyclic-successor key,
+  and parent clause index.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceData.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRouteRasterSourceCompiler.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData.lean),
