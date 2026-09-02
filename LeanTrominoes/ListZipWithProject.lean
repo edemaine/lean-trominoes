@@ -22,6 +22,22 @@ theorem zipWith_map_map_same
       simp only [List.map_cons, List.zipWith_cons_cons]
       rw [induction]
 
+/-- Flattening blocks from two aligned columns is the same as flat-mapping
+the corresponding paired column. -/
+theorem zipWith_flatten_eq_pair_flatMap
+    {First Second Element : Type*}
+    (block : First → Second → List Element) :
+    ∀ (firsts : List First) (seconds : List Second),
+      (List.zipWith block firsts seconds).flatten =
+        (List.zipWith Prod.mk firsts seconds).flatMap fun pair =>
+          block pair.1 pair.2
+  | [], _ => rfl
+  | _ :: _, [] => rfl
+  | first :: firsts, second :: seconds => by
+      simp only [List.zipWith_cons_cons, List.flatten_cons,
+        List.flatMap_cons]
+      rw [zipWith_flatten_eq_pair_flatMap block firsts seconds]
+
 theorem zipWith_project_left_of_length_eq
     {First Second Target : Type*}
     (project : First → Target) (firsts : List First) (seconds : List Second)

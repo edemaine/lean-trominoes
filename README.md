@@ -2779,6 +2779,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Strengthen parent regrouping to a joint permutation
                   that keeps every finite occurrence record attached to its
                   original parent index.
+                - [x] Lift that joint permutation through the RGB terminal
+                  tag table, preserving the complete occurrence-derived
+                  parent-terminal code multiset.
                 - [x] Compile descriptor-indexed clause-core incidence codes
                   from the finite colored internal/top/left/right reference
                   table, with exact direction-query length alignment.
