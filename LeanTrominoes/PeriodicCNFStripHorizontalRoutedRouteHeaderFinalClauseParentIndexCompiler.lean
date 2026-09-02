@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.FiniteBlockIndexCompiler
 import LeanTrominoes.FiniteBlockTransducer
 import LeanTrominoes.FiniteUnaryFieldMapCompiler
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderClauseFrameData
@@ -82,6 +83,16 @@ theorem tokenMarkers_count_true_eq_topMarkers (token : Token) :
   | «variable» => rfl
   | clause profile => cases profile <;> native_decide +revert
 
+/-- More strongly, the boundary detector is exactly the ordinary
+block-ending marker stream of the boundary-preserving final-clause frames. -/
+theorem tokenMarkers_eq_blockMarkers (token : Token) :
+    tokenMarkers token =
+      FiniteBlockIndices.markers List.length
+        (HorizontalRoutedRouteHeaderClauseFrame.tokenBlocks token) := by
+  cases token with
+  | «variable» => rfl
+  | clause profile => cases profile <;> native_decide +revert
+
 /-- Globally, final-clause ends and final-clause starts have the same count. -/
 theorem markers_count_true_eq_topMarkers (source : List Token) :
     (markers source).count true =
@@ -93,6 +104,47 @@ theorem markers_count_true_eq_topMarkers (source : List Token) :
         (tokenTopMarkers token ++ source.flatMap tokenTopMarkers).count true
       rw [List.count_append, List.count_append,
         tokenMarkers_count_true_eq_topMarkers, induction]
+
+/-- The complete boundary stream is the block-ending stream of all actual
+final clauses with their boundaries retained. -/
+theorem markers_eq_blockMarkers (source : List Token) :
+    markers source =
+      FiniteBlockIndices.markers List.length
+        (HorizontalRoutedRouteHeaderClauseFrame.outputBlocks source) := by
+  induction source with
+  | nil => rfl
+  | cons token source induction =>
+      change tokenMarkers token ++ markers source =
+        FiniteBlockIndices.markers List.length
+          (HorizontalRoutedRouteHeaderClauseFrame.tokenBlocks token ++
+            HorizontalRoutedRouteHeaderClauseFrame.outputBlocks source)
+      unfold FiniteBlockIndices.markers
+      rw [List.flatMap_append]
+      change tokenMarkers token ++ markers source =
+        FiniteBlockIndices.markers List.length
+            (HorizontalRoutedRouteHeaderClauseFrame.tokenBlocks token) ++
+          FiniteBlockIndices.markers List.length
+            (HorizontalRoutedRouteHeaderClauseFrame.outputBlocks source)
+      rw [tokenMarkers_eq_blockMarkers, induction]
+
+/-- Prefix summation of the finite boundary detector is exactly the generic
+actual-clause block-index stream. -/
+theorem parentIndices_eq_blockIndices (source : List Token) :
+    parentIndices source =
+      FiniteBlockIndices.indices List.length
+        (HorizontalRoutedRouteHeaderClauseFrame.outputBlocks source) := by
+  unfold parentIndices increments FiniteBlockIndices.indices
+    FiniteBlockIndices.increments
+  rw [markers_eq_blockMarkers]
+
+/-- Thus the computed index is each actual final clause's ordinal repeated
+over every occurrence frame in that clause. -/
+theorem parentIndices_eq_expected (source : List Token) :
+    parentIndices source =
+      FiniteBlockIndices.expected List.length
+        (HorizontalRoutedRouteHeaderClauseFrame.outputBlocks source) := by
+  rw [parentIndices_eq_blockIndices]
+  exact FiniteBlockIndices.indices_eq_expected List.length _
 
 theorem markers_length (source : List Token) :
     (markers source).length =

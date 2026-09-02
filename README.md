@@ -2796,9 +2796,14 @@ build; an imported proof counts when its statement matches the paper.
                   canonical clause elements/degrees over that actual
                   final-clause stream.
                 - [x] Reindex occurrence parent-terminal identities at the
-                  same actual final-clause boundaries, and exhaustively audit
-                  that every finite descriptor has equally many clause-end
-                  markers and `.top` clause-start frames.
+                  same actual final-clause boundaries, preserving those
+                  boundaries structurally through the frame compiler.
+                - [x] Prove that the occurrence-derived parent-terminal code
+                  stream is exactly the present RGB terminal block of every
+                  actual final clause.
+                - [x] Combine each clause core's baseline multiplicities with
+                  those occurrence-side terminal references to realize the
+                  declared degree of every canonical RGB clause element.
                 - [x] Append the grouped variable and clause-core families
                   into the complete canonical incidence element-code column,
                   one identity per independently delimited direction query.

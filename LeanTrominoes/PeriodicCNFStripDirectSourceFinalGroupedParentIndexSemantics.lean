@@ -15,12 +15,17 @@ variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
 /-- The clause-major compiler is exactly the actual-final-clause boundary
-indexer on the complete descriptor stream. -/
+specification: each clause ordinal is repeated over precisely that clause's
+occurrence-frame block. -/
 theorem directSourceFinalOccurrenceParentIndices_eq_expected
     (symbols : List encoding.Γ) :
     directSourceFinalOccurrenceParentIndices decider symbols =
-      HorizontalRoutedRouteHeaderFinalClauseParentIndex.parentIndices
-        (directSourceFinalClauseDescriptors decider symbols) := by
-  rfl
+      FiniteBlockIndices.expected List.length
+        (HorizontalRoutedRouteHeaderClauseFrame.outputBlocks
+          (directSourceFinalClauseDescriptors decider symbols)) := by
+  unfold directSourceFinalOccurrenceParentIndices
+  exact
+    HorizontalRoutedRouteHeaderFinalClauseParentIndex.parentIndices_eq_expected
+      _
 
 end LeanTrominoes.PeriodicCNFStripReduction

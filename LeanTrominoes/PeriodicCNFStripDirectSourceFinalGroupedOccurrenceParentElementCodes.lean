@@ -15,16 +15,22 @@ namespace LeanTrominoes.PeriodicCNFStripReduction
 
 open Gadget PlanarThreeDM
 
+/-- The three RGB clause-terminal element codes selected by one connector
+kind at a given actual final-clause position. -/
+def finalConnectorParentElementCodeBlock
+    (kind : VariableConnectorKind) (parent : Nat) : List Nat :=
+  [parent * directSourceFinalElementCodeStride +
+      (variableIncidenceClauseTerminalTag kind .red).val,
+    parent * directSourceFinalElementCodeStride +
+      (variableIncidenceClauseTerminalTag kind .green).val,
+    parent * directSourceFinalElementCodeStride +
+      (variableIncidenceClauseTerminalTag kind .blue).val]
+
 /-- The three clause-terminal element codes referenced by one finite final
 occurrence record. -/
 def finalOccurrenceParentElementCodeBlock
     (data : FinalFanOccurrenceData) (parent : Nat) : List Nat :=
-  [parent * directSourceFinalElementCodeStride +
-      (variableIncidenceClauseTerminalTag data.kind .red).val,
-    parent * directSourceFinalElementCodeStride +
-      (variableIncidenceClauseTerminalTag data.kind .green).val,
-    parent * directSourceFinalElementCodeStride +
-      (variableIncidenceClauseTerminalTag data.kind .blue).val]
+  finalConnectorParentElementCodeBlock data.kind parent
 
 /-- Once the grouped fan/slot kind is identified with its grouped occurrence
 record, the audited parent selector block is exactly the occurrence-based RGB
@@ -42,6 +48,7 @@ theorem groupedVariableIncidenceExpectedParentElementCodeBlock_eq_of_kind_eq
     VariableIncidenceLocalControl.slot,
     VariableIncidenceLocalControl.parent,
     finalOccurrenceParentElementCodeBlock,
+    finalConnectorParentElementCodeBlock,
     kindEq]
 
 variable {Input : Type}

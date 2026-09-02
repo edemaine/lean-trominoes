@@ -6,10 +6,13 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.FiniteBlockTransducer
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFrameCompiler
 import LeanTrominoes.TM2CompositionMachine
+import LeanTrominoes.TM2ComputableInPolyTimeCongr
 
 /-! # Actual final-clause fan enumeration -/
 
 noncomputable section
+
+set_option maxHeartbeats 800000
 
 namespace LeanTrominoes.PeriodicCNFStripReduction
 
@@ -25,7 +28,7 @@ final clause.  Left and right occurrence frames contribute no new clause. -/
 def finalClauseFanFrameBlock
     (frame : HorizontalRoutedRouteHeaderClauseFrame.Data) :
     List ClauseRibbonFanData :=
-  if frame.group = .top then [frame.clauseFan] else []
+  HorizontalRoutedRouteHeaderClauseFrame.fanFrameBlock frame
 
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
@@ -37,18 +40,44 @@ presentation order.  This is deliberately finer than the parent-descriptor
 stream: one descriptor can generate many final clauses. -/
 def directSourceFinalClauseFans
     (symbols : List encoding.Γ) : List ClauseRibbonFanData :=
-  (directSourceFinalClauseFrames decider symbols).flatMap
-    finalClauseFanFrameBlock
+  HorizontalRoutedRouteHeaderClauseFrame.outputClauseFans
+    (directSourceFinalClauseDescriptors decider symbols)
+
+/-- The canonical list is definitionally the fan projection of the retained
+actual-clause blocks. -/
+theorem directSourceFinalClauseFans_eq_blockFans
+    (symbols : List encoding.Γ) :
+    directSourceFinalClauseFans decider symbols =
+      (HorizontalRoutedRouteHeaderClauseFrame.outputBlocks
+        (directSourceFinalClauseDescriptors decider symbols)).map
+          HorizontalRoutedRouteHeaderClauseFrame.blockFan := by
+  rfl
+
+/-- Expose the descriptor-level normal form without unfolding the direct
+compiler in downstream semantic proofs. -/
+theorem directSourceFinalClauseFans_eq_output
+    (symbols : List encoding.Γ) :
+    directSourceFinalClauseFans decider symbols =
+      (HorizontalRoutedRouteHeaderClauseFrame.output
+        (directSourceFinalClauseDescriptors decider symbols)).flatMap
+          finalClauseFanFrameBlock := by
+  exact
+    (HorizontalRoutedRouteHeaderClauseFrame.output_flatMap_fanFrameBlock_eq_outputClauseFans
+      _).symm
 
 /-- The actual final-clause fan stream is polynomial-time computable. -/
 noncomputable def directSourceFinalClauseFansComputableInPolyTime :
     TM2ComputableInPolyTime id id
       (directSourceFinalClauseFans decider) := by
-  unfold directSourceFinalClauseFans
-  exact TM2CompositionMachine.computableInPolyTime
+  let selected := TM2CompositionMachine.computableInPolyTime
     (directSourceFinalClauseFramesComputableInPolyTime decider)
     (FiniteBlockTransducer.computableInPolyTime
       finalClauseFanFrameBlock)
+  apply Turing.TM2ComputableInPolyTime.of_eq selected
+  intro symbols
+  exact
+    HorizontalRoutedRouteHeaderClauseFrame.output_flatMap_fanFrameBlock_eq_outputClauseFans
+      (directSourceFinalClauseDescriptors decider symbols)
 
 end LeanTrominoes.PeriodicCNFStripReduction
 
