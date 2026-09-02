@@ -2767,6 +2767,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Combine cyclic-successor balance with the current-key
                   column to prove two references to every canonical red
                   cycle element globally.
+                - [x] Regroup cycle and private contributions across local
+                  RGB order and prove exactly two incidence references to
+                  every canonical variable element.
                 - [x] Compile descriptor-indexed clause-core incidence codes
                   from the finite colored internal/top/left/right reference
                   table, with exact direction-query length alignment.

@@ -54,6 +54,26 @@ theorem zipWith4_ignore_fourth_of_length_eq
       rw [zipWith4_ignore_fourth_of_length_eq combine
         firsts seconds thirds fourths (Nat.succ.inj lengthEq)]
 
+/-- A three-list zip whose result ignores the third column is the
+corresponding two-list zip when that column is long enough. -/
+theorem zipWith3_ignore_third_of_length_eq
+    {First Second Third Target : Type*}
+    (combine : First → Second → Target) :
+    ∀ (firsts : List First) (seconds : List Second) (thirds : List Third),
+      firsts.length = thirds.length →
+      zipWith3 (fun first second _ => combine first second)
+          firsts seconds thirds =
+        zipWith combine firsts seconds
+  | [], _, [], _ => rfl
+  | [], _, _ :: _, lengthEq => by simp at lengthEq
+  | _ :: _, [], _, _ => rfl
+  | _ :: _, _ :: _, [], lengthEq => by simp at lengthEq
+  | first :: firsts, second :: seconds, third :: thirds, lengthEq => by
+      simp only [List.length_cons] at lengthEq
+      simp only [zipWith3, zipWith]
+      rw [zipWith3_ignore_third_of_length_eq combine
+        firsts seconds thirds (Nat.succ.inj lengthEq)]
+
 /-- Mapping the result of a three-list zip fuses into its combining
 function. -/
 theorem map_zipWith3
