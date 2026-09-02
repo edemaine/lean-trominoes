@@ -9,6 +9,19 @@ import Mathlib.Data.List.Zip
 
 namespace List
 
+theorem zipWith_map_map_same
+    {Key First Second Target : Type*}
+    (combine : First → Second → Target)
+    (first : Key → First) (second : Key → Second)
+    (keys : List Key) :
+    List.zipWith combine (keys.map first) (keys.map second) =
+      keys.map fun key => combine (first key) (second key) := by
+  induction keys with
+  | nil => rfl
+  | cons key keys induction =>
+      simp only [List.map_cons, List.zipWith_cons_cons]
+      rw [induction]
+
 theorem zipWith_project_left_of_length_eq
     {First Second Target : Type*}
     (project : First → Target) (firsts : List First) (seconds : List Second)

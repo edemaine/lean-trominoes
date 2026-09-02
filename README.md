@@ -2776,6 +2776,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove stable-key regrouping permutes the complete
                   clause-major parent-index column without loss or
                   duplication.
+                - [x] Strengthen parent regrouping to a joint permutation
+                  that keeps every finite occurrence record attached to its
+                  original parent index.
                 - [x] Compile descriptor-indexed clause-core incidence codes
                   from the finite colored internal/top/left/right reference
                   table, with exact direction-query length alignment.
