@@ -1352,6 +1352,11 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Bridge each numeric color-list degree test to the incidence
           degree of the typed element at the same stable list index, in
           independently compiled red, green, and blue leaves.
+        - [x] Prove the complete typed red, green, and blue degree columns are
+          three copies of one structural occurrence/clause pattern: each used
+          occurrence contributes `[2,2,2]` only for a fixed-red connector and
+          `[2]` otherwise, while each clause contributes `[3,3,3,3]` or
+          `[3,3,3,2]` according to its arity.
         - [x] Classify degree-three typed elements by constructor and rewrite
           every color's indexed request block as a typed-element scan, with
           data, predicate transport, and list algebra compiled separately.
@@ -13612,7 +13617,11 @@ The representation choices for this target are:
   [`horizontal element-degree list semantics`](LeanTrominoes/PeriodicCNFStripHorizontalElementDegreeListSemantics.lean)
   discharge the encoding half of the first equality: natural-number element
   indices enumerate exactly the typed red, green, and blue degrees, with
-  `idxOf` eliminated using duplicate-freeness of each typed element list.
+  `idxOf` eliminated using duplicate-freeness of each typed element list.  The
+  [`typed structural degree pattern`](LeanTrominoes/PeriodicCNFStripHorizontalTypedElementDegreePattern.lean)
+  then computes each color list locally from exact incidence multiplicities
+  and proves the complete color-major list consists of three copies of one
+  occurrence/clause pattern.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
