@@ -4,8 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseDescriptorSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFrameCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexSemantics
-import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedParentIndexCompiler
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompiler
 import LeanTrominoes.TM2EmptyAlphabetListInputCompiler
 import LeanTrominoes.UnaryIndexedValueLookupCompiler
 
@@ -26,11 +27,11 @@ noncomputable local instance directFinalGroupedParentIndexStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-/-- Zero-based parent clause index of every final occurrence in the original
-clause-major presentation. -/
+/-- Zero-based actual final-clause index of every final occurrence in the
+original clause-major presentation. -/
 def directSourceFinalOccurrenceParentIndices
     (symbols : List encoding.Γ) : List Nat :=
-  HorizontalRoutedRouteHeaderCopiedParentIndex.parentIndices
+  HorizontalRoutedRouteHeaderFinalClauseParentIndex.parentIndices
     (directSourceFinalClauseDescriptors decider symbols)
 
 /-- Parent clause indices reordered beside the variable-major active
@@ -46,8 +47,9 @@ def directSourceFinalGroupedParentIndices
     (directSourceFinalOccurrenceParentIndices decider symbols).length =
       (directSourceFinalCompiledOccurrenceData decider symbols).length := by
   unfold directSourceFinalOccurrenceParentIndices
-  rw [HorizontalRoutedRouteHeaderCopiedParentIndex.parentIndices_length,
-    directSourceFinalClauseDescriptors_occurrenceData_eq]
+  rw [HorizontalRoutedRouteHeaderFinalClauseParentIndex.parentIndices_length]
+  change (directSourceFinalClauseFrames decider symbols).length = _
+  exact directSourceFinalClauseFrames_length decider symbols
 
 @[simp] theorem directSourceFinalGroupedParentIndices_length
     (symbols : List encoding.Γ) :
@@ -64,7 +66,7 @@ noncomputable def
   unfold directSourceFinalOccurrenceParentIndices
   exact TM2CompositionMachine.computableInPolyTime
     (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
-    HorizontalRoutedRouteHeaderCopiedParentIndex.parentIndicesComputableInPolyTime
+    HorizontalRoutedRouteHeaderFinalClauseParentIndex.parentIndicesComputableInPolyTime
 
 /-- Grouped parent-clause indices are polynomial-time computable from the
 direct source. -/

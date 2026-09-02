@@ -14,14 +14,13 @@ variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
-/-- The clause-major compiler is exactly the generic nonempty-block parent
-index specification on the complete final descriptor stream. -/
+/-- The clause-major compiler is exactly the actual-final-clause boundary
+indexer on the complete descriptor stream. -/
 theorem directSourceFinalOccurrenceParentIndices_eq_expected
     (symbols : List encoding.Γ) :
     directSourceFinalOccurrenceParentIndices decider symbols =
-      HorizontalRoutedRouteHeaderCopiedParentIndex.expected
+      HorizontalRoutedRouteHeaderFinalClauseParentIndex.parentIndices
         (directSourceFinalClauseDescriptors decider symbols) := by
-  unfold directSourceFinalOccurrenceParentIndices
-  exact HorizontalRoutedRouteHeaderCopiedParentIndex.parentIndices_eq_expected _
+  rfl
 
 end LeanTrominoes.PeriodicCNFStripReduction

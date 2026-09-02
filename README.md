@@ -2795,8 +2795,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Reindex clause-core incidence queries/codes and
                   canonical clause elements/degrees over that actual
                   final-clause stream.
-                - [ ] Reindex occurrence parent-terminal identities at the
-                  same actual final-clause boundaries.
+                - [x] Reindex occurrence parent-terminal identities at the
+                  same actual final-clause boundaries, and exhaustively audit
+                  that every finite descriptor has equally many clause-end
+                  markers and `.top` clause-start frames.
                 - [x] Append the grouped variable and clause-core families
                   into the complete canonical incidence element-code column,
                   one identity per independently delimited direction query.
