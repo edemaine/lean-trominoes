@@ -2785,6 +2785,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Lift that joint permutation through the RGB terminal
                   tag table, preserving the complete occurrence-derived
                   parent-terminal code multiset.
+                - [x] Identify every active grouped fan/slot connector kind
+                  with its aligned finite occurrence record, and thereby
+                  equate the audited parent-selector stream with that
+                  occurrence-derived RGB terminal stream.
                 - [x] Compile descriptor-indexed clause-core incidence codes
                   from the finite colored internal/top/left/right reference
                   table, with exact direction-query length alignment.
