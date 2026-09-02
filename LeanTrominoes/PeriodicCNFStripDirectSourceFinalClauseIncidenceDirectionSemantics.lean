@@ -10,11 +10,11 @@ import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceDi
 
 namespace LeanTrominoes.PeriodicCNFStripReduction
 
-open PeriodicCNF
+open PeriodicPlanarOneInThreeToThreeDM
 
 @[simp] theorem finalClauseIncidenceQueryBlock_length
-    (descriptor : FormulaShapeDirectionOrdering.Token) :
-    (finalClauseIncidenceQueryBlock descriptor).length = 27 := by
+    (fan : ClauseRibbonFanData) :
+    (finalClauseIncidenceQueryBlock fan).length = 27 := by
   simp [finalClauseIncidenceQueryBlock,
     PeriodicPlanarOneInThreeToThreeDM.allClauseSets]
 
@@ -26,7 +26,7 @@ variable (decider : Complexity.DeciderInPolySpace encoding language)
 @[simp] theorem directSourceFinalClauseIncidenceQueries_length
     (symbols : List encoding.Γ) :
     (directSourceFinalClauseIncidenceQueries decider symbols).length =
-      27 * (directSourceFinalClauseDescriptors decider symbols).length := by
+      27 * (directSourceFinalClauseFans decider symbols).length := by
   unfold directSourceFinalClauseIncidenceQueries
   simp [Nat.mul_comm]
 

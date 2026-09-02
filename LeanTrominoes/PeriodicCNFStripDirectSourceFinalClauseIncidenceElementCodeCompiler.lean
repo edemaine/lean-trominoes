@@ -23,17 +23,16 @@ open Computability Turing
 open Gadget PeriodicCNF PlanarThreeDM
 open PeriodicPlanarOneInThreeToThreeDM
 
-/-- One placeholder per descriptor, including the harmless total fallback
-case. -/
+/-- One placeholder per actual final-clause fan. -/
 def directSourceFinalClauseIncidenceIndexPlaceholders
     {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
     {language : Input → Prop}
     (decider : Complexity.DeciderInPolySpace encoding language)
     (symbols : List encoding.Γ) : List Nat :=
-  FiniteUnaryFieldMap.values (fun _ : FormulaShapeDirectionOrdering.Token => 0)
-    (directSourceFinalClauseDescriptors decider symbols)
+  FiniteUnaryFieldMap.values (fun _ : ClauseRibbonFanData => 0)
+    (directSourceFinalClauseFans decider symbols)
 
-/-- Zero-based descriptor positions used as parent clause identities. -/
+/-- Zero-based actual final-clause positions used as clause identities. -/
 def directSourceFinalClauseIncidenceIndices
     {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
     {language : Input → Prop}
@@ -65,13 +64,13 @@ def clauseIncidenceReferenceTag
 /-- Twenty-seven clause-reference tags in the exact triple-major RGB order
 of the clause-incidence direction-query block. -/
 def finalClauseIncidenceElementTagBlock
-    (_ : FormulaShapeDirectionOrdering.Token) : List Nat :=
+    (_ : ClauseRibbonFanData) : List Nat :=
   allClauseSets.flatMap fun set =>
     [clauseIncidenceReferenceTag set .red,
       clauseIncidenceReferenceTag set .green,
       clauseIncidenceReferenceTag set .blue]
 
-/-- Twenty-seven repeated stride-scaled parent bases per final descriptor. -/
+/-- Twenty-seven repeated stride-scaled bases per actual final clause. -/
 def directSourceFinalClauseIncidenceElementCodeBases
     (indices : List Nat) : List Nat :=
   UnaryFieldFixedCopies.values 27 <|
@@ -90,7 +89,7 @@ noncomputable local instance directFinalClauseIncidenceElementCodeStackFintype
 def directSourceFinalClauseIncidenceElementTags
     (symbols : List encoding.Γ) : List Nat :=
   FiniteUnaryFieldBlockMap.values finalClauseIncidenceElementTagBlock
-    (directSourceFinalClauseDescriptors decider symbols)
+    (directSourceFinalClauseFans decider symbols)
 
 /-- Complete canonical element codes for final clause-core incidences. -/
 def directSourceFinalClauseIncidenceElementCodes
@@ -101,22 +100,22 @@ def directSourceFinalClauseIncidenceElementCodes
     (directSourceFinalClauseIncidenceElementTags decider symbols)
 
 @[simp] theorem finalClauseIncidenceElementTagBlock_length
-    (token : FormulaShapeDirectionOrdering.Token) :
-    (finalClauseIncidenceElementTagBlock token).length = 27 := by
+    (fan : ClauseRibbonFanData) :
+    (finalClauseIncidenceElementTagBlock fan).length = 27 := by
   simp [finalClauseIncidenceElementTagBlock, allClauseSets]
 
 @[simp] theorem directSourceFinalClauseIncidenceIndexPlaceholders_length
     (symbols : List encoding.Γ) :
     (directSourceFinalClauseIncidenceIndexPlaceholders
       decider symbols).length =
-      (directSourceFinalClauseDescriptors decider symbols).length := by
+      (directSourceFinalClauseFans decider symbols).length := by
   simp [directSourceFinalClauseIncidenceIndexPlaceholders,
     FiniteUnaryFieldMap.values]
 
 @[simp] theorem directSourceFinalClauseIncidenceIndices_length
     (symbols : List encoding.Γ) :
     (directSourceFinalClauseIncidenceIndices decider symbols).length =
-      (directSourceFinalClauseDescriptors decider symbols).length := by
+      (directSourceFinalClauseFans decider symbols).length := by
   simp [directSourceFinalClauseIncidenceIndices, UnaryFieldRange.values]
 
 @[simp] theorem directSourceFinalClauseIncidenceElementCodeBases_length
@@ -141,10 +140,10 @@ def directSourceFinalClauseIncidenceElementCodes
 @[simp] theorem directSourceFinalClauseIncidenceElementTags_length
     (symbols : List encoding.Γ) :
     (directSourceFinalClauseIncidenceElementTags decider symbols).length =
-      27 * (directSourceFinalClauseDescriptors decider symbols).length := by
+      27 * (directSourceFinalClauseFans decider symbols).length := by
   unfold directSourceFinalClauseIncidenceElementTags
     FiniteUnaryFieldBlockMap.values
-  induction directSourceFinalClauseDescriptors decider symbols with
+  induction directSourceFinalClauseFans decider symbols with
   | nil => rfl
   | cons token tokens induction =>
       simp [induction]
@@ -156,9 +155,9 @@ noncomputable def
       (directSourceFinalClauseIncidenceIndexPlaceholders decider) := by
   unfold directSourceFinalClauseIncidenceIndexPlaceholders
   exact TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
+    (directSourceFinalClauseFansComputableInPolyTime decider)
     (FiniteUnaryFieldMap.computableInPolyTime
-      fun _ : FormulaShapeDirectionOrdering.Token => 0)
+      fun _ : ClauseRibbonFanData => 0)
 
 noncomputable def
     directSourceFinalClauseIncidenceIndicesComputableInPolyTime :
@@ -188,7 +187,7 @@ noncomputable def
       (directSourceFinalClauseIncidenceElementTags decider) := by
   unfold directSourceFinalClauseIncidenceElementTags
   exact TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
+    (directSourceFinalClauseFansComputableInPolyTime decider)
     (FiniteUnaryFieldBlockMap.computableInPolyTime
       finalClauseIncidenceElementTagBlock)
 

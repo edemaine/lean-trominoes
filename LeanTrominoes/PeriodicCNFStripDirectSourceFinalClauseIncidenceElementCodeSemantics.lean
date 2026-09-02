@@ -23,23 +23,23 @@ noncomputable local instance directFinalClauseIncidenceSemanticsStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-/-- The descriptor-position compiler emits the literal range of the final
-descriptor length. -/
+/-- The clause-position compiler emits the literal range of the actual
+final-clause fan length. -/
 theorem directSourceFinalClauseIncidenceIndices_eq_range
     (symbols : List encoding.Γ) :
     directSourceFinalClauseIncidenceIndices decider symbols =
-      List.range (directSourceFinalClauseDescriptors decider symbols).length := by
+      List.range (directSourceFinalClauseFans decider symbols).length := by
   unfold directSourceFinalClauseIncidenceIndices
     directSourceFinalClauseIncidenceIndexPlaceholders
     UnaryFieldRange.values FiniteUnaryFieldMap.values
   simp
 
-/-- The tag compiler is the direct descriptor-wise expansion of the finite
+/-- The tag compiler is the direct final-clause-wise expansion of the finite
 clause reference table. -/
 theorem directSourceFinalClauseIncidenceElementTags_eq_flatMap
     (symbols : List encoding.Γ) :
     directSourceFinalClauseIncidenceElementTags decider symbols =
-      (directSourceFinalClauseDescriptors decider symbols).flatMap
+      (directSourceFinalClauseFans decider symbols).flatMap
         finalClauseIncidenceElementTagBlock := by
   rfl
 

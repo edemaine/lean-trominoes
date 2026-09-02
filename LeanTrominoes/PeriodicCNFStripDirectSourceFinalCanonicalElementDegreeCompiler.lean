@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.FiniteUnaryFieldBlockMapCompiler
-import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseDescriptorCompiler
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFanCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableFanSlotCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableIncidencePrefixCompiler
 import LeanTrominoes.UnaryFieldEncoderAppendClosure
@@ -32,14 +32,11 @@ def directSourceFinalVariableElementDegreeBlock
   | .fixedRed => [2, 2, 2]
   | .fixedGreen | .fixedBlue => [2]
 
-/-- The clause internal has degree three.  Terminal degree is two plus the
-presence of its top, left, or right literal. -/
-def directSourceFinalClauseElementDegreeBlock :
-    FormulaShapeDirectionOrdering.Token → List Nat
-  | .clause (.unary _ _) => [3, 3, 2, 2]
-  | .clause (.binary _ _ _ _) => [3, 3, 3, 2]
-  | .clause (.ternary _ _ _ _ _ _) => [3, 3, 3, 3]
-  | .variable => []
+/-- The clause internal, top, and left elements have degree three.  The
+right terminal has degree three exactly for a ternary final clause. -/
+def directSourceFinalClauseElementDegreeBlock
+    (fan : ClauseRibbonFanData) : List Nat :=
+  if fan.hasRight then [3, 3, 3, 3] else [3, 3, 3, 2]
 
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
@@ -64,7 +61,7 @@ def directSourceFinalClauseElementDegrees
     (symbols : List encoding.Γ) : List Nat :=
   FiniteUnaryFieldBlockMap.values
     directSourceFinalClauseElementDegreeBlock
-    (directSourceFinalClauseDescriptors decider symbols)
+    (directSourceFinalClauseFans decider symbols)
 
 /-- Complete element-degree column for one color. -/
 def directSourceFinalOneColorElementDegrees
@@ -100,7 +97,7 @@ noncomputable def
       (directSourceFinalClauseElementDegrees decider) := by
   unfold directSourceFinalClauseElementDegrees
   exact TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
+    (directSourceFinalClauseFansComputableInPolyTime decider)
     (FiniteUnaryFieldBlockMap.computableInPolyTime
       directSourceFinalClauseElementDegreeBlock)
 

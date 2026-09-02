@@ -6,7 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.AlignedUnaryListClosure
 import LeanTrominoes.FiniteUnaryFieldBlockMapCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalVariableElementCodeCompiler
-import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseDescriptorCompiler
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFanCompiler
 import LeanTrominoes.TM2EmptyAlphabetListInputCompiler
 import LeanTrominoes.UnaryFieldConstantOffsetCompiler
 import LeanTrominoes.UnaryFieldConstantScaleCompiler
@@ -23,13 +23,12 @@ namespace LeanTrominoes.PeriodicCNFStripReduction
 open Computability Turing
 open Gadget
 open PeriodicCNF
+open PeriodicPlanarOneInThreeToThreeDM
 open PlanarThreeDM
 
-/-- Clause indices count only actual clause descriptors. -/
-def directSourceFinalClauseIndexPlaceholderBlock :
-    FormulaShapeDirectionOrdering.Token → List Nat
-  | .variable => []
-  | .clause _ => [0]
+/-- One placeholder for each actual final-clause fan. -/
+def directSourceFinalClauseIndexPlaceholderBlock
+    (_ : ClauseRibbonFanData) : List Nat := [0]
 
 /-- One dummy unary field per final clause. -/
 def directSourceFinalClauseIndexPlaceholders
@@ -39,7 +38,7 @@ def directSourceFinalClauseIndexPlaceholders
     (symbols : List encoding.Γ) : List Nat :=
   FiniteUnaryFieldBlockMap.values
     directSourceFinalClauseIndexPlaceholderBlock
-    (directSourceFinalClauseDescriptors decider symbols)
+    (directSourceFinalClauseFans decider symbols)
 
 /-- Zero-based final clause indices in descriptor order. -/
 def directSourceFinalClauseIndices
@@ -143,7 +142,7 @@ noncomputable def
       (directSourceFinalClauseIndexPlaceholders decider) := by
   unfold directSourceFinalClauseIndexPlaceholders
   exact TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
+    (directSourceFinalClauseFansComputableInPolyTime decider)
     (FiniteUnaryFieldBlockMap.computableInPolyTime
       directSourceFinalClauseIndexPlaceholderBlock)
 

@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.FiniteBlockTransducer
-import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseDescriptorCompiler
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFanCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceDirectionCompiler
 import LeanTrominoes.PeriodicCNFStripHorizontalFiniteIncidenceDirectionQueryCompiler
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMTyped
@@ -21,10 +21,10 @@ open Gadget PeriodicCNF
 open PeriodicPlanarOneInThreeToThreeDM
 
 /-- The nine clause-core triples, each expanded in stable RGB order.  The
-descriptor payload is irrelevant because every final clause uses the same
-finite X3C core. -/
+fan payload is irrelevant because every final clause uses the same finite
+X3C core. -/
 def finalClauseIncidenceQueryBlock
-    (_ : FormulaShapeDirectionOrdering.Token) :
+    (_ : ClauseRibbonFanData) :
     List HorizontalFiniteIncidenceDirectionQuery :=
   allClauseSets.flatMap fun set =>
     [.clause set .red, .clause set .green, .clause set .blue]
@@ -43,7 +43,7 @@ in clause-major, triple-major, RGB-minor order. -/
 def directSourceFinalClauseIncidenceQueries
     (symbols : List encoding.Γ) :
     List HorizontalFiniteIncidenceDirectionQuery :=
-  (directSourceFinalClauseDescriptors decider symbols).flatMap
+  (directSourceFinalClauseFans decider symbols).flatMap
     finalClauseIncidenceQueryBlock
 
 /-- Independently delimited finite clause-core directions in the normalized
@@ -66,7 +66,7 @@ noncomputable def
       (directSourceFinalClauseIncidenceQueries decider) := by
   unfold directSourceFinalClauseIncidenceQueries
   exact TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
+    (directSourceFinalClauseFansComputableInPolyTime decider)
     (FiniteBlockTransducer.computableInPolyTime
       finalClauseIncidenceQueryBlock)
 

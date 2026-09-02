@@ -27,14 +27,10 @@ open PlanarThreeDM
     simp [directSourceFinalVariableElementDegreeBlock, kindEq]
 
 @[simp] theorem directSourceFinalClauseElementDegreeBlock_length
-    (descriptor : FormulaShapeDirectionOrdering.Token) :
-    (directSourceFinalClauseElementDegreeBlock descriptor).length =
-      match descriptor with
-      | .clause _ => 4
-      | .variable => 0 := by
-  cases descriptor with
-  | «variable» => rfl
-  | clause profile => cases profile <;> rfl
+    (fan : ClauseRibbonFanData) :
+    (directSourceFinalClauseElementDegreeBlock fan).length = 4 := by
+  by_cases hasRight : fan.hasRight = true <;>
+    simp [directSourceFinalClauseElementDegreeBlock, hasRight]
 
 theorem directSourceFinalVariableElementDegreeBlock_valid
     (pair : GroupedVariableFanSlot)
@@ -46,16 +42,13 @@ theorem directSourceFinalVariableElementDegreeBlock_valid
     simp [member]
 
 theorem directSourceFinalClauseElementDegreeBlock_valid
-    (descriptor : FormulaShapeDirectionOrdering.Token)
+    (fan : ClauseRibbonFanData)
     (degree : Nat)
-    (member : degree ∈ directSourceFinalClauseElementDegreeBlock descriptor) :
+    (member : degree ∈ directSourceFinalClauseElementDegreeBlock fan) :
     degree = 2 ∨ degree = 3 := by
-  cases descriptor with
-  | «variable» => simp [directSourceFinalClauseElementDegreeBlock] at member
-  | clause profile =>
-      cases profile <;>
-        simp [directSourceFinalClauseElementDegreeBlock] at member <;>
-        omega
+  by_cases hasRight : fan.hasRight = true <;>
+    simp [directSourceFinalClauseElementDegreeBlock, hasRight] at member <;>
+    omega
 
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
@@ -94,9 +87,9 @@ private theorem directSourceFinalClauseElementDegrees_valid
   unfold directSourceFinalClauseElementDegrees at member
   simp only [FiniteUnaryFieldBlockMap.values,
     List.mem_flatMap] at member
-  obtain ⟨descriptor, _descriptorMember, localMember⟩ := member
+  obtain ⟨fan, _fanMember, localMember⟩ := member
   exact directSourceFinalClauseElementDegreeBlock_valid
-    descriptor degree localMember
+    fan degree localMember
 
 private theorem directSourceFinalOneColorElementDegrees_valid
     (symbols : List encoding.Γ) :

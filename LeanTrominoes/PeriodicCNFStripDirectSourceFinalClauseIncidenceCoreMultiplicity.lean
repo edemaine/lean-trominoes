@@ -25,8 +25,8 @@ def finalClauseCoreExpectedElementTagBlock : List Nat :=
 /-- The finite nine-triple clause table has its claimed baseline
 multiplicities. -/
 theorem finalClauseIncidenceElementTagBlock_perm_expected
-    (token : FormulaShapeDirectionOrdering.Token) :
-    (finalClauseIncidenceElementTagBlock token).Perm
+    (fan : ClauseRibbonFanData) :
+    (finalClauseIncidenceElementTagBlock fan).Perm
       finalClauseCoreExpectedElementTagBlock := by
   unfold finalClauseIncidenceElementTagBlock
     finalClauseCoreExpectedElementTagBlock allClauseSets
@@ -35,12 +35,12 @@ theorem finalClauseIncidenceElementTagBlock_perm_expected
     directSourceFinalClauseElementColorTagBase
   native_decide
 
-/-- The exact compiled code block belonging to one descriptor position. -/
+/-- The exact compiled code block belonging to one actual clause position. -/
 def finalClauseIncidenceElementCodeBlock
-    (index : Nat) (token : FormulaShapeDirectionOrdering.Token) : List Nat :=
+    (index : Nat) (fan : ClauseRibbonFanData) : List Nat :=
   List.zipWith (fun base tag => base + tag)
     (List.replicate 27 (index * directSourceFinalElementCodeStride))
-    (finalClauseIncidenceElementTagBlock token)
+    (finalClauseIncidenceElementTagBlock fan)
 
 /-- The baseline multiplicity block under one stride-scaled clause index. -/
 def finalClauseCoreExpectedElementCodeBlock (index : Nat) : List Nat :=
@@ -48,26 +48,26 @@ def finalClauseCoreExpectedElementCodeBlock (index : Nat) : List Nat :=
     index * directSourceFinalElementCodeStride + tag
 
 theorem finalClauseIncidenceElementCodeBlock_eq_map
-    (index : Nat) (token : FormulaShapeDirectionOrdering.Token) :
-    finalClauseIncidenceElementCodeBlock index token =
-      (finalClauseIncidenceElementTagBlock token).map fun tag =>
+    (index : Nat) (fan : ClauseRibbonFanData) :
+    finalClauseIncidenceElementCodeBlock index fan =
+      (finalClauseIncidenceElementTagBlock fan).map fun tag =>
         index * directSourceFinalElementCodeStride + tag := by
   unfold finalClauseIncidenceElementCodeBlock
-  rw [show 27 = (finalClauseIncidenceElementTagBlock token).length by
-    exact (finalClauseIncidenceElementTagBlock_length token).symm]
+  rw [show 27 = (finalClauseIncidenceElementTagBlock fan).length by
+    exact (finalClauseIncidenceElementTagBlock_length fan).symm]
   exact List.zipWith_replicate_left (fun base tag => base + tag)
     (index * directSourceFinalElementCodeStride)
-    (finalClauseIncidenceElementTagBlock token)
+    (finalClauseIncidenceElementTagBlock fan)
 
 /-- Lifting the finite tag audit through the common clause base gives the
 baseline code multiplicities at every descriptor. -/
 theorem finalClauseIncidenceElementCodeBlock_perm_expected
-    (index : Nat) (token : FormulaShapeDirectionOrdering.Token) :
-    (finalClauseIncidenceElementCodeBlock index token).Perm
+    (index : Nat) (fan : ClauseRibbonFanData) :
+    (finalClauseIncidenceElementCodeBlock index fan).Perm
       (finalClauseCoreExpectedElementCodeBlock index) := by
   rw [finalClauseIncidenceElementCodeBlock_eq_map]
   unfold finalClauseCoreExpectedElementCodeBlock
-  exact (finalClauseIncidenceElementTagBlock_perm_expected token).map _
+  exact (finalClauseIncidenceElementTagBlock_perm_expected fan).map _
 
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
@@ -75,14 +75,14 @@ variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
 /-- The arithmetic compiler is a flattening of one explicit 27-reference
-block per descriptor position. -/
+block per actual final-clause position. -/
 theorem directSourceFinalClauseIncidenceElementCodes_eq_blocks
     (symbols : List encoding.Γ) :
     directSourceFinalClauseIncidenceElementCodes decider symbols =
       (List.zipWith finalClauseIncidenceElementCodeBlock
         (List.range
-          (directSourceFinalClauseDescriptors decider symbols).length)
-        (directSourceFinalClauseDescriptors decider symbols)).flatten := by
+          (directSourceFinalClauseFans decider symbols).length)
+        (directSourceFinalClauseFans decider symbols)).flatten := by
   rw [directSourceFinalClauseIncidenceElementCodes_eq_zipWith,
     directSourceFinalClauseIncidenceIndices_eq_range,
     directSourceFinalClauseIncidenceElementTags_eq_flatMap]
@@ -104,7 +104,7 @@ theorem directSourceFinalClauseIncidenceElementCodes_perm_expected
     (symbols : List encoding.Γ) :
     (directSourceFinalClauseIncidenceElementCodes decider symbols).Perm
       ((List.range
-        (directSourceFinalClauseDescriptors decider symbols).length).flatMap
+        (directSourceFinalClauseFans decider symbols).length).flatMap
           finalClauseCoreExpectedElementCodeBlock) := by
   rw [directSourceFinalClauseIncidenceElementCodes_eq_blocks]
   exact List.zipWith_flatten_perm_flatMap_left_of_length_eq
@@ -112,8 +112,8 @@ theorem directSourceFinalClauseIncidenceElementCodes_perm_expected
     finalClauseCoreExpectedElementCodeBlock
     finalClauseIncidenceElementCodeBlock_perm_expected
     (List.range
-      (directSourceFinalClauseDescriptors decider symbols).length)
-    (directSourceFinalClauseDescriptors decider symbols) (by simp)
+      (directSourceFinalClauseFans decider symbols).length)
+    (directSourceFinalClauseFans decider symbols) (by simp)
 
 end LeanTrominoes.PeriodicCNFStripReduction
 

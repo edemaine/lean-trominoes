@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalElementCodeCompiler
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalVariableElementCodeSemantics
 import LeanTrominoes.UnaryAlignedAddSemantics
 
@@ -15,6 +16,7 @@ namespace LeanTrominoes.PeriodicCNFStripReduction
 
 open Gadget
 open PeriodicCNF
+open PeriodicPlanarOneInThreeToThreeDM
 open PlanarThreeDM
 
 /-- The four color-specific structural codes of one final clause. -/
@@ -69,37 +71,31 @@ theorem directSourceFinalClauseElementCodesFromIndices_eq_flatMap
   simp [directSourceFinalClauseIndices, UnaryFieldRange.values]
 
 private theorem four_clausePlaceholders_length_eq_degrees
-    (descriptors : List FormulaShapeDirectionOrdering.Token) :
+    (fans : List ClauseRibbonFanData) :
     4 * (FiniteUnaryFieldBlockMap.values
-        directSourceFinalClauseIndexPlaceholderBlock descriptors).length =
+        directSourceFinalClauseIndexPlaceholderBlock fans).length =
       (FiniteUnaryFieldBlockMap.values
-        directSourceFinalClauseElementDegreeBlock descriptors).length := by
-  induction descriptors with
+        directSourceFinalClauseElementDegreeBlock fans).length := by
+  induction fans with
   | nil => rfl
-  | cons descriptor descriptors induction =>
+  | cons fan fans induction =>
       rw [show FiniteUnaryFieldBlockMap.values
             directSourceFinalClauseIndexPlaceholderBlock
-            (descriptor :: descriptors) =
-          directSourceFinalClauseIndexPlaceholderBlock descriptor ++
+            (fan :: fans) =
+          directSourceFinalClauseIndexPlaceholderBlock fan ++
             FiniteUnaryFieldBlockMap.values
-              directSourceFinalClauseIndexPlaceholderBlock descriptors by rfl]
+              directSourceFinalClauseIndexPlaceholderBlock fans by rfl]
       rw [show FiniteUnaryFieldBlockMap.values
             directSourceFinalClauseElementDegreeBlock
-            (descriptor :: descriptors) =
-          directSourceFinalClauseElementDegreeBlock descriptor ++
+            (fan :: fans) =
+          directSourceFinalClauseElementDegreeBlock fan ++
             FiniteUnaryFieldBlockMap.values
-              directSourceFinalClauseElementDegreeBlock descriptors by rfl]
+              directSourceFinalClauseElementDegreeBlock fans by rfl]
       rw [List.length_append, List.length_append]
-      cases descriptor with
-      | «variable» =>
-          simpa [directSourceFinalClauseIndexPlaceholderBlock,
-            directSourceFinalClauseElementDegreeBlock] using induction
-      | clause profile =>
-          cases profile <;>
-            simp only [directSourceFinalClauseIndexPlaceholderBlock,
-              directSourceFinalClauseElementDegreeBlock,
-              List.length_cons, List.length_nil] <;>
-            omega
+      rw [show (directSourceFinalClauseIndexPlaceholderBlock fan).length = 1
+          by rfl,
+        directSourceFinalClauseElementDegreeBlock_length]
+      omega
 
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
@@ -107,7 +103,7 @@ variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
 /-- The compiled clause suffix is four explicit color-specific code fields
-per actual final clause, using its zero-based descriptor index. -/
+per actual final clause, using its zero-based clause index. -/
 theorem directSourceFinalClauseElementCodes_eq_flatMap
     (color : WireColor) (symbols : List encoding.Γ) :
     directSourceFinalClauseElementCodes decider color symbols =

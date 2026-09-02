@@ -2792,9 +2792,11 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Enumerate one actual final-clause fan at every `.top`
                   occurrence frame, separating final clauses from the
                   coarser parent descriptors that can generate many clauses.
-                - [ ] Reindex clause-core incidence codes, canonical clause
-                  elements/degrees, and occurrence parent terminals over
-                  that actual final-clause stream.
+                - [x] Reindex clause-core incidence queries/codes and
+                  canonical clause elements/degrees over that actual
+                  final-clause stream.
+                - [ ] Reindex occurrence parent-terminal identities at the
+                  same actual final-clause boundaries.
                 - [x] Append the grouped variable and clause-core families
                   into the complete canonical incidence element-code column,
                   one identity per independently delimited direction query.
