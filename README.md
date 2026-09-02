@@ -2789,9 +2789,12 @@ build; an imported proof counts when its statement matches the paper.
                   with its aligned finite occurrence record, and thereby
                   equate the audited parent-selector stream with that
                   occurrence-derived RGB terminal stream.
-                - [x] Compile descriptor-indexed clause-core incidence codes
-                  from the finite colored internal/top/left/right reference
-                  table, with exact direction-query length alignment.
+                - [x] Enumerate one actual final-clause fan at every `.top`
+                  occurrence frame, separating final clauses from the
+                  coarser parent descriptors that can generate many clauses.
+                - [ ] Reindex clause-core incidence codes, canonical clause
+                  elements/degrees, and occurrence parent terminals over
+                  that actual final-clause stream.
                 - [x] Append the grouped variable and clause-core families
                   into the complete canonical incidence element-code column,
                   one identity per independently delimited direction query.
