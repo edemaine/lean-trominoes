@@ -2773,6 +2773,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Audit the fixed 27-reference clause-core table and
                   prove baseline multiplicities of three per internal and
                   two per terminal element in every color.
+                - [x] Prove stable-key regrouping permutes the complete
+                  clause-major parent-index column without loss or
+                  duplication.
                 - [x] Compile descriptor-indexed clause-core incidence codes
                   from the finite colored internal/top/left/right reference
                   table, with exact direction-query length alignment.
