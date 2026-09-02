@@ -2629,6 +2629,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose repeated fan counts, decoded selected records,
                   and triple assembly into one polynomial-time finite fan
                   record per final occurrence.
+                - [x] Rewrite that complete fan list as the identity-major
+                  map of explicit stable-key semantic fans, including the
+                  inactive-slot fallback records.
                 - [x] Express every axis-aligned segment's complete unary
                   direction run by its four signed coordinate differences,
                   and lift the equality over whole orthogonal polylines.
