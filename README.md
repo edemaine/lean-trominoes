@@ -2770,6 +2770,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Regroup cycle and private contributions across local
                   RGB order and prove exactly two incidence references to
                   every canonical variable element.
+                - [x] Audit the fixed 27-reference clause-core table and
+                  prove baseline multiplicities of three per internal and
+                  two per terminal element in every color.
                 - [x] Compile descriptor-indexed clause-core incidence codes
                   from the finite colored internal/top/left/right reference
                   table, with exact direction-query length alignment.
