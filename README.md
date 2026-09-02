@@ -2815,6 +2815,9 @@ build; an imported proof counts when its statement matches the paper.
                   retained and through edge blocks, and prove that their
                   independently delimited direction words are exactly the
                   direct counted-contraction output.
+                - [x] Identify the numeric color-major degree enumeration of
+                  the encoded horizontal 3DM problem with the red/green/blue
+                  degree lists of its underlying typed element presentation.
                 - [x] Append the grouped variable and clause-core families
                   into the complete canonical incidence element-code column,
                   one identity per independently delimited direction query.
@@ -13605,7 +13608,11 @@ The representation choices for this target are:
   bodies regroup to the canonical horizontal contracted blocks.  Thus the
   remaining direct-source identification is isolated to equality of the
   compiled degree column and equality of the selected incidence-body column
-  with those two actual horizontal lists.
+  with those two actual horizontal lists.  The
+  [`horizontal element-degree list semantics`](LeanTrominoes/PeriodicCNFStripHorizontalElementDegreeListSemantics.lean)
+  discharge the encoding half of the first equality: natural-number element
+  indices enumerate exactly the typed red, green, and blue degrees, with
+  `idxOf` eliminated using duplicate-freeness of each typed element list.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
