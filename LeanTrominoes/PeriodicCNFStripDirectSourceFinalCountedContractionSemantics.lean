@@ -4,8 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalElementCodeSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalElementCodeNodup
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalIncidenceElementCodeSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalIncidenceMultiplicity
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCountedContractionCompiler
 
 /-! # Static promises of the direct final counted contraction -/
@@ -42,6 +44,31 @@ theorem directSourceFinalCountedContraction_incidenceColumn_length
       decider symbols).length =
       (directSourceFinalCanonicalIncidenceQueries decider symbols).length := by
   exact directSourceFinalCanonicalIncidenceElementCodes_length decider symbols
+
+/-- Stable occurrence keys of the independently compiled incidence column
+are unique and cover every canonical element/rank query requested by its
+aligned degree. -/
+theorem directSourceFinalCountedContraction_occurrenceKeyContract
+    (symbols : List encoding.Γ) :
+    (CountedContractedIncidence.incidenceBlockKeys
+      (directSourceFinalCanonicalIncidenceElementCodes
+        decider symbols)).Nodup ∧
+      ∀ query ∈ CountedContractedIncidence.queryKeys
+          (directSourceFinalCanonicalElementCodes decider symbols)
+          (directSourceFinalCanonicalElementDegrees decider symbols),
+        query ∈ CountedContractedIncidence.incidenceBlockKeys
+          (directSourceFinalCanonicalIncidenceElementCodes
+            decider symbols) := by
+  exact CountedContractedIncidence.occurrenceKeyContract_of_perm_expanded
+    (directSourceFinalCanonicalElementCodes decider symbols)
+    (directSourceFinalCanonicalElementDegrees decider symbols)
+    (directSourceFinalCanonicalIncidenceElementCodes decider symbols)
+    (directSourceFinalCountedContraction_elementColumns_length
+      decider symbols)
+    (directSourceFinalCountedContraction_degrees_valid decider symbols)
+    (directSourceFinalCanonicalElementCodes_nodup decider symbols)
+    (directSourceFinalCanonicalIncidenceElementCodes_perm_expanded
+      decider symbols)
 
 end LeanTrominoes.PeriodicCNFStripReduction
 

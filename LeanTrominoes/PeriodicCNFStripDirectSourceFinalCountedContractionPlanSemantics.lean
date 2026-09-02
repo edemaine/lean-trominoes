@@ -3,7 +3,8 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceSemantics
+import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceBlockSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalIncidenceDirectionBlockListSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCountedContractionSemantics
 
 /-! # Exact contraction plan of the direct final source -/
@@ -56,6 +57,48 @@ theorem directSourceFinalCountedContraction_incidenceBlockKeys_eq
       StableOccurrenceRanks.candidateKeys
         (directSourceFinalCanonicalIncidenceElementCodes decider symbols) := by
   exact CountedContractedIncidence.incidenceBlockKeys_eq_candidateKeys _
+
+/-- The direct counted-contraction compiler is exactly the established
+contracted-direction assembler applied to the uniquely selected incidence
+bodies in canonical element/rank order. -/
+theorem directSourceFinalCountedContractedDirectionTokens_eq_assembledBodies
+    (symbols : List encoding.Γ) :
+    directSourceFinalCountedContractedDirectionTokens decider symbols =
+      PeriodicThreeDM.ContractedDirectionAssembler.output
+        (((CountedContractedIncidence.roles
+              (directSourceFinalCanonicalElementDegrees decider symbols)).zip
+            (CountedContractedIncidence.selectedBodies
+              (directSourceFinalCanonicalElementCodes decider symbols)
+              (directSourceFinalCanonicalElementDegrees decider symbols)
+              (directSourceFinalCanonicalIncidenceElementCodes
+                decider symbols)
+              (directSourceFinalCanonicalIncidenceBodies decider symbols))
+          ).flatMap fun pair =>
+            PeriodicThreeDM.ContractedDirectionAssembler.roleBlock
+              pair.1 pair.2) := by
+  have bodiesAligned :
+      (directSourceFinalCanonicalIncidenceBodies decider symbols).length =
+        (CountedContractedIncidence.incidenceBlockKeys
+          (directSourceFinalCanonicalIncidenceElementCodes
+            decider symbols)).length := by
+    unfold CountedContractedIncidence.incidenceBlockKeys
+    rw [UnaryFieldStableOccurrenceKeys.keys_length,
+      directSourceFinalCanonicalIncidenceBodies_length,
+      directSourceFinalCanonicalIncidenceElementCodes_length]
+  have occurrenceContract :=
+    directSourceFinalCountedContraction_occurrenceKeyContract
+      decider symbols
+  unfold directSourceFinalCountedContractedDirectionTokens
+  rw [directSourceFinalCanonicalIncidenceDirectionTokens_eq_blocks]
+  exact CountedContractedIncidence.output_blocks
+    (directSourceFinalCanonicalElementCodes decider symbols)
+    (directSourceFinalCanonicalElementDegrees decider symbols)
+    (directSourceFinalCanonicalIncidenceElementCodes decider symbols)
+    (directSourceFinalCanonicalIncidenceBodies decider symbols)
+    (directSourceFinalCountedContraction_elementColumns_length
+      decider symbols)
+    (directSourceFinalCountedContraction_degrees_valid decider symbols)
+    bodiesAligned occurrenceContract.1 occurrenceContract.2
 
 end LeanTrominoes.PeriodicCNFStripReduction
 

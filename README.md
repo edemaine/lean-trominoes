@@ -2804,6 +2804,13 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Combine each clause core's baseline multiplicities with
                   those occurrence-side terminal references to realize the
                   declared degree of every canonical RGB clause element.
+                - [x] Reorder the variable and clause degree expansions into
+                  canonical color-major order and prove that the complete
+                  incidence identity column is a permutation of the aligned
+                  element-code column expanded by its degree column.
+                - [x] Derive duplicate-free, covering stable occurrence keys
+                  and identify the direct counted-contraction output with the
+                  contracted-direction assembler on its selected bodies.
                 - [x] Append the grouped variable and clause-core families
                   into the complete canonical incidence element-code column,
                   one identity per independently delimited direction query.
