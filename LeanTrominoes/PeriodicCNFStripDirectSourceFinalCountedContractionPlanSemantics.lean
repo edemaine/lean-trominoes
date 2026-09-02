@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceEdgeBlockSemantics
+import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceHorizontalEdgeBlockSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalIncidenceDirectionBlockListSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCountedContractionSemantics
 
@@ -143,6 +143,43 @@ theorem directSourceFinalCountedContractedDirectionTokens_eq_edgeBlocks
           decider symbols).2
   · exact directSourceFinalCountedContraction_degrees_valid
       decider symbols
+
+/-- Once the compiled degree and selected-body columns are identified with
+the actual horizontal problem, the explicit direct blocks are exactly the
+assembler edges underlying its canonical compact contracted blocks. -/
+theorem directSourceFinalCountedContractedEdgeBlocks_eq_horizontal_of
+    (symbols : List encoding.Γ)
+    (incidenceBlock : PeriodicThreeDM.IncidenceTag →
+      HorizontalTypedIncidenceDirectionBlock)
+    (degrees : directSourceFinalCanonicalElementDegrees decider symbols =
+      CountedContractedIncidence.horizontalElementDegrees
+        (horizontalThreeDMProblemComputed
+          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)))
+    (bodies : CountedContractedIncidence.selectedBodies
+        (directSourceFinalCanonicalElementCodes decider symbols)
+        (directSourceFinalCanonicalElementDegrees decider symbols)
+        (directSourceFinalCanonicalIncidenceElementCodes decider symbols)
+        (directSourceFinalCanonicalIncidenceBodies decider symbols) =
+      CountedContractedIncidence.horizontalIncidenceDirectionBodiesByElement
+        (horizontalThreeDMProblemComputed
+          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+        incidenceBlock)
+    (degreeTwoOrThree :
+      (horizontalThreeDMProblemComputed
+        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+          decider symbols)).DegreeTwoOrThree) :
+    directSourceFinalCountedContractedEdgeBlocks decider symbols =
+      (horizontalContractedDirectionBlocks
+        (horizontalThreeDMProblemComputed
+          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+        incidenceBlock).map fun tagged =>
+          HorizontalContractedRoutedRequest.ContractedBlock.assemblerEdge
+            tagged.2 := by
+  unfold directSourceFinalCountedContractedEdgeBlocks
+  rw [bodies, degrees]
+  exact
+    CountedContractedIncidence.edgeBlocks_horizontalIncidenceDirectionBodiesByElement
+      _ incidenceBlock degreeTwoOrThree
 
 end LeanTrominoes.PeriodicCNFStripReduction
 

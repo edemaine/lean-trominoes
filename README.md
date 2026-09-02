@@ -13599,7 +13599,13 @@ The representation choices for this target are:
   or three retained blocks for degree three.  Instantiating this result proves
   that the direct counted-contraction stream is exactly the independently
   delimited output of its explicit retained/through edge-block list, exposing
-  the edge boundaries needed by the final framed source emitter.
+  the edge boundaries needed by the final framed source emitter.  The
+  [`horizontal edge-block bridge`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceHorizontalEdgeBlockSemantics.lean)
+  proves generically that actual element degrees and element-major incidence
+  bodies regroup to the canonical horizontal contracted blocks.  Thus the
+  remaining direct-source identification is isolated to equality of the
+  compiled degree column and equality of the selected incidence-body column
+  with those two actual horizontal lists.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
