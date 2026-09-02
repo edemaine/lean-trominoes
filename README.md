@@ -2764,6 +2764,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove the one-occurrence cycle fallback equals the
                   compiled cyclic-successor key, so every second cycle
                   reference uses one uniform successor column.
+                - [x] Combine cyclic-successor balance with the current-key
+                  column to prove two references to every canonical red
+                  cycle element globally.
                 - [x] Compile descriptor-indexed clause-core incidence codes
                   from the finite colored internal/top/left/right reference
                   table, with exact direction-query length alignment.
