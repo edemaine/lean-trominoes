@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceBlockSemantics
+import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceEdgeBlockSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalIncidenceDirectionBlockListSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCountedContractionSemantics
 
@@ -99,6 +99,50 @@ theorem directSourceFinalCountedContractedDirectionTokens_eq_assembledBodies
       decider symbols)
     (directSourceFinalCountedContraction_degrees_valid decider symbols)
     bodiesAligned occurrenceContract.1 occurrenceContract.2
+
+/-- Explicit retained/through edge blocks obtained by regrouping the selected
+incidence bodies according to the canonical degree column. -/
+noncomputable def directSourceFinalCountedContractedEdgeBlocks
+    (symbols : List encoding.Γ) :
+    List PeriodicThreeDM.ContractedDirectionAssembler.EdgeBlock :=
+  CountedContractedIncidence.edgeBlocks
+    (directSourceFinalCanonicalElementDegrees decider symbols)
+    (CountedContractedIncidence.selectedBodies
+      (directSourceFinalCanonicalElementCodes decider symbols)
+      (directSourceFinalCanonicalElementDegrees decider symbols)
+      (directSourceFinalCanonicalIncidenceElementCodes decider symbols)
+      (directSourceFinalCanonicalIncidenceBodies decider symbols))
+
+/-- The compiled counted-contraction stream is exactly one independently
+delimited direction word per explicit retained/through edge block. -/
+theorem directSourceFinalCountedContractedDirectionTokens_eq_edgeBlocks
+    (symbols : List encoding.Γ) :
+    directSourceFinalCountedContractedDirectionTokens decider symbols =
+      PeriodicThreeDM.ContractedDirectionAssembler.outputTokens
+        (directSourceFinalCountedContractedEdgeBlocks decider symbols) := by
+  rw [directSourceFinalCountedContractedDirectionTokens_eq_assembledBodies]
+  unfold directSourceFinalCountedContractedEdgeBlocks
+  apply CountedContractedIncidence.output_roleBodies_eq_edgeBlocks
+  · rw [CountedContractedIncidence.selectedBodies_length]
+    · exact (CountedContractedIncidence.roles_length_eq_queryKeys
+        (directSourceFinalCanonicalElementCodes decider symbols)
+        (directSourceFinalCanonicalElementDegrees decider symbols)
+        (directSourceFinalCountedContraction_elementColumns_length
+          decider symbols)
+        (directSourceFinalCountedContraction_degrees_valid
+          decider symbols)).symm
+    · unfold CountedContractedIncidence.incidenceBlockKeys
+      rw [UnaryFieldStableOccurrenceKeys.keys_length,
+        directSourceFinalCanonicalIncidenceBodies_length,
+        directSourceFinalCanonicalIncidenceElementCodes_length]
+    · exact
+        (directSourceFinalCountedContraction_occurrenceKeyContract
+          decider symbols).1
+    · exact
+        (directSourceFinalCountedContraction_occurrenceKeyContract
+          decider symbols).2
+  · exact directSourceFinalCountedContraction_degrees_valid
+      decider symbols
 
 end LeanTrominoes.PeriodicCNFStripReduction
 

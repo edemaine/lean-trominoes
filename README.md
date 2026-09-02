@@ -2811,6 +2811,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Derive duplicate-free, covering stable occurrence keys
                   and identify the direct counted-contraction output with the
                   contracted-direction assembler on its selected bodies.
+                - [x] Regroup the selected element-major bodies into explicit
+                  retained and through edge blocks, and prove that their
+                  independently delimited direction words are exactly the
+                  direct counted-contraction output.
                 - [x] Append the grouped variable and clause-core families
                   into the complete canonical incidence element-code column,
                   one identity per independently delimited direction query.
@@ -13588,7 +13592,14 @@ The representation choices for this target are:
   They identify its query stream as the canonical element-major two- or
   three-key blocks, its role stream as degree-two through pairs or
   degree-three retained triples, and its incidence lookup keys as the stable
-  base-three occurrence keys of the compiled incidence identities.
+  base-three occurrence keys of the compiled incidence identities.  The
+  generic
+  [`edge-block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceEdgeBlockSemantics.lean)
+  then regroup aligned selected bodies into one through block for degree two
+  or three retained blocks for degree three.  Instantiating this result proves
+  that the direct counted-contraction stream is exactly the independently
+  delimited output of its explicit retained/through edge-block list, exposing
+  the edge boundaries needed by the final framed source emitter.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
