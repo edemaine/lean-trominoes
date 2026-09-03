@@ -13,10 +13,12 @@ namespace FormulaShapeFigureNineFinalClauseOrdering
 
 open UnaryProgramClauseProfile
 
+universe u
+
 /-- Stable clockwise ordering induced by the unit-elimination clause exits.
 Binary clauses leave west/east and ternary clauses leave south/west/east, so
 their final orders are respectively `1,0` and `2,0,1`. -/
-def reorderList {Value : Type} : List Value → List Value
+def reorderList {Value : Type u} : List Value → List Value
   | [first, second] => [second, first]
   | [first, second, third] => [third, first, second]
   | values => values
@@ -31,7 +33,7 @@ def reorderProfile : ClauseProfile → ClauseProfile
     (reorderProfile profile).literals = reorderList profile.literals := by
   cases profile <;> rfl
 
-@[simp] theorem reorderList_length {Value : Type} (values : List Value) :
+@[simp] theorem reorderList_length {Value : Type u} (values : List Value) :
     (reorderList values).length = values.length := by
   rcases values with _ | ⟨first, rest⟩
   · rfl
@@ -46,7 +48,7 @@ def reorderProfile : ClauseProfile → ClauseProfile
   rw [reorderProfile_literals, reorderList_length]
 
 /-- Reordering a block never introduces a value not already in that block. -/
-theorem mem_of_mem_reorderList {Value : Type} {value : Value}
+theorem mem_of_mem_reorderList {Value : Type u} {value : Value}
     {values : List Value} (member : value ∈ reorderList values) :
     value ∈ values := by
   have permutation : (reorderList values).Perm values := by

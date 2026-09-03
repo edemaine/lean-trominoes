@@ -13943,7 +13943,9 @@ The representation choices for this target are:
   those first directions, and are therefore sorted semantically in exact
   old-index order `1,0`.  Together with the existing ternary `2,0,1`
   theorem, this justifies the direct finite permutation against the actual
-  normalized route family.
+  normalized route family.  A combined pointwise theorem now identifies the
+  semantic sorter with the same polymorphic `reorderList` operation for any
+  genuine binary-or-ternary generated clause.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original

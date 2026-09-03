@@ -4,7 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedClauseRouteOrder
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineBinaryClauseRouteOrder
+import LeanTrominoes.PositionedPeriodicCNFUnitEliminationFinalOrdering
 
 /-! # Binary Figure 9 clause order after final loop erasure -/
 
@@ -298,6 +300,56 @@ theorem
     AxisDirection.binaryUnitEliminationClauseExitDirection,
     AxisDirection.clockwiseRank, literalsEq,
     firstDirection, secondDirection]
+
+/-- On every genuine generated clause, the semantic second clockwise sort
+is exactly the arity-indexed finite permutation `reorderList`. -/
+theorem
+    retainedOrderedFixedEight_orderClauseByRouteDirection_literals_eq_reorderList
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+          source).clauses.zipIdx)
+    (clauseArity :
+      clause.literals.length = 2 ∨ clause.literals.length = 3) :
+    (PositionedPeriodicCNF.orderClauseByRouteDirection
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedIncidenceRoutes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      clauseIndex clause).literals =
+        PeriodicCNF.FormulaShapeFigureNineFinalClauseOrdering.reorderList
+          clause.literals := by
+  rcases clauseArity with binary | ternary
+  · rcases List.length_eq_two.mp binary with
+      ⟨first, second, literalsEq⟩
+    rw [literalsEq]
+    exact
+      retainedOrderedFixedEight_orderClauseByRouteDirection_literals_eq_one_zero_of_binary
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalsEq
+  · rcases List.length_eq_three.mp ternary with
+      ⟨first, second, third, literalsEq⟩
+    rw [literalsEq]
+    exact
+      PositionedPeriodicCNF.orderClauseByRouteDirection_literals_eq_two_zero_one_of_unitEliminationOrder
+        (placement :=
+          retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+            source)
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedIncidenceRoutes_ternaryClauseRoutesInUnitEliminationOrder
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty)
+        clauseMember literalsEq
 
 end PeriodicOrthocrossing
 end LeanTrominoes
