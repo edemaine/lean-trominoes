@@ -13747,7 +13747,12 @@ The representation choices for this target are:
   and
   [`grouped route-pair alignment`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceRoutePairSemantics.lean)
   then identify those indexed fields with the matching declarative endpoint
-  frame and retained route-pair metadata, respectively.
+  frame and retained route-pair metadata, respectively.  At one occurrence,
+  the
+  [`requested-output bridge`](LeanTrominoes/PeriodicCNFStripDirectFinalOccurrenceDirectionBodyRequestedOutput.lean)
+  now rewrites each direct RGB body into the same finite variable stub,
+  routed corridor, and finite clause stub form consumed by the horizontal
+  typed-incidence compiler.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
