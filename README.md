@@ -2823,6 +2823,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Identify the numeric color-major degree enumeration of
                   the encoded horizontal 3DM problem with the red/green/blue
                   degree lists of its underlying typed element presentation.
+                - [x] Prove the direct final clause-fan `hasRight` column is
+                  exactly the binary/ternary column of the certified final
+                  exact-one formula shape.
                 - [x] Append the grouped variable and clause-core families
                   into the complete canonical incidence element-code column,
                   one identity per independently delimited direction query.
@@ -13621,7 +13624,12 @@ The representation choices for this target are:
   [`typed structural degree pattern`](LeanTrominoes/PeriodicCNFStripHorizontalTypedElementDegreePattern.lean)
   then computes each color list locally from exact incidence multiplicities
   and proves the complete color-major list consists of three copies of one
-  occurrence/clause pattern.
+  occurrence/clause pattern.  The
+  [`direct final clause-degree pattern`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseDegreePattern.lean)
+  additionally identifies every directly compiled clause fan's `hasRight`
+  bit with the corresponding binary/ternary entry of the certified final
+  exact-one formula shape; its generic routed-header lemma is in
+  [`PeriodicCNFStripHorizontalRoutedClauseDegreePattern.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedClauseDegreePattern.lean).
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
