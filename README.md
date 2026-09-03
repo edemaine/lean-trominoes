@@ -13863,7 +13863,11 @@ The representation choices for this target are:
   source literal, and the
   [`route-tail selection semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteTailRouteOrderSemantics.lean)
   use this bound to identify the header-selected dynamic word pointwise with
-  the corresponding canonical clockwise source-route tail.
+  the corresponding canonical clockwise source-route tail.  Finally, the
+  [`header-prefix semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderPrefixSemantics.lean)
+  prove that every generated polarity header selects a genuine dependent
+  `descriptorAt` entry of the same Figure 9 template, eliminating the total
+  `getD` fallback from all actual header blocks.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
