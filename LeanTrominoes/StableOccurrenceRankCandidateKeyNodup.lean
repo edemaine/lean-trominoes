@@ -116,4 +116,58 @@ theorem candidateKeys_nodup_of_count_le_three
   exact index_eq_of_value_eq_of_rank_eq values first.val second.val
     firstValueLt secondValueLt components.1 components.2
 
+/-- Looking up the base-three key of occurrence rank `rank` recovers the
+presentation index of that ranked occurrence. -/
+theorem candidateKeys_idxOf_rank
+    (values : List Nat)
+    (atMostThree : ∀ value ∈ values, values.count value ≤ 3)
+    (value rank : Nat) (rankLt : rank < values.count value) :
+    (candidateKeys values).idxOf (value * 3 + rank) =
+      (values.idxsOf value).getD rank 0 := by
+  have rankIndexLt : rank < (values.idxsOf value).length := by
+    simpa using rankLt
+  let occurrenceIndex := (values.idxsOf value)[rank]
+  have occurrenceIndexLt : occurrenceIndex < values.length := by
+    exact List.getElem_idxsOf_lt rankIndexLt
+  have valueAt : values[occurrenceIndex] = value := by
+    have selected := List.getElem_getElem_findIdxs rankIndexLt
+    simpa [occurrenceIndex] using selected
+  have stableRankAt :
+      (ranks values)[occurrenceIndex]'(by simpa using occurrenceIndexLt) =
+        rank := by
+    have rankListIndexLt : occurrenceIndex < (ranks values).length := by
+      simpa using occurrenceIndexLt
+    have rankLookup :
+        (ranks values)[occurrenceIndex]'rankListIndexLt =
+          (values.take occurrenceIndex).count values[occurrenceIndex] := by
+      simpa only [List.getElem?_eq_getElem rankListIndexLt,
+        List.getElem?_eq_getElem occurrenceIndexLt, Option.map_some,
+        Option.some.injEq] using ranks_getElem? values occurrenceIndex
+    calc
+      _ = (values.take occurrenceIndex).count values[occurrenceIndex] :=
+        rankLookup
+      _ = (values.take occurrenceIndex).count value := by rw [valueAt]
+      _ = rank := by
+        rw [show occurrenceIndex =
+            (values.idxsOf value)[rank]'rankIndexLt by rfl]
+        exact count_take_getElem_idxsOf values value rank rankLt
+  have candidateIndexLt :
+      occurrenceIndex < (candidateKeys values).length := by
+    simpa using occurrenceIndexLt
+  have keyAt :
+      (candidateKeys values)[occurrenceIndex]'candidateIndexLt =
+        value * 3 + rank := by
+    simp [candidateKeys, valueAt, stableRankAt]
+  have keysNodup := candidateKeys_nodup_of_count_le_three
+    values atMostThree
+  calc
+    (candidateKeys values).idxOf (value * 3 + rank) =
+        (candidateKeys values).idxOf
+          ((candidateKeys values)[occurrenceIndex]'candidateIndexLt) := by
+            rw [keyAt]
+    _ = occurrenceIndex :=
+      keysNodup.idxOf_getElem occurrenceIndex candidateIndexLt
+    _ = (values.idxsOf value).getD rank 0 := by
+      rw [List.getD_eq_getElem _ _ rankIndexLt]
+
 end LeanTrominoes.StableOccurrenceRanks

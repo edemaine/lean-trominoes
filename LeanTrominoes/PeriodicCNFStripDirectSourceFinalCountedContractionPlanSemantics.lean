@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceHorizontalEdgeBlockSemantics
+import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceRankedBodySemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalIncidenceDirectionBlockListSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCountedContractionSemantics
 
@@ -100,6 +101,38 @@ theorem directSourceFinalCountedContraction_selectedBodies_eq_queryMap
     incidenceCodes
     (directSourceFinalCanonicalIncidenceBodies decider symbols)
     bodiesAligned occurrenceContract.1 occurrenceContract.2
+
+/-- Stable occurrence lookup is equivalently the direct body presentation
+grouped by each canonical element code, preserving presentation order within
+every element. -/
+theorem directSourceFinalCountedContraction_selectedBodies_eq_groupedPresentation
+    (symbols : List encoding.Γ) :
+    CountedContractedIncidence.selectedBodies
+        (directSourceFinalCanonicalElementCodes decider symbols)
+        (directSourceFinalCanonicalElementDegrees decider symbols)
+        (directSourceFinalCanonicalIncidenceElementCodes decider symbols)
+        (directSourceFinalCanonicalIncidenceBodies decider symbols) =
+      (directSourceFinalCanonicalElementCodes decider symbols).flatMap
+        fun elementCode =>
+          ((directSourceFinalCanonicalIncidenceElementCodes
+              decider symbols).idxsOf elementCode).map fun index =>
+            (directSourceFinalCanonicalIncidenceBodies
+              decider symbols).getD index [] := by
+  rw [directSourceFinalCountedContraction_selectedBodies_eq_queryMap]
+  unfold directSourceFinalIncidenceBodyAtKey
+  rw [CountedContractedIncidence.incidenceBlockKeys_eq_candidateKeys]
+  exact
+    CountedContractedIncidence.queryKeys_map_alignedBody_eq_flatMap_idxsOf_of_perm_expanded
+      (directSourceFinalCanonicalElementCodes decider symbols)
+      (directSourceFinalCanonicalElementDegrees decider symbols)
+      (directSourceFinalCanonicalIncidenceElementCodes decider symbols)
+      (directSourceFinalCanonicalIncidenceBodies decider symbols)
+      (directSourceFinalCountedContraction_elementColumns_length
+        decider symbols)
+      (directSourceFinalCountedContraction_degrees_valid decider symbols)
+      (directSourceFinalCanonicalElementCodes_nodup decider symbols)
+      (directSourceFinalCanonicalIncidenceElementCodes_perm_expanded
+        decider symbols)
 
 /-- The direct counted-contraction compiler is exactly the established
 contracted-direction assembler applied to the uniquely selected incidence

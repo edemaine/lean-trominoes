@@ -13680,7 +13680,14 @@ The representation choices for this target are:
   horizontal bridge also normalizes its target body column to an ordinary
   map of the chosen incidence-direction block over the canonical
   element-major incidence-tag list, leaving a direct comparison between two
-  mapped enumerations.
+  mapped enumerations.  Reusable ranked-body semantics now prove that a
+  stable base-three key for element `e` and occurrence rank `r` recovers the
+  presentation index of the `r`th occurrence of `e`.  Applied to the direct
+  source, the entire selected column becomes the direct incidence-body
+  presentation grouped by each canonical element code, with presentation
+  order preserved inside every group.  The final comparison is therefore
+  reduced to identifying these direct presentation indices with the
+  computed 3DM incidence tags and their route bodies.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established

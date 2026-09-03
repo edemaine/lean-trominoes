@@ -118,6 +118,35 @@ private theorem expandedElementCodes_count_le_three
   rcases degreesValid pair pairMember with degreeEq | degreeEq <;>
     omega
 
+/-- A presentation that is a permutation of a valid duplicate-free degree
+expansion has the advertised multiplicity at every listed element. -/
+theorem incidenceElementCodes_count_eq_degree_of_perm_expanded
+    (pairs : List (Nat × Nat)) (incidenceElementCodes : List Nat)
+    (codesNodup : (pairs.map Prod.fst).Nodup)
+    (incidencePermutation :
+      incidenceElementCodes.Perm (expandedElementCodes pairs))
+    (pair : Nat × Nat) (pairMember : pair ∈ pairs) :
+    incidenceElementCodes.count pair.1 = pair.2 := by
+  rw [incidencePermutation.count_eq,
+    expandedElementCodes_count_of_mem pairs codesNodup pair pairMember]
+
+/-- A presentation that is a permutation of a duplicate-free degree-two-or-
+three expansion has multiplicity at most three at every presented value. -/
+theorem incidenceElementCodes_count_le_three_of_perm_expanded
+    (pairs : List (Nat × Nat)) (incidenceElementCodes : List Nat)
+    (codesNodup : (pairs.map Prod.fst).Nodup)
+    (degreesValid : ∀ pair ∈ pairs, pair.2 = 2 ∨ pair.2 = 3)
+    (incidencePermutation :
+      incidenceElementCodes.Perm (expandedElementCodes pairs)) :
+    ∀ value ∈ incidenceElementCodes,
+      incidenceElementCodes.count value ≤ 3 := by
+  intro value valueMember
+  have expandedMember : value ∈ expandedElementCodes pairs :=
+    incidencePermutation.mem_iff.mp valueMember
+  rw [incidencePermutation.count_eq value]
+  exact expandedElementCodes_count_le_three
+    pairs codesNodup degreesValid value expandedMember
+
 private theorem queryBlock_rank
     (elementCode size query : Nat)
     (valid : size = 2 ∨ size = 3)
