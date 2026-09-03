@@ -13942,7 +13942,11 @@ The representation choices for this target are:
   their common local query for the eventual index comparison.  The
   [`local-query extensionality lemma`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalDirectionQueryCoordinates.lean)
   proves that a profile plus these two incidence coordinates uniquely
-  determines the dependent finite query.
+  determines the dependent finite query.  The
+  [`direct pair specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRoutePairCoordinateSemantics.lean)
+  lifts the finite coordinate theorem over the complete explicit
+  header/tail stream, while completion by a dynamic tail is proved not to
+  change the header's selected local query.
   The
   [`finite final-clause ordering`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData.lean)
   now records the second clockwise permutation explicitly: binary generated

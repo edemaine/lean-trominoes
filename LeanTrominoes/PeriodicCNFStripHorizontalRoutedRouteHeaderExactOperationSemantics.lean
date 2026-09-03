@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderData
 import LeanTrominoes.PeriodicOneInThreePolarityNormalizationMetadataRouteOperationSemantics
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixLocalDirectionSemantics
 
 /-! # Exact operation semantics of completed routed headers -/
 
@@ -26,6 +27,15 @@ def sourceBlock (header : Header)
   match header.figurePrefix with
   | .local query => .local query
   | .inherited _ query => .inherited query sourceTailDirections
+
+/-- Completing a header with a dynamic tail does not change the common
+finite-template local query selected by its prefix descriptor. -/
+@[simp] theorem sourceBlock_localQuery
+    (header : Header) (sourceTailDirections : List AxisDirection) :
+    (sourceBlock header sourceTailDirections).localQuery =
+      header.figurePrefix.localQuery := by
+  rcases header with ⟨polarity, figurePrefix⟩
+  cases figurePrefix <;> rfl
 
 /-- `block` is the header's polarity operation applied to `sourceBlock`. -/
 theorem block_eq_operationBlock_sourceBlock

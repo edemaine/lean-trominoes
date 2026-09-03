@@ -6,6 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingSemantics
 import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixLocalDirectionSemantics
 import LeanTrominoes.PeriodicCNFClauseProfilePolarityIndexedRouteOperationSemantics
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNinePolarityRouteTailPairs
 
 /-! # Presentation coordinates selected by final Figure 9 headers -/
 
@@ -56,6 +57,47 @@ theorem sourceClauseHeaders_map_headerTemplateCoordinate :
       (sourceClauseHeaders profile).map headerTemplateCoordinate =
         expectedSourceClauseHeaderTemplateCoordinates profile := by
   native_decide
+
+/-- Coordinate block emitted by one direction-aware source token. -/
+def expectedHeaderTemplateCoordinateBlock :
+    FormulaShapeDirectionOrdering.Token → List HeaderTemplateCoordinate
+  | .clause profile => expectedSourceClauseHeaderTemplateCoordinates profile
+  | .variable => []
+
+/-- Across a complete header/tail pair stream, dynamic tails do not affect
+the exact finite-template coordinate schedule. -/
+theorem sourcePairs_map_headerTemplateCoordinate
+    (source : List FormulaShapeDirectionOrdering.Token)
+    (tailTables : List (List (List AxisDirection))) :
+    (FormulaShapeFigureNinePolarityRouteTail.sourcePairs
+      source tailTables).map (fun pair =>
+        headerTemplateCoordinate pair.1) =
+      source.flatMap expectedHeaderTemplateCoordinateBlock := by
+  rw [show
+      (FormulaShapeFigureNinePolarityRouteTail.sourcePairs
+        source tailTables).map (fun pair =>
+          headerTemplateCoordinate pair.1) =
+        ((FormulaShapeFigureNinePolarityRouteTail.sourcePairs
+          source tailTables).map Prod.fst).map
+            headerTemplateCoordinate by
+    rw [List.map_map]
+    rfl]
+  rw [FormulaShapeFigureNinePolarityRouteTail.sourcePairs_map_fst]
+  induction source with
+  | nil => rfl
+  | cons token source induction =>
+      cases token with
+      | «variable» =>
+          simpa [FormulaShapeFigureNinePolarityRouteHeader.sourceHeaders,
+            FormulaShapeFigureNinePolarityRouteHeader.tokenBlock,
+            expectedHeaderTemplateCoordinateBlock] using induction
+      | clause profile =>
+          simp only [FormulaShapeFigureNinePolarityRouteHeader.sourceHeaders,
+            FormulaShapeFigureNinePolarityRouteHeader.tokenBlock,
+            expectedHeaderTemplateCoordinateBlock,
+            List.map_append, List.flatMap_cons]
+          rw [sourceClauseHeaders_map_headerTemplateCoordinate]
+          congr 1
 
 end FormulaShapeFigureNineRoutePrefix
 end PeriodicCNF
