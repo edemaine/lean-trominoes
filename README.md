@@ -2829,6 +2829,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove the certified final exact-one profile arities are
                   exactly the clause lengths of the retained raw positioned
                   logical endpoint.
+                - [x] Transport that ordered arity list through the final
+                  variable gauge, routed polarity normalization, factor-two
+                  padding, and clause-anchor normalization to the typed 3DM
+                  source used by the horizontal assembly.
                 - [x] Append the grouped variable and clause-core families
                   into the complete canonical incidence element-code column,
                   one identity per independently delimited direction query.
@@ -13640,7 +13644,20 @@ The representation choices for this target are:
   and
   [`raw positioned bridge`](LeanTrominoes/PeriodicCNFStripHorizontalRawFinalClauseAritySemantics.lean)
   identify the resulting arity list with the clauses of the retained raw
-  Figure 9, unit-elimination, and polarity-normalization endpoint.
+  Figure 9, unit-elimination, and polarity-normalization endpoint.  Polarity-
+  preserving clause maps and variable gauges are handled generically by
+  [`clause-map arity semantics`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationClauseMapArity.lean)
+  and
+  [`variable-gauge arity semantics`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationVariableGaugeArity.lean).
+  The
+  [`route-subdivision transport`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteSubdivisionArity.lean),
+  its
+  [`horizontal routed specialization`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedClauseAritySemantics.lean),
+  and the
+  [`typed-source bridge`](LeanTrominoes/PeriodicCNFStripHorizontalTypedSourceFinalClauseAritySemantics.lean)
+  now carry that same ordered list through fresh-variable gauging, padding,
+  and final anchor normalization to the exact typed CNF consumed by the 3DM
+  assembly.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
