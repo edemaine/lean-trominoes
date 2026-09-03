@@ -13903,6 +13903,14 @@ The representation choices for this target are:
   `(source clause, source literal, operation)` stream, so this remaining
   Figure 9 comparison cannot accidentally align equal-looking routes from
   different clauses.
+  The
+  [`local prefix-direction semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixLocalDirectionSemantics.lean)
+  now identify the local query inside every Figure 9 descriptor—auxiliary
+  or inherited—with its exact template incidence.  Mapping these queries
+  over the complete descriptor block reproduces the template drawing's
+  normalized local route-direction column in clause-major, literal-minor
+  order.  Thus the source-block proof can add the inherited connector and
+  selected dynamic tail without revisiting finite local-route indexing.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
