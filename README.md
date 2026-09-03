@@ -14005,7 +14005,15 @@ The representation choices for this target are:
   theorem, this justifies the direct finite permutation against the actual
   normalized route family.  A combined pointwise theorem now identifies the
   semantic sorter with the same polymorphic `reorderList` operation for any
-  genuine binary-or-ternary generated clause.  The generic
+  genuine binary-or-ternary generated clause.  The
+  [`tagged permutation semantics`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalClauseTaggedPermutationSemantics.lean)
+  strengthen that equality to retain every original `zipIdx` literal tag,
+  and the
+  [`exact final-gauged source-index theorem`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedExactSourceIndex.lean)
+  therefore recovers the raw composed literal index as the explicit
+  reordered-range lookup while preserving the full direction word.  This
+  remains exact even when two literals have equal values or payloads.  The
+  generic
   [`whole-list permutation lift`](LeanTrominoes/PositionedPeriodicCNFClauseDirectionListPermutation.lean)
   maps such pointwise equalities across a complete zip-indexed positioned
   formula.  A separately compiled
