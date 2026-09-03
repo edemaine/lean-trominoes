@@ -13939,7 +13939,10 @@ The representation choices for this target are:
   exhaustively verify that every final polarity header selects the same
   original template clause/literal coordinate after the binary `1,0` or
   ternary `2,0,1` permutation.  Compact semantic route blocks now expose
-  their common local query for the eventual index comparison.
+  their common local query for the eventual index comparison.  The
+  [`local-query extensionality lemma`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalDirectionQueryCoordinates.lean)
+  proves that a profile plus these two incidence coordinates uniquely
+  determines the dependent finite query.
   The
   [`finite final-clause ordering`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData.lean)
   now records the second clockwise permutation explicitly: binary generated
