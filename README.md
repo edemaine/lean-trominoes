@@ -13857,7 +13857,13 @@ The representation choices for this target are:
   canonical-route forms also show that the whole-period anchor translation
   leaves these rows unchanged.  Thus only the finite Figure 9 prefix and
   polarity-operation alignment remains before the explicit pair block can
-  be identified with its normalized routed occurrence.
+  be identified with its normalized routed occurrence.  The
+  [`prefix source-slot semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixSourceSlotSemantics.lean)
+  establish that every inherited finite prefix selects a genuine active
+  source literal, and the
+  [`route-tail selection semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteTailRouteOrderSemantics.lean)
+  use this bound to identify the header-selected dynamic word pointwise with
+  the corresponding canonical clockwise source-route tail.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
