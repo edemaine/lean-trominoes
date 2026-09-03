@@ -13872,6 +13872,14 @@ The representation choices for this target are:
   show that interpreting such a descriptor recovers the atom at that exact
   template incidence, so emitted headers now have a direct occurrence-level
   meaning rather than merely a finite-code interpretation.
+  The
+  [`exact polarity route-block semantics`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationExactRouteDirectionBlock.lean)
+  strengthen the downstream route classification from an existential block
+  to the canonical block selected by clause metadata: every output literal
+  names its exact source incidence and one of the compatible, incompatible,
+  complement-fresh, or complement-original operations.  The remaining route
+  alignment can therefore compare the finite headers to a deterministic
+  metadata stream pointwise.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
