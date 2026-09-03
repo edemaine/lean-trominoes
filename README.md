@@ -13804,7 +13804,12 @@ The representation choices for this target are:
   derives the variable-stub word directly from equality of the decoded fan
   and site slot, while keeping the much larger clause decoder opaque.  This
   leaves only the source-specific decoder alignment needed to replace the
-  abstract suffixes by actual routed words.
+  abstract suffixes by actual routed words.  The
+  [`typed direction-block semantics`](LeanTrominoes/PeriodicCNFStripGroupedVariableIncidenceTypedDirectionBlockSemantics.lean)
+  perform that replacement generically: once a compact coordinated block is
+  supplied for each color, the abstract local shape is exactly the horizontal
+  variable-incidence direction-block presentation, including its routed and
+  non-routed branches.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
