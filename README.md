@@ -13880,6 +13880,12 @@ The representation choices for this target are:
   complement-fresh, or complement-original operations.  The remaining route
   alignment can therefore compare the finite headers to a deterministic
   metadata stream pointwise.
+  Its
+  [`whole-list form`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationExactRouteDirectionBlockList.lean)
+  flattens this pointwise result through the complete clause-major,
+  literal-minor presentation, proving that the actual routed output word
+  column is exactly the mapped canonical metadata-block column whenever the
+  selected source routes have the established geometry.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
