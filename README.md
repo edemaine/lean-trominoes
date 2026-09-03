@@ -13735,6 +13735,11 @@ The representation choices for this target are:
   [`colored occurrence-body block semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceDirectionBodyBlockSemantics.lean)
   further regroup the flat clause-major route-body column into one coherent
   red/green/blue block per aligned occurrence frame and header/tail pair.
+  Finally, the
+  [`grouped colored-body selection semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedColoredOccurrenceBodySelectionSemantics.lean)
+  prove that the three consecutive colored ordinals generated from every
+  stable grouped occurrence index recover exactly that occurrence's complete
+  coherent RGB body block.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established

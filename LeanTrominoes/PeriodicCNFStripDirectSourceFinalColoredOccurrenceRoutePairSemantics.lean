@@ -32,7 +32,9 @@ private theorem map_snd_then
   | cons pair pairs induction =>
       simp only [List.map_cons, induction]
 
-private theorem occurrenceFramesExpected_length_eq_routePairs
+/-- The declarative occurrence-frame column is aligned one-for-one with the
+explicit retained Figure 9 header/tail pairs. -/
+theorem directSourceFinalOccurrenceFramesExpected_length_eq_routePairs
     (symbols : List encoding.Γ) :
     (directSourceFinalOccurrenceFramesExpected decider symbols).length =
       (directFigureNinePolarityRoutePairs decider symbols).length := by
@@ -68,7 +70,7 @@ private theorem occurrenceEndpointFramesExpected_length_eq_routeBlocks
         decider symbols).length := by
   unfold directSourceFinalOccurrenceEndpointFramesExpected
   rw [DirectFinalOccurrenceEndpointFrame.output_length,
-    occurrenceFramesExpected_length_eq_routePairs,
+    directSourceFinalOccurrenceFramesExpected_length_eq_routePairs,
     directFigureNinePolarityColoredRouteBlocks_length]
 
 /-- Pointwise alignment of each RGB endpoint frame with its complete routed
@@ -161,7 +163,7 @@ def directSourceFinalColoredOccurrenceDirectionBodies
     calc
       _ = (directSourceFinalOccurrenceFramesExpected
             decider symbols).length :=
-        (occurrenceFramesExpected_length_eq_routePairs
+        (directSourceFinalOccurrenceFramesExpected_length_eq_routePairs
           decider symbols).symm
       _ = _ := by
         rw [← directSourceFinalOccurrenceFrames_eq_expected,

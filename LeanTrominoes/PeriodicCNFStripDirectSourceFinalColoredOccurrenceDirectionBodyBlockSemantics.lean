@@ -25,6 +25,12 @@ def directFinalOccurrenceDirectionBodyBlock
         (DirectFinalOccurrenceEndpointFrame.ofColor frame color)
         (HorizontalRoutedRouteHeader.block pair.1 pair.2))
 
+@[simp] theorem directFinalOccurrenceDirectionBodyBlock_length
+    (frame : DirectFinalOccurrenceFrame.Data)
+    (pair : HorizontalRoutedRouteHeaderTail.Header × List AxisDirection) :
+    (directFinalOccurrenceDirectionBodyBlock frame pair).length = 3 := by
+  simp [directFinalOccurrenceDirectionBodyBlock, incidenceColors]
+
 private theorem coloredDirectionBodies_zip_blocks
     (frames : List DirectFinalOccurrenceFrame.Data)
     (pairs : List
