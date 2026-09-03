@@ -13867,7 +13867,11 @@ The representation choices for this target are:
   [`header-prefix semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderPrefixSemantics.lean)
   prove that every generated polarity header selects a genuine dependent
   `descriptorAt` entry of the same Figure 9 template, eliminating the total
-  `getD` fallback from all actual header blocks.
+  `getD` fallback from all actual header blocks.  The subsequent
+  [`prefix-atom semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixAtomSemantics.lean)
+  show that interpreting such a descriptor recovers the atom at that exact
+  template incidence, so emitted headers now have a direct occurrence-level
+  meaning rather than merely a finite-code interpretation.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
