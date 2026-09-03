@@ -13777,7 +13777,11 @@ The representation choices for this target are:
   and their
   [`direct-source specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceLocalBodyBlockSourceSemantics.lean)
   combine locality with RGB block alignment, replacing every occurrence's
-  global sparse lookup by a self-contained three-key/three-body lookup.
+  global sparse lookup by a self-contained three-key/three-body lookup.  The
+  [`local-column assembly semantics`](LeanTrominoes/PeriodicCNFStripGroupedVariableIncidenceLocalColumnSemantics.lean)
+  package the four aligned fields of an occurrence opaquely and lift this
+  pointwise replacement through an arbitrary flattened list of blocks,
+  without expanding the source compiler.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
