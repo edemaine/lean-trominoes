@@ -44,6 +44,25 @@ def horizontalIncidenceDirectionBodiesByElement
   (horizontalElementPairs problem).flatMap
     (horizontalIncidenceDirectionBodiesForElement problem incidenceBlock)
 
+/-- The element-major direction-body list is just the element-major incidence
+tag list with the selected direction block evaluated at every tag. -/
+theorem horizontalIncidenceDirectionBodiesByElement_eq_map_incidenceTagsByElement
+    (problem : PeriodicThreeDM)
+    (incidenceBlock : IncidenceTag → HorizontalTypedIncidenceDirectionBlock) :
+    horizontalIncidenceDirectionBodiesByElement problem incidenceBlock =
+      problem.incidenceTagsByElement.map fun tag =>
+        (incidenceBlock tag).directions := by
+  unfold horizontalIncidenceDirectionBodiesByElement horizontalElementPairs
+    horizontalIncidenceDirectionBodiesForElement
+    PeriodicThreeDM.incidenceTagsByElement
+  rw [List.flatMap_assoc, List.map_flatMap]
+  apply List.flatMap_congr
+  intro color _colorMember
+  rw [List.flatMap_map, List.map_flatMap]
+  apply List.flatMap_congr
+  intro atom _atomMember
+  simp
+
 private theorem edgeBlocks_elementPairs
     (problem : PeriodicThreeDM)
     (incidenceBlock : IncidenceTag → HorizontalTypedIncidenceDirectionBlock)

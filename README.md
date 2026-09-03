@@ -13676,7 +13676,11 @@ The representation choices for this target are:
   covering body selection as a direct map of the aligned body-at-key lookup,
   and the direct counted-contraction plan specializes this result to its
   canonical element/rank query stream.  Consequently the remaining equality
-  is pointwise rather than a nested relational-lookup obligation.
+  is pointwise rather than a nested relational-lookup obligation.  The
+  horizontal bridge also normalizes its target body column to an ordinary
+  map of the chosen incidence-direction block over the canonical
+  element-major incidence-tag list, leaving a direct comparison between two
+  mapped enumerations.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
