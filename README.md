@@ -13781,7 +13781,10 @@ The representation choices for this target are:
   [`local-column assembly semantics`](LeanTrominoes/PeriodicCNFStripGroupedVariableIncidenceLocalColumnSemantics.lean)
   package the four aligned fields of an occurrence opaquely and lift this
   pointwise replacement through an arbitrary flattened list of blocks,
-  without expanding the source compiler.
+  without expanding the source compiler.  The
+  [`direct source columns`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceLocalColumns.lean)
+  now zip the four concrete, equal-length source columns into that compact
+  representation while retaining the routed key/body alignment.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
