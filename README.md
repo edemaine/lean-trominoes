@@ -13714,6 +13714,10 @@ The representation choices for this target are:
   [`sparse-suffix selection semantics`](LeanTrominoes/PeriodicCNFStripVariableIncidenceSparseSuffixSelectionSemantics.lean)
   reduce any aligned duplicate-free routed-key table pointwise to its unique
   routed body when the query key is present and the empty suffix otherwise.
+  The
+  [`routed-key block semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceKeyBlockSemantics.lean)
+  expose the compiled global key column as three explicit scaled local
+  offsets per grouped occurrence, ready for the required uniqueness proof.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
