@@ -13994,8 +13994,14 @@ The representation choices for this target are:
   exposes both the globally indexed flattened coordinate stream and that
   exact metadata projection for the compiled source.  Thus the direct header
   schedule and semantic metadata schedule now share one global,
-  clause-sensitive indexing scheme, leaving only pointwise source-word
-  equality before the final list lift.
+  clause-sensitive indexing scheme.  A source-independent
+  [`pointwise lookup lemma`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineIndexedProfileCoordinateMetadataLookup.lean)
+  combines those two projections without unfolding the retained formula;
+  its
+  [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalMetadataProfileCoordinateLookup.lean)
+  retrieves, at every direct occurrence, concrete metadata with the same
+  parent profile and local generated-clause coordinate as the header.  Only
+  literal-index and source-word equality remain before the final list lift.
   The
   [`finite final-clause ordering`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData.lean)
   now records the second clockwise permutation explicitly: binary generated
