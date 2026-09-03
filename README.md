@@ -13795,7 +13795,12 @@ The representation choices for this target are:
   then identify each local block with its typed occurrence triples in exact
   triple-major, RGB-minor order, attaching the three abstract routed suffixes
   at precisely the typed routed incidences.  The three connector cases are
-  compiled separately to keep each finite-table proof small.
+  compiled separately to keep each finite-table proof small.  The generic
+  [`occurrence-request semantic bridge`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceDirectionRequestSemanticBridge.lean)
+  identifies a compact direct variable-stub/corridor/clause-stub request with
+  the complete horizontal coordinated direction word once its endpoint and
+  lane projections agree.  This leaves only the source-specific decoder
+  alignment needed to replace the abstract suffixes by actual routed words.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
