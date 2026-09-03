@@ -13937,6 +13937,13 @@ The representation choices for this target are:
   They also retain each query's exact source-clause profile; profile identity
   and the two incidence coordinates can therefore determine the full dependent
   local query without unfolding the finite template construction again.
+  The
+  [`route-pair source provenance`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRoutePairSourceProvenance.lean)
+  and its
+  [`retained specialization`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineRoutePairSourceProvenance.lean)
+  additionally recover the concrete refined source clause, its exact directed
+  profile, and the matching clockwise dynamic-tail row from every emitted
+  header/tail pair.
   On the direct side, the
   [`header coordinate semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateSemantics.lean)
   exhaustively verify that every final polarity header selects the same
