@@ -13731,7 +13731,10 @@ The representation choices for this target are:
   clause-major source, the
   [`route-pair occurrence-data semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRoutePairOccurrenceDataSemantics.lean)
   identify the finite occurrence records and the routed bodies as projections
-  of the same explicit retained Figure 9 header/tail pair stream.
+  of the same explicit retained Figure 9 header/tail pair stream.  The
+  [`colored occurrence-body block semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalColoredOccurrenceDirectionBodyBlockSemantics.lean)
+  further regroup the flat clause-major route-body column into one coherent
+  red/green/blue block per aligned occurrence frame and header/tail pair.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
