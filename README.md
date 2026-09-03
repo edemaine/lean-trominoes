@@ -13710,7 +13710,10 @@ The representation choices for this target are:
   [`routed-offset semantics`](LeanTrominoes/PeriodicCNFStripGroupedVariableRoutedIncidenceOffsetSemantics.lean)
   additionally identify the direct block widths with the typed triple counts
   and the sparse offsets with the precise RGB positions of the three routed
-  typed incidences.
+  typed incidences.  The generic
+  [`sparse-suffix selection semantics`](LeanTrominoes/PeriodicCNFStripVariableIncidenceSparseSuffixSelectionSemantics.lean)
+  reduce any aligned duplicate-free routed-key table pointwise to its unique
+  routed body when the query key is present and the empty suffix otherwise.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
