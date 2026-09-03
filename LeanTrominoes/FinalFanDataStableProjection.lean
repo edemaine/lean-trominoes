@@ -142,6 +142,66 @@ theorem stableFan_kind_of_active
               FinalFanQueryRanks.selectedRank,
               VariableSiteSlot.index]
 
+/-- Every active finite slot of the semantic fan projects the polarity of the
+occurrence record at that exact stable rank. -/
+theorem stableFan_polarity_of_active
+    (candidateKeys : List Nat) (records : List OccurrenceData)
+    (value : Nat) (countPred : Fin 3) (slot : VariableSiteSlot)
+    (active : slot.index < countPred.val + 1) :
+    (stableFan candidateKeys records value countPred).polarity slot =
+      (FiniteAlphabetKeyedValueLookup.alignedDatum candidateKeys records
+        (value * 3 + slot.index)).polarity := by
+  cases countPred using Fin.cases with
+  | zero =>
+      cases slot <;>
+        simp [stableFan, stableSelectedOccurrence, fanData,
+          FinalFanQueryRanks.selectedRank,
+          VariableSiteSlot.index] at active ⊢
+  | succ countPred =>
+      cases countPred using Fin.cases with
+      | zero =>
+          cases slot <;>
+            simp [stableFan, stableSelectedOccurrence, fanData,
+              FinalFanQueryRanks.selectedRank,
+              VariableSiteSlot.index] at active ⊢
+      | succ countPred =>
+          have countPredEq : countPred = 0 := Fin.eq_zero countPred
+          subst countPred
+          cases slot <;>
+            simp [stableFan, stableSelectedOccurrence, fanData,
+              FinalFanQueryRanks.selectedRank,
+              VariableSiteSlot.index]
+
+/-- Every active finite slot of the semantic fan projects the direction of the
+occurrence record at that exact stable rank. -/
+theorem stableFan_direction_of_active
+    (candidateKeys : List Nat) (records : List OccurrenceData)
+    (value : Nat) (countPred : Fin 3) (slot : VariableSiteSlot)
+    (active : slot.index < countPred.val + 1) :
+    (stableFan candidateKeys records value countPred).direction slot =
+      (FiniteAlphabetKeyedValueLookup.alignedDatum candidateKeys records
+        (value * 3 + slot.index)).direction := by
+  cases countPred using Fin.cases with
+  | zero =>
+      cases slot <;>
+        simp [stableFan, stableSelectedOccurrence, fanData,
+          FinalFanQueryRanks.selectedRank,
+          VariableSiteSlot.index] at active ⊢
+  | succ countPred =>
+      cases countPred using Fin.cases with
+      | zero =>
+          cases slot <;>
+            simp [stableFan, stableSelectedOccurrence, fanData,
+              FinalFanQueryRanks.selectedRank,
+              VariableSiteSlot.index] at active ⊢
+      | succ countPred =>
+          have countPredEq : countPred = 0 := Fin.eq_zero countPred
+          subst countPred
+          cases slot <;>
+            simp [stableFan, stableSelectedOccurrence, fanData,
+              FinalFanQueryRanks.selectedRank,
+              VariableSiteSlot.index]
+
 end LeanTrominoes.FinalFanDataTripleAssembler
 
 end

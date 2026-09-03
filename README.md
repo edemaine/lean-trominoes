@@ -13696,7 +13696,11 @@ The representation choices for this target are:
   the direct fan stream and the actual typed source are now proved to have
   the same clause count.  Both incidence presentations reduce to one copy
   of the same fixed 27-body X3C clause-core block per clause, proving exact
-  equality of the direct and typed clause-incidence body lists.
+  equality of the direct and typed clause-incidence body lists.  The stable
+  fan projection lemmas now also recover an active occurrence record's
+  polarity and direction, in addition to its connector kind, both by slot and
+  directly from a stable occurrence key.  This supplies all three fields
+  needed for the analogous variable-incidence body comparison.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
