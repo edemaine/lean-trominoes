@@ -13699,8 +13699,11 @@ The representation choices for this target are:
   equality of the direct and typed clause-incidence body lists.  The stable
   fan projection lemmas now also recover an active occurrence record's
   polarity and direction, in addition to its connector kind, both by slot and
-  directly from a stable occurrence key.  This supplies all three fields
-  needed for the analogous variable-incidence body comparison.
+  directly from a stable occurrence key.  Their
+  [`grouped-source specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableFanRouteFieldSemantics.lean)
+  aligns each grouped fan slot with its occurrence record in all three fields,
+  supplying the local data needed for the analogous variable-incidence body
+  comparison.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
