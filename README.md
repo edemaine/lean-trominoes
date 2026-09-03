@@ -13960,7 +13960,15 @@ The representation choices for this target are:
   [`direct pair specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRoutePairCoordinateSemantics.lean)
   lifts the finite coordinate theorem over the complete explicit
   header/tail stream, while completion by a dynamic tail is proved not to
-  change the header's selected local query.
+  change the header's selected local query.  The
+  [`profile-qualified coordinate semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixProfileCoordinateSemantics.lean)
+  package each header's canonical parent profile with those incidence
+  coordinates and verify the resulting finite block directly; their
+  [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRoutePairProfileCoordinateSemantics.lean)
+  exposes the same compact record over the complete direct route-pair list.
+  This is the occurrence signature that the remaining global metadata-index
+  alignment will compare, avoiding separate dependent profile and coordinate
+  columns.
   The
   [`finite final-clause ordering`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData.lean)
   now records the second clockwise permutation explicitly: binary generated
