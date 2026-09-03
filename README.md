@@ -13977,7 +13977,16 @@ The representation choices for this target are:
   dynamic route tails preserves the schedule.  Their
   [`direct source specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPolarityOperationSemantics.lean)
   equates that schedule with the literals of the actual retained
-  final-clockwise formula in clause-major order.
+  final-clockwise formula in clause-major order.  Variable gauging preserves
+  this value presentation by the generic
+  [`gauge projection`](LeanTrominoes/PositionedPeriodicCNFVariableGaugeValueProjection.lean).
+  Finally, the separately compiled
+  [`metadata list semantics`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationMetadataRouteOperationListSemantics.lean)
+  and
+  [`direct metadata specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalMetadataPolarityOperationSemantics.lean)
+  prove that the direct route pairs and the actual semantic polarity metadata
+  have exactly the same local source-literal indices and operations after
+  canonical gauging.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original

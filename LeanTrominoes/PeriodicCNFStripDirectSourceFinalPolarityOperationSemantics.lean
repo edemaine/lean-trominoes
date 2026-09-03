@@ -63,6 +63,17 @@ private theorem directSourceClausesNonempty
     sourceFormula_clausesNonempty
       (PolySpaceCompiler.formulaOfSymbols decider symbols)
 
+/-- The actual retained final-clockwise formula, named under the direct
+compiler's shared equality implementation. -/
+noncomputable def directSourceFinalClockwiseFormula
+    (symbols : List encoding.Γ) :=
+  PeriodicOrthocrossing.retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula
+    (directSourceFormula decider symbols)
+    (directSourceIsLocal decider symbols)
+    (directSourceWidthAtMostThree decider symbols)
+    (directSourceOccurrencesAtMostThree decider symbols)
+    (directSourceClausesNonempty decider symbols)
+
 /-- The direct header/tail pairs carry exactly the local literal index and
 polarity operation of every literal in the actual retained final-clockwise
 formula, in clause-major order. -/
@@ -70,12 +81,8 @@ theorem directFigureNinePolarityRoutePairs_map_indexedPolarity
     (symbols : List encoding.Γ) :
     (directFigureNinePolarityRoutePairs decider symbols).map
         (fun pair => pair.1.polarity.indexed) =
-      ((PeriodicOrthocrossing.retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula
-          (directSourceFormula decider symbols)
-          (directSourceIsLocal decider symbols)
-          (directSourceWidthAtMostThree decider symbols)
-          (directSourceOccurrencesAtMostThree decider symbols)
-          (directSourceClausesNonempty decider symbols)).clauses.flatMap fun clause =>
+      ((directSourceFinalClockwiseFormula decider symbols).clauses.flatMap
+        fun clause =>
             indexedDescriptors
               (clause.literals.map PeriodicLiteral.value)) := by
   unfold directFigureNinePolarityRoutePairs
@@ -89,7 +96,8 @@ theorem directFigureNinePolarityRoutePairs_map_indexedPolarity
         (directSourceWidthAtMostThree decider symbols)
         (directSourceOccurrencesAtMostThree decider symbols)
         (directSourceClausesNonempty decider symbols)
-  simpa only [List.flatMap_map, Function.comp_apply] using
+  simpa only [directSourceFinalClockwiseFormula,
+    List.flatMap_map, Function.comp_apply] using
     congrArg (List.flatMap indexedDescriptors) valueEq.symm
 
 end LeanTrominoes.PeriodicCNFStripReduction
