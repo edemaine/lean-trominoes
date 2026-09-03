@@ -13724,7 +13724,10 @@ The representation choices for this target are:
   the
   [`direct suffix pointwise semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceSuffixPointwiseSemantics.lean)
   now present the complete suffix column as a map over every incidence
-  position, returning its unique aligned routed body or the empty list.
+  position, returning its unique aligned routed body or the empty list.  The
+  [`complete body pointwise semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceBodyPointwiseSemantics.lean)
+  join each of those indexed suffixes to its aligned finite prefix, yielding
+  one ordinary indexed map for the full direct variable-body column.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
