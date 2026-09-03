@@ -3,7 +3,8 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFFormulaShapeDirectionOrderingFormulaData
+import LeanTrominoes.PeriodicCNFFormulaShapeDirectionOrderingClauseSemantics
+import LeanTrominoes.PeriodicCNFFormulaShapeCanonical
 import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixData
 
 /-! # Semantics of finite Figure 9 route-prefix descriptors -/
@@ -59,6 +60,39 @@ theorem clauseProfile_ofClause
               | cons fourth rest =>
                   simp only [List.length_cons] at width
                   omega
+
+/-- Sorting a genuine directed clause profile and then forgetting its route
+directions gives the canonical finite profile of the correspondingly
+clockwise-reordered positioned clause. -/
+theorem clauseProfile_orderedDirectedProfile_ofClause
+    {Variable : Type}
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (clauseIndex : Nat) (clause : PositionedPeriodicClause Variable)
+    (nonempty : clause.literals ≠ [])
+    (width : clause.literals.length ≤ 3) :
+    clauseProfile
+        (orderedDirectedProfile
+          (DirectedClauseProfile.ofClause routes clauseIndex clause)) =
+      FormulaShapeOfFormula.clauseProfile
+        (ClauseProfileOccurrenceSplit.literalProfiles
+          (PositionedPeriodicCNF.orderClauseByRouteDirection
+            routes clauseIndex clause).literals) := by
+  apply ClauseProfile.literals_injective
+  rw [clauseProfile_orderedDirectedProfile,
+    DirectedClauseProfile.orderedProfile_ofClause_literals
+      routes clauseIndex clause nonempty width]
+  exact (FormulaShapeOfFormula.clauseProfile_literals
+    (ClauseProfileOccurrenceSplit.literalProfiles
+      (PositionedPeriodicCNF.orderClauseByRouteDirection
+        routes clauseIndex clause).literals)
+    (by
+      apply List.ne_nil_of_length_pos
+      simpa [ClauseProfileOccurrenceSplit.literalProfiles,
+        PositionedPeriodicCNF.orderClauseByRouteDirection_length] using
+          (List.length_pos_iff.mpr nonempty))
+    (by
+      simpa [ClauseProfileOccurrenceSplit.literalProfiles,
+        PositionedPeriodicCNF.orderClauseByRouteDirection_length] using width)).symm
 
 /-- At every genuine source-literal slot, the reconstructed fan has exactly
 the semantic first direction.  Inactive directions are intentionally left at

@@ -13943,7 +13943,11 @@ The representation choices for this target are:
   [`retained specialization`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineRoutePairSourceProvenance.lean)
   additionally recover the concrete refined source clause, its exact directed
   profile, and the matching clockwise dynamic-tail row from every emitted
-  header/tail pair.
+  header/tail pair.  The subsequent
+  [`route-pair profile semantics`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineRoutePairProfileSemantics.lean)
+  transport that clause through clockwise ordering and clearance scaling,
+  proving that the header's dependent local-query profile is exactly the
+  canonical profile of the clause actually expanded by Figure 9.
   On the direct side, the
   [`header coordinate semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateSemantics.lean)
   exhaustively verify that every final polarity header selects the same
