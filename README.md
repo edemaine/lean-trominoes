@@ -13799,8 +13799,12 @@ The representation choices for this target are:
   [`occurrence-request semantic bridge`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceDirectionRequestSemanticBridge.lean)
   identifies a compact direct variable-stub/corridor/clause-stub request with
   the complete horizontal coordinated direction word once its endpoint and
-  lane projections agree.  This leaves only the source-specific decoder
-  alignment needed to replace the abstract suffixes by actual routed words.
+  lane projections agree.  Its
+  [`endpoint-field specialization`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceEndpointFieldSemanticBridge.lean)
+  derives the variable-stub word directly from equality of the decoded fan
+  and site slot, while keeping the much larger clause decoder opaque.  This
+  leaves only the source-specific decoder alignment needed to replace the
+  abstract suffixes by actual routed words.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
