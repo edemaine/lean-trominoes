@@ -13934,6 +13934,16 @@ The representation choices for this target are:
   source arities, polarities, and slice-offset profiles.  An index-level
   version retains the selected old literal positions as well, so the result
   distinguishes equal-looking occurrences rather than just equal profiles.
+  The
+  [`binary route-order transport`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineBinaryClauseRouteOrder.lean)
+  carries the finite west/east exits through template instantiation, anchor
+  normalization, and suffix splicing.  Its
+  [`retained normalized specialization`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightBinaryNormalizedClauseRouteOrder.lean)
+  proves binary routes are start-isolated, survive final loop erasure with
+  those first directions, and are therefore sorted semantically in exact
+  old-index order `1,0`.  Together with the existing ternary `2,0,1`
+  theorem, this justifies the direct finite permutation against the actual
+  normalized route family.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
