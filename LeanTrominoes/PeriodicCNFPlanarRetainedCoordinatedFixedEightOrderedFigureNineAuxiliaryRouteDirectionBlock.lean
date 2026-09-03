@@ -61,6 +61,10 @@ theorem
         (retainedFigureNineClearancePositionedFormula source))[
           clauseIndex]? = some metadata ∧
         metadata.clause = clause ∧
+        query.1 =
+          PeriodicCNF.FormulaShapeOfFormula.clauseProfile
+            (PeriodicCNF.ClauseProfileOccurrenceSplit.literalProfiles
+              metadata.sourceClause.literals) ∧
         unitSubdivisionDirections
             (AxisDirection.normalizeOrthogonalPolyline
               (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawIncidenceRoutes
@@ -93,13 +97,13 @@ theorem
       PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes_directionBlock_of_members
         clearanceSource clearancePlacement clearanceWidth clearanceDistinct
         clearanceNonempty clauseMember literalMember with
-    ⟨metadata, query, metadataLookup, metadataClause, localBlock,
-      clauseCoordinate, literalCoordinate⟩
+    ⟨metadata, query, metadataLookup, metadataClause, queryProfile,
+      localBlock, clauseCoordinate, literalCoordinate⟩
   have rawEq :=
     retainedOrderedFixedEightComposedRawIncidenceRoutes_eq_normalizedLocalRoutes_of_not_inherited
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty clauseMember literalMember notInherited
-  refine ⟨metadata, query, metadataLookup, metadataClause, ?_,
+  refine ⟨metadata, query, metadataLookup, metadataClause, queryProfile, ?_,
     clauseCoordinate, literalCoordinate⟩
   rw [rawEq]
   exact localBlock

@@ -94,7 +94,8 @@ theorem
             sourceClausesNonempty clauseMember literalMember
             sourceAtom literalSource with
         ⟨_data, _first, second, rest, query, _dataLookup, _routeEq,
-          directionWord, _clauseCoordinate, _literalCoordinate⟩
+          directionWord, _queryProfile, _clauseCoordinate,
+          _literalCoordinate⟩
       refine ⟨.inherited query
         (unitSubdivisionDirections (second :: rest)), ?_⟩
       simpa [RetainedFigureNineRouteDirectionBlock.directions] using
@@ -111,7 +112,8 @@ theorem
             source sourceLocal sourceWidth sourceOccurrences
             sourceClausesNonempty clauseMember literalMember notInherited with
         ⟨_metadata, query, _metadataLookup, _metadataClause,
-          directionWord, _clauseCoordinate, _literalCoordinate⟩
+          _queryProfile, directionWord, _clauseCoordinate,
+          _literalCoordinate⟩
       refine ⟨.local query, ?_⟩
       simpa [RetainedFigureNineRouteDirectionBlock.directions] using
         directionWord
@@ -127,7 +129,8 @@ theorem
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty clauseMember literalMember notInherited with
       ⟨_metadata, query, _metadataLookup, _metadataClause,
-        directionWord, _clauseCoordinate, _literalCoordinate⟩
+        _queryProfile, directionWord, _clauseCoordinate,
+        _literalCoordinate⟩
     refine ⟨.local query, ?_⟩
     simpa [RetainedFigureNineRouteDirectionBlock.directions] using
       directionWord

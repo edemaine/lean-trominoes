@@ -43,6 +43,10 @@ theorem normalizedLocalRoutes_directionBlock_of_members
         (query : LocalDirectionQuery),
       (formulaClauseMetadata source)[clauseIndex]? = some metadata ∧
         metadata.clause = clause ∧
+        query.1 =
+          PeriodicCNF.FormulaShapeOfFormula.clauseProfile
+            (PeriodicCNF.ClauseProfileOccurrenceSplit.literalProfiles
+              metadata.sourceClause.literals) ∧
         unitSubdivisionDirections
             (AxisDirection.normalizeOrthogonalPolyline
               (normalizedLocalRoutes source sourcePlacement
@@ -56,7 +60,7 @@ theorem normalizedLocalRoutes_directionBlock_of_members
       source sourcePlacement sourceWidth sourceClausesNonempty
       clauseMember literalMember with
     ⟨metadata, profile, templateIndex, origin,
-      metadataLookup, metadataClause, localRouteEq,
+      metadataLookup, metadataClause, profileEq, localRouteEq,
       clauseCoordinate, literalCoordinate⟩
   let localRoute :=
     normalizedLocalRoutes source sourcePlacement clauseIndex literalIndex
@@ -72,7 +76,7 @@ theorem normalizedLocalRoutes_directionBlock_of_members
       source sourcePlacement sourceWidth sourceDistinct
       clauseMember literalMember
   refine ⟨metadata, ⟨profile, templateIndex⟩,
-    metadataLookup, metadataClause, ?_, ?_, ?_⟩
+    metadataLookup, metadataClause, profileEq, ?_, ?_, ?_⟩
   · exact normalizedTranslatedLocalRoute_directionWord
       profile templateIndex origin localRoute localRouteEq
       localRouteNonempty localRouteOrthogonal

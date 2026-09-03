@@ -88,6 +88,10 @@ theorem normalizedLocalRoutes_eq_translated_profileRoute_of_members
         (origin : Cell),
       (formulaClauseMetadata source)[clauseIndex]? = some metadata ∧
         metadata.clause = clause ∧
+        profile =
+          FormulaShapeOfFormula.clauseProfile
+            (ClauseProfileOccurrenceSplit.literalProfiles
+              metadata.sourceClause.literals) ∧
         normalizedLocalRoutes source sourcePlacement
             clauseIndex literalIndex =
           translatePolyline origin
@@ -166,7 +170,7 @@ theorem normalizedLocalRoutes_eq_translated_profileRoute_of_members
       ((composedPlacement source sourcePlacement).translation
         (PeriodicCNF.clauseAnchor metadata.clause.literals))
   refine ⟨metadata, profile, templateIndex, origin,
-    metadataLookup, metadataClause, ?_, ?_, ?_⟩
+    metadataLookup, metadataClause, rfl, ?_, ?_, ?_⟩
   · calc
       normalizedLocalRoutes source sourcePlacement clauseIndex literalIndex =
           translatePolyline origin

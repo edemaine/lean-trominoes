@@ -13934,6 +13934,9 @@ The representation choices for this target are:
   auxiliary-route, and inherited-route direction theorems now retain them all
   the way to their finite direction queries, so duplicate-looking template
   routes remain tied to the generated clause and literal that selected them.
+  They also retain each query's exact source-clause profile; profile identity
+  and the two incidence coordinates can therefore determine the full dependent
+  local query without unfolding the finite template construction again.
   On the direct side, the
   [`header coordinate semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateSemantics.lean)
   exhaustively verify that every final polarity header selects the same

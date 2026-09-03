@@ -76,6 +76,10 @@ theorem
               query ++
             repeatDirections 144
               (unitSubdivisionDirections (second :: rest)) ∧
+        query.1 =
+          PeriodicCNF.FormulaShapeOfFormula.clauseProfile
+            (PeriodicCNF.ClauseProfileOccurrenceSplit.literalProfiles
+              data.sourceClause.literals) ∧
         ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
           query.1).incidenceAt query.2.1).clauseIndex =
             data.metadata.localClauseIndex ∧
@@ -139,7 +143,7 @@ theorem
             rfl
           rw [clearanceFactorEq] at clearanceRouteEq
           refine ⟨data, first, second, rest, query,
-            dataLookup, routeEq, ?_, ?_, ?_⟩
+            dataLookup, routeEq, ?_, rfl, ?_, ?_⟩
           · rw [rawShape, clearanceRouteEq, routeEq]
             simpa only [query, profile, fanData, slot, clearanceWidth] using
               compiledWord
