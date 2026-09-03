@@ -13706,7 +13706,11 @@ The representation choices for this target are:
   comparison.  The
   [`grouped variable prefix-order bridge`](LeanTrominoes/PeriodicCNFStripGroupedVariableIncidenceTripleOrder.lean)
   now identifies every such local finite prefix with the typed occurrence
-  triples in exact triple-major, red/green/blue-minor order.
+  triples in exact triple-major, red/green/blue-minor order.  The
+  [`routed-offset semantics`](LeanTrominoes/PeriodicCNFStripGroupedVariableRoutedIncidenceOffsetSemantics.lean)
+  additionally identify the direct block widths with the typed triple counts
+  and the sparse offsets with the precise RGB positions of the three routed
+  typed incidences.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
