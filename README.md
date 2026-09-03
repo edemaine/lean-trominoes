@@ -13898,6 +13898,11 @@ The representation choices for this target are:
   stream.  What remains in route alignment is no longer the polarity case
   split, but identification of each selected pre-polarity source route with
   its explicit Figure 9 prefix-and-tail block.
+  The metadata projection also retains the global source-clause index:
+  mapping the complete exact block list now yields precisely the flattened
+  `(source clause, source literal, operation)` stream, so this remaining
+  Figure 9 comparison cannot accidentally align equal-looking routes from
+  different clauses.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
