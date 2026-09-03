@@ -13756,7 +13756,10 @@ The representation choices for this target are:
   [`occurrence-block index semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceOccurrenceBlockIndexSemantics.lean)
   regroup the flat finite-prefix query stream without changing its stable
   indices: each occurrence block starts at three times the same prefix-sum
-  triple offset used by its three routed-suffix keys.
+  triple offset used by its three routed-suffix keys.  The corresponding
+  [`complete-body regrouping`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceOccurrenceBlockBodySemantics.lean)
+  carries those indices through sparse suffix selection, presenting the
+  entire direct variable-body column as explicit occurrence-local blocks.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
