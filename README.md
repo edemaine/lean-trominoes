@@ -13905,8 +13905,11 @@ The representation choices for this target are:
   stream.  What remains in route alignment is no longer the polarity case
   split, but identification of each selected pre-polarity source route with
   its explicit Figure 9 prefix-and-tail block.
-  The metadata projection also retains the global source-clause index:
-  mapping the complete exact block list now yields precisely the flattened
+  The
+  [`globally source-indexed list semantics`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationMetadataRouteSourceIndexedListSemantics.lean)
+  also retain the metadata's global source-clause index through anchor
+  normalization and coordinate refinement: mapping the complete exact block
+  list yields precisely the flattened
   `(source clause, source literal, operation)` stream, so this remaining
   Figure 9 comparison cannot accidentally align equal-looking routes from
   different clauses.
@@ -13986,7 +13989,15 @@ The representation choices for this target are:
   [`direct metadata specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalMetadataPolarityOperationSemantics.lean)
   prove that the direct route pairs and the actual semantic polarity metadata
   have exactly the same local source-literal indices and operations after
-  canonical gauging.
+  canonical gauging.  The
+  [`direct source-index attachment`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalSourceIndexedPolarityOperationSemantics.lean)
+  broadcasts each final gauged clause's global `zipIdx` index across all its
+  operation descriptors, including across empty blocks without shifting later
+  indices.  Composing this with the semantic list theorem in the
+  [`exact metadata alignment`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalExactMetadataPolarityOperationSemantics.lean)
+  proves that the direct pair stream and exact metadata route-block stream
+  agree on every global source clause, local source literal, and polarity
+  operation.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
