@@ -13672,7 +13672,11 @@ The representation choices for this target are:
   the complete directly compiled degree column is exactly the actual
   horizontal 3DM element-degree column.  This discharges the first of the two
   source-specific contraction equalities; only the selected incidence-body
-  equality remains.
+  equality remains.  The generic keyed-block semantics now rewrite unique,
+  covering body selection as a direct map of the aligned body-at-key lookup,
+  and the direct counted-contraction plan specializes this result to its
+  canonical element/rank query stream.  Consequently the remaining equality
+  is pointwise rather than a nested relational-lookup obligation.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established

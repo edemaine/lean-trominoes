@@ -18,6 +18,16 @@ variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
+/-- The complete direct incidence body recovered at one stable
+element/occurrence-rank key. -/
+def directSourceFinalIncidenceBodyAtKey
+    (symbols : List encoding.Γ) (key : Nat) : List AxisDirection :=
+  FiniteAlphabetKeyedDelimitedBlockLookup.alignedBody
+    (CountedContractedIncidence.incidenceBlockKeys
+      (directSourceFinalCanonicalIncidenceElementCodes decider symbols))
+    (directSourceFinalCanonicalIncidenceBodies decider symbols)
+    key
+
 /-- The direct source's compiled query keys are exactly the two- or
 three-incidence block attached to every canonical element, in element-major
 order. -/
@@ -57,6 +67,39 @@ theorem directSourceFinalCountedContraction_incidenceBlockKeys_eq
       StableOccurrenceRanks.candidateKeys
         (directSourceFinalCanonicalIncidenceElementCodes decider symbols) := by
   exact CountedContractedIncidence.incidenceBlockKeys_eq_candidateKeys _
+
+/-- Unique-key selection reduces the direct incidence body column to an
+ordinary map over the canonical element/rank query stream. -/
+theorem directSourceFinalCountedContraction_selectedBodies_eq_queryMap
+    (symbols : List encoding.Γ) :
+    CountedContractedIncidence.selectedBodies
+        (directSourceFinalCanonicalElementCodes decider symbols)
+        (directSourceFinalCanonicalElementDegrees decider symbols)
+        (directSourceFinalCanonicalIncidenceElementCodes decider symbols)
+        (directSourceFinalCanonicalIncidenceBodies decider symbols) =
+      (CountedContractedIncidence.queryKeys
+        (directSourceFinalCanonicalElementCodes decider symbols)
+        (directSourceFinalCanonicalElementDegrees decider symbols)).map
+          (directSourceFinalIncidenceBodyAtKey decider symbols) := by
+  let incidenceCodes :=
+    directSourceFinalCanonicalIncidenceElementCodes decider symbols
+  have bodiesAligned :
+      (directSourceFinalCanonicalIncidenceBodies decider symbols).length =
+        (CountedContractedIncidence.incidenceBlockKeys
+          incidenceCodes).length := by
+    unfold CountedContractedIncidence.incidenceBlockKeys
+    rw [UnaryFieldStableOccurrenceKeys.keys_length,
+      directSourceFinalCanonicalIncidenceBodies_length,
+      directSourceFinalCanonicalIncidenceElementCodes_length]
+  have occurrenceContract :=
+    directSourceFinalCountedContraction_occurrenceKeyContract
+      decider symbols
+  exact CountedContractedIncidence.selectedBodies_eq_map_alignedBody
+    (directSourceFinalCanonicalElementCodes decider symbols)
+    (directSourceFinalCanonicalElementDegrees decider symbols)
+    incidenceCodes
+    (directSourceFinalCanonicalIncidenceBodies decider symbols)
+    bodiesAligned occurrenceContract.1 occurrenceContract.2
 
 /-- The direct counted-contraction compiler is exactly the established
 contracted-direction assembler applied to the uniquely selected incidence

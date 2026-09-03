@@ -25,6 +25,25 @@ def selectedBodies
     (incidenceBlockKeys incidenceElementCodes)
     bodies
 
+/-- Under the occurrence-key contract, selected bodies are the unique
+candidate bodies recovered at the requested element/rank keys. -/
+theorem selectedBodies_eq_map_alignedBody
+    (elementCodes sizes incidenceElementCodes : List Nat)
+    (bodies : List (List AxisDirection))
+    (bodiesAligned :
+      bodies.length = (incidenceBlockKeys incidenceElementCodes).length)
+    (keysNodup : (incidenceBlockKeys incidenceElementCodes).Nodup)
+    (queriesPresent : ∀ query ∈ queryKeys elementCodes sizes,
+      query ∈ incidenceBlockKeys incidenceElementCodes) :
+    selectedBodies elementCodes sizes incidenceElementCodes bodies =
+      (queryKeys elementCodes sizes).map
+        (FiniteAlphabetKeyedDelimitedBlockLookup.alignedBody
+          (incidenceBlockKeys incidenceElementCodes) bodies) := by
+  unfold selectedBodies
+  exact
+    FiniteAlphabetKeyedDelimitedBlockLookup.expectedBodyList_eq_map_alignedBody
+      _ _ _ bodiesAligned.symm keysNodup queriesPresent
+
 /-- The degree-driven role and query compilers emit one item per requested
 incidence. -/
 theorem roles_length_eq_queryKeys

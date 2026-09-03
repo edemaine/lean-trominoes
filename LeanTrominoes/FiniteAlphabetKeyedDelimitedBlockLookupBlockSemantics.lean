@@ -95,6 +95,85 @@ def expectedBodyList
     (blockKeys.zip bodies).flatMap fun candidate =>
       if query = candidate.1 then [candidate.2] else []
 
+/-- Recover the body aligned with a candidate key at that key's unique
+presentation index. -/
+def alignedBody
+    (blockKeys : List Nat) (bodies : List (List Alphabet))
+    (key : Nat) : List Alphabet :=
+  bodies.getD (blockKeys.idxOf key) []
+
+/-- An aligned body column over duplicate-free keys is its keywise recovery
+map. -/
+theorem bodies_eq_map_alignedBody
+    (blockKeys : List Nat) (bodies : List (List Alphabet))
+    (aligned : blockKeys.length = bodies.length)
+    (keysNodup : blockKeys.Nodup) :
+    bodies = blockKeys.map (alignedBody blockKeys bodies) := by
+  apply List.ext_getElem (by simpa using aligned.symm)
+  intro index bodyIndexLt mappedIndexLt
+  simp only [List.getElem_map]
+  unfold alignedBody
+  rw [keysNodup.idxOf_getElem index
+    (by simpa [aligned] using bodyIndexLt)]
+  exact (List.getD_eq_getElem bodies [] bodyIndexLt).symm
+
+private theorem select_map_alignedBody
+    (query : Nat) (blockKeys : List Nat) (body : Nat → List Alphabet)
+    (keysNodup : blockKeys.Nodup) :
+    (blockKeys.map fun key => (key, body key)).flatMap (fun candidate =>
+        if query = candidate.1 then [candidate.2] else []) =
+      (if query ∈ blockKeys then [body query] else []) := by
+  induction blockKeys with
+  | nil => simp
+  | cons key keys induction =>
+      have ⟨keyNotMem, keysNodup'⟩ := List.nodup_cons.mp keysNodup
+      by_cases same : query = key
+      · subst key
+        simp only [List.map_cons, List.flatMap_cons,
+          List.mem_cons, true_or, if_true]
+        rw [induction keysNodup', if_neg keyNotMem]
+        rfl
+      · simp only [List.map_cons, List.flatMap_cons, if_neg same,
+          List.nil_append]
+        rw [induction keysNodup']
+        simp [same]
+
+private theorem zip_map_alignedBody
+    (blockKeys : List Nat) (body : Nat → List Alphabet) :
+    blockKeys.zip (blockKeys.map body) =
+      blockKeys.map fun key => (key, body key) := by
+  induction blockKeys with
+  | nil => rfl
+  | cons key keys induction => simp [induction]
+
+/-- With aligned duplicate-free candidate keys covering every query, the
+abstract keyed lookup is exactly the aligned body map in query order. -/
+theorem expectedBodyList_eq_map_alignedBody
+    (queries blockKeys : List Nat) (bodies : List (List Alphabet))
+    (aligned : blockKeys.length = bodies.length)
+    (keysNodup : blockKeys.Nodup)
+    (present : ∀ query ∈ queries, query ∈ blockKeys) :
+    expectedBodyList queries blockKeys bodies =
+      queries.map (alignedBody blockKeys bodies) := by
+  unfold expectedBodyList
+  let body := alignedBody blockKeys bodies
+  change _ = queries.map body
+  have bodiesEq : bodies = blockKeys.map body :=
+    bodies_eq_map_alignedBody blockKeys bodies aligned keysNodup
+  have zipped :
+      blockKeys.zip (blockKeys.map body) =
+        blockKeys.map fun key => (key, body key) :=
+    zip_map_alignedBody blockKeys body
+  rw [bodiesEq, zipped]
+  calc
+    _ = queries.flatMap fun query => [body query] := by
+      apply List.flatMap_congr
+      intro query queryMember
+      rw [select_map_alignedBody query blockKeys body keysNodup,
+        if_pos (present query queryMember)]
+    _ = queries.map body := by
+      rw [← List.map_eq_flatMap]
+
 /-- The relational token specification is exactly serialization of its
 query-major matching body list. -/
 theorem expectedBlocks_eq_blocks
