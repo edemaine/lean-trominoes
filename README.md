@@ -13768,6 +13768,10 @@ The representation choices for this target are:
   [`occurrence-block refinement`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceBodyBlockAlignmentSemantics.lean)
   proves the stronger pointwise correspondence: each occurrence's three
   routed keys select exactly the RGB body block at the same grouped ordinal.
+  The
+  [`routed-key locality semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceKeyLocalitySemantics.lean)
+  show that no key from another occurrence can enter the current incidence
+  interval, reducing global membership there to its three local offsets.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
