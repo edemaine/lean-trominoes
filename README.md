@@ -13720,7 +13720,11 @@ The representation choices for this target are:
   offsets per grouped occurrence.  The resulting
   [`routed-key uniqueness proof`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceKeyNodup.lean)
   verifies that every local offset stays inside its prefix-sum block, so all
-  routed suffix keys are duplicate-free.
+  routed suffix keys are duplicate-free.  Specializing the generic selector,
+  the
+  [`direct suffix pointwise semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceSuffixPointwiseSemantics.lean)
+  now present the complete suffix column as a map over every incidence
+  position, returning its unique aligned routed body or the empty list.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
