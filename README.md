@@ -13621,9 +13621,9 @@ The representation choices for this target are:
   [`horizontal edge-block bridge`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceHorizontalEdgeBlockSemantics.lean)
   proves generically that actual element degrees and element-major incidence
   bodies regroup to the canonical horizontal contracted blocks.  Thus the
-  remaining direct-source identification is isolated to equality of the
-  compiled degree column and equality of the selected incidence-body column
-  with those two actual horizontal lists.  The
+  remaining direct-source identification splits into equality of the compiled
+  degree column and equality of the selected incidence-body column with those
+  two actual horizontal lists.  The
   [`horizontal element-degree list semantics`](LeanTrominoes/PeriodicCNFStripHorizontalElementDegreeListSemantics.lean)
   discharge the encoding half of the first equality: natural-number element
   indices enumerate exactly the typed red, green, and blue degrees, with
@@ -13657,7 +13657,22 @@ The representation choices for this target are:
   [`typed-source bridge`](LeanTrominoes/PeriodicCNFStripHorizontalTypedSourceFinalClauseAritySemantics.lean)
   now carry that same ordered list through fresh-variable gauging, padding,
   and final anchor normalization to the exact typed CNF consumed by the 3DM
-  assembly.
+  assembly.  The
+  [`typed variable-degree semantics`](LeanTrominoes/PeriodicCNFStripHorizontalTypedVariableElementDegreeSemantics.lean)
+  use the occurrence/source-order permutation to rewrite the variable-major
+  all-two prefix as four entries per binary clause or five per ternary clause.
+  The matching
+  [`direct variable-degree semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableElementDegreeSemantics.lean)
+  transport connector kinds through stable-key regrouping and recover those
+  same clause blocks from the boundary-preserving final frames, while the
+  [`direct clause-degree semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseElementDegreeSemantics.lean)
+  use the transported arities for the clause suffix.  Finally, the
+  [`canonical horizontal degree bridge`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+  combines the variable and clause lists in all three colors and proves that
+  the complete directly compiled degree column is exactly the actual
+  horizontal 3DM element-degree column.  This discharges the first of the two
+  source-specific contraction equalities; only the selected incidence-body
+  equality remains.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
