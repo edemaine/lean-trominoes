@@ -13915,7 +13915,8 @@ The representation choices for this target are:
   [`local-route incidence-index bridge`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRouteIncidenceIndex.lean)
   now preserves that presentation index through the concrete instantiated
   drawing: every genuine generated incidence exposes an equal-valued finite
-  template index together with its exact translated route.  This lets the
+  template index, the same clause/literal coordinates, and its exact
+  translated route.  This lets the
   geometric and descriptor columns meet at the same dependent index instead
   of comparing existentially selected finite blocks.
 - The generic
