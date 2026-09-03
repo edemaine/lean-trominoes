@@ -2826,6 +2826,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove the direct final clause-fan `hasRight` column is
                   exactly the binary/ternary column of the certified final
                   exact-one formula shape.
+                - [x] Prove the certified final exact-one profile arities are
+                  exactly the clause lengths of the retained raw positioned
+                  logical endpoint.
                 - [x] Append the grouped variable and clause-core families
                   into the complete canonical incidence element-code column,
                   one identity per independently delimited direction query.
@@ -13630,6 +13633,14 @@ The representation choices for this target are:
   bit with the corresponding binary/ternary entry of the certified final
   exact-one formula shape; its generic routed-header lemma is in
   [`PeriodicCNFStripHorizontalRoutedClauseDegreePattern.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedClauseDegreePattern.lean).
+  The generic
+  [`final exact-one clause-arity semantics`](LeanTrominoes/PeriodicCNFFinalExactOneClauseAritySemantics.lean)
+  project those exact profiles to ordinary clause lengths.  Their
+  [`retained-source specialization`](LeanTrominoes/PeriodicCNFStripHorizontalFinalClauseAritySemantics.lean)
+  and
+  [`raw positioned bridge`](LeanTrominoes/PeriodicCNFStripHorizontalRawFinalClauseAritySemantics.lean)
+  identify the resulting arity list with the clauses of the retained raw
+  Figure 9, unit-elimination, and polarity-normalization endpoint.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
