@@ -13692,7 +13692,11 @@ The representation choices for this target are:
   recovers the typed route body at every in-range triple index and color.
   Expanding the fixed red/green/blue blocks and then the outer index scan
   identifies the full canonical incidence-body map exactly with the typed
-  triple-major, RGB-minor route-body presentation.
+  triple-major, RGB-minor route-body presentation.  For the clause suffix,
+  the direct fan stream and the actual typed source are now proved to have
+  the same clause count.  Both incidence presentations reduce to one copy
+  of the same fixed 27-body X3C clause-core block per clause, proving exact
+  equality of the direct and typed clause-incidence body lists.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
