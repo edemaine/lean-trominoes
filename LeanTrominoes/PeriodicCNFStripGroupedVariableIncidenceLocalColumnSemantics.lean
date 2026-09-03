@@ -65,6 +65,15 @@ def Valid
             directFinalOccurrenceTripleBlockWidth column.data) * 3 →
       (query ∈ globalKeys ↔ query ∈ keyBlock column.start column.data)
 
+/-- Routed-key membership is local throughout one occurrence interval. -/
+def IntervalLocal
+    (globalKeys : List Nat) (start : Nat)
+    (data : FinalFanOccurrenceData) : Prop :=
+  ∀ query,
+    start * 3 ≤ query →
+    query < (start + directFinalOccurrenceTripleBlockWidth data) * 3 →
+    (query ∈ globalKeys ↔ query ∈ keyBlock start data)
+
 /-- A valid aligned column has identical global and local body blocks. -/
 theorem globalBodyBlock_eq_localBodyBlock_of_valid
     (globalKeys : List Nat) (globalBodies : List (List AxisDirection))
@@ -91,6 +100,47 @@ theorem flatten_map_globalBodyBlock_eq_localBodyBlock
   intro column columnMember
   exact globalBodyBlock_eq_localBodyBlock_of_valid
     globalKeys globalBodies column (valid column columnMember)
+
+/-- Pairwise kind, body, and interval alignments synchronize to make every
+four-field occurrence column valid. -/
+theorem valid_of_forall₂_alignments
+    (globalKeys : List Nat) (globalBodies : List (List AxisDirection))
+    (starts : List Nat) (pairs : List GroupedVariableFanSlot)
+    (data : List FinalFanOccurrenceData)
+    (bodyBlocks : List (List (List AxisDirection)))
+    (kindAligned : List.Forall₂
+      (fun pair datum =>
+        pair.1.kind (groupedVariableFanSiteSlot pair.2) = datum.kind)
+      pairs data)
+    (bodyAligned : List.Forall₂
+      (fun keyBlock bodyBlock =>
+        keyBlock.map
+          (FiniteAlphabetKeyedDelimitedBlockLookup.alignedBody
+            globalKeys globalBodies) = bodyBlock)
+      (List.zipWith keyBlock starts data) bodyBlocks)
+    (intervalAligned : List.Forall₂
+      (IntervalLocal globalKeys) starts data) :
+    ∀ column ∈ List.zipWith4 GroupedVariableIncidenceLocalColumn.mk
+        starts pairs data bodyBlocks,
+      column.Valid globalKeys globalBodies := by
+  induction intervalAligned generalizing pairs bodyBlocks with
+  | nil =>
+      cases kindAligned
+      cases bodyAligned
+      intro column columnMember
+      change column ∈ ([] : List GroupedVariableIncidenceLocalColumn)
+        at columnMember
+      exact nomatch columnMember
+  | @cons start datum starts data intervalHead intervalTail induction =>
+      cases kindAligned with
+      | @cons pair _ _ _ kindHead kindTail =>
+          cases bodyAligned with
+          | @cons bodyBlock _ _ _ bodyHead bodyTail =>
+              intro column columnMember
+              simp only [List.zipWith4, List.mem_cons] at columnMember
+              rcases columnMember with rfl | columnMember
+              · exact ⟨kindHead, bodyHead, intervalHead⟩
+              · exact induction _ _ kindTail bodyTail column columnMember
 
 end GroupedVariableIncidenceLocalColumn
 
