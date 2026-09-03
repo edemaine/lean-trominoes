@@ -38,6 +38,28 @@ def figureDirectedClauseProfiles (profile : DirectedClauseProfile) :
   let drawing := templateDrawingOfClauseProfile (clauseProfile profile)
   drawing.formula.zipIdx.map (embeddedDirectedClauseProfile drawing)
 
+/-- Original literal indices selected by the stable clockwise sort of one
+finite generated clause. -/
+def embeddedClauseSourceOrder
+    (drawing : PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+      FigureNineNoUnitsVariable)
+    (taggedClause :
+      PlanarThreeSAT.EmbeddedClause FigureNineNoUnitsVariable × Nat) :
+    List Nat :=
+  (((List.range taggedClause.1.literals.length).map fun literalIndex =>
+      (literalIndex,
+        AxisDirection.polylineFirstDirection
+          (drawing.routes taggedClause.2 literalIndex))).insertionSort
+    (fun first second =>
+      first.2.clockwiseRank ≤ second.2.clockwiseRank)).map Prod.fst
+
+/-- Source-index permutations chosen by the final finite clockwise sort, one
+row per generated clause. -/
+def figureClauseSourceOrders (profile : DirectedClauseProfile) :
+    List (List Nat) :=
+  let drawing := templateDrawingOfClauseProfile (clauseProfile profile)
+  drawing.formula.zipIdx.map (embeddedClauseSourceOrder drawing)
+
 /-- Forgetting route directions recovers the original generated profile
 column exactly. -/
 theorem figureDirectedClauseProfiles_map_clauseProfile :
@@ -54,6 +76,18 @@ theorem figureDirectedClauseProfiles_map_orderedProfile :
       (figureDirectedClauseProfiles profile).map
           DirectedClauseProfile.orderedProfile =
         finalFigureClauseProfiles profile := by
+  native_decide
+
+/-- The stable sort selects old indices `1,0` in every binary generated
+clause and `2,0,1` in every ternary generated clause.  This index-level form
+retains occurrence identity even when two literal profiles are equal. -/
+theorem figureClauseSourceOrders_eq_reorderList_range :
+    ∀ profile : DirectedClauseProfile,
+      figureClauseSourceOrders profile =
+        let drawing :=
+          templateDrawingOfClauseProfile (clauseProfile profile)
+        drawing.formula.map fun clause =>
+          reorderList (List.range clause.literals.length) := by
   native_decide
 
 end FormulaShapeFigureNineFinalClauseOrdering

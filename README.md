@@ -13931,7 +13931,9 @@ The representation choices for this target are:
   [`finite ordering semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingSemantics.lean)
   exhaustively verify that sorting every actual finite-template route by its
   first direction produces exactly those reordered clause profiles for all
-  source arities, polarities, and slice-offset profiles.
+  source arities, polarities, and slice-offset profiles.  An index-level
+  version retains the selected old literal positions as well, so the result
+  distinguishes equal-looking occurrences rather than just equal profiles.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
