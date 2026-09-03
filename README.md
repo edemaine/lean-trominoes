@@ -13790,6 +13790,12 @@ The representation choices for this target are:
   [`validity specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceLocalColumnValiditySemantics.lean)
   aligns interval locality at every source ordinal and proves that the full
   flattened globally keyed body column equals its occurrence-local form.
+  The
+  [`typed local-shape semantics`](LeanTrominoes/PeriodicCNFStripGroupedVariableIncidenceLocalTypedShapeSemantics.lean)
+  then identify each local block with its typed occurrence triples in exact
+  triple-major, RGB-minor order, attaching the three abstract routed suffixes
+  at precisely the typed routed incidences.  The three connector cases are
+  compiled separately to keep each finite-table proof small.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
