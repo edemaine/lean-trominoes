@@ -73,6 +73,24 @@ theorem directFigureNinePolarityRoutePairs_map_indexedPolarity_eq_blocks
         List.flatten_eq_flatMap, List.flatMap_map,
         id_eq]
 
+/-- The explicit parent-clause column is aligned with every direct Figure 9
+route pair. -/
+@[simp] theorem directFigureNinePolarityRoutePairSourceClauseIndices_length
+    (symbols : List encoding.Γ) :
+    (directFigureNinePolarityRoutePairSourceClauseIndices
+      decider symbols).length =
+      (directFigureNinePolarityRoutePairs decider symbols).length := by
+  rw [show
+      (directFigureNinePolarityRoutePairSourceClauseIndices
+        decider symbols).length =
+        (directSourceFinalPolarityDescriptorBlocks
+          decider symbols).flatten.length by
+    exact List.zipIdxReplicate_length_eq_flatten_length 0 _]
+  have descriptorLength := congrArg List.length
+    (directFigureNinePolarityRoutePairs_map_indexedPolarity_eq_blocks
+      decider symbols)
+  simpa using descriptorLength.symm
+
 /-- Attaching the explicit parent-clause index column to the direct Figure 9
 pairs yields the formula's exact clause-major global operation schedule. -/
 theorem directFigureNinePolarityRoutePairs_zipWith_sourceIndexedDescriptor

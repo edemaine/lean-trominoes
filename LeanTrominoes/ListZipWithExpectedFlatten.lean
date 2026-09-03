@@ -104,4 +104,19 @@ theorem zipWith_zipIdxReplicate_flatten_eq_zipIdx_flatMap_zero
   exact zipWith_zipIdxReplicate_flatten_eq_zipIdx_flatMap
     combine 0 blocks
 
+/-- The explicit `zipIdx` broadcast column has one entry for every element
+of the flattened block family, including when some blocks are empty. -/
+@[simp] theorem zipIdxReplicate_length_eq_flatten_length
+    {Element : Type*} (start : Nat) (blocks : List (List Element)) :
+    ((blocks.zipIdx start).flatMap fun tagged =>
+        List.replicate tagged.1.length tagged.2).length =
+      blocks.flatten.length := by
+  induction blocks generalizing start with
+  | nil => rfl
+  | cons block blocks induction =>
+      simp only [List.zipIdx_cons, List.flatMap_cons,
+        List.length_append, List.length_replicate,
+        List.flatten_cons]
+      rw [induction (start + 1)]
+
 end List

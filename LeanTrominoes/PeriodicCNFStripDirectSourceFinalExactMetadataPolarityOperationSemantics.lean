@@ -78,6 +78,14 @@ noncomputable def directSourceFinalGaugedIncidenceRoutes
     (directSourceOccurrencesAtMostThree decider symbols)
     (directSourceClausesNonempty decider symbols)
 
+/-- The exact metadata route blocks for the named direct final source. -/
+noncomputable def directSourceFinalExactMetadataRouteBlocks
+    (symbols : List encoding.Γ) :=
+  exactMetadataRouteBlocks
+    (directSourceFinalGaugedFormula decider symbols)
+    (directSourceFinalGaugedPlacement decider symbols)
+    (directSourceFinalGaugedIncidenceRoutes decider symbols)
+
 /-- After attaching the exact global source-clause indices, the direct
 Figure 9 route pairs and the semantic exact route blocks have identical
 source incidence coordinates and polarity operations. -/
@@ -89,17 +97,25 @@ theorem directFigureNinePolarityRoutePairs_sourceIndexedDescriptor_eq_exactMetad
             pair.1.polarity.indexed)
         (directFigureNinePolarityRoutePairSourceClauseIndices decider symbols)
         (directFigureNinePolarityRoutePairs decider symbols) =
-      (exactMetadataRouteBlocks
-        (directSourceFinalGaugedFormula decider symbols)
-        (directSourceFinalGaugedPlacement decider symbols)
-        (directSourceFinalGaugedIncidenceRoutes decider symbols)).map
+      (directSourceFinalExactMetadataRouteBlocks decider symbols).map
           RouteDirectionBlock.sourceIndexedDescriptor := by
   rw [directFigureNinePolarityRoutePairs_zipWith_sourceIndexedDescriptor]
+  unfold directSourceFinalExactMetadataRouteBlocks
   exact
     (exactMetadataRouteBlocks_map_sourceIndexedDescriptor_eq_values
       (directSourceFinalGaugedFormula decider symbols)
       (directSourceFinalGaugedPlacement decider symbols)
       (directSourceFinalGaugedIncidenceRoutes decider symbols)).symm
+
+/-- There is exactly one exact metadata block for every direct route pair. -/
+@[simp] theorem directSourceFinalExactMetadataRouteBlocks_length
+    (symbols : List encoding.Γ) :
+    (directSourceFinalExactMetadataRouteBlocks decider symbols).length =
+      (directFigureNinePolarityRoutePairs decider symbols).length := by
+  have keyedLength := congrArg List.length
+    (directFigureNinePolarityRoutePairs_sourceIndexedDescriptor_eq_exactMetadata
+      decider symbols)
+  simpa [List.length_zipWith] using keyedLength.symm
 
 end LeanTrominoes.PeriodicCNFStripReduction
 

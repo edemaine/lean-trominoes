@@ -14002,7 +14002,12 @@ The representation choices for this target are:
   then lifts equality of an underlying Figure 9 source word through each of
   the four route transformations.  Thus the remaining direction-block
   obligation is solely to identify the finite prefix and selected dynamic
-  tail with the named final-gauged source route.
+  tail with the named final-gauged source route.  The separately compiled
+  [`pointwise lookup`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalExactMetadataPolarityOperationLookup.lean)
+  exposes that alignment at every valid absolute occurrence index, while the
+  [`direction-list reduction`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalExactMetadataDirectionListReduction.lean)
+  lifts any pointwise source-word proof to equality of the complete direct and
+  exact metadata direction-block lists.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
