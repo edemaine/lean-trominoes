@@ -13687,7 +13687,12 @@ The representation choices for this target are:
   presentation grouped by each canonical element code, with presentation
   order preserved inside every group.  The final comparison is therefore
   reduced to identifying these direct presentation indices with the
-  computed 3DM incidence tags and their route bodies.
+  computed 3DM incidence tags and their route bodies.  On the target side,
+  a pointwise index bridge now proves that the canonical numbered selector
+  recovers the typed route body at every in-range triple index and color.
+  Expanding the fixed red/green/blue blocks and then the outer index scan
+  identifies the full canonical incidence-body map exactly with the typed
+  triple-major, RGB-minor route-body presentation.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
