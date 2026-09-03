@@ -75,7 +75,12 @@ theorem
           PlanarOneInThreeNoUnitsFigureNine.normalizedLocalExtendedDirectionBlock
               query ++
             repeatDirections 144
-              (unitSubdivisionDirections (second :: rest)) := by
+              (unitSubdivisionDirections (second :: rest)) ∧
+        ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+          query.1).incidenceAt query.2.1).clauseIndex =
+            data.metadata.localClauseIndex ∧
+        ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+          query.1).incidenceAt query.2.1).literalIndex = literalIndex := by
   rcases
       retainedOrderedFixedEightComposedRawIncidenceRoutes_eq_fanInheritedRoute_of_inherited
         source sourceLocal sourceWidth sourceOccurrences
@@ -107,7 +112,8 @@ theorem
               retainedOrderedFixedEightFigureNineOwnInheritedRoute_compiledDirectionWord
                 source sourceLocal sourceWidth sourceOccurrences
                 sourceClausesNonempty data first second rest routeEq with
-            ⟨templateIndex, compiledWord⟩
+            ⟨templateIndex, compiledWord,
+              clauseCoordinate, literalCoordinate⟩
           let clearanceWidth :=
             retainedFigureNineClearancePositionedFormula_widthAtMostThree
               source sourceWidth
@@ -133,10 +139,12 @@ theorem
             rfl
           rw [clearanceFactorEq] at clearanceRouteEq
           refine ⟨data, first, second, rest, query,
-            dataLookup, routeEq, ?_⟩
-          rw [rawShape, clearanceRouteEq, routeEq]
-          simpa only [query, profile, fanData, slot, clearanceWidth] using
-            compiledWord
+            dataLookup, routeEq, ?_, ?_, ?_⟩
+          · rw [rawShape, clearanceRouteEq, routeEq]
+            simpa only [query, profile, fanData, slot, clearanceWidth] using
+              compiledWord
+          · simpa only [query] using clauseCoordinate
+          · simpa only [query] using literalCoordinate
 
 end PeriodicOrthocrossing
 end LeanTrominoes

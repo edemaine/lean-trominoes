@@ -39,16 +39,25 @@ theorem normalizedLocalRoutes_directionBlock_of_members
     {literalIndex : Nat}
     (literalMember :
       (literal, literalIndex) ∈ clause.literals.zipIdx) :
-    ∃ query : LocalDirectionQuery,
-      unitSubdivisionDirections
-          (AxisDirection.normalizeOrthogonalPolyline
-            (normalizedLocalRoutes source sourcePlacement
-              clauseIndex literalIndex)) =
-        normalizedLocalDirectionBlock query := by
+    ∃ (metadata : ClauseMetadata Variable)
+        (query : LocalDirectionQuery),
+      (formulaClauseMetadata source)[clauseIndex]? = some metadata ∧
+        metadata.clause = clause ∧
+        unitSubdivisionDirections
+            (AxisDirection.normalizeOrthogonalPolyline
+              (normalizedLocalRoutes source sourcePlacement
+                clauseIndex literalIndex)) =
+          normalizedLocalDirectionBlock query ∧
+        ((templateDrawingOfClauseProfile query.1).incidenceAt
+          query.2).clauseIndex = metadata.localClauseIndex ∧
+        ((templateDrawingOfClauseProfile query.1).incidenceAt
+          query.2).literalIndex = literalIndex := by
   rcases normalizedLocalRoutes_eq_translated_profileRoute_of_members
       source sourcePlacement sourceWidth sourceClausesNonempty
       clauseMember literalMember with
-    ⟨profile, templateIndex, origin, localRouteEq⟩
+    ⟨metadata, profile, templateIndex, origin,
+      metadataLookup, metadataClause, localRouteEq,
+      clauseCoordinate, literalCoordinate⟩
   let localRoute :=
     normalizedLocalRoutes source sourcePlacement clauseIndex literalIndex
   have endpoints := normalizedLocalRoutes_endpoints_of_members
@@ -62,10 +71,13 @@ theorem normalizedLocalRoutes_directionBlock_of_members
     normalizedLocalRoutes_orthogonal_of_members
       source sourcePlacement sourceWidth sourceDistinct
       clauseMember literalMember
-  refine ⟨⟨profile, templateIndex⟩, ?_⟩
-  exact normalizedTranslatedLocalRoute_directionWord
-    profile templateIndex origin localRoute localRouteEq
-    localRouteNonempty localRouteOrthogonal
+  refine ⟨metadata, ⟨profile, templateIndex⟩,
+    metadataLookup, metadataClause, ?_, ?_, ?_⟩
+  · exact normalizedTranslatedLocalRoute_directionWord
+      profile templateIndex origin localRoute localRouteEq
+      localRouteNonempty localRouteOrthogonal
+  · exact clauseCoordinate
+  · exact literalCoordinate
 
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes

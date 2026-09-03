@@ -81,12 +81,12 @@ theorem
     · have literalSource : literal.atom = .inl (.inl sourceAtom) := by
         simp [atomEq, figureAtomEq]
       rcases
-          retainedOrderedFixedEightFigureNineInheritedRoute_directionBlock
+        retainedOrderedFixedEightFigureNineInheritedRoute_directionBlock
             source sourceLocal sourceWidth sourceOccurrences
             sourceClausesNonempty clauseMember literalMember
             sourceAtom literalSource with
         ⟨_data, _first, second, rest, query, _dataLookup, _routeEq,
-          directionWord⟩
+          directionWord, _clauseCoordinate, _literalCoordinate⟩
       refine ⟨.inherited query
         (unitSubdivisionDirections (second :: rest)), ?_⟩
       simpa [RetainedFigureNineRouteDirectionBlock.directions] using
@@ -102,7 +102,8 @@ theorem
           retainedOrderedFixedEightFigureNineAuxiliaryRoute_directionBlock
             source sourceLocal sourceWidth sourceOccurrences
             sourceClausesNonempty clauseMember literalMember notInherited with
-        ⟨query, directionWord⟩
+        ⟨_metadata, query, _metadataLookup, _metadataClause,
+          directionWord, _clauseCoordinate, _literalCoordinate⟩
       refine ⟨.local query, ?_⟩
       simpa [RetainedFigureNineRouteDirectionBlock.directions] using
         directionWord
@@ -117,7 +118,8 @@ theorem
         retainedOrderedFixedEightFigureNineAuxiliaryRoute_directionBlock
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty clauseMember literalMember notInherited with
-      ⟨query, directionWord⟩
+      ⟨_metadata, query, _metadataLookup, _metadataClause,
+        directionWord, _clauseCoordinate, _literalCoordinate⟩
     refine ⟨.local query, ?_⟩
     simpa [RetainedFigureNineRouteDirectionBlock.directions] using
       directionWord

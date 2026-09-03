@@ -13928,7 +13928,12 @@ The representation choices for this target are:
   template index, the same clause/literal coordinates, and its exact
   translated route.  This lets the
   geometric and descriptor columns meet at the same dependent index instead
-  of comparing existentially selected finite blocks.
+  of comparing existentially selected finite blocks.  The
+  [`normalized index bridge`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRouteIncidenceIndex.lean)
+  carries those coordinates through anchor normalization.  The local-profile,
+  auxiliary-route, and inherited-route direction theorems now retain them all
+  the way to their finite direction queries, so duplicate-looking template
+  routes remain tied to the generated clause and literal that selected them.
   The
   [`finite final-clause ordering`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData.lean)
   now records the second clockwise permutation explicitly: binary generated

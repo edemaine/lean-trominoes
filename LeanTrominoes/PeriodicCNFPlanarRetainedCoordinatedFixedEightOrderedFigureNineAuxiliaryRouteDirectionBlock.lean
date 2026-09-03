@@ -52,15 +52,27 @@ theorem
         ThreeOccurrenceVariable
           (WrappedPeriodicPlanarSATVariable Variable),
         literal.atom ≠ .inl (.inl sourceAtom)) :
-    ∃ query :
-        PlanarOneInThreeNoUnitsFigureNine.LocalDirectionQuery,
-      unitSubdivisionDirections
-          (AxisDirection.normalizeOrthogonalPolyline
-            (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawIncidenceRoutes
-              source sourceLocal sourceWidth sourceOccurrences
-              sourceClausesNonempty clauseIndex literalIndex)) =
-        PlanarOneInThreeNoUnitsFigureNine.normalizedLocalDirectionBlock
-          query := by
+    ∃ (metadata :
+        PlanarOneInThreeNoUnitsFigureNine.ClauseMetadata
+          (PeriodicPlanarThreeSATThreeVariable Variable))
+        (query :
+          PlanarOneInThreeNoUnitsFigureNine.LocalDirectionQuery),
+      (PlanarOneInThreeNoUnitsFigureNine.formulaClauseMetadata
+        (retainedFigureNineClearancePositionedFormula source))[
+          clauseIndex]? = some metadata ∧
+        metadata.clause = clause ∧
+        unitSubdivisionDirections
+            (AxisDirection.normalizeOrthogonalPolyline
+              (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawIncidenceRoutes
+                source sourceLocal sourceWidth sourceOccurrences
+                sourceClausesNonempty clauseIndex literalIndex)) =
+          PlanarOneInThreeNoUnitsFigureNine.normalizedLocalDirectionBlock
+            query ∧
+        ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+          query.1).incidenceAt query.2).clauseIndex =
+            metadata.localClauseIndex ∧
+        ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+          query.1).incidenceAt query.2).literalIndex = literalIndex := by
   let clearanceSource :=
     retainedFigureNineClearancePositionedFormula source
   let clearancePlacement :=
@@ -81,12 +93,14 @@ theorem
       PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes_directionBlock_of_members
         clearanceSource clearancePlacement clearanceWidth clearanceDistinct
         clearanceNonempty clauseMember literalMember with
-    ⟨query, localBlock⟩
+    ⟨metadata, query, metadataLookup, metadataClause, localBlock,
+      clauseCoordinate, literalCoordinate⟩
   have rawEq :=
     retainedOrderedFixedEightComposedRawIncidenceRoutes_eq_normalizedLocalRoutes_of_not_inherited
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty clauseMember literalMember notInherited
-  refine ⟨query, ?_⟩
+  refine ⟨metadata, query, metadataLookup, metadataClause, ?_,
+    clauseCoordinate, literalCoordinate⟩
   rw [rawEq]
   exact localBlock
 

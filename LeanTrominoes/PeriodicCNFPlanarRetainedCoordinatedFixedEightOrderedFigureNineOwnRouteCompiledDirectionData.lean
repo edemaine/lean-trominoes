@@ -89,14 +89,19 @@ theorem
         PlanarOneInThreeNoUnitsFigureNine.normalizedLocalExtendedDirectionBlock
             ⟨profile, templateIndex, fanData, slot⟩ ++
           repeatDirections 144
-            (unitSubdivisionDirections (second :: rest)) := by
+            (unitSubdivisionDirections (second :: rest)) ∧
+      ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+        profile).incidenceAt templateIndex).clauseIndex =
+          data.metadata.localClauseIndex ∧
+      ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+        profile).incidenceAt templateIndex).literalIndex = literalIndex := by
   dsimp only
   rcases
       retainedOrderedFixedEightFigureNineOwnInheritedFinitePrefix_directionBlock
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty data with
-    ⟨templateIndex, prefixEq⟩
-  refine ⟨templateIndex, ?_⟩
+    ⟨templateIndex, prefixEq, clauseCoordinate, literalCoordinate⟩
+  refine ⟨templateIndex, ?_, clauseCoordinate, literalCoordinate⟩
   rw [
     retainedOrderedFixedEightFigureNineOwnInheritedRoute_directionWord
       source sourceLocal sourceWidth sourceOccurrences

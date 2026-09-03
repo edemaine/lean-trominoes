@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineClauseProfileTemplate
-import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRoutes
+import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRouteIncidenceIndex
 
 /-!
 # Clause-profile selection for Figure 9 local routes
@@ -40,6 +40,23 @@ private theorem selectedRoute_eq_of_drawing_eq
   subst second
   rfl
 
+private theorem selectedIncidence_eq_of_drawing_eq
+    (first second :
+      EmbeddedCNFIncidenceDrawing FigureNineNoUnitsVariable)
+    (drawingEq : first = second)
+    (index : Fin second.incidences.length) :
+    let castIndex : Fin first.incidences.length :=
+      Fin.cast
+        (congrArg
+          (fun drawing :
+            EmbeddedCNFIncidenceDrawing FigureNineNoUnitsVariable =>
+            drawing.incidences.length)
+          drawingEq.symm)
+        index
+    first.incidenceAt castIndex = second.incidenceAt index := by
+  subst second
+  rfl
+
 /-- A genuine normalized local route is one translated finite profile route.
 The translation is retained only to state the exact point-list equality; it
 will disappear at the direction boundary. -/
@@ -64,19 +81,28 @@ theorem normalizedLocalRoutes_eq_translated_profileRoute_of_members
     {literalIndex : Nat}
     (literalMember :
       (literal, literalIndex) ∈ clause.literals.zipIdx) :
-    ∃ (profile : ClauseProfile)
+    ∃ (metadata : ClauseMetadata Variable)
+        (profile : ClauseProfile)
         (templateIndex :
           Fin (templateDrawingOfClauseProfile profile).incidences.length)
         (origin : Cell),
-      normalizedLocalRoutes source sourcePlacement
-          clauseIndex literalIndex =
-        translatePolyline origin
-          ((templateDrawingOfClauseProfile profile).routeAt
-            ((templateDrawingOfClauseProfile profile).incidenceAt
-              templateIndex)) := by
-  rcases normalizedLocalRoutes_eq_translated_templateRoute_of_members
+      (formulaClauseMetadata source)[clauseIndex]? = some metadata ∧
+        metadata.clause = clause ∧
+        normalizedLocalRoutes source sourcePlacement
+            clauseIndex literalIndex =
+          translatePolyline origin
+            ((templateDrawingOfClauseProfile profile).routeAt
+              ((templateDrawingOfClauseProfile profile).incidenceAt
+                templateIndex)) ∧
+        ((templateDrawingOfClauseProfile profile).incidenceAt
+          templateIndex).clauseIndex = metadata.localClauseIndex ∧
+        ((templateDrawingOfClauseProfile profile).incidenceAt
+          templateIndex).literalIndex = literalIndex := by
+  rcases normalizedLocalRoutes_eq_translated_templateRoute_with_index_of_members
       source sourcePlacement sourceWidth clauseMember literalMember with
-    ⟨metadata, concreteIndex, metadataLookup, _metadataClause, localEq⟩
+    ⟨metadata, _incidenceIndex, concreteIndex,
+      metadataLookup, metadataClause, _incidenceEq, _indexValue,
+      concreteClauseCoordinate, concreteLiteralCoordinate, localEq⟩
   have metadataSourceMember : metadata.sourceClause ∈ source.clauses := by
     rcases formulaClauseMetadata_lookup_valid_embedded
         source clauseMember with
@@ -124,20 +150,35 @@ theorem normalizedLocalRoutes_eq_translated_profileRoute_of_members
         (templateDrawingOfClauseProfile profile)
         (templateDrawing metadata.sourceClause)
         drawingEq concreteIndex
+  have selectedIncidenceEq :
+      (templateDrawingOfClauseProfile profile).incidenceAt
+          templateIndex =
+        (templateDrawing metadata.sourceClause).incidenceAt
+          concreteIndex := by
+    simpa only [templateIndex] using
+      selectedIncidence_eq_of_drawing_eq
+        (templateDrawingOfClauseProfile profile)
+        (templateDrawing metadata.sourceClause)
+        drawingEq concreteIndex
   let origin :=
     Cell.sub
       (Cell.scale composedGadgetScale metadata.sourceClause.position)
       ((composedPlacement source sourcePlacement).translation
         (PeriodicCNF.clauseAnchor metadata.clause.literals))
-  refine ⟨profile, templateIndex, origin, ?_⟩
-  calc
-    normalizedLocalRoutes source sourcePlacement clauseIndex literalIndex =
-        translatePolyline origin
-          ((templateDrawing metadata.sourceClause).routeAt
-            ((templateDrawing metadata.sourceClause).incidenceAt
-              concreteIndex)) := by
-      simpa only [origin] using localEq
-    _ = _ := by rw [← selectedRouteEq]
+  refine ⟨metadata, profile, templateIndex, origin,
+    metadataLookup, metadataClause, ?_, ?_, ?_⟩
+  · calc
+      normalizedLocalRoutes source sourcePlacement clauseIndex literalIndex =
+          translatePolyline origin
+            ((templateDrawing metadata.sourceClause).routeAt
+              ((templateDrawing metadata.sourceClause).incidenceAt
+                concreteIndex)) := by
+        simpa only [origin] using localEq
+      _ = _ := by rw [← selectedRouteEq]
+  · rw [selectedIncidenceEq]
+    exact concreteClauseCoordinate
+  · rw [selectedIncidenceEq]
+    exact concreteLiteralCoordinate
 
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes

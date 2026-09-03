@@ -6,6 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineClauseProfileTemplate
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionTranslation
+import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRouteIncidenceIndex
 
 /-!
 # Finite prefix blocks for retained inherited Figure 9 routes
@@ -32,6 +33,25 @@ local instance finitePrefixDirectionVariableDecidableEq
       (OneInThreeNoUnitVariable
         (PeriodicPlanarOneInThreeThreeRawVariable Variable)) :=
   PlanarOneInThreeNoUnitsFigureNine.nestedVariableDecidableEq
+
+private theorem selectedIncidence_eq_of_drawing_eq
+    (first second :
+      EmbeddedCNFIncidenceDrawing
+        PlanarOneInThreeNoUnitsFigureNine.FigureNineNoUnitsVariable)
+    (drawingEq : first = second)
+    (index : Fin second.incidences.length) :
+    let castIndex : Fin first.incidences.length :=
+      Fin.cast
+        (congrArg
+          (fun drawing :
+            EmbeddedCNFIncidenceDrawing
+              PlanarOneInThreeNoUnitsFigureNine.FigureNineNoUnitsVariable =>
+            drawing.incidences.length)
+          drawingEq.symm)
+        index
+    first.incidenceAt castIndex = second.incidenceAt index := by
+  subst second
+  rfl
 
 private theorem selectedRoute_eq_of_drawing_eq
     (first second :
@@ -104,7 +124,12 @@ theorem
             (joinAtEndpoint localRoute
               (fanData.translatedExtendedRoute origin slot))) =
         PlanarOneInThreeNoUnitsFigureNine.normalizedLocalExtendedDirectionBlock
-          ⟨profile, templateIndex, fanData, slot⟩ := by
+          ⟨profile, templateIndex, fanData, slot⟩ ∧
+      ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+        profile).incidenceAt templateIndex).clauseIndex =
+          data.metadata.localClauseIndex ∧
+      ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+        profile).incidenceAt templateIndex).literalIndex = literalIndex := by
   dsimp only
   let clearanceSource :=
     retainedFigureNineClearancePositionedFormula source
@@ -145,10 +170,12 @@ theorem
       PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile_clauseProfile_literalProfiles
         data.sourceClause sourceClauseNonempty sourceClauseWidth
   rcases
-      PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes_eq_translated_templateRoute_of_members
+      PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes_eq_translated_templateRoute_with_index_of_members
         clearanceSource clearancePlacement clearanceWidth
         data.generatedClauseMember data.generatedLiteralMember with
-    ⟨metadata, concreteIndex, metadataLookup, metadataClause, localEq⟩
+    ⟨metadata, _incidenceIndex, concreteIndex,
+      metadataLookup, metadataClause, _incidenceEq, _indexValue,
+      concreteClauseCoordinate, concreteLiteralCoordinate, localEq⟩
   have metadataEqual : metadata = data.metadata := by
     apply Option.some.inj
     exact metadataLookup.symm.trans data.metadataLookup
@@ -172,6 +199,18 @@ theorem
           drawing.incidences.length)
         sourceDrawingEq)
       concreteIndex
+  have sourceSelectedIncidenceEq :
+      (PlanarOneInThreeNoUnitsFigureNine.templateDrawing
+          data.sourceClause).incidenceAt sourceConcreteIndex =
+        (PlanarOneInThreeNoUnitsFigureNine.templateDrawing
+          data.metadata.sourceClause).incidenceAt concreteIndex := by
+    simpa only [sourceConcreteIndex] using
+      selectedIncidence_eq_of_drawing_eq
+        (PlanarOneInThreeNoUnitsFigureNine.templateDrawing
+          data.sourceClause)
+        (PlanarOneInThreeNoUnitsFigureNine.templateDrawing
+          data.metadata.sourceClause)
+        sourceDrawingEq.symm concreteIndex
   have sourceSelectedRouteEq :
       (PlanarOneInThreeNoUnitsFigureNine.templateDrawing
           data.sourceClause).routeAt
@@ -243,6 +282,18 @@ theorem
           drawing.incidences.length)
         drawingEq.symm)
       sourceConcreteIndex
+  have selectedIncidenceEq :
+      (PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+          profile).incidenceAt templateIndex =
+        (PlanarOneInThreeNoUnitsFigureNine.templateDrawing
+          data.sourceClause).incidenceAt sourceConcreteIndex := by
+    simpa only [templateIndex] using
+      selectedIncidence_eq_of_drawing_eq
+        (PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
+          profile)
+        (PlanarOneInThreeNoUnitsFigureNine.templateDrawing
+          data.sourceClause)
+        drawingEq sourceConcreteIndex
   have selectedRouteEq :
       (PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
           profile).routeAt
@@ -350,11 +401,15 @@ theorem
             (fanData.translatedExtendedRoute origin slot).tail = [] := by
       simpa [joinAtEndpoint] using empty
     exact localNonempty (List.append_eq_nil_iff.mp joinedEmpty).1
-  refine ⟨templateIndex, ?_⟩
-  exact
-    PlanarOneInThreeNoUnitsFigureNine.normalizedTranslatedLocalExtendedRoute_directionWord
-      profile templateIndex fanData slot origin localRoute
-      localRouteEqProfile actualPrefixNonempty actualPrefixOrthogonal
+  refine ⟨templateIndex, ?_, ?_, ?_⟩
+  · exact
+      PlanarOneInThreeNoUnitsFigureNine.normalizedTranslatedLocalExtendedRoute_directionWord
+        profile templateIndex fanData slot origin localRoute
+        localRouteEqProfile actualPrefixNonempty actualPrefixOrthogonal
+  · rw [selectedIncidenceEq, sourceSelectedIncidenceEq]
+    exact concreteClauseCoordinate
+  · rw [selectedIncidenceEq, sourceSelectedIncidenceEq]
+    exact concreteLiteralCoordinate
 
 end PeriodicOrthocrossing
 end LeanTrominoes
