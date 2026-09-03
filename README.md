@@ -13786,7 +13786,10 @@ The representation choices for this target are:
   four-field column.  The
   [`direct source columns`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceLocalColumns.lean)
   now zip the four concrete, equal-length source columns into that compact
-  representation while retaining the routed key/body alignment.
+  representation while retaining the routed key/body alignment.  Their
+  [`validity specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceLocalColumnValiditySemantics.lean)
+  aligns interval locality at every source ordinal and proves that the full
+  flattened globally keyed body column equals its occurrence-local form.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
