@@ -13772,6 +13772,12 @@ The representation choices for this target are:
   [`routed-key locality semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceKeyLocalitySemantics.lean)
   show that no key from another occurrence can enter the current incidence
   interval, reducing global membership there to its three local offsets.
+  The generic
+  [`local body-block semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceLocalBodyBlockSemantics.lean)
+  and their
+  [`direct-source specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceLocalBodyBlockSourceSemantics.lean)
+  combine locality with RGB block alignment, replacing every occurrence's
+  global sparse lookup by a self-contained three-key/three-body lookup.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
