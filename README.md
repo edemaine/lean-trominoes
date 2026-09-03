@@ -14000,8 +14000,17 @@ The representation choices for this target are:
   its
   [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalMetadataProfileCoordinateLookup.lean)
   retrieves, at every direct occurrence, concrete metadata with the same
-  parent profile and local generated-clause coordinate as the header.  Only
-  literal-index and source-word equality remain before the final list lift.
+  parent profile and local generated-clause coordinate as the header.  The
+  [`metadata clause-arity bridge`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineMetadataClauseArity.lean)
+  identifies each concrete composed clause's literal count with its selected
+  finite-template clause, while the
+  [`finite literal-index semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineIndexedProfileCoordinateLiteralIndex.lean)
+  prove that every header coordinate stores the corresponding reordered
+  original index.  Their
+  [`direct lookup`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalMetadataLiteralIndexLookup.lean)
+  therefore recovers exactly the `reorderList` index used by the
+  final-gauged geometric route theorem.  Only source-word equality remains
+  before the final list lift.
   The
   [`finite final-clause ordering`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData.lean)
   now records the second clockwise permutation explicitly: binary generated

@@ -23,6 +23,14 @@ structure ParentProfileCoordinate where
   clauseIndex : Nat
   deriving DecidableEq, Inhabited
 
+/-- Number of literals in the finite-template clause selected by a parent
+coordinate, with zero outside the formula. -/
+def ParentProfileCoordinate.literalCount
+    (coordinate : ParentProfileCoordinate) : Nat :=
+  (((templateDrawingOfClauseProfile coordinate.profile).formula[
+      coordinate.clauseIndex]?).map fun clause =>
+        clause.literals.length).getD 0
+
 /-- Project the parent-profile coordinate from one metadata entry. -/
 def ClauseMetadata.parentProfileCoordinate {Variable : Type}
     (metadata : ClauseMetadata Variable) : ParentProfileCoordinate :=

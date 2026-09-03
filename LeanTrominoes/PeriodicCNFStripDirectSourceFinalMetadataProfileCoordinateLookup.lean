@@ -53,7 +53,16 @@ theorem exists_metadata_of_directFigureNinePolarityRoutePair
       (headerTemplateProfileCoordinate
         ((directFigureNinePolarityRoutePairs
           decider symbols).getD index default).1).coordinate.clauseIndex =
-        metadata.localClauseIndex := by
+        metadata.localClauseIndex ∧
+      (headerTemplateProfileCoordinate
+        ((directFigureNinePolarityRoutePairs
+          decider symbols).getD index default).1).coordinate.literalIndex =
+        (PeriodicCNF.FormulaShapeFigureNineFinalClauseOrdering.reorderList
+          (List.range metadata.parentProfileCoordinate.literalCount)).getD
+            ((headerTemplateProfileCoordinate
+              ((directFigureNinePolarityRoutePairs
+                decider symbols).getD index default).1).coordinate.polarity.sourceLiteralIndex)
+            0 := by
   apply exists_metadata_of_indexedProfileCoordinateStream
     (fun pair => headerTemplateProfileCoordinate pair.1)
     (directFigureNinePolarityRoutePairSourceClauseIndices decider symbols)
@@ -73,6 +82,12 @@ theorem exists_metadata_of_directFigureNinePolarityRoutePair
   · intro block blockMember coordinate coordinateMember
     exact
       coordinate_parent_of_mem_source_expectedIndexedProfileCoordinateBlocks
+        (PeriodicCNF.FormulaShapeRetainedFigureNineDirection.descriptors
+          (directSourceFormula decider symbols))
+        blockMember coordinateMember
+  · intro block blockMember coordinate coordinateMember
+    exact
+      coordinate_literalIndex_of_mem_source_expectedIndexedProfileCoordinateBlocks
         (PeriodicCNF.FormulaShapeRetainedFigureNineDirection.descriptors
           (directSourceFormula decider symbols))
         blockMember coordinateMember

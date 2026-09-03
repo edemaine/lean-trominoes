@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixIndexedProfileCoordinateBlocks
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineIndexedProfileCoordinateLiteralIndex
 
 /-! # Metadata lookup from indexed Figure 9 coordinate streams -/
 
@@ -12,6 +12,7 @@ namespace PeriodicCNF
 namespace FormulaShapeFigureNineRoutePrefix
 
 open PlanarOneInThreeNoUnitsFigureNine
+open FormulaShapeFigureNineFinalClauseOrdering
 
 /-- A flattened coordinate stream and its blockwise parent projection locate
 the corresponding metadata entry at every occurrence index. -/
@@ -36,13 +37,24 @@ theorem exists_metadata_of_indexedProfileCoordinateStream
       ∀ block ∈ blocks, ∀ coordinate ∈ block.coordinates,
         coordinate.profile = block.parent.profile ∧
         coordinate.coordinate.clauseIndex = block.parent.clauseIndex)
+    (coordinateLiteralIndex :
+      ∀ block ∈ blocks, ∀ coordinate ∈ block.coordinates,
+        coordinate.coordinate.literalIndex =
+          (reorderList (List.range block.parent.literalCount)).getD
+            coordinate.coordinate.polarity.sourceLiteralIndex 0)
     (index : Nat) (indexLt : index < pairs.length) :
     ∃ selectedMetadata,
       metadata[indices.getD index 0]? = some selectedMetadata ∧
       (coordinateOf (pairs.getD index default)).profile =
         (metadataParent selectedMetadata).profile ∧
       (coordinateOf (pairs.getD index default)).coordinate.clauseIndex =
-        (metadataParent selectedMetadata).clauseIndex := by
+        (metadataParent selectedMetadata).clauseIndex ∧
+      (coordinateOf (pairs.getD index default)).coordinate.literalIndex =
+        (reorderList
+          (List.range (metadataParent selectedMetadata).literalCount)).getD
+            (coordinateOf
+              (pairs.getD index default)).coordinate.polarity.sourceLiteralIndex
+            0 := by
   have indicesLt : index < indices.length := by
     simpa only [lengthEq] using indexLt
   have streamMember :
@@ -73,13 +85,16 @@ theorem exists_metadata_of_indexedProfileCoordinateStream
   have blockInvariant := coordinateParent taggedBlock.1
     (List.fst_mem_of_mem_zipIdx taggedBlockMember)
     coordinate coordinateInBlock
+  have literalInvariant := coordinateLiteralIndex taggedBlock.1
+    (List.fst_mem_of_mem_zipIdx taggedBlockMember)
+    coordinate coordinateInBlock
   have blockIndexEq :
       taggedBlock.2 = indices.getD index 0 :=
     congrArg Prod.fst coordinateEq
   have coordinateEq' :
       coordinate = coordinateOf (pairs.getD index default) :=
     congrArg Prod.snd coordinateEq
-  refine ⟨selectedMetadata, ?_, ?_, ?_⟩
+  refine ⟨selectedMetadata, ?_, ?_, ?_, ?_⟩
   · rw [← blockIndexEq]
     exact metadataLookup
   · exact
@@ -92,6 +107,8 @@ theorem exists_metadata_of_indexedProfileCoordinateStream
           value.coordinate.clauseIndex) coordinateEq').symm.trans
       (blockInvariant.2.trans
         (congrArg ParentProfileCoordinate.clauseIndex metadataParentEq.symm))
+  · rw [← coordinateEq', metadataParentEq]
+    exact literalInvariant
 
 end FormulaShapeFigureNineRoutePrefix
 end PeriodicCNF
