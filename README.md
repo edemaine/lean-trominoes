@@ -13919,6 +13919,15 @@ The representation choices for this target are:
   translated route.  This lets the
   geometric and descriptor columns meet at the same dependent index instead
   of comparing existentially selected finite blocks.
+  The
+  [`finite final-clause ordering`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData.lean)
+  now records the second clockwise permutation explicitly: binary generated
+  clauses use source order `1,0`, while ternary generated clauses use
+  `2,0,1`.  The direct Figure 9 header and clause-frame streams apply the
+  same permutation simultaneously to each generated profile and its aligned
+  prefix descriptors.  Their occurrence-field, parent-clause,
+  copied-source-position, and immediate compiler consumers have all been
+  rechecked against that corrected final order.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original

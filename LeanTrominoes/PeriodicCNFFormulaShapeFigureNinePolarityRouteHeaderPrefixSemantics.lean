@@ -13,21 +13,23 @@ namespace PeriodicCNF
 namespace FormulaShapeFigureNinePolarityRouteHeader
 
 open ClauseProfilePolarityRouteOperation
+open FormulaShapeFigureNineFinalClauseOrdering
 open FormulaShapeFigureNineRoutePrefix
 open PlanarThreeSAT
 open UnaryProgramClauseProfile
 
-private theorem headers_figurePrefix_mem
+private theorem finalHeaders_figurePrefix_mem
     (profiles : List ClauseProfile)
     (prefixes : List FormulaShapeFigureNineRoutePrefix.Descriptor)
     (lengthEq : prefixes.length =
       (profiles.map fun profile => profile.literals.length).sum)
-    (header : Header) (headerMember : header ∈ headers profiles prefixes) :
+    (header : Header)
+    (headerMember : header ∈ finalHeaders profiles prefixes) :
     header.figurePrefix ∈ prefixes := by
   induction profiles generalizing prefixes with
-  | nil => simp [headers] at headerMember
+  | nil => simp [finalHeaders] at headerMember
   | cons profile profiles induction =>
-      simp only [headers, List.mem_append] at headerMember
+      simp only [finalHeaders, List.mem_append] at headerMember
       rcases headerMember with currentMember | laterMember
       · unfold clauseHeaders at currentMember
         rcases List.mem_map.mp currentMember with
@@ -39,10 +41,17 @@ private theorem headers_figurePrefix_mem
             (prefixes.take profile.literals.length).length =
               profile.literals.length := by
           simp [Nat.min_eq_left countLe]
+        have reorderedTakeLength :
+            (reorderList
+              (prefixes.take profile.literals.length)).length =
+                (reorderProfile profile).literals.length := by
+          simp [takeLength]
         rw [headerOf_figurePrefix_eq_get
-          profile (prefixes.take profile.literals.length)
-          takeLength polarity polarityMember]
-        exact List.mem_of_mem_take (List.get_mem _ _)
+          (reorderProfile profile)
+          (reorderList (prefixes.take profile.literals.length))
+          reorderedTakeLength polarity polarityMember]
+        apply List.mem_of_mem_take
+        exact mem_of_mem_reorderList (List.get_mem _ _)
       · have droppedMember : header.figurePrefix ∈
             prefixes.drop profile.literals.length := by
           apply induction (prefixes := prefixes.drop profile.literals.length)
@@ -123,7 +132,7 @@ theorem sourceClauseHeaders_figurePrefix_mem_clauseDescriptors
     header.figurePrefix ∈
       clauseDescriptors (orderedDirectedProfile profile) := by
   unfold sourceClauseHeaders at headerMember
-  exact headers_figurePrefix_mem
+  exact finalHeaders_figurePrefix_mem
     (figureClauseProfiles (orderedDirectedProfile profile))
     (clauseDescriptors (orderedDirectedProfile profile))
     (clauseDescriptors_length_eq_figureClauseProfiles

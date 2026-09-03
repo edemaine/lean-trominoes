@@ -14,6 +14,7 @@ namespace HorizontalRoutedRouteHeaderCopiedSourcePosition
 
 open PeriodicCNF.ClauseProfilePolarityRouteOperation
 open PeriodicCNF.FormulaShapeDirectionOrdering
+open PeriodicCNF.FormulaShapeFigureNineFinalClauseOrdering
 open PeriodicCNF.FormulaShapeFigureNinePolarityRouteHeader
 open HorizontalRoutedRouteHeader
 
@@ -150,6 +151,23 @@ private theorem headers_ne_nil
       exact List.length_pos_iff_ne_nil.mpr
         (polarityDescriptors_ne_nil profile)
 
+private theorem finalHeaders_ne_nil
+    (profiles : List PeriodicCNF.UnaryProgramClauseProfile.ClauseProfile)
+    (profilesNe : profiles ≠ [])
+    (prefixes : List
+      PeriodicCNF.FormulaShapeFigureNineRoutePrefix.Descriptor) :
+    finalHeaders profiles prefixes ≠ [] := by
+  cases profiles with
+  | nil => contradiction
+  | cons profile profiles =>
+      simp only [finalHeaders]
+      apply List.append_ne_nil_of_left_ne_nil
+      unfold clauseHeaders
+      apply List.ne_nil_of_length_pos
+      rw [List.length_map]
+      exact List.length_pos_iff_ne_nil.mpr
+        (polarityDescriptors_ne_nil (reorderProfile profile))
+
 theorem clauseOccurrenceCount_pos (profile : DirectedClauseProfile) :
     0 < (HorizontalRoutedRouteHeaderOccurrenceBlock.tokenBlock
       (.clause profile)).length := by
@@ -157,7 +175,7 @@ theorem clauseOccurrenceCount_pos (profile : DirectedClauseProfile) :
     List.length_map]
   apply List.length_pos_iff_ne_nil.mpr
   unfold sourceClauseHeaders
-  apply headers_ne_nil
+  apply finalHeaders_ne_nil
   exact figureClauseProfiles_ne_nil
     (PeriodicCNF.FormulaShapeFigureNineRoutePrefix.orderedDirectedProfile
       profile)

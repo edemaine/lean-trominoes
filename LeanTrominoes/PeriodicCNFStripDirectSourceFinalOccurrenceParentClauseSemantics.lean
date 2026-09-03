@@ -21,6 +21,7 @@ open PeriodicPlanarOneInThreeToThreeDM
 open PeriodicCNF
 open PeriodicCNF.ClauseProfilePolarityRouteOperation
 open PeriodicCNF.FormulaShapeDirectionOrdering
+open PeriodicCNF.FormulaShapeFigureNineFinalClauseOrdering
 open PeriodicCNF.FormulaShapeFigureNinePolarityRouteHeader
 open PeriodicCNF.FormulaShapeFigureNineRoutePrefix
 open PeriodicCNF.UnaryProgramClauseProfile
@@ -252,6 +253,38 @@ private theorem frameBlocks_spec
         exact induction (prefixes.drop profile.literals.length)
           tailArities block member
 
+private theorem finalFrameBlocks_spec
+    (profiles : List ClauseProfile)
+    (prefixes : List HorizontalRoutedRouteHeader.PrefixDescriptor)
+    (arities : ∀ profile ∈ profiles,
+      profile.literals.length = 2 ∨
+        profile.literals.length = 3) :
+    ∀ block ∈ HorizontalRoutedRouteHeaderClauseFrame.finalFrameBlocks
+        profiles prefixes,
+      0 < block.length ∧
+        block.map finalClauseFrameConnectorKind =
+          finalClauseTerminalConnectorKinds
+            (finalClauseFrameBlockFan block) ∧
+        block.flatMap finalClauseFanFrameBlock =
+          [finalClauseFrameBlockFan block] := by
+  induction profiles generalizing prefixes with
+  | nil =>
+      simp [HorizontalRoutedRouteHeaderClauseFrame.finalFrameBlocks]
+  | cons profile profiles induction =>
+      intro block member
+      simp only [HorizontalRoutedRouteHeaderClauseFrame.finalFrameBlocks,
+        List.mem_append] at member
+      rcases member with member | member
+      · exact clauseFrameBlocks_spec_of_arity (reorderProfile profile) _
+          (by simpa using arities profile (by simp)) block member
+      · have tailArities : ∀ later ∈ profiles,
+            later.literals.length = 2 ∨
+              later.literals.length = 3 := by
+          intro later laterMember
+          exact arities later (by simp [laterMember])
+        exact induction (prefixes.drop profile.literals.length)
+          tailArities block member
+
 /-- Every boundary-preserving finite descriptor block is nonempty and its
 retained occurrence kinds are exactly the terminals selected by its fan. -/
 theorem tokenFinalClauseFrameBlocks_spec (token : Token) :
@@ -267,7 +300,7 @@ theorem tokenFinalClauseFrameBlocks_spec (token : Token) :
   | clause profile =>
       unfold HorizontalRoutedRouteHeaderClauseFrame.tokenBlocks
         HorizontalRoutedRouteHeaderClauseFrame.sourceClauseFrameBlocks
-      exact frameBlocks_spec _ _
+      exact finalFrameBlocks_spec _ _
         (figureClauseProfiles_arity_two_or_three
           (orderedDirectedProfile profile))
 
