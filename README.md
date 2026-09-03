@@ -13927,7 +13927,11 @@ The representation choices for this target are:
   same permutation simultaneously to each generated profile and its aligned
   prefix descriptors.  Their occurrence-field, parent-clause,
   copied-source-position, and immediate compiler consumers have all been
-  rechecked against that corrected final order.
+  rechecked against that corrected final order.  The
+  [`finite ordering semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingSemantics.lean)
+  exhaustively verify that sorting every actual finite-template route by its
+  first direction produces exactly those reordered clause profiles for all
+  source arities, polarities, and slice-offset profiles.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
