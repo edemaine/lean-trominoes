@@ -13985,13 +13985,17 @@ The representation choices for this target are:
   canonical parent profile and local generated-clause index.  The
   [`indexed profile-coordinate blocks`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixIndexedProfileCoordinateBlocks.lean)
   pair that parent coordinate with each finite header-coordinate block, and
-  the
+  prove that every routed coordinate inside a block carries the block's
+  parent profile and local generated-clause index.  The
   [`retained specialization`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineIndexedProfileCoordinateBlocks.lean)
   proves that projecting their parent column gives exactly the concrete
-  retained formula's metadata column.  Thus the direct header schedule and
-  semantic metadata schedule now share one global, clause-sensitive indexing
-  scheme, leaving only pointwise source-word equality before the final list
-  lift.
+  retained formula's metadata column.  The
+  [`direct specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalMetadataProfileCoordinateSemantics.lean)
+  exposes both the globally indexed flattened coordinate stream and that
+  exact metadata projection for the compiled source.  Thus the direct header
+  schedule and semantic metadata schedule now share one global,
+  clause-sensitive indexing scheme, leaving only pointwise source-word
+  equality before the final list lift.
   The
   [`finite final-clause ordering`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData.lean)
   now records the second clockwise permutation explicitly: binary generated

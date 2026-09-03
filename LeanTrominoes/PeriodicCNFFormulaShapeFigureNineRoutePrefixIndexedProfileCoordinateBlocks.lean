@@ -53,6 +53,17 @@ theorem expectedSourceClauseIndexedProfileCoordinateBlocks_map_coordinates :
           profile := by
   native_decide
 
+/-- Every routed coordinate inside an indexed block carries that block's
+parent profile and local generated-clause index. -/
+theorem coordinate_parent_of_mem_expectedSourceClauseIndexedProfileCoordinateBlocks :
+    ∀ (profile : DirectedClauseProfile)
+      (block : IndexedProfileCoordinateBlock),
+      block ∈ expectedSourceClauseIndexedProfileCoordinateBlocks profile →
+      ∀ coordinate ∈ block.coordinates,
+        coordinate.profile = block.parent.profile ∧
+        coordinate.coordinate.clauseIndex = block.parent.clauseIndex := by
+  native_decide
+
 /-- Parent-indexed generated-clause blocks emitted by one source token. -/
 def expectedIndexedProfileCoordinateBlocks :
     FormulaShapeDirectionOrdering.Token →
@@ -60,6 +71,29 @@ def expectedIndexedProfileCoordinateBlocks :
   | .clause profile =>
       expectedSourceClauseIndexedProfileCoordinateBlocks profile
   | .variable => []
+
+/-- The parent-coordinate invariant holds in the flattened block schedule
+of any direction-aware source. -/
+theorem coordinate_parent_of_mem_source_expectedIndexedProfileCoordinateBlocks
+    (source : List FormulaShapeDirectionOrdering.Token)
+    {block : IndexedProfileCoordinateBlock}
+    (blockMember : block ∈
+      source.flatMap expectedIndexedProfileCoordinateBlocks)
+    {coordinate : HeaderTemplateProfileCoordinate}
+    (coordinateMember : coordinate ∈ block.coordinates) :
+    coordinate.profile = block.parent.profile ∧
+      coordinate.coordinate.clauseIndex = block.parent.clauseIndex := by
+  rcases List.mem_flatMap.mp blockMember with
+    ⟨token, _tokenMember, blockMember⟩
+  cases token with
+  | «variable» => simp [expectedIndexedProfileCoordinateBlocks] at blockMember
+  | clause profile =>
+      exact
+        coordinate_parent_of_mem_expectedSourceClauseIndexedProfileCoordinateBlocks
+          profile block (by
+            simpa only [expectedIndexedProfileCoordinateBlocks] using
+              blockMember)
+          coordinate coordinateMember
 
 /-- Projecting coordinates from a complete indexed source schedule recovers
 the original generated-clause coordinate blocks. -/
