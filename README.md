@@ -13703,7 +13703,10 @@ The representation choices for this target are:
   [`grouped-source specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableFanRouteFieldSemantics.lean)
   aligns each grouped fan slot with its occurrence record in all three fields,
   supplying the local data needed for the analogous variable-incidence body
-  comparison.
+  comparison.  The
+  [`grouped variable prefix-order bridge`](LeanTrominoes/PeriodicCNFStripGroupedVariableIncidenceTripleOrder.lean)
+  now identifies every such local finite prefix with the typed occurrence
+  triples in exact triple-major, red/green/blue-minor order.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
