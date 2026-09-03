@@ -13968,7 +13968,17 @@ The representation choices for this target are:
   exposes the same compact record over the complete direct route-pair list.
   This is the occurrence signature that the remaining global metadata-index
   alignment will compare, avoiding separate dependent profile and coordinate
-  columns.
+  columns.  The
+  [`generated-clause block semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixProfileCoordinateBlocks.lean)
+  retain the boundary of every final Figure 9 clause and prove that each
+  coordinate block projects to that clause's exact polarity schedule.  The
+  corresponding
+  [`direct indexed-block semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRoutePairProfileCoordinateBlocks.lean)
+  identify those finite boundaries with the actual final-gauged formula and
+  its broadcast global clause-index column.  Consequently every direct route
+  occurrence now carries one exact global generated-clause index, parent
+  profile, and local template clause/literal coordinate; repeated equal-valued
+  routes cannot be confused by the remaining lookup proof.
   The
   [`finite final-clause ordering`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData.lean)
   now records the second clockwise permutation explicitly: binary generated
