@@ -13997,7 +13997,12 @@ The representation choices for this target are:
   [`exact metadata alignment`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalExactMetadataPolarityOperationSemantics.lean)
   proves that the direct pair stream and exact metadata route-block stream
   agree on every global source clause, local source literal, and polarity
-  operation.
+  operation.  The generic
+  [`exact operation bridge`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderExactOperationSemantics.lean)
+  then lifts equality of an underlying Figure 9 source word through each of
+  the four route transformations.  Thus the remaining direction-block
+  obligation is solely to identify the finite prefix and selected dynamic
+  tail with the named final-gauged source route.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
