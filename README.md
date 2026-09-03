@@ -13970,7 +13970,14 @@ The representation choices for this target are:
   and the
   [`retained source specialization`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalClauseValueSemantics.lean)
   therefore prove exact equality between the direct Figure 9 value blocks
-  and the actual final clockwise formula's clause-value stream.
+  and the actual final clockwise formula's clause-value stream.  The
+  [`whole-stream polarity-operation semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalPolarityOperationListSemantics.lean)
+  then identify the corresponding local source-literal indices and polarity
+  operations across all headers and prove that pairing those headers with
+  dynamic route tails preserves the schedule.  Their
+  [`direct source specialization`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPolarityOperationSemantics.lean)
+  equates that schedule with the literals of the actual retained
+  final-clockwise formula in clause-major order.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
