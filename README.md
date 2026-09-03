@@ -13760,6 +13760,10 @@ The representation choices for this target are:
   [`complete-body regrouping`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceOccurrenceBlockBodySemantics.lean)
   carries those indices through sparse suffix selection, presenting the
   entire direct variable-body column as explicit occurrence-local blocks.
+  The
+  [`routed key/body alignment`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceBodyAlignmentSemantics.lean)
+  additionally proves that mapping those unique routed keys back through
+  the aligned lookup recovers the grouped RGB body stream in exact order.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
