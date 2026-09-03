@@ -13764,6 +13764,10 @@ The representation choices for this target are:
   [`routed key/body alignment`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceBodyAlignmentSemantics.lean)
   additionally proves that mapping those unique routed keys back through
   the aligned lookup recovers the grouped RGB body stream in exact order.
+  Its
+  [`occurrence-block refinement`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceBodyBlockAlignmentSemantics.lean)
+  proves the stronger pointwise correspondence: each occurrence's three
+  routed keys select exactly the RGB body block at the same grouped ordinal.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
