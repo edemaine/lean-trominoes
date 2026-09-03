@@ -13752,7 +13752,11 @@ The representation choices for this target are:
   [`requested-output bridge`](LeanTrominoes/PeriodicCNFStripDirectFinalOccurrenceDirectionBodyRequestedOutput.lean)
   now rewrites each direct RGB body into the same finite variable stub,
   routed corridor, and finite clause stub form consumed by the horizontal
-  typed-incidence compiler.
+  typed-incidence compiler.  The
+  [`occurrence-block index semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceOccurrenceBlockIndexSemantics.lean)
+  regroup the flat finite-prefix query stream without changing its stable
+  indices: each occurrence block starts at three times the same prefix-sum
+  triple offset used by its three routed-suffix keys.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
