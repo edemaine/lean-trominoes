@@ -13849,6 +13849,15 @@ The representation choices for this target are:
   further proves that the compiled copied/cycle descriptor prefix and the
   retained descriptor stream expand to exactly the same header list, which
   is also the header column of the compiled occurrence frames.
+  The
+  [`source-tail route-order semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceTailRouteOrderSemantics.lean)
+  now prove that every dynamic tail row is exactly the tail-direction column
+  of the same stable clockwise literal ordering used by the positioned
+  geometric construction.  The equivalent reindexed-route and
+  canonical-route forms also show that the whole-period anchor translation
+  leaves these rows unchanged.  Thus only the finite Figure 9 prefix and
+  polarity-operation alignment remains before the explicit pair block can
+  be identified with its normalized routed occurrence.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
