@@ -35,6 +35,14 @@ def RetainedFigureNineRouteDirectionBlock.directions :
           query ++
         repeatDirections 144 sourceTailDirections
 
+/-- The common finite-template local query retained by either compact route
+block form. -/
+def RetainedFigureNineRouteDirectionBlock.localQuery :
+    RetainedFigureNineRouteDirectionBlock →
+      PlanarOneInThreeNoUnitsFigureNine.LocalDirectionQuery
+  | .local query => query
+  | .inherited query _ => ⟨query.1, query.2.1⟩
+
 local instance completeRouteDirectionBlockVariableDecidableEq
     {Variable : Type} [DecidableEq Variable] :
     DecidableEq

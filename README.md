@@ -13934,6 +13934,12 @@ The representation choices for this target are:
   auxiliary-route, and inherited-route direction theorems now retain them all
   the way to their finite direction queries, so duplicate-looking template
   routes remain tied to the generated clause and literal that selected them.
+  On the direct side, the
+  [`header coordinate semantics`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateSemantics.lean)
+  exhaustively verify that every final polarity header selects the same
+  original template clause/literal coordinate after the binary `1,0` or
+  ternary `2,0,1` permutation.  Compact semantic route blocks now expose
+  their common local query for the eventual index comparison.
   The
   [`finite final-clause ordering`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData.lean)
   now records the second clockwise permutation explicitly: binary generated
