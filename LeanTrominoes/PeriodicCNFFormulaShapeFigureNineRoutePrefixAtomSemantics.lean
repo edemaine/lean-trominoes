@@ -29,6 +29,23 @@ the exact template incidence from which the descriptor was constructed. -/
   dsimp only
   split <;> rfl
 
+/-- The whole descriptor block names the template incidences in their exact
+clause-major, literal-minor presentation order. -/
+theorem clauseDescriptors_map_prefixAtom
+    (profile : FormulaShapeDirectionOrdering.DirectedClauseProfile) :
+    (clauseDescriptors profile).map prefixAtom =
+      (templateDrawingOfClauseProfile
+        (clauseProfile profile)).incidences.map fun incidence =>
+          incidence.literal.1 := by
+  unfold clauseDescriptors
+  rw [List.map_map]
+  apply List.ext_getElem
+  · simp
+  · intro index leftLt rightLt
+    simp only [List.getElem_map, List.getElem_finRange]
+    exact prefixAtom_descriptorAt profile
+      ⟨index, by simpa using leftLt⟩
+
 /-- Every emitted polarity header therefore names the atom of a genuine
 incidence in the exact clockwise parent Figure 9 template. -/
 theorem exists_prefixAtom_eq_incidenceAt_of_mem_sourceClauseHeaders
