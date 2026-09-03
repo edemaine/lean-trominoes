@@ -13742,7 +13742,12 @@ The representation choices for this target are:
   coherent RGB body block.  The matching
   [`fan-slot index semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableFanSlotIndexSemantics.lean)
   show that grouped variable-fan data and occurrence slots are selected
-  through the identical clause-major occurrence-index stream.
+  through the identical clause-major occurrence-index stream.  The separate
+  [`grouped frame alignment`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceFrameSemantics.lean)
+  and
+  [`grouped route-pair alignment`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceRoutePairSemantics.lean)
+  then identify those indexed fields with the matching declarative endpoint
+  frame and retained route-pair metadata, respectively.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
