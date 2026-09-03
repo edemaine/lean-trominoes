@@ -13717,7 +13717,10 @@ The representation choices for this target are:
   The
   [`routed-key block semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceKeyBlockSemantics.lean)
   expose the compiled global key column as three explicit scaled local
-  offsets per grouped occurrence, ready for the required uniqueness proof.
+  offsets per grouped occurrence.  The resulting
+  [`routed-key uniqueness proof`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedRoutedIncidenceKeyNodup.lean)
+  verifies that every local offset stays inside its prefix-sum block, so all
+  routed suffix keys are duplicate-free.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
