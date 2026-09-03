@@ -13886,6 +13886,18 @@ The representation choices for this target are:
   literal-minor presentation, proving that the actual routed output word
   column is exactly the mapped canonical metadata-block column whenever the
   selected source routes have the established geometry.
+  The finite
+  [`indexed operation semantics`](LeanTrominoes/PeriodicCNFClauseProfilePolarityIndexedRouteOperationSemantics.lean)
+  next forget the three source-slot constructors and prove that every
+  width-three profile emits the generic numeric source-index/operation
+  schedule.  Independently, the
+  [`metadata operation semantics`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationMetadataRouteOperationSemantics.lean)
+  derive that same schedule from the semantic polarity metadata, including
+  its filtered complement clauses.  Projecting the exact metadata route
+  blocks therefore recovers the identical globally indexed operation
+  stream.  What remains in route alignment is no longer the polarity case
+  split, but identification of each selected pre-polarity source route with
+  its explicit Figure 9 prefix-and-tail block.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original

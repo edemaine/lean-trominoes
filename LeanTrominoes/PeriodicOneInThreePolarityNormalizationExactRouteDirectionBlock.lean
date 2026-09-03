@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFClauseProfilePolarityRouteOperationData
 import LeanTrominoes.PeriodicOneInThreePolarityNormalizationRouteDirectionBlock
 
 /-! # Canonical compact blocks for routed polarity normalization
@@ -31,6 +32,30 @@ def sourceLiteralIndexForMetadata {Variable : Type*}
 
 /-- The canonical compact route operation selected by polarity metadata.
 The fallbacks are irrelevant for genuine output literal indices. -/
+def operationForMetadata {Variable : Type*}
+    (metadata :
+      PeriodicOneInThreePolarityNormalizationPositioned.ClauseMetadata
+        Variable)
+    (literalIndex : Nat) :
+    PeriodicCNF.ClauseProfilePolarityRouteOperation.Operation :=
+  match metadata.origin with
+  | .normalized =>
+      match metadata.sourceClause.literals[literalIndex]? with
+      | none => .compatible
+      | some sourceLiteral =>
+          if sourceLiteral.value =
+              PeriodicOneInThreePolarityNormalization.normalizedPolarity
+                literalIndex then
+            .compatible
+          else
+            .incompatible
+  | .complement _ _ =>
+      if literalIndex = 0 then
+        .complementFresh
+      else
+        .complementOriginal
+
+/-- Pair the metadata-selected operation with its exact source incidence. -/
 def exactRouteBlockForMetadata {Variable : Type*}
     (metadata :
       PeriodicOneInThreePolarityNormalizationPositioned.ClauseMetadata
@@ -39,22 +64,11 @@ def exactRouteBlockForMetadata {Variable : Type*}
   let sourceIndex :=
     (metadata.sourceClauseIndex,
       sourceLiteralIndexForMetadata metadata literalIndex)
-  match metadata.origin with
-  | .normalized =>
-      match metadata.sourceClause.literals[literalIndex]? with
-      | none => .compatible sourceIndex
-      | some sourceLiteral =>
-          if sourceLiteral.value =
-              PeriodicOneInThreePolarityNormalization.normalizedPolarity
-                literalIndex then
-            .compatible sourceIndex
-          else
-            .incompatible sourceIndex
-  | .complement _ _ =>
-      if literalIndex = 0 then
-        .complementFresh sourceIndex
-      else
-        .complementOriginal sourceIndex
+  match operationForMetadata metadata literalIndex with
+  | .compatible => .compatible sourceIndex
+  | .incompatible => .incompatible sourceIndex
+  | .complementFresh => .complementFresh sourceIndex
+  | .complementOriginal => .complementOriginal sourceIndex
 
 /-- At a genuine metadata entry and literal index, the final routed
 polarity-normalization word is the canonical metadata-selected compact
@@ -140,6 +154,7 @@ theorem incidenceRoutes_directionWord_eq_exactRouteBlockForMetadata
             literalIndex originEq sourceLiteralLookup compatible geometry.2
         exact outputDirections.trans (by
           simpa [exactRouteBlockForMetadata,
+            operationForMetadata,
             sourceLiteralIndexForMetadata, originEq,
             sourceLiteralLookup, compatible,
             RouteDirectionBlock.directions] using rawDirections)
@@ -150,6 +165,7 @@ theorem incidenceRoutes_directionWord_eq_exactRouteBlockForMetadata
             literalIndex originEq sourceLiteralLookup compatible geometry.2
         exact outputDirections.trans (by
           simpa [exactRouteBlockForMetadata,
+            operationForMetadata,
             sourceLiteralIndexForMetadata, originEq,
             sourceLiteralLookup, compatible,
             RouteDirectionBlock.directions] using rawDirections)
@@ -187,6 +203,7 @@ theorem incidenceRoutes_directionWord_eq_exactRouteBlockForMetadata
             sourceLiteralIndex originEq geometry.1 geometry.2
         exact outputDirections.trans (by
           simpa [exactRouteBlockForMetadata,
+            operationForMetadata,
             sourceLiteralIndexForMetadata, originEq,
             RouteDirectionBlock.directions] using rawDirections)
       · subst literalIndex
@@ -196,6 +213,7 @@ theorem incidenceRoutes_directionWord_eq_exactRouteBlockForMetadata
             sourceLiteralIndex originEq geometry.2
         exact outputDirections.trans (by
           simpa [exactRouteBlockForMetadata,
+            operationForMetadata,
             sourceLiteralIndexForMetadata, originEq,
             RouteDirectionBlock.directions] using rawDirections)
 
