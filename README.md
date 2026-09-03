@@ -13739,7 +13739,10 @@ The representation choices for this target are:
   [`grouped colored-body selection semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedColoredOccurrenceBodySelectionSemantics.lean)
   prove that the three consecutive colored ordinals generated from every
   stable grouped occurrence index recover exactly that occurrence's complete
-  coherent RGB body block.
+  coherent RGB body block.  The matching
+  [`fan-slot index semantics`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableFanSlotIndexSemantics.lean)
+  show that grouped variable-fan data and occurrence slots are selected
+  through the identical clause-major occurrence-index stream.
 - The generic
   [`counted-contraction block semantics`](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceBlockSemantics.lean)
   now reduce any aligned complete incidence-body stream to the established
