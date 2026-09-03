@@ -2683,6 +2683,9 @@ build; an imported proof counts when its statement matches the paper.
                   global clause order and applies the direct finite
                   permutation `1,0` to every binary clause and `2,0,1` to
                   every ternary clause in the retained Figure 9 formula.
+                - [x] Project away the intentionally erased periodic-anchor
+                  bits and prove that the explicit Figure 9 tables emit the
+                  actual final clockwise formula's literal-value clauses.
                 - [x] Package variable-site prefixes, clause-core routes, and
                   both occurrence endpoint stubs as finite direction queries,
                   and compile delimited or undelimited query streams by fixed
@@ -13958,7 +13961,16 @@ The representation choices for this target are:
   elaboration, and the resulting
   [`global final-clause permutation theorem`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalClausePermutationSemantics.lean)
   proves that the actual final clockwise formula keeps its clause list and
-  applies exactly `reorderList` to every clause's literals.
+  applies exactly `reorderList` to every clause's literals.  The explicit
+  finite drawing clears periodic-anchor bits, while polarity routing depends
+  only on literal values.  The
+  [`finite profile projection`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseProfileSemantics.lean),
+  its
+  [`whole-token lift`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseProfileListSemantics.lean),
+  and the
+  [`retained source specialization`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalClauseValueSemantics.lean)
+  therefore prove exact equality between the direct Figure 9 value blocks
+  and the actual final clockwise formula's clause-value stream.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
