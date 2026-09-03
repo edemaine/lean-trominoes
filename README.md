@@ -13980,6 +13980,19 @@ The representation choices for this target are:
   profile, and local template clause/literal coordinate; repeated equal-valued
   routes cannot be confused by the remaining lookup proof.
   The
+  [`metadata parent-coordinate semantics`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineMetadataParentProfileCoordinates.lean)
+  independently map every concrete composed Figure 9 clause back to its
+  canonical parent profile and local generated-clause index.  The
+  [`indexed profile-coordinate blocks`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixIndexedProfileCoordinateBlocks.lean)
+  pair that parent coordinate with each finite header-coordinate block, and
+  the
+  [`retained specialization`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineIndexedProfileCoordinateBlocks.lean)
+  proves that projecting their parent column gives exactly the concrete
+  retained formula's metadata column.  Thus the direct header schedule and
+  semantic metadata schedule now share one global, clause-sensitive indexing
+  scheme, leaving only pointwise source-word equality before the final list
+  lift.
+  The
   [`finite final-clause ordering`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingData.lean)
   now records the second clockwise permutation explicitly: binary generated
   clauses use source order `1,0`, while ternary generated clauses use
