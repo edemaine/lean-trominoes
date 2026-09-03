@@ -13911,6 +13911,13 @@ The representation choices for this target are:
   normalized local route-direction column in clause-major, literal-minor
   order.  Thus the source-block proof can add the inherited connector and
   selected dynamic tail without revisiting finite local-route indexing.
+  The complementary
+  [`local-route incidence-index bridge`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRouteIncidenceIndex.lean)
+  now preserves that presentation index through the concrete instantiated
+  drawing: every genuine generated incidence exposes an equal-valued finite
+  template index together with its exact translated route.  This lets the
+  geometric and descriptor columns meet at the same dependent index instead
+  of comparing existentially selected finite blocks.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
