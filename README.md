@@ -2679,6 +2679,10 @@ build; an imported proof counts when its statement matches the paper.
                   dynamic source tail through all four polarity operations,
                   horizontal doubling, and reversal to the exact routed
                   occurrence source-direction word.
+                - [x] Prove that the actual second clockwise sort preserves
+                  global clause order and applies the direct finite
+                  permutation `1,0` to every binary clause and `2,0,1` to
+                  every ternary clause in the retained Figure 9 formula.
                 - [x] Package variable-site prefixes, clause-core routes, and
                   both occurrence endpoint stubs as finite direction queries,
                   and compile delimited or undelimited query streams by fixed
@@ -13945,7 +13949,16 @@ The representation choices for this target are:
   theorem, this justifies the direct finite permutation against the actual
   normalized route family.  A combined pointwise theorem now identifies the
   semantic sorter with the same polymorphic `reorderList` operation for any
-  genuine binary-or-ternary generated clause.
+  genuine binary-or-ternary generated clause.  The generic
+  [`whole-list permutation lift`](LeanTrominoes/PositionedPeriodicCNFClauseDirectionListPermutation.lean)
+  maps such pointwise equalities across a complete zip-indexed positioned
+  formula.  A separately compiled
+  [`composed-raw arity lookup`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightComposedRawClauseArity.lean)
+  keeps the concrete formula from being unfolded during membership
+  elaboration, and the resulting
+  [`global final-clause permutation theorem`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalClausePermutationSemantics.lean)
+  proves that the actual final clockwise formula keeps its clause list and
+  applies exactly `reorderList` to every clause's literals.
 - The generic
   [`fixed-copy block semantics`](LeanTrominoes/EndDelimitedBlockFixedCopiesBlockSemantics.lean)
   prove that explicitly framed payloads split back into their original
