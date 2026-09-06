@@ -38,7 +38,16 @@ theorem directRetainedPlanarMetadataDirectionDescriptors_eq_blocks
   unfold directRetainedPlanarMetadataDirectionDescriptors
     directRetainedPlanarMetadataClauseDescriptors
     directRetainedPlanarMetadataVariableMarkers
-  exact FormulaShapeRetainedPlanarMetadataDirection.descriptors_eq_blocks _
+    directSourceFormula
+  rw [FormulaShapeRetainedPlanarMetadataDirection.descriptors_eq_blocks]
+  apply congrArg₂ List.append
+  · rfl
+  · exact congrArg
+      (fun equality : DecidableEq Variable =>
+        @FormulaShapeRetainedPlanarMetadataDirection.variableMarkers
+          Variable equality
+          (sourceFormula (PolySpaceCompiler.formulaOfSymbols decider symbols)))
+      (Subsingleton.elim _ _)
 
 end PeriodicCNFStripReduction
 end LeanTrominoes

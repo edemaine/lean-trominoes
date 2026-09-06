@@ -37,8 +37,16 @@ theorem directRetainedPlanarMetadataVariableMarkers_eq_retainedVariables
             (PolySpaceCompiler.formulaOfSymbols decider symbols))).length
         .variable := by
   unfold directRetainedPlanarMetadataVariableMarkers
-  apply
-    FormulaShapeRetainedPlanarMetadataDirection.variableMarkers_eq_replicate_retainedVariables
+  refine Eq.trans ?_
+    (@FormulaShapeRetainedPlanarMetadataDirection.variableMarkers_eq_replicate_retainedVariables
+      Variable (Classical.decEq Variable)
+      (sourceFormula (PolySpaceCompiler.formulaOfSymbols decider symbols)) ?_ ?_ ?_ ?_)
+  · exact congrArg
+      (fun equality : DecidableEq Variable =>
+        @FormulaShapeRetainedPlanarMetadataDirection.variableMarkers
+          Variable equality
+          (sourceFormula (PolySpaceCompiler.formulaOfSymbols decider symbols)))
+      (Subsingleton.elim _ _)
   · exact sourceFormula_occurrencesAtMostThree_canonicalBEq _
   · exact PeriodicCNF.incidenceGraph_isWellFormed _
   · exact PeriodicCNF.incidenceGraph_degreeAtMost
