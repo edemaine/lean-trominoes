@@ -5,6 +5,8 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotCrossingShapePairIndexSemantics
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotFieldValueSemantics
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotPairProjectionSemantics
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineCrossingCompiler
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineCrossingScanLocalSemantics
 
 /-! # Exact semantics of one route-shape slot crossing scan -/
