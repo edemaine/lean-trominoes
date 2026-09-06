@@ -55,7 +55,7 @@ theorem finalCoordinatedSourceCarrierRoute_directions_eq
   have taggedLinkMember : taggedLink ∈
       (retainedDrawingCompleteCarrierLinks
         retained.incidenceGraph).product [true, false] :=
-    List.fst_mem_of_mem_zipIdx taggedLinkIndexed
+    List.fst_mem_of_mem_zipIdx taggedLinkIndexed.member
   have retainedWellFormed : retained.incidenceGraph.IsWellFormed :=
     formula_incidenceGraph_isWellFormed source
   have retainedDegree : retained.incidenceGraph.DegreeAtMost 3 :=

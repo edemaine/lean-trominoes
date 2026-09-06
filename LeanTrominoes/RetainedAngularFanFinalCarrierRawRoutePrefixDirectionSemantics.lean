@@ -59,7 +59,7 @@ theorem finalCoordinatedSourceCarrierRoute_prefixDirections_eq
   have taggedLinkMember : taggedLink ∈
       (retainedDrawingCompleteCarrierLinks
         retained.incidenceGraph).product [true, false] :=
-    List.fst_mem_of_mem_zipIdx taggedLinkIndexed
+    List.fst_mem_of_mem_zipIdx taggedLinkIndexed.member
   have linkMember : taggedLink.1 ∈
       retainedDrawingCompleteCarrierLinks retained.incidenceGraph :=
     (List.mem_product.mp taggedLinkMember).1
