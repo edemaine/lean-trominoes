@@ -20,6 +20,7 @@ namespace CarrierKeyRecipeStream
   unfold outputWithSentinel
     PaddedSupportedCandidateWords.wordsWithSentinel rejectionSentinel
   rw [output_descriptorWords, guardedWords_eq_paddedCandidateStream]
+  rfl
 
 end CarrierKeyRecipeStream
 end LeanTrominoes.PeriodicOrthocrossing
