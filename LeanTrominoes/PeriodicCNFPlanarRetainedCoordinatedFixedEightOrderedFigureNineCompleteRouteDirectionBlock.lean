@@ -95,7 +95,7 @@ theorem
             sourceAtom literalSource with
         ⟨_data, _first, second, rest, query, _dataLookup, _routeEq,
           directionWord, _queryProfile, _clauseCoordinate,
-          _literalCoordinate⟩
+          _literalCoordinate, _fanEq, _slotEq⟩
       refine ⟨.inherited query
         (unitSubdivisionDirections (second :: rest)), ?_⟩
       simpa [RetainedFigureNineRouteDirectionBlock.directions] using

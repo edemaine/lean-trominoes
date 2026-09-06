@@ -3,8 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineIndexedProfileCoordinateMetadataLookup
-import LeanTrominoes.PeriodicCNFStripDirectSourceFinalMetadataProfileCoordinateSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceWitness
 
 /-! # Pointwise direct Figure 9 metadata profile-coordinate lookup -/
 
@@ -63,35 +62,12 @@ theorem exists_metadata_of_directFigureNinePolarityRoutePair
               ((directFigureNinePolarityRoutePairs
                 decider symbols).getD index default).1).coordinate.polarity.sourceLiteralIndex)
             0 := by
-  apply exists_metadata_of_indexedProfileCoordinateStream
-    (fun pair => headerTemplateProfileCoordinate pair.1)
-    (directFigureNinePolarityRoutePairSourceClauseIndices decider symbols)
-    (directFigureNinePolarityRoutePairs decider symbols)
-    ((PeriodicCNF.FormulaShapeRetainedFigureNineDirection.descriptors
-      (directSourceFormula decider symbols)).flatMap
-        expectedIndexedProfileCoordinateBlocks)
-    (formulaClauseMetadata
-      (retainedFigureNineClearancePositionedFormula
-        (directSourceFormula decider symbols)))
-    ClauseMetadata.parentProfileCoordinate
-  · simp
-  · exact directFigureNinePolarityRoutePairs_zipWith_indexedProfileCoordinate
-      decider symbols
-  · exact directSourceIndexedProfileCoordinateBlocks_map_parent_eq_metadata
-      decider symbols
-  · intro block blockMember coordinate coordinateMember
-    exact
-      coordinate_parent_of_mem_source_expectedIndexedProfileCoordinateBlocks
-        (PeriodicCNF.FormulaShapeRetainedFigureNineDirection.descriptors
-          (directSourceFormula decider symbols))
-        blockMember coordinateMember
-  · intro block blockMember coordinate coordinateMember
-    exact
-      coordinate_literalIndex_of_mem_source_expectedIndexedProfileCoordinateBlocks
-        (PeriodicCNF.FormulaShapeRetainedFigureNineDirection.descriptors
-          (directSourceFormula decider symbols))
-        blockMember coordinateMember
-  · exact indexLt
+  obtain ⟨occurrence, pairEq, generatedEq, ⟨witness⟩⟩ :=
+    exists_directSourceFinalOccurrence decider symbols index indexLt
+  obtain ⟨profileEq, clauseEq, literalEq, _literalLt⟩ :=
+    witness.metadataCoordinates
+  rw [← pairEq, ← generatedEq]
+  exact ⟨witness.metadata, witness.metadataLookup, profileEq, clauseEq, literalEq⟩
 
 end LeanTrominoes.PeriodicCNFStripReduction
 

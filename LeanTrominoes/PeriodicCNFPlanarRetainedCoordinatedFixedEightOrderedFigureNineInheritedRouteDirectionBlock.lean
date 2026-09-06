@@ -22,7 +22,8 @@ local instance inheritedRouteDirectionBlockVariableDecidableEq
 
 /-- Every genuine inherited incidence in the named retained route family has
 one finite local-plus-connector query followed by factor-`144` repetition of
-the corresponding source-route tail word. -/
+the corresponding source-route tail word. The query retains the exact
+semantic exit fan and source slot, as well as the local coordinates. -/
 theorem
     retainedOrderedFixedEightFigureNineInheritedRoute_directionBlock
     {Variable : Type} [DecidableEq Variable]
@@ -84,7 +85,13 @@ theorem
           query.1).incidenceAt query.2.1).clauseIndex =
             data.metadata.localClauseIndex ∧
         ((PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile
-          query.1).incidenceAt query.2.1).literalIndex = literalIndex := by
+          query.1).incidenceAt query.2.1).literalIndex = literalIndex ∧
+        query.2.2.1 = PositionedPeriodicCNF.clauseExitFanData
+          data.sourceClause data.sourceClauseIndex
+          (retainedFigureNineClearanceIncidenceRoutes source) ∧
+        query.2.2.2 = data.sourceSlot
+          (retainedFigureNineClearancePositionedFormula_widthAtMostThree
+            source sourceWidth) := by
   rcases
       retainedOrderedFixedEightComposedRawIncidenceRoutes_eq_fanInheritedRoute_of_inherited
         source sourceLocal sourceWidth sourceOccurrences
@@ -143,7 +150,7 @@ theorem
             rfl
           rw [clearanceFactorEq] at clearanceRouteEq
           refine ⟨data, first, second, rest, query,
-            dataLookup, routeEq, ?_, rfl, ?_, ?_⟩
+            dataLookup, routeEq, ?_, rfl, ?_, ?_, rfl, rfl⟩
           · rw [rawShape, clearanceRouteEq, routeEq]
             simpa only [query, profile, fanData, slot, clearanceWidth] using
               compiledWord
