@@ -49,12 +49,15 @@ theorem directSourceFinalCarrierSemanticOccurrenceSlotBlocks_eq_taggedLinks
     directSourceFinalCarrierTaggedClauses_eq decider symbols
   unfold directSourceFinalCarrierSemanticOccurrenceSlotBlocks
   rw [taggedClausesEq, List.map_map]
-  induction directSourceFinalCarrierTaggedLinks decider symbols with
-  | nil => rfl
-  | cons tagged taggedLinks induction =>
-      simp only [List.map_cons, Function.comp_apply]
-      rw [directSourceFinalCarrierSemanticOccurrenceSlotBlock_eq,
-        induction]
+  apply List.map_congr_left
+  intro tagged _
+  dsimp only [Function.comp_apply]
+  have clauseEquality : directFinalCarrierTaggedClauseVariableDecidableEq =
+      @PeriodicThreeSATThree.fiveFamilyNormalizedThreeOccurrenceDecidableEq
+        (ThreeCNFVariable Nat) directSourceFinalStructuralBaseDecidableEq :=
+    Subsingleton.elim _ _
+  rw [clauseEquality]
+  exact directSourceFinalCarrierSemanticOccurrenceSlotBlock_eq decider symbols tagged
 
 end LeanTrominoes.PeriodicCNFStripReduction
 
