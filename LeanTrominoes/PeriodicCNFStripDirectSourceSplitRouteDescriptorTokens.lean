@@ -23,10 +23,6 @@ noncomputable local instance directSourceSplitRouteDescriptorTokensStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-noncomputable local instance directSourceSplitRouteDescriptorTokensVariableDecidableEq :
-    DecidableEq Variable :=
-  directSourceVariableDecidableEq
-
 /-- The exact direct-source unary token stream encodes the explicit
 copied-plus-cycle route records. -/
 theorem directSourceRouteDescriptorTokens_eq_splitRouteDescriptors
@@ -37,6 +33,7 @@ theorem directSourceRouteDescriptorTokens_eq_splitRouteDescriptors
           (PeriodicThreeCNF.formula
             (PolySpaceCompiler.formulaOfSymbols decider symbols))) := by
   exact congrArg routeDescriptorTokens
-    (directSource_numericRouteDescriptors_eq_splitRouteDescriptors decider symbols)
+    ((directSource_numericRouteDescriptors_eq_splitRouteDescriptors decider symbols).trans
+      (directSource_splitRouteDescriptors_eq_structural decider symbols))
 
 end LeanTrominoes.PeriodicCNFStripReduction
