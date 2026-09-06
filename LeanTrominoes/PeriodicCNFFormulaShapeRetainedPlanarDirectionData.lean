@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeDirectionOrderingFormulaData
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATVariableGauge
+import LeanTrominoes.PositionedPeriodicCNFClauseDirectionOrdering
 
 /-! # Direction descriptors of the retained planar source -/
 
