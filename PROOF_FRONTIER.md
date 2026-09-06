@@ -73,7 +73,6 @@ assumes one of these compiler contracts.
 Build coverage and proof completion are separate: a successful build of
 conditional closure theorems does not prove the unconditional target.
 
-The occurrence refactoring and its direct consumers have passed targeted
-Lean checks, as has the small public root. A complete default rebuild has
-not yet finished; do not treat existing cached artifacts as an all-module
-validation result.
+The complete default `lake build` passed on 2026-09-06: all 10,184 build
+jobs succeeded, covering all 7,007 tracked Lean source files, including the
+occurrence refactoring and its consumers.
