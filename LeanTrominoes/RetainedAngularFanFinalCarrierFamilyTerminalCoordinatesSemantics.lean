@@ -53,7 +53,7 @@ theorem finalCarrierTerminalCoordinates_eq_taggedLinks
   intro tagged taggedMember
   exact finalCarrierClauseTerminalCoordinates_eq
     source sourceLocal sourceWidth sourceClausesNonempty
-      positiveOffsets tagged.1 tagged.2 taggedMember
+      positiveOffsets tagged.1 tagged.2 ⟨taggedMember⟩
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
