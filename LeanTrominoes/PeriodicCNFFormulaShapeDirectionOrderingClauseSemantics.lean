@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeDirectionOrderingFormulaData
 import LeanTrominoes.PeriodicCNFFormulaShapeDirectionOrderingSemantics
+import LeanTrominoes.PositionedPeriodicCNFClauseDirectionOrdering
 
 /-! # Clause semantics of finite direction-aware shape ordering -/
 

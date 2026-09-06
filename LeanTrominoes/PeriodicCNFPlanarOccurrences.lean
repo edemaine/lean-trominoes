@@ -1096,7 +1096,7 @@ theorem drawingRoutedVariableLinks_firsts
       (drawingVariableRouteSites formula).flatMap fun site =>
         (routedVariableNodes formula site).take 3 := by
   simp [drawingRoutedVariableLinks, routedVariableLinksAt,
-    List.map_flatMap, List.map_map, Function.comp_def]
+    equalityTakeThreeLinks, List.map_flatMap, List.map_map, Function.comp_def]
 
 /-- Across the complete represented variable family, active target
 terminals serve as first endpoints of at most one equality arm. -/
@@ -1128,7 +1128,7 @@ theorem routedVariableLinksAt_length_le_three
     (formula : PeriodicCNF Variable)
     (site : VariableRouteSite Variable) :
     (routedVariableLinksAt formula site).length ≤ 3 := by
-  simp [routedVariableLinksAt]
+  simp [routedVariableLinksAt, equalityTakeThreeLinks]
 
 /-- The second endpoint of every active arm is its site's central atom. -/
 theorem routedVariableLinksAt_second

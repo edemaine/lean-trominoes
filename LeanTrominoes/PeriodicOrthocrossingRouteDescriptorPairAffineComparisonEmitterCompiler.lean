@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.FiniteBlockTransducer
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineComparisonEmitterSemantics
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairFieldTagFintypeData
 import LeanTrominoes.TM2CompositionMachine
 import LeanTrominoes.TM2PolyTimeOutputEncodingTransport
 
