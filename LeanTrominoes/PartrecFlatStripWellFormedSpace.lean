@@ -25,6 +25,15 @@ open LeanTrominoes
 
 namespace EvaluatorCodeFits
 
+private theorem encodedListSpace_append (first rest : List Nat) :
+    encodedListSpace (first ++ rest) =
+      encodedListSpace first + encodedListSpace rest := by
+  induction first with
+  | nil => simp
+  | cons value first induction =>
+      simp only [List.cons_append, encodedListSpace_cons, induction]
+      omega
+
 theorem encodedFieldSpace_le_of_mem
     (field : Nat) (fields : List Nat) (member : field ∈ fields) :
     (Computability.encodeNat field).length + 1 ≤
@@ -42,7 +51,7 @@ theorem encodedListSpace_suffix_le
     (leadingFields suffix : List Nat) :
     encodedListSpace suffix ≤
       encodedListSpace (leadingFields ++ suffix) := by
-  rw [LeanTrominoes.FiniteState.encodedListSpace_append]
+  rw [encodedListSpace_append]
   omega
 
 def flatStripMotifCellPairArgumentsCost
@@ -352,9 +361,6 @@ theorem flatStripMotifBodyCost_le_input
   let cellCode := Encodable.encode cell
   let restFields :=
     remaining.flatMap PeriodicStripFlatEncoding.cellFields
-  let state :=
-    Code.flatStripMotifState periodicStrip.width
-      periodicStrip.period valid (cell :: remaining)
   have fieldsEq :
       fields =
         [periodicStrip.width, periodicStrip.period,
@@ -394,19 +400,13 @@ theorem flatStripMotifBodyCost_le_input
         ((Computability.encodeNat xCode).length + 1 +
         ((Computability.encodeNat yCode).length + 1 +
           encodedListSpace restFields))))) := by
+    change encodedListSpace fields = _
     rw [fieldsEq]
-    simp [inputSpace,
-      LeanTrominoes.FiniteState.encodedListSpace_append,
+    simp only [encodedListSpace_append, encodedListSpace_cons,
+      encodedListSpace_nil, Nat.add_zero, Nat.add_assoc,
       PeriodicStripFlatEncoding.cellFields, xCode, yCode]
   have restSpace : encodedListSpace restFields ≤ inputSpace := by
-    have suffix := encodedListSpace_suffix_le
-      ([periodicStrip.width, periodicStrip.period,
-          periodicStrip.motif.length] ++
-        leading.flatMap PeriodicStripFlatEncoding.cellFields ++
-        PeriodicStripFlatEncoding.cellFields cell)
-      restFields
-    rw [← fieldsEq]
-    simpa [List.append_assoc, inputSpace] using suffix
+    omega
   have remainingCount :
       remaining.length + 1 ≤ periodicStrip.motif.length := by
     rw [decomposition]
@@ -443,16 +443,10 @@ theorem flatStripMotifBodyCost_le_input
   have cellPredicateInput :
       stripCellInBoundsCost periodicStrip.width periodicStrip.period cell ≤
         10000000000000 * (inputSpace + 1) := by
+    rw [← cellCodeEq] at pairBits
     simp only [cellCode] at pairBits withCellBits doubledBits localBits
     simp only [encodedListSpace_cons, encodedListSpace_nil] at cellPredicate
     omega
-  have stateSpace : encodedListSpace state ≤ inputSpace + 2 := by
-    have rest := restSpace
-    cases valid <;>
-      simp [state, Code.flatStripMotifState,
-        PeriodicStripFlatEncoding.cellFields,
-        encodedListSpace_cons, restFields] at inputExpanded ⊢ <;>
-      omega
   have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
   have oneBits : (Computability.encodeNat 1).length = 1 := rfl
   have remainingBits :=
@@ -464,10 +458,15 @@ theorem flatStripMotifBodyCost_le_input
   have ySuccBits := listCodeEncodeNat_succ_length_le yCode
   have remainingSuccBits :=
     listCodeEncodeNat_succ_length_le remaining.length
+  -- Keep only the resulting bounds. Asking `omega` to eliminate the
+  -- intermediate arithmetic constraints makes it unnecessarily expensive.
+  clear fieldsEq inputExpanded widthPeriodBits withCellBits doubledBits
+    localBits pairCost pairUnit cellPredicate remainingCount
+    widthMember periodMember lengthMember xMember yMember decomposition
   cases valid <;>
     by_cases inBounds :
       cell.InStripBounds periodicStrip.width periodicStrip.period <;>
-  simp [flatStripMotifBodyCost, flatCountdownBodyCost,
+  simp only [flatStripMotifBodyCost, flatCountdownBodyCost,
     flatCountdownSuccBranchCost, flatStripMotifStepCost,
     flatStripMotifUpdatedValidCost,
     flatStripMotifHeadInBoundsCost,
@@ -484,7 +483,16 @@ theorem flatStripMotifBodyCost_le_input
     PeriodicStripFlatEncoding.cellFields,
     encodedListSpace_cons, encodedListSpace_nil,
     fields, inputSpace, xCode, yCode, cellCode, cellCodeEq,
-    restFields, state, zeroBits, oneBits] at *
+    restFields, zeroBits, oneBits, inBounds,
+    Bool.toNat_false, Bool.toNat_true,
+    decide_true, decide_false, if_true, if_false, Nat.one_ne_zero,
+    not_true_eq_false, not_false_eq_true, ne_eq, eq_self,
+    Nat.succ_eq_add_one, Nat.reduceAdd, Nat.pred_succ, twoBits,
+    Bool.and_true, Bool.and_false,
+    PeriodicCNFFlatEncoding.decodeIntField_encode, Prod.mk.eta,
+    List.flatMap_cons, List.cons_append, List.nil_append,
+    List.headI_cons, List.tail_cons, List.drop_succ_cons, List.drop_zero,
+    Nat.add_zero, Nat.zero_add] at *
   all_goals omega
 
 theorem flatStripMotifBodyZeroCost_le_input
@@ -509,7 +517,7 @@ theorem flatStripMotifBodyZeroCost_le_input
     simp [flatStripMotifBodyZeroCost, flatCountdownBodyCost,
       zeroPrimeCost, Code.flatStripMotifState,
       encodedListSpace_cons, encodedListSpace_nil,
-      fields, inputSpace, zeroBits, oneBits] at * <;>
+      fields, zeroBits, oneBits] at * <;>
     omega
 
 /-- Exact (deliberately additive) cost of scanning a typed flat motif.  This
@@ -539,10 +547,6 @@ theorem flatStripMotifFlatCost_le_input_mul
       simpa [flatStripMotifFlatCost] using
         flatStripMotifBodyZeroCost_le_input periodicStrip valid
   | cons cell remaining induction =>
-      let unit :=
-        1000000000000000000000000000000000000000000000 *
-          (encodedListSpace
-            (PeriodicStripFlatEncoding.stripFields periodicStrip) + 1)
       have body :=
         flatStripMotifBodyCost_le_input periodicStrip valid cell remaining
           leading decomposition
@@ -554,7 +558,6 @@ theorem flatStripMotifFlatCost_le_input_mul
           periodicStrip.period)
       have tail := induction nextValid (leading ++ [cell]) tailDecomposition
       simp only [flatStripMotifFlatCost, List.length_cons]
-      simp only [unit] at body tail ⊢
       nlinarith
 
 /-- The complete typed motif countdown has a quadratic bound in the target
@@ -574,13 +577,11 @@ theorem flatStripMotifFlatCost_le_quadratic
   have encodingLength :
       (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length =
         inputSpace := by
-    rw [PeriodicStripFlatEncoding.finEncoding_encode_length,
-      encodedListSpace_eq_sum]
-    rfl
+    simpa only [inputSpace, encodedListSpace_eq_sum] using
+      PeriodicStripFlatEncoding.finEncoding_encode_length periodicStrip
   have motifLength :=
     PeriodicStripFlatEncoding.motif_length_le_encoding_length periodicStrip
   rw [encodingLength] at motifLength
-  simp only [inputSpace] at additive ⊢
   have factor : periodicStrip.motif.length + 1 ≤ inputSpace + 1 := by
     omega
   calc
@@ -929,7 +930,8 @@ theorem flatStripWellFormed (periodicStrip : PeriodicStrip) :
           result []))
       (flatStripWellFormedLoop periodicStrip)
   simpa [Code.flatStripWellFormedCode, flatStripWellFormedCost,
-    dimensionsValid, result, Code.stripWellFormedAccumulator_eq] using fitted
+    dimensionsValid, result, Code.stripWellFormedAccumulator_eq,
+    Code.flatStripMotifState] using fitted
 
 set_option maxHeartbeats 1000000 in
 theorem flatStripWellFormedLoopInputCost_le_input
@@ -955,8 +957,15 @@ theorem flatStripWellFormedLoopInputCost_le_input
   have periodSuccBits := listCodeEncodeNat_succ_length_le periodicStrip.period
   have lengthSuccBits :=
     listCodeEncodeNat_succ_length_le periodicStrip.motif.length
+  have widthPredBits := listCodeEncodeNat_length_mono
+    (Nat.sub_le periodicStrip.width 1)
+  have periodPredBits := listCodeEncodeNat_length_mono
+    (Nat.sub_le periodicStrip.period 1)
+  have widthZero : periodicStrip.width = 0 ↔ ¬ 0 < periodicStrip.width := by omega
+  have periodZero : periodicStrip.period = 0 ↔ ¬ 0 < periodicStrip.period := by omega
   have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
   have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  have twoBits : (Computability.encodeNat 2).length = 2 := rfl
   by_cases widthPositive : 0 < periodicStrip.width <;>
     by_cases periodPositive : 0 < periodicStrip.period <;>
     simp [flatStripWellFormedLoopInputCost, flatStripPayloadCost,
@@ -968,11 +977,12 @@ theorem flatStripWellFormedLoopInputCost_le_input
       branchZeroZeroCost, branchZeroSuccCost, branchZeroTestCost,
       getCost, dropCost, idCost, headCost, nilCost, oneCost,
       zeroCost, zeroPrimeCost, tailCost, succCost,
-      Code.flatStripMotifState, PeriodicStripFlatEncoding.cellFields,
+      Code.flatStripMotifState,
       fields, coordinates, inputSpace, inputExpanded,
-      widthPositive, periodPositive, Nat.eq_zero_iff_not_pos,
+      widthPositive, periodPositive, widthZero, periodZero,
+      PeriodicStripFlatEncoding.stripFields,
       encodedListSpace_cons, encodedListSpace_nil,
-      zeroBits, oneBits] at * <;>
+      zeroBits, oneBits, twoBits] at * <;>
     omega
 
 theorem flatStripWellFormedProjectionCost_le_input
@@ -997,12 +1007,13 @@ theorem flatStripWellFormedProjectionCost_le_input
   have periodSuccBits := listCodeEncodeNat_succ_length_le periodicStrip.period
   have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
   have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  have twoBits : (Computability.encodeNat 2).length = 2 := rfl
   cases result <;>
     simp [getCost, dropCost, idCost, headCost, nilCost,
       zeroPrimeCost, tailCost, succCost,
-      Code.flatStripMotifState, fields, inputSpace,
+      Code.flatStripMotifState, fields,
       encodedListSpace_cons, encodedListSpace_nil,
-      zeroBits, oneBits] at * <;>
+      zeroBits, oneBits, twoBits] at * <;>
     omega
 
 /-- Complete structural validation, including input preparation and result
@@ -1028,7 +1039,7 @@ theorem flatStripWellFormedCost_le_quadratic
   have squareDominates : inputSpace + 1 ≤ (inputSpace + 1) ^ 2 := by
     nlinarith
   simp only [flatStripWellFormedCost, flatStripWellFormedLoopCost,
-    dimensionsValid, result, inputSpace] at loop prepared projected ⊢
+    dimensionsValid, result] at loop prepared projected ⊢
   nlinarith
 
 end EvaluatorCodeFits
