@@ -485,7 +485,7 @@ theorem exists_routedVariableLinkIndex_of_nodeMember
       (List.mem_zipIdx_iff_getElem?).mp taggedNodeMember
     simp [List.getElem?_zipIdx, lookup]
   refine ⟨armIndex, ?_⟩
-  unfold routedVariableLinksAt
+  unfold routedVariableLinksAt equalityTakeThreeLinks
   rw [List.zipIdx_map]
   apply List.mem_map.mpr
   exact
