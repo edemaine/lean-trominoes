@@ -39,6 +39,6 @@ theorem routedVariableLinksAt_exists_of_mem_drawingVariableRouteSites
         ⟨⟨first, .atom site,
             routedVariableEqualityPositions formula site
               first.duplicatorArm⟩, ?_⟩
-      simp [routedVariableLinksAt, nodesEq]
+      simp [routedVariableLinksAt, equalityTakeThreeLinks, nodesEq]
 
 end LeanTrominoes.PeriodicOrthocrossing

@@ -26,7 +26,8 @@ theorem routedVariableLinksAt_arms_eq_targetTerminalArms
   have firsts :
       (routedVariableLinksAt formula site).map EqualityLink.first =
         (routedVariableNodes formula site).take 3 := by
-    simp [routedVariableLinksAt, List.map_map, Function.comp_def]
+    simp [routedVariableLinksAt, equalityTakeThreeLinks,
+      List.map_map, Function.comp_def]
   calc
     ((routedVariableLinksAt formula site).map fun link =>
         link.first.duplicatorArm) =
