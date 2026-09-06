@@ -264,7 +264,8 @@ theorem routedVariableLinksAt_nodup
           PlanarSATNode Variable)).dedup.take 3).Nodup :=
     (List.nodup_dedup _).take
   apply List.Nodup.of_map EqualityLink.first
-  simpa [routedVariableLinksAt, routedVariableNodes, List.map_map,
+  simpa [routedVariableLinksAt, equalityTakeThreeLinks,
+    routedVariableNodes, List.map_map,
     Function.comp_def] using nodesNodup
 
 /-- Crossover metadata has unique component/local-clause keys. -/
