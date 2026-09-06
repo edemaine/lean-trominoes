@@ -31,10 +31,6 @@ local instance directFinalCarrierOccurrenceSlotLinkVariableDecidableEq :
     DecidableEq Variable :=
   directSourceVariableDecidableEq
 
-private noncomputable def directFinalCarrierOccurrenceSlotLinkDefaultBaseDecidableEq :
-    DecidableEq (ThreeCNFVariable Nat) :=
-  inferInstance
-
 attribute [local implicit_reducible]
   directSourceFinalStructuralBaseDecidableEq
 attribute [local instance]
@@ -50,30 +46,6 @@ private theorem flatten_map_eq_flatMap
       simp only [List.map_cons, List.flatten_cons, List.flatMap_cons]
       rw [induction]
 
-private def physicalProductOccurrenceSlots
-    (equality : DecidableEq (ThreeCNFVariable Nat))
-    (source : PeriodicCNF (ThreeCNFVariable Nat))
-    (links : List (EqualityLink CarrierNode))
-    (start : Nat) : List RetainedTerminalSlot :=
-  ((links.product [true, false]).zipIdx start).flatMap fun tagged =>
-    [@finalCarrierSemanticOccurrenceSlotAt (ThreeCNFVariable Nat) equality
-        source tagged.1 tagged.2 0,
-      @finalCarrierSemanticOccurrenceSlotAt (ThreeCNFVariable Nat) equality
-        source tagged.1 tagged.2 1]
-
-private theorem physicalProduct_eq_semanticOccurrenceSlotsFrom
-    (source : PeriodicCNF (ThreeCNFVariable Nat))
-    (links : List (EqualityLink CarrierNode))
-    (start : Nat) :
-    ((links.product [true, false]).zipIdx start).flatMap (fun tagged =>
-        [finalCarrierSemanticOccurrenceSlotAt source tagged.1 tagged.2 0,
-          finalCarrierSemanticOccurrenceSlotAt source tagged.1 tagged.2 1]) =
-      finalCarrierSemanticOccurrenceSlotsFrom source start links := by
-  symm
-  exact finalCarrierSemanticOccurrenceSlotsFrom_eq_product
-    source links start
-
-set_option maxHeartbeats 400000 in
 /-- The compiled direct carrier slot stream is the recursive four-slot
 presentation aligned with physical retained links. -/
 theorem directSourceFinalCarrierOccurrenceSlots_eq_linkPresentation
@@ -88,30 +60,12 @@ theorem directSourceFinalCarrierOccurrenceSlots_eq_linkPresentation
   rw [directSourceFinalCarrierOccurrenceSlots_eq_semantic,
     directSourceFinalCarrierSemanticOccurrenceSlotBlocks_eq_taggedLinks,
     flatten_map_eq_flatMap,
-    directSourceFinalCarrierTaggedLinks_eq_generic]
-  unfold finalCarrierTaggedLinks finalCarrierTaggedLinksFrom
-  rw [finalCarrierTaggedLinkValues_eq_physicalProduct]
-  generalize
-    directThreeCNFSourceFormula decider symbols = source
-  generalize finalCarrierPhysicalLinks source = links
-  generalize finalCarrierStart source = start
-  change physicalProductOccurrenceSlots
-      directFinalCarrierOccurrenceSlotLinkDefaultBaseDecidableEq
-      source links start =
-    finalCarrierSemanticOccurrenceSlotsFrom source start links
-  calc
-    physicalProductOccurrenceSlots
-        directFinalCarrierOccurrenceSlotLinkDefaultBaseDecidableEq
-        source links start =
-      physicalProductOccurrenceSlots
-        directSourceFinalStructuralBaseDecidableEq source links start := by
-      exact decidableEq_application_irrel
-        (fun equality : DecidableEq (ThreeCNFVariable Nat) =>
-          physicalProductOccurrenceSlots equality source links start)
-        directFinalCarrierOccurrenceSlotLinkDefaultBaseDecidableEq
-        directSourceFinalStructuralBaseDecidableEq
-    _ = finalCarrierSemanticOccurrenceSlotsFrom source start links :=
-      physicalProduct_eq_semanticOccurrenceSlotsFrom source links start
+    directSourceFinalCarrierTaggedLinks_eq_generic,
+    finalCarrierTaggedLinks_eq_physicalPresentation]
+  exact product_eq_finalCarrierSemanticOccurrenceSlotsFrom
+    (directThreeCNFSourceFormula decider symbols)
+    (finalCarrierPhysicalLinks (directThreeCNFSourceFormula decider symbols))
+    (finalCarrierStart (directThreeCNFSourceFormula decider symbols))
 
 end LeanTrominoes.PeriodicCNFStripReduction
 
