@@ -202,6 +202,14 @@ theorem stableFan_direction_of_active
               FinalFanQueryRanks.selectedRank,
               VariableSiteSlot.index]
 
+/-- Every unused stable-fan slot has the semantic north direction. -/
+theorem stableFan_direction_of_inactive
+    (candidateKeys : List Nat) (records : List OccurrenceData)
+    (value : Nat) (countPred : Fin 3) (slot : VariableSiteSlot)
+    (inactive : ¬ slot.index < countPred.val + 1) :
+    (stableFan candidateKeys records value countPred).direction slot = .north := by
+  exact fanData_direction_of_inactive countPred _ _ _ slot inactive
+
 end LeanTrominoes.FinalFanDataTripleAssembler
 
 end

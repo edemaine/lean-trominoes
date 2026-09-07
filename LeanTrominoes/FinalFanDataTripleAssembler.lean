@@ -38,8 +38,8 @@ def countPredOfSlot (slot : FiniteRoleSlotUnaryDecoder.Slot) : Fin 3 :=
   unfold countPredOfSlot slotOfCountPred
   simp only [countPred.isLt, ↓reduceDIte]
 
-/-- Assemble one complete fan from its count and selected first, second, and
-third occurrence records. -/
+/-- Assemble one complete fan from its count and selected occurrence records.
+Inactive directions use the semantic north fallback. -/
 def fanData (countPred : Fin 3)
     (first second third : OccurrenceData) : FanData where
   countPred := countPred
@@ -53,8 +53,8 @@ def fanData (countPred : Fin 3)
     | .third => third.polarity
   direction
     | .first => first.direction
-    | .second => second.direction
-    | .third => third.direction
+    | .second => if 1 < countPred.val + 1 then second.direction else .north
+    | .third => if 2 < countPred.val + 1 then third.direction else .north
 
 instance : Inhabited FanData :=
   ⟨fanData 0 default default default⟩
@@ -101,20 +101,31 @@ instance : Inhabited FanData :=
 
 @[simp] theorem fanData_direction_second (countPred : Fin 3)
     (first second third : OccurrenceData) :
-    (fanData countPred first second third).direction .second = second.direction :=
+    (fanData countPred first second third).direction .second =
+      if 1 < countPred.val + 1 then second.direction else .north :=
   rfl
 
 @[simp] theorem fanData_direction_third (countPred : Fin 3)
     (first second third : OccurrenceData) :
-    (fanData countPred first second third).direction .third = third.direction :=
+    (fanData countPred first second third).direction .third =
+      if 2 < countPred.val + 1 then third.direction else .north :=
   rfl
+
+/-- Unused slots have the same total direction as the horizontal source fan. -/
+theorem fanData_direction_of_inactive (countPred : Fin 3)
+    (first second third : OccurrenceData) (slot : VariableSiteSlot)
+    (inactive : ¬ slot.index < countPred.val + 1) :
+    (fanData countPred first second third).direction slot = .north := by
+  cases slot <;> simp_all [fanData, VariableSiteSlot.index]
 
 inductive State
   | empty
   | first (countPred : Fin 3) (first : OccurrenceData)
   | second (countPred : Fin 3)
       (first second : OccurrenceData)
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+instance : Inhabited State := ⟨.empty⟩
 
 def transition : State → Pair → State × List FanData
   | .empty, pair =>

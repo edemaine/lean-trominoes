@@ -68,6 +68,11 @@ The preliminary header projection remains available for identity compilation.
 The [direct endpoint-column theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalEndpointDirections.lean)
 identifies the variable fan input directions with the actual horizontal route
 words. The grouped fan field proofs now use these completed records.
+Unused variable-fan directions now use north, matching the horizontal source.
+The [inactive-slot lemmas](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableFanInactiveDirections.lean)
+prove this for both direct enumeration orders. The finite assembler uses an
+explicit empty initial state, which also removes a pre-existing Lean code-generation
+panic in its derived `Inhabited` instance.
 
 The [clause direction blocks](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseDirectionBlocks.lean)
 now agree with the actual horizontal clauses, preserving every clause boundary
