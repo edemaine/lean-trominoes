@@ -76,8 +76,8 @@ noncomputable def directSourceFinalInheritedRingCode
     (directSourceFinalCompactAtomIdentityDatum decider symbols
       (directSourceFinalCompactAtomWord (directSourceFormula decider symbols) atom)) slot
 
-/-- On represented source atoms and genuine ring slots, numeric equality is
-exactly equality of the actual fixed-ring copy variables. -/
+/-- On represented source atoms and genuine angular slots, numeric equality
+is exactly equality of the paired source-atom and angular-slot keys. -/
 theorem directSourceFinalInheritedRingCode_eq_iff
     (symbols : List encoding.Γ) (first second : WrappedPeriodicPlanarSATVariable Variable)
     (firstMember : first ∈ (retainedFinalCoordinatedScaledSource

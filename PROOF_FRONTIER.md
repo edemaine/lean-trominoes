@@ -144,8 +144,21 @@ therefore selects the exact original parent literal and its instantiated atom.
 The [common ring-code semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalInheritedRingAtomSemantics.lean)
 prove that numeric identities separate actual retained source atoms and ring
 slots. Copied codes query this semantic candidate column, and cycle codes use
-the actual distinct source atoms in their construction order. Connecting those
-compiled query positions and cycle slots to each occurrence witness remains.
+the actual distinct source atoms in their construction order.
+
+The [actual ring-variable code](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRingVariableSemantics.lean)
+converts between east-first angular slots and northwest-first compass-variable
+indices, keeping the separator distinct. The [copied-atom proof](LeanTrominoes/RetainedAngularOccurrenceCopiedAtomSemantics.lean)
+shows that every bounded stable rank selects the actual assigned compass port.
+The [direct copied-column semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedRingVariableSemantics.lean)
+therefore identify the candidate stream with actual copied literals, and each
+compiled query with its own parent literal row. This uses the
+[clause-local selection theorem](LeanTrominoes/PeriodicCNFStripHorizontalRoutedCopiedSourceBlockSelection.lean)
+and the [coherent occurrence projection](LeanTrominoes/PeriodicCNFStripHorizontalSourceOccurrenceCopiedValues.lean).
+The [cycle-table check](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCycleRingLiteralSemantics.lean)
+identifies every fixed slot with its actual local cycle literal and proves
+that every inherited lookup is active. Transporting the copied and cycle
+blocks into the complete occurrence stream and its witnesses remains.
 
 Next prove the remaining inherited-to-inherited identity comparisons, then
 identify stable occurrence ranks with source order. This will identify the
@@ -186,7 +199,7 @@ assumes one of these compiler contracts.
 Build coverage and proof completion are separate: a successful build of
 conditional closure theorems does not prove the unconditional target.
 
-The complete default `lake build` passed on 2026-09-07: all 10,234 jobs
+The complete default `lake build` passed on 2026-09-07: all 10,240 jobs
 succeeded. This includes the actual source-descriptor and local-code bridges,
 finite fresh-key reconstruction, and every numeric comparison involving a
 fresh atom, including separation from inherited and original auxiliary atoms.
@@ -196,4 +209,6 @@ involving original auxiliaries now agree with horizontal atoms, with genuine
 first-stage index bounds and inherited/auxiliary constructor separation.
 The inherited source-slot and common ring-code lemmas also pass, including
 the exact distinct-atom order of the cycle suffix.
+The actual compass/separator conversion, copied literal rows, coherent
+occurrence value projection, and finite cycle literal table are also verified.
 The changed modules' build traces contain no compiler diagnostics.
