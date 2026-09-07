@@ -108,10 +108,21 @@ using the exact refined source literal. Its
 identifies the actual horizontal atom column at the same source coordinates
 already carried by the route-pair stream.
 
-Next prove that equality of numeric atom codes is exactly equality of these
-decoded atoms, and identify stable occurrence ranks with their source order.
-This will identify the complete variable fans and grouped occurrence bodies,
-then the canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [parent descriptor bridge](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseDescriptorSourceSemantics.lean)
+identifies the compiled parent list with the actual source descriptors, apart
+from ignored variable markers. The [local-code projection](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceLocalAtomCodes.lean)
+therefore uses each coherent occurrence's own parent and header.
+The [fresh-key proof](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentity.lean)
+identifies the parent/prefix key with the global source occurrence, using
+canonical finite-prefix reconstruction. The [complete numeric-code proof](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFreshAtomIdentity.lean)
+and [horizontal atom theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFreshAtomHorizontalSemantics.lean)
+now prove that two genuine fresh incidences have equal compiled identities
+exactly when their actual horizontal atoms are equal.
+
+Next prove the inherited-ring and original Figure 9 auxiliary cases, including
+separation from fresh atoms, then identify stable occurrence ranks with source
+order. This will identify the complete variable fans and grouped occurrence
+bodies, then the canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -147,8 +158,8 @@ assumes one of these compiler contracts.
 Build coverage and proof completion are separate: a successful build of
 conditional closure theorems does not prove the unconditional target.
 
-The complete default `lake build` passed on 2026-09-07: all 10,219 jobs
-succeeded. This includes the endpoint and inactive-direction corrections,
-clause-fan and occurrence-field compiler certificates, and the direct
-source-indexed atom decoder. The changed modules' build traces contain no
-compiler diagnostics.
+The complete default `lake build` passed on 2026-09-07: all 10,225 jobs
+succeeded. This includes the actual source-descriptor and local-code bridges,
+finite fresh-key reconstruction, and complete numeric fresh-identity agreement
+with horizontal atoms. The changed modules' build traces contain no compiler
+diagnostics.

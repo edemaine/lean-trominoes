@@ -23,6 +23,43 @@ def SourceIndexedDescriptor.atom? {Variable : Type*}
       | .incompatible | .complementFresh =>
           .inr ((descriptor.sourceClauseIndex, descriptor.sourceLiteralIndex), literal)
 
+/-- Fresh atoms decoded in one source are equal exactly when their source
+coordinates agree. The literal payload introduces no extra identity test. -/
+theorem SourceIndexedDescriptor.fresh_atom_eq_iff {Variable : Type*}
+    (source : PeriodicCNF Variable) (first second : SourceIndexedDescriptor)
+    (firstFresh : first.operation = .incompatible ∨ first.operation = .complementFresh)
+    (secondFresh : second.operation = .incompatible ∨ second.operation = .complementFresh)
+    (firstAtom secondAtom : PolarityNormalizedVariable Variable)
+    (firstDecoded : first.atom? source = some firstAtom)
+    (secondDecoded : second.atom? source = some secondAtom) :
+    firstAtom = secondAtom ↔
+      (first.sourceClauseIndex, first.sourceLiteralIndex) =
+        (second.sourceClauseIndex, second.sourceLiteralIndex) := by
+  have freshShape (descriptor : SourceIndexedDescriptor)
+      (fresh : descriptor.operation = .incompatible ∨ descriptor.operation = .complementFresh)
+      (atom : PolarityNormalizedVariable Variable)
+      (decoded : descriptor.atom? source = some atom) :
+      ∃ literal, atom = .inr ((descriptor.sourceClauseIndex, descriptor.sourceLiteralIndex), literal) := by
+    obtain ⟨clause, _, decodedLiteral⟩ := Option.bind_eq_some_iff.mp decoded
+    obtain ⟨literal, _, atomEq⟩ := Option.map_eq_some_iff.mp decodedLiteral
+    rcases fresh with fresh | fresh <;>
+      exact ⟨literal, by simpa only [fresh] using atomEq.symm⟩
+  constructor
+  · intro atomEq
+    obtain ⟨firstLiteral, firstShape⟩ := freshShape first firstFresh firstAtom firstDecoded
+    obtain ⟨secondLiteral, secondShape⟩ := freshShape second secondFresh secondAtom secondDecoded
+    exact congrArg Prod.fst (Sum.inr.inj (firstShape.symm.trans (atomEq.trans secondShape)))
+  · intro coordinatesEq
+    have clauseEq : first.sourceClauseIndex = second.sourceClauseIndex :=
+      congrArg Prod.fst coordinatesEq
+    have literalEq : first.sourceLiteralIndex = second.sourceLiteralIndex :=
+      congrArg Prod.snd coordinatesEq
+    have decodedEq : first.atom? source = second.atom? source := by
+      rcases firstFresh with firstFresh | firstFresh <;>
+        rcases secondFresh with secondFresh | secondFresh <;>
+        simp only [SourceIndexedDescriptor.atom?, firstFresh, secondFresh, clauseEq, literalEq]
+    exact Option.some.inj (firstDecoded.symm.trans (decodedEq.trans secondDecoded))
+
 private theorem flatMap_filterMap {α β γ : Type*}
     (source : List α) (select : α → Option β) (emit : β → List γ) :
     (source.filterMap select).flatMap emit =
