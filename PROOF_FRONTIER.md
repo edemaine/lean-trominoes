@@ -121,8 +121,15 @@ compiled identities exactly when its actual horizontal atoms are equal. Parity
 separates inherited atoms, and the finite local quotient separates original
 auxiliary atoms from fresh ones.
 
-Next prove the inherited-ring and original Figure 9 auxiliary cases, then
-identify stable occurrence ranks with source order. This will identify the complete variable fans and grouped occurrence
+The [original-atom transport](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceFinalGaugedAtoms.lean)
+now preserves the selected instantiated atom through final clockwise ordering,
+variable gauging, anchor normalization, and refinement. Its
+[direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOriginalAtomHorizontalSemantics.lean)
+constructs the occurrence witness at each genuine index and identifies every
+original horizontal atom with that witness's instantiated template role.
+
+Next compare these actual original atoms with the inherited-ring and original
+Figure 9 auxiliary codes, then identify stable occurrence ranks with source order. This will identify the complete variable fans and grouped occurrence
 bodies, then the canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -159,8 +166,10 @@ assumes one of these compiler contracts.
 Build coverage and proof completion are separate: a successful build of
 conditional closure theorems does not prove the unconditional target.
 
-The complete default `lake build` passed on 2026-09-07: all 10,225 jobs
+The complete default `lake build` passed on 2026-09-07: all 10,227 jobs
 succeeded. This includes the actual source-descriptor and local-code bridges,
 finite fresh-key reconstruction, and every numeric comparison involving a
-fresh atom, including separation from inherited and original auxiliary atoms. The changed modules' build traces contain no compiler
+fresh atom, including separation from inherited and original auxiliary atoms.
+It also includes original-atom transport through all final geometric
+normalizations and its actual horizontal specialization. The changed modules' build traces contain no compiler
 diagnostics.
