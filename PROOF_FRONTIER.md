@@ -9,7 +9,10 @@ the final construction; the old intermediate checklist is in
 
 ## Route-word agreement
 
-The immediate semantic obligation is the `sourceWords` premise of
+The generic source-word agreement is proved by
+[`OccurrenceWitness.sourceDirectionWord`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceDirectionWords.lean).
+The next step is to specialize it to the direct stream and discharge the
+`sourceWords` premise of
 [`directFigureNinePolarityRoutePairs_map_directions_eq_exactMetadata_of_sourceWords`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalExactMetadataDirectionListReduction.lean):
 every direct header/tail pair denotes the final-gauged source direction word
 at its attached clause/literal index.
@@ -38,18 +41,17 @@ The connector proof uses [direction preservation through the paired clockwise so
 The header's selected template atom now [instantiates to the actual raw literal](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceLiteralAtoms.lean).
 The [case-classification lemmas](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixInstantiationSemantics.lean)
 preserve auxiliary roles and identify the atom at each active inherited slot.
-The [complete auxiliary route-word equality](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceAuxiliaryRoutes.lean)
-is proved.
-
-The remaining source-word proof must equate the inherited header's selected
-slot with the geometric provenance's source literal index. Then combine the
-connector and tail lemmas with the
-[inherited geometric direction-block theorem](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineInheritedRouteDirectionBlock.lean)
-Retain the factor-144 tail repetition.
+The complete [auxiliary](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceAuxiliaryRoutes.lean)
+and [inherited](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceInheritedRoutes.lean)
+route-word equalities are proved. The inherited proof uses distinct source
+atoms to identify the exact geometric source slot, then combines the
+connector and tail equalities with factor-144 repetition.
 
 Consume source-word equality in the existing direction-list and polarity
 lifts, then in the framed occurrence, contraction, and raster-request
-compiler. A coordinate projection alone does not discharge this obligation.
+compiler. The [exact polarity-list geometry lemma](LeanTrominoes/PeriodicOneInThreePolarityNormalizationExactRouteDirectionBlockGeometry.lean)
+reduces the metadata-level geometry premise to geometry of genuine source
+incidences, which is already available for the final gauged construction.
 
 ## Final compiler witnesses
 
@@ -88,3 +90,6 @@ jobs succeeded, covering the then-existing 7,007 tracked Lean source files.
 The subsequent occurrence route, connector, literal-instantiation, and
 auxiliary-word lemmas passed a targeted Lake build of 4,800 jobs on
 2026-09-07.
+The complete inherited and combined source-word proofs and the exact
+polarity-list geometry lemma also passed targeted Lean checks. The direct
+stream specialization is still being checked by a targeted rebuild.
