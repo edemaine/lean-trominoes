@@ -40,9 +40,11 @@ private def defaultClauseFan : ClauseRibbonFanData where
 instance : Inhabited Data :=
   ⟨⟨default, defaultClauseFan, .top⟩⟩
 
-/-- A missing terminal has the semantic north fallback used by clause fans. -/
+/-- Stored routes run from clause to variable; occurrence routes arrive at
+the clause in the opposite direction. Missing terminals use north. -/
 def directionAt (headers : List Header) (index : Nat) : AxisDirection :=
-  (headers[index]?).map HorizontalRoutedRouteHeader.outputFirstDirection
+  (headers[index]?).map
+    (fun header => (HorizontalRoutedRouteHeader.outputFirstDirection header).opposite)
     |>.getD .north
 
 /-- Assemble the finite clause fan carried by one consecutive final-clause

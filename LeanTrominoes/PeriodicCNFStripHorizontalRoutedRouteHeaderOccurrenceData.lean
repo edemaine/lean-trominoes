@@ -82,7 +82,8 @@ def AtomControl.sameAtom : AtomControl → AtomControl → Bool
   | .fresh first, .fresh second => decide (first = second)
   | _, _ => false
 
-/-- The finite local occurrence fields needed to assemble a variable fan. -/
+/-- Finite occurrence fields. A header projection retains the stored first
+direction; a completed record supplies the reversed route's variable direction. -/
 structure OccurrenceData where
   atomControl : AtomControl
   kind : VariableConnectorKind
@@ -93,7 +94,8 @@ structure OccurrenceData where
 instance : Inhabited OccurrenceData :=
   ⟨⟨default, .fixedRed, false, .invalid⟩⟩
 
-/-- Project all finite local occurrence fields from one routed header. -/
+/-- Project the fields available before reading the dynamic route tail.
+Variable fans use `completeOccurrenceData` after the tail is consumed. -/
 def occurrenceData (header : Header) : OccurrenceData where
   atomControl := outputAtomControl header
   kind := outputConnectorKind header
