@@ -28,9 +28,9 @@ private theorem incidenceAt_eq_of_drawing_eq
   subst second
   rfl
 
-/-- Equal-valued indices in the instantiated drawing and its finite template
-select incidences with the same clause and literal presentation indices. -/
-theorem templateIncidence_coordinates_eq_instantiated
+/-- Equal-valued indices preserve both presentation coordinates and the
+literal's actual variable under template instantiation. -/
+theorem templateIncidence_data_eq_instantiated
     {Variable : Type*} [DecidableEq Variable]
     (sourceClauseIndex figureNineClauseStart : Nat)
     (source : PositionedPeriodicClause Variable)
@@ -43,7 +43,11 @@ theorem templateIncidence_coordinates_eq_instantiated
           incidenceIndex).clauseIndex ∧
       ((templateDrawing source).incidenceAt templateIndex).literalIndex =
         ((instantiatedDrawing sourceClauseIndex figureNineClauseStart source).incidenceAt
-          incidenceIndex).literalIndex := by
+          incidenceIndex).literalIndex ∧
+      instantiatedVariableMap sourceClauseIndex figureNineClauseStart source
+          ((templateDrawing source).incidenceAt templateIndex).literal.1 =
+        ((instantiatedDrawing sourceClauseIndex figureNineClauseStart source).incidenceAt
+          incidenceIndex).literal.1 := by
   letI := nestedVariableDecidableEq (Variable := Variable)
   let template := templateDrawing source
   let variableMap :=
@@ -118,7 +122,27 @@ theorem templateIncidence_coordinates_eq_instantiated
     EmbeddedCNFIncidence.rename variableMap
       (template.incidenceAt templateIndex) at renamedIncidence
   rw [selectedIncidenceEqual, translatedIncidence, renamedIncidence]
-  constructor <;> rfl
+  exact ⟨rfl, rfl, rfl⟩
+
+/-- Equal-valued indices in the instantiated drawing and its finite template
+select incidences with the same clause and literal presentation indices. -/
+theorem templateIncidence_coordinates_eq_instantiated
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (incidenceIndex : Fin
+      ((instantiatedDrawing sourceClauseIndex figureNineClauseStart source).incidences.length))
+    (templateIndex : Fin (templateDrawing source).incidences.length)
+    (indexValue : templateIndex.val = incidenceIndex.val) :
+    ((templateDrawing source).incidenceAt templateIndex).clauseIndex =
+        ((instantiatedDrawing sourceClauseIndex figureNineClauseStart source).incidenceAt
+          incidenceIndex).clauseIndex ∧
+      ((templateDrawing source).incidenceAt templateIndex).literalIndex =
+        ((instantiatedDrawing sourceClauseIndex figureNineClauseStart source).incidenceAt
+          incidenceIndex).literalIndex := by
+  have data := templateIncidence_data_eq_instantiated
+    sourceClauseIndex figureNineClauseStart source incidenceIndex templateIndex indexValue
+  exact ⟨data.1, data.2.1⟩
 
 /-- A genuine generated incidence retains its clause-major presentation
 index when the instantiated Figure 9 drawing is related back to its finite

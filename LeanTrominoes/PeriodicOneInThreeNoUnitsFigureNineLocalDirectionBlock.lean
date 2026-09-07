@@ -61,7 +61,7 @@ theorem normalizedLocalRoutes_directionBlock_of_members
       clauseMember literalMember with
     ⟨metadata, profile, templateIndex, origin,
       metadataLookup, metadataClause, profileEq, localRouteEq,
-      clauseCoordinate, literalCoordinate⟩
+      clauseCoordinate, literalCoordinate, _literalAtom⟩
   let localRoute :=
     normalizedLocalRoutes source sourcePlacement clauseIndex literalIndex
   have endpoints := normalizedLocalRoutes_endpoints_of_members

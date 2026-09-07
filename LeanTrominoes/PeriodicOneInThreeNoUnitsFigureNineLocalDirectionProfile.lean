@@ -58,8 +58,8 @@ private theorem selectedIncidence_eq_of_drawing_eq
   rfl
 
 /-- A genuine normalized local route is one translated finite profile route.
-The translation is retained only to state the exact point-list equality; it
-will disappear at the direction boundary. -/
+The selected incidence retains its actual variable under instantiation as
+well as its presentation coordinates. -/
 theorem normalizedLocalRoutes_eq_translated_profileRoute_of_members
     {Variable : Type} [DecidableEq Variable]
     (source : PositionedPeriodicCNF Variable)
@@ -101,11 +101,15 @@ theorem normalizedLocalRoutes_eq_translated_profileRoute_of_members
         ((templateDrawingOfClauseProfile profile).incidenceAt
           templateIndex).clauseIndex = metadata.localClauseIndex ∧
         ((templateDrawingOfClauseProfile profile).incidenceAt
-          templateIndex).literalIndex = literalIndex := by
+          templateIndex).literalIndex = literalIndex ∧
+        instantiatedVariableMap metadata.sourceClauseIndex metadata.figureNineClauseStart
+            metadata.sourceClause
+            ((templateDrawingOfClauseProfile profile).incidenceAt templateIndex).literal.1 =
+          literal.atom := by
   rcases normalizedLocalRoutes_eq_translated_templateRoute_with_index_of_members
       source sourcePlacement sourceWidth clauseMember literalMember with
-    ⟨metadata, _incidenceIndex, concreteIndex,
-      metadataLookup, metadataClause, _incidenceEq, _indexValue,
+    ⟨metadata, incidenceIndex, concreteIndex,
+      metadataLookup, metadataClause, incidenceEq, indexValue,
       concreteClauseCoordinate, concreteLiteralCoordinate, localEq⟩
   have metadataSourceMember : metadata.sourceClause ∈ source.clauses := by
     rcases formulaClauseMetadata_lookup_valid_embedded
@@ -170,7 +174,7 @@ theorem normalizedLocalRoutes_eq_translated_profileRoute_of_members
       ((composedPlacement source sourcePlacement).translation
         (PeriodicCNF.clauseAnchor metadata.clause.literals))
   refine ⟨metadata, profile, templateIndex, origin,
-    metadataLookup, metadataClause, rfl, ?_, ?_, ?_⟩
+    metadataLookup, metadataClause, rfl, ?_, ?_, ?_, ?_⟩
   · calc
       normalizedLocalRoutes source sourcePlacement clauseIndex literalIndex =
           translatePolyline origin
@@ -183,6 +187,12 @@ theorem normalizedLocalRoutes_eq_translated_profileRoute_of_members
     exact concreteClauseCoordinate
   · rw [selectedIncidenceEq]
     exact concreteLiteralCoordinate
+  · rw [selectedIncidenceEq]
+    have atomEq := (templateIncidence_data_eq_instantiated
+      metadata.sourceClauseIndex metadata.figureNineClauseStart metadata.sourceClause
+      incidenceIndex concreteIndex indexValue).2.2
+    rw [incidenceEq] at atomEq
+    exact atomEq
 
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes

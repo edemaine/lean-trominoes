@@ -35,12 +35,17 @@ the [inherited connector at its selected source slot](LeanTrominoes/PeriodicCNFF
 and [direction-word transport to the final gauged index](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceFinalGaugedRoutes.lean).
 The connector proof uses [direction preservation through the paired clockwise sort](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixOrderedFanSemantics.lean).
 
-The remaining source-word proof must identify the finite template's local
-versus inherited case with the raw literal's atom, and, in the inherited
-case, equate its selected slot with the geometric provenance's source literal
-index. Then combine these witness lemmas with the
+The header's selected template atom now [instantiates to the actual raw literal](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceLiteralAtoms.lean).
+The [case-classification lemmas](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixInstantiationSemantics.lean)
+preserve auxiliary roles and identify the atom at each active inherited slot.
+The [complete auxiliary route-word equality](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceAuxiliaryRoutes.lean)
+is proved.
+
+The remaining source-word proof must equate the inherited header's selected
+slot with the geometric provenance's source literal index. Then combine the
+connector and tail lemmas with the
 [inherited geometric direction-block theorem](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineInheritedRouteDirectionBlock.lean)
-and its auxiliary counterpart. Retain the factor-144 tail repetition.
+Retain the factor-144 tail repetition.
 
 Consume source-word equality in the existing direction-list and polarity
 lifts, then in the framed occurrence, contraction, and raster-request
@@ -80,5 +85,6 @@ conditional closure theorems does not prove the unconditional target.
 
 The complete default `lake build` passed on 2026-09-06: all 10,184 build
 jobs succeeded, covering the then-existing 7,007 tracked Lean source files.
-The subsequent occurrence local-route, ordered-fan, inherited-connector, and
-final-gauge lemmas passed targeted Lean checks on 2026-09-07.
+The subsequent occurrence route, connector, literal-instantiation, and
+auxiliary-word lemmas passed a targeted Lake build of 4,800 jobs on
+2026-09-07.
