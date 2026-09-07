@@ -19,7 +19,7 @@ open PeriodicOrthocrossing
 open PlanarOneInThreeNoUnitsFigureNine
 open PeriodicOneInThreePolarityNormalizationRouteSubdivision
 
-private theorem prefixAtom_eq_localQuery
+theorem prefixAtom_eq_localQuery
     (routePrefix : HorizontalRoutedRouteHeader.PrefixDescriptor) :
     HorizontalRoutedRouteHeader.prefixAtom routePrefix =
       ((templateDrawingOfClauseProfile routePrefix.localQuery.1).incidenceAt

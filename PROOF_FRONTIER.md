@@ -128,9 +128,19 @@ variable gauging, anchor normalization, and refinement. Its
 constructs the occurrence witness at each genuine index and identifies every
 original horizontal atom with that witness's instantiated template role.
 
-Next compare these actual original atoms with the inherited-ring and original
-Figure 9 auxiliary codes, then identify stable occurrence ranks with source order. This will identify the complete variable fans and grouped occurrence
-bodies, then the canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [auxiliary identity proof](LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineAuxiliaryIdentity.lean)
+uses global first-stage metadata lookups to keep unit-elimination auxiliaries
+in distinct parents separate. The [occurrence bounds](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceAuxiliaryAtoms.lean)
+supply its exact local-index premises. The [atom classification](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceAtomClassification.lean)
+separates actual inherited variables from auxiliaries. Their
+[horizontal specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalAuxiliaryAtomHorizontalSemantics.lean)
+now proves numeric identity agreement for every comparison involving an
+original auxiliary, including comparisons with inherited and fresh atoms.
+
+Next prove the remaining inherited-to-inherited identity comparisons, then
+identify stable occurrence ranks with source order. This will identify the
+complete variable fans and grouped occurrence bodies, then the canonical
+contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -166,10 +176,12 @@ assumes one of these compiler contracts.
 Build coverage and proof completion are separate: a successful build of
 conditional closure theorems does not prove the unconditional target.
 
-The complete default `lake build` passed on 2026-09-07: all 10,227 jobs
+The complete default `lake build` passed on 2026-09-07: all 10,231 jobs
 succeeded. This includes the actual source-descriptor and local-code bridges,
 finite fresh-key reconstruction, and every numeric comparison involving a
 fresh atom, including separation from inherited and original auxiliary atoms.
 It also includes original-atom transport through all final geometric
-normalizations and its actual horizontal specialization. The changed modules' build traces contain no compiler
-diagnostics.
+normalizations and its actual horizontal specialization. All comparisons
+involving original auxiliaries now agree with horizontal atoms, with genuine
+first-stage index bounds and inherited/auxiliary constructor separation.
+The changed modules' build traces contain no compiler diagnostics.
