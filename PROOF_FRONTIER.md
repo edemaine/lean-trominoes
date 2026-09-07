@@ -30,12 +30,17 @@ The [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccur
 now supplies the existing
 [metadata lookup](LeanTrominoes/PeriodicCNFStripDirectSourceFinalMetadataProfileCoordinateLookup.lean).
 
-The [inherited geometric direction-block theorem](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineInheritedRouteDirectionBlock.lean)
-also exposes its exact exit fan and slot. The remaining source-word proof
-must identify the header's selected local incidence with the raw incidence,
-match the inherited connector at its active slot, and use the
-[exact final-gauged source-index transport](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedExactSourceIndex.lean).
-Retain the factor-144 tail repetition in this comparison.
+The witness now proves the [exact local route and both literal-index bounds](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceLocalRoutes.lean),
+the [inherited connector at its selected source slot](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceInheritedConnectors.lean),
+and [direction-word transport to the final gauged index](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceFinalGaugedRoutes.lean).
+The connector proof uses [direction preservation through the paired clockwise sort](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineRoutePrefixOrderedFanSemantics.lean).
+
+The remaining source-word proof must identify the finite template's local
+versus inherited case with the raw literal's atom, and, in the inherited
+case, equate its selected slot with the geometric provenance's source literal
+index. Then combine these witness lemmas with the
+[inherited geometric direction-block theorem](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineInheritedRouteDirectionBlock.lean)
+and its auxiliary counterpart. Retain the factor-144 tail repetition.
 
 Consume source-word equality in the existing direction-list and polarity
 lifts, then in the framed occurrence, contraction, and raster-request
@@ -74,5 +79,6 @@ Build coverage and proof completion are separate: a successful build of
 conditional closure theorems does not prove the unconditional target.
 
 The complete default `lake build` passed on 2026-09-06: all 10,184 build
-jobs succeeded, covering all 7,007 tracked Lean source files, including the
-occurrence refactoring and its consumers.
+jobs succeeded, covering the then-existing 7,007 tracked Lean source files.
+The subsequent occurrence local-route, ordered-fan, inherited-connector, and
+final-gauge lemmas passed targeted Lean checks on 2026-09-07.
