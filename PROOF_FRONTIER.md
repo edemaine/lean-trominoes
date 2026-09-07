@@ -48,11 +48,18 @@ route-word equalities are proved. The inherited proof uses distinct source
 atoms to identify the exact geometric source slot, then combines the
 connector and tail equalities with factor-144 repetition.
 
-Next lift the exact metadata words to the actual horizontal routed source,
-then prove agreement of the finite endpoint frames, grouped occurrence
-bodies, and raster requests. The [exact polarity-list geometry lemma](LeanTrominoes/PeriodicOneInThreePolarityNormalizationExactRouteDirectionBlockGeometry.lean)
-reduces the metadata-level geometry premise to geometry of genuine source
-incidences, which is already available for the final gauged construction.
+The [horizontal presentation proof](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPresentedDirectionWords.lean)
+now identifies the complete direct word list with the actual computed
+horizontal routed source. It also proves that the colored occurrence
+compiler consumes those actual route words, surrounded by its compiled
+finite endpoint frames. This uses the [exact polarity-list geometry lemma](LeanTrominoes/PeriodicOneInThreePolarityNormalizationExactRouteDirectionBlockGeometry.lean)
+and the geometry of genuine final gauged incidences.
+
+Next prove agreement of the finite endpoint frames and grouped occurrence
+identities and bodies with the horizontal construction, then derive the
+canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
+already agree with the horizontal construction.
 
 ## Final compiler witnesses
 
@@ -91,7 +98,7 @@ jobs succeeded, covering the then-existing 7,007 tracked Lean source files.
 The subsequent occurrence route, connector, literal-instantiation, and
 auxiliary-word lemmas passed a targeted Lake build of 4,800 jobs on
 2026-09-07.
-The complete inherited and combined source-word proofs and the exact
-polarity-list geometry lemma also passed targeted Lean checks. The direct
-stream specialization and unconditional exact metadata word-list equality
-passed a targeted Lean check on 2026-09-07 after rebuilding their dependencies.
+The complete source-word proofs, direct stream specialization, horizontal
+route-word presentation, and colored occurrence lift passed a targeted Lake
+build on 2026-09-07: all 8,485 jobs succeeded. This includes the exact
+polarity-list geometry lemma and the rebuilt dependencies.
