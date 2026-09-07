@@ -11,11 +11,12 @@ the final construction; the old intermediate checklist is in
 
 The generic source-word agreement is proved by
 [`OccurrenceWitness.sourceDirectionWord`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceDirectionWords.lean).
-The next step is to specialize it to the direct stream and discharge the
-`sourceWords` premise of
-[`directFigureNinePolarityRoutePairs_map_directions_eq_exactMetadata_of_sourceWords`](LeanTrominoes/PeriodicCNFStripDirectSourceFinalExactMetadataDirectionListReduction.lean):
-every direct header/tail pair denotes the final-gauged source direction word
-at its attached clause/literal index.
+Its [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalSourceWords.lean)
+now proves that every direct header/tail pair denotes the final gauged source
+direction word at its attached clause/literal index. This discharges the
+`sourceWords` premise and proves
+`directFigureNinePolarityRoutePairs_map_directions_eq_exactMetadata`
+without that assumption.
 
 The common proof-side stream is now
 [`SourceOccurrence`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrences.lean).
@@ -47,9 +48,9 @@ route-word equalities are proved. The inherited proof uses distinct source
 atoms to identify the exact geometric source slot, then combines the
 connector and tail equalities with factor-144 repetition.
 
-Consume source-word equality in the existing direction-list and polarity
-lifts, then in the framed occurrence, contraction, and raster-request
-compiler. The [exact polarity-list geometry lemma](LeanTrominoes/PeriodicOneInThreePolarityNormalizationExactRouteDirectionBlockGeometry.lean)
+Next lift the exact metadata words to the actual horizontal routed source,
+then prove agreement of the finite endpoint frames, grouped occurrence
+bodies, and raster requests. The [exact polarity-list geometry lemma](LeanTrominoes/PeriodicOneInThreePolarityNormalizationExactRouteDirectionBlockGeometry.lean)
 reduces the metadata-level geometry premise to geometry of genuine source
 incidences, which is already available for the final gauged construction.
 
@@ -92,4 +93,5 @@ auxiliary-word lemmas passed a targeted Lake build of 4,800 jobs on
 2026-09-07.
 The complete inherited and combined source-word proofs and the exact
 polarity-list geometry lemma also passed targeted Lean checks. The direct
-stream specialization is still being checked by a targeted rebuild.
+stream specialization and unconditional exact metadata word-list equality
+passed a targeted Lean check on 2026-09-07 after rebuilding their dependencies.
