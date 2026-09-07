@@ -137,6 +137,16 @@ separates actual inherited variables from auxiliaries. Their
 now proves numeric identity agreement for every comparison involving an
 original auxiliary, including comparisons with inherited and fresh atoms.
 
+The [presentation-slot proof](LeanTrominoes/PeriodicCNFStripHorizontalRoutedPresentationSlotSemantics.lean)
+identifies the inverse clockwise permutation, including tied directions. The
+[inherited occurrence witness](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceInheritedSourceLiterals.lean)
+therefore selects the exact original parent literal and its instantiated atom.
+The [common ring-code semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalInheritedRingAtomSemantics.lean)
+prove that numeric identities separate actual retained source atoms and ring
+slots. Copied codes query this semantic candidate column, and cycle codes use
+the actual distinct source atoms in their construction order. Connecting those
+compiled query positions and cycle slots to each occurrence witness remains.
+
 Next prove the remaining inherited-to-inherited identity comparisons, then
 identify stable occurrence ranks with source order. This will identify the
 complete variable fans and grouped occurrence bodies, then the canonical
@@ -176,7 +186,7 @@ assumes one of these compiler contracts.
 Build coverage and proof completion are separate: a successful build of
 conditional closure theorems does not prove the unconditional target.
 
-The complete default `lake build` passed on 2026-09-07: all 10,231 jobs
+The complete default `lake build` passed on 2026-09-07: all 10,234 jobs
 succeeded. This includes the actual source-descriptor and local-code bridges,
 finite fresh-key reconstruction, and every numeric comparison involving a
 fresh atom, including separation from inherited and original auxiliary atoms.
@@ -184,4 +194,6 @@ It also includes original-atom transport through all final geometric
 normalizations and its actual horizontal specialization. All comparisons
 involving original auxiliaries now agree with horizontal atoms, with genuine
 first-stage index bounds and inherited/auxiliary constructor separation.
+The inherited source-slot and common ring-code lemmas also pass, including
+the exact distinct-atom order of the cycle suffix.
 The changed modules' build traces contain no compiler diagnostics.
