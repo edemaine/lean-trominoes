@@ -23,6 +23,19 @@ def SourceIndexedDescriptor.atom? {Variable : Type*}
       | .incompatible | .complementFresh =>
           .inr ((descriptor.sourceClauseIndex, descriptor.sourceLiteralIndex), literal)
 
+/-- The decoded atom's original/fresh constructor is exactly the operation's
+classification, whenever its source lookup succeeds. -/
+theorem SourceIndexedDescriptor.atom_isFresh_iff {Variable : Type*}
+    (source : PeriodicCNF Variable) (descriptor : SourceIndexedDescriptor)
+    (atom : PolarityNormalizedVariable Variable)
+    (decoded : descriptor.atom? source = some atom) :
+    (∃ fresh, atom = .inr fresh) ↔
+      descriptor.operation = .incompatible ∨ descriptor.operation = .complementFresh := by
+  obtain ⟨clause, _, decodedLiteral⟩ := Option.bind_eq_some_iff.mp decoded
+  obtain ⟨literal, _, atomEq⟩ := Option.map_eq_some_iff.mp decodedLiteral
+  rw [← atomEq]
+  cases descriptor.operation <;> simp
+
 /-- Fresh atoms decoded in one source are equal exactly when their source
 coordinates agree. The literal payload introduces no extra identity test. -/
 theorem SourceIndexedDescriptor.fresh_atom_eq_iff {Variable : Type*}
@@ -59,6 +72,29 @@ theorem SourceIndexedDescriptor.fresh_atom_eq_iff {Variable : Type*}
         rcases secondFresh with secondFresh | secondFresh <;>
         simp only [SourceIndexedDescriptor.atom?, firstFresh, secondFresh, clauseEq, literalEq]
     exact Option.some.inj (firstDecoded.symm.trans (decodedEq.trans secondDecoded))
+
+/-- A fresh semantic atom can equal only another fresh atom at the same
+source coordinates; original atoms cannot collide with it. -/
+theorem SourceIndexedDescriptor.atom_eq_iff_of_fresh {Variable : Type*}
+    (source : PeriodicCNF Variable) (first second : SourceIndexedDescriptor)
+    (firstFresh : first.operation = .incompatible ∨ first.operation = .complementFresh)
+    (firstAtom secondAtom : PolarityNormalizedVariable Variable)
+    (firstDecoded : first.atom? source = some firstAtom)
+    (secondDecoded : second.atom? source = some secondAtom) :
+    firstAtom = secondAtom ↔
+      (second.operation = .incompatible ∨ second.operation = .complementFresh) ∧
+        (first.sourceClauseIndex, first.sourceLiteralIndex) =
+          (second.sourceClauseIndex, second.sourceLiteralIndex) := by
+  constructor
+  · intro equal
+    have freshShape := (first.atom_isFresh_iff source firstAtom firstDecoded).mpr firstFresh
+    rw [equal] at freshShape
+    have secondFresh := (second.atom_isFresh_iff source secondAtom secondDecoded).mp freshShape
+    exact ⟨secondFresh, (fresh_atom_eq_iff source first second firstFresh secondFresh
+      firstAtom secondAtom firstDecoded secondDecoded).mp equal⟩
+  · rintro ⟨secondFresh, coordinatesEq⟩
+    exact (fresh_atom_eq_iff source first second firstFresh secondFresh
+      firstAtom secondAtom firstDecoded secondDecoded).mpr coordinatesEq
 
 private theorem flatMap_filterMap {α β γ : Type*}
     (source : List α) (select : α → Option β) (emit : β → List γ) :

@@ -28,6 +28,17 @@ private theorem sourceOccurrencePolarityDescriptor_fresh
     PeriodicCNF.ClauseProfilePolarityRouteOperation.Descriptor.indexed,
     sourceOccurrenceIsFresh] using fresh
 
+private theorem sourceOccurrenceDescriptor_identity_iff
+    (first second : SourceOccurrence) :
+    (((sourceOccurrencePolarityDescriptor second).operation = .incompatible ∨
+        (sourceOccurrencePolarityDescriptor second).operation = .complementFresh) ∧
+      ((sourceOccurrencePolarityDescriptor first).sourceClauseIndex,
+          (sourceOccurrencePolarityDescriptor first).sourceLiteralIndex) =
+        ((sourceOccurrencePolarityDescriptor second).sourceClauseIndex,
+          (sourceOccurrencePolarityDescriptor second).sourceLiteralIndex)) ↔
+      sourceOccurrenceIsFresh second ∧ first.sourceIndex = second.sourceIndex := by
+  rfl
+
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
@@ -103,6 +114,35 @@ theorem directSourceFinalAtomIdentityCodes_fresh_eq_iff_horizontalAtoms
     (directSourceFinalOccurrence_atom_eq_of_horizontal_lookup decider symbols secondIndex secondLt secondAtom secondLookup)
   simpa only [sourceOccurrencePolarityDescriptor, sourceIndexedDescriptorOf,
     SourceOccurrence.sourceIndex] using semantic.symm
+
+/-- Every comparison involving a fresh incidence is correct, including
+comparison with arbitrary inherited and auxiliary incidences. -/
+theorem directSourceFinalAtomIdentityCodes_eq_iff_horizontalAtoms_of_fresh
+    (symbols : List encoding.Γ) (firstIndex secondIndex : Nat)
+    (firstLt : firstIndex < (directSourceFinalOccurrences decider symbols).length)
+    (secondLt : secondIndex < (directSourceFinalOccurrences decider symbols).length)
+    (firstFresh : sourceOccurrenceIsFresh (directSourceFinalOccurrences decider symbols)[firstIndex])
+    (firstAtom secondAtom : RoutedVariable)
+    (firstLookup : (horizontalRoutedFormulaComputed
+      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[firstIndex]? = some firstAtom)
+    (secondLookup : (horizontalRoutedFormulaComputed
+      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[secondIndex]? = some secondAtom) :
+    (directSourceFinalAtomIdentityCodes decider symbols).getD firstIndex 0 =
+        (directSourceFinalAtomIdentityCodes decider symbols).getD secondIndex 0 ↔
+      firstAtom = secondAtom := by
+  rw [directSourceFinalAtomIdentityCodes_eq_iff_of_fresh
+    decider symbols firstIndex secondIndex firstLt secondLt firstFresh]
+  have semantic := SourceIndexedDescriptor.atom_eq_iff_of_fresh
+    (refinedSource (directSourceFinalGaugedFormula decider symbols)
+      (directSourceFinalGaugedPlacement decider symbols)).erase
+    (sourceOccurrencePolarityDescriptor (directSourceFinalOccurrences decider symbols)[firstIndex])
+    (sourceOccurrencePolarityDescriptor (directSourceFinalOccurrences decider symbols)[secondIndex])
+    (sourceOccurrencePolarityDescriptor_fresh _ firstFresh) firstAtom secondAtom
+    (directSourceFinalOccurrence_atom_eq_of_horizontal_lookup decider symbols firstIndex firstLt firstAtom firstLookup)
+    (directSourceFinalOccurrence_atom_eq_of_horizontal_lookup decider symbols secondIndex secondLt secondAtom secondLookup)
+  exact (sourceOccurrenceDescriptor_identity_iff
+    (directSourceFinalOccurrences decider symbols)[firstIndex]
+    (directSourceFinalOccurrences decider symbols)[secondIndex]).symm.trans semantic.symm
 
 end LeanTrominoes.PeriodicCNFStripReduction
 

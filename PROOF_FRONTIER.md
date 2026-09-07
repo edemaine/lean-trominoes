@@ -116,12 +116,13 @@ The [fresh-key proof](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccur
 identifies the parent/prefix key with the global source occurrence, using
 canonical finite-prefix reconstruction. The [complete numeric-code proof](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFreshAtomIdentity.lean)
 and [horizontal atom theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFreshAtomHorizontalSemantics.lean)
-now prove that two genuine fresh incidences have equal compiled identities
-exactly when their actual horizontal atoms are equal.
+now prove that every comparison involving a genuine fresh incidence has equal
+compiled identities exactly when its actual horizontal atoms are equal. Parity
+separates inherited atoms, and the finite local quotient separates original
+auxiliary atoms from fresh ones.
 
-Next prove the inherited-ring and original Figure 9 auxiliary cases, including
-separation from fresh atoms, then identify stable occurrence ranks with source
-order. This will identify the complete variable fans and grouped occurrence
+Next prove the inherited-ring and original Figure 9 auxiliary cases, then
+identify stable occurrence ranks with source order. This will identify the complete variable fans and grouped occurrence
 bodies, then the canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -160,6 +161,6 @@ conditional closure theorems does not prove the unconditional target.
 
 The complete default `lake build` passed on 2026-09-07: all 10,225 jobs
 succeeded. This includes the actual source-descriptor and local-code bridges,
-finite fresh-key reconstruction, and complete numeric fresh-identity agreement
-with horizontal atoms. The changed modules' build traces contain no compiler
+finite fresh-key reconstruction, and every numeric comparison involving a
+fresh atom, including separation from inherited and original auxiliary atoms. The changed modules' build traces contain no compiler
 diagnostics.
