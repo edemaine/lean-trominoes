@@ -69,7 +69,16 @@ The [direct endpoint-column theorem](LeanTrominoes/PeriodicCNFStripDirectSourceF
 identifies the variable fan input directions with the actual horizontal route
 words. The grouped fan field proofs now use these completed records.
 
-Next prove agreement of the finite endpoint frames and grouped occurrence
+The [clause direction blocks](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseDirectionBlocks.lean)
+now agree with the actual horizontal clauses, preserving every clause boundary
+and literal index. Their exact arities recover the block boundaries from the
+already equal flattened direction columns. The direct clause fans are assembled
+from those blocks, and their terminal groups are the actual literal-index groups.
+The [semantic fan lookup](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFanIndexedDirections.lean)
+now selects the stored route at that same clause and literal index.
+
+Next transport these clause fans through padding and normalization, and prove
+agreement of the remaining finite endpoint frames and grouped occurrence
 identities and bodies with the horizontal construction, then derive the
 canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
@@ -122,3 +131,7 @@ compiler passed a combined targeted Lake build on 2026-09-07: all 9,005
 jobs succeeded. The targets cover horizontal endpoint-column agreement,
 grouped fan direction/polarity/kind alignment, and canonical degree-column
 agreement with the horizontal construction.
+
+The clause block arities, incoming directions, terminal groups, and generic
+semantic fan lookup passed a combined targeted Lake build on 2026-09-07:
+all 9,004 jobs succeeded.
