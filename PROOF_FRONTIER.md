@@ -92,9 +92,26 @@ The [compiler certificates](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClaus
 now emit these actual horizontal fan and clause-frame field streams in polynomial
 time, with their semantic agreement discharged.
 
-Next prove agreement of the variable endpoint frames and grouped occurrence
-identities and bodies with the horizontal construction, then derive the
-canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [header literal-index proof](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderLiteralIndexBlocks.lean)
+now identifies every output header with its actual literal position. The
+[joint occurrence-field theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceFieldsHorizontalSemantics.lean)
+proves that kind, polarity, and variable-end direction all belong to that same
+incidence in the normalized horizontal source. The [shared field lemmas](LeanTrominoes/PeriodicCNFStripHorizontalPresentedOccurrenceFields.lean)
+prove that padding and anchor normalization preserve this complete field stream.
+The [occurrence-field compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceFieldsHorizontalCompiler.lean)
+emits this actual semantic stream in polynomial time.
+
+The [source-indexed atom decoder](LeanTrominoes/PeriodicOneInThreePolarityNormalizationSourceIndexedAtoms.lean)
+recovers the original or fresh atom selected by every polarity operation,
+using the exact refined source literal. Its
+[direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalSourceIndexedAtomsHorizontalSemantics.lean)
+identifies the actual horizontal atom column at the same source coordinates
+already carried by the route-pair stream.
+
+Next prove that equality of numeric atom codes is exactly equality of these
+decoded atoms, and identify stable occurrence ranks with their source order.
+This will identify the complete variable fans and grouped occurrence bodies,
+then the canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -130,27 +147,8 @@ assumes one of these compiler contracts.
 Build coverage and proof completion are separate: a successful build of
 conditional closure theorems does not prove the unconditional target.
 
-The complete default `lake build` passed on 2026-09-06: all 10,184 build
-jobs succeeded, covering the then-existing 7,007 tracked Lean source files.
-The subsequent occurrence route, connector, literal-instantiation, and
-auxiliary-word lemmas passed a targeted Lake build of 4,800 jobs on
-2026-09-07.
-The complete source-word proofs, direct stream specialization, horizontal
-route-word presentation, and colored occurrence lift passed a targeted Lake
-build on 2026-09-07: all 8,485 jobs succeeded. This includes the exact
-polarity-list geometry lemma and the rebuilt dependencies.
-
-The endpoint orientation corrections and completed variable occurrence
-compiler passed a combined targeted Lake build on 2026-09-07: all 9,005
-jobs succeeded. The targets cover horizontal endpoint-column agreement,
-grouped fan direction/polarity/kind alignment, and canonical degree-column
-agreement with the horizontal construction.
-
-The clause block arities, incoming directions, terminal groups, and generic
-semantic fan lookup passed a combined targeted Lake build on 2026-09-07:
-all 9,004 jobs succeeded.
-
-The complete clause-fan/frame agreement, normalization invariance, and actual
-horizontal clause-stream compiler certificates passed a combined targeted Lake
-build on 2026-09-07: all 9,014 jobs succeeded. This also rebuilt and checked
-the shared endpoint, grouped variable-fan, and canonical degree-column dependencies.
+The complete default `lake build` passed on 2026-09-07: all 10,219 jobs
+succeeded. This includes the endpoint and inactive-direction corrections,
+clause-fan and occurrence-field compiler certificates, and the direct
+source-indexed atom decoder. The changed modules' build traces contain no
+compiler diagnostics.
