@@ -51,7 +51,7 @@ theorem directSourceFinalGroupedVariableFanSlots_eq_map_stableFan
       (directSourceFinalUniqueFanQueryKeys decider symbols).map fun key =>
         (FinalFanDataTripleAssembler.stableFan
             (directSourceFinalOccurrenceCandidateKeys decider symbols)
-            (directSourceFinalCompiledOccurrenceData decider symbols)
+            (directSourceFinalVariableOccurrenceData decider symbols)
             (key / 3)
             (BoundedPositiveCountPreds.boundedPositiveCountPred
               ((directSourceFinalAtomIdentityCodes decider symbols).count
@@ -88,7 +88,7 @@ theorem directSourceFinalGroupedVariableFanSlotKinds
   rw [directSourceFinalOccurrenceCandidateKeys_eq_candidateKeys]
   exact FinalFanDataTripleAssembler.stableFan_kind_of_candidateKey
     (directSourceFinalAtomIdentityCodes decider symbols)
-    (directSourceFinalCompiledOccurrenceData decider symbols)
+    (directSourceFinalVariableOccurrenceData decider symbols)
     (fun value _valueMember =>
       directSourceFinalAtomIdentityCodes_count_le_three
         decider symbols value)

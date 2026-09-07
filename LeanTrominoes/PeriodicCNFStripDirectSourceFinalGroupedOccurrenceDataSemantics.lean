@@ -25,10 +25,10 @@ theorem directSourceFinalGroupedOccurrenceData_eq_map_alignedDatum
       (directSourceFinalUniqueFanQueryKeys decider symbols).map
         (FiniteAlphabetKeyedValueLookup.alignedDatum
           (directSourceFinalOccurrenceCandidateKeys decider symbols)
-          (directSourceFinalCompiledOccurrenceData decider symbols)) := by
+          (directSourceFinalVariableOccurrenceData decider symbols)) := by
   unfold directSourceFinalGroupedOccurrenceData
   apply FiniteAlphabetKeyedValueLookup.values_eq_map_alignedDatum
-  · exact directSourceFinalOccurrenceCandidateKeys_length decider symbols
+  · simpa using directSourceFinalOccurrenceCandidateKeys_length decider symbols
   · exact directSourceFinalOccurrenceCandidateKeys_nodup decider symbols
   · intro query queryMember
     exact directSourceFinalUniqueFanQueryKey_mem_candidateKeys

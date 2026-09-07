@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.FiniteRoleSlotUnaryDecoderCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFanQueryKeyCompiler
+import LeanTrominoes.PeriodicCNFStripDirectSourceFinalVariableOccurrenceData
 import LeanTrominoes.TM2EmptyAlphabetListInputCompiler
 import LeanTrominoes.UnaryKeyedValueLookupSemantics
 
@@ -70,7 +71,7 @@ noncomputable local instance directFinalFanOccurrenceDataStackFintype
 /-- Unary candidate values aligned with all final occurrence keys. -/
 def directSourceFinalFanOccurrenceCandidateCodes
     (symbols : List encoding.Γ) : List Nat :=
-  (directSourceFinalCompiledOccurrenceData decider symbols).map
+  (directSourceFinalVariableOccurrenceData decider symbols).map
     finalFanOccurrenceDataCode
 
 /-- Three selected finite-record codes per final occurrence, one for each fan
@@ -82,7 +83,7 @@ def directSourceFinalFanSelectedOccurrenceCodes
     (directSourceFinalOccurrenceCandidateKeys decider symbols)
     (directSourceFinalFanOccurrenceCandidateCodes decider symbols)
 
-/-- Decoded connector kind, polarity, and first direction for the three
+/-- Decoded connector kind, polarity, and variable departure direction for the three
 finite fan slots of every final occurrence. -/
 def directSourceFinalFanSelectedOccurrenceData
     (symbols : List encoding.Γ) : List FinalFanOccurrenceData :=
@@ -118,7 +119,7 @@ noncomputable def
       (directSourceFinalFanOccurrenceCandidateCodes decider) := by
   unfold directSourceFinalFanOccurrenceCandidateCodes
   exact TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalCompiledOccurrenceDataComputableInPolyTime decider)
+    (directSourceFinalVariableOccurrenceDataComputableInPolyTime decider)
     (FiniteUnaryFieldMap.computableInPolyTime finalFanOccurrenceDataCode)
 
 /-- Keyed lookup compiles the three selected occurrence-record codes per

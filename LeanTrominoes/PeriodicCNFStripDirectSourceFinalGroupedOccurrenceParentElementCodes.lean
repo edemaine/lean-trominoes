@@ -68,6 +68,14 @@ def directSourceFinalOccurrenceParentElementCodes
     (directSourceFinalCompiledOccurrenceData decider symbols)
     (directSourceFinalOccurrenceParentIndices decider symbols)).flatten
 
+private theorem parentElementCodeBlocks_eq_map_kind
+    (data : List FinalFanOccurrenceData) (parents : List Nat) :
+    List.zipWith finalOccurrenceParentElementCodeBlock data parents =
+      List.zipWith finalConnectorParentElementCodeBlock
+        (data.map HorizontalRoutedRouteHeader.OccurrenceData.kind) parents := by
+  rw [List.zipWith_map_left]
+  rfl
+
 /-- Stable-key regrouping preserves the complete RGB parent-terminal code
 stream as a multiset. -/
 theorem directSourceFinalGroupedOccurrenceParentElementCodes_perm
@@ -79,6 +87,17 @@ theorem directSourceFinalGroupedOccurrenceParentElementCodes_perm
     directSourceFinalOccurrenceParentElementCodes
   have attached := directSourceFinalGroupedOccurrenceParents_perm
     decider symbols
+  have correctedCodes :
+      List.zipWith finalOccurrenceParentElementCodeBlock
+          (directSourceFinalVariableOccurrenceData decider symbols)
+          (directSourceFinalOccurrenceParentIndices decider symbols) =
+        List.zipWith finalOccurrenceParentElementCodeBlock
+          (directSourceFinalCompiledOccurrenceData decider symbols)
+          (directSourceFinalOccurrenceParentIndices decider symbols) := by
+    rw [parentElementCodeBlocks_eq_map_kind,
+      parentElementCodeBlocks_eq_map_kind,
+      directSourceFinalVariableOccurrenceData_map_kind]
+  rw [← correctedCodes]
   rw [List.zipWith_flatten_eq_pair_flatMap,
     List.zipWith_flatten_eq_pair_flatMap]
   exact attached.flatMap fun pair _ =>

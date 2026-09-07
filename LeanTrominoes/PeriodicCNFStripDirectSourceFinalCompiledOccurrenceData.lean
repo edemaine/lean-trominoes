@@ -24,8 +24,8 @@ noncomputable local instance directFinalCompiledOccurrenceDataStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-/-- Project one finite kind/polarity/first-direction record from every
-compiled final Figure 9 route. -/
+/-- Project one preliminary header record from every compiled Figure 9
+route. Variable fan directions are supplied by `directSourceFinalVariableOccurrenceData`. -/
 def directSourceFinalCompiledOccurrenceData
     (symbols : List encoding.Γ) :
     List HorizontalRoutedRouteHeader.OccurrenceData :=
@@ -55,4 +55,3 @@ theorem directSourceFinalCompiledOccurrenceData_eq
 end LeanTrominoes.PeriodicCNFStripReduction
 
 end
-

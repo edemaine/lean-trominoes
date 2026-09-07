@@ -55,6 +55,20 @@ compiler consumes those actual route words, surrounded by its compiled
 finite endpoint frames. This uses the [exact polarity-list geometry lemma](LeanTrominoes/PeriodicOneInThreePolarityNormalizationExactRouteDirectionBlockGeometry.lean)
 and the geometry of genuine final gauged incidences.
 
+The endpoint audit found and corrected two orientation errors. Stored routes
+run from clause to variable, while occurrence routes run in reverse. Clause
+fans now use the opposite stored first direction. Their [direction semantics](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderClauseDirectionSemantics.lean)
+prove agreement with the arriving direction of a completed route.
+Variable fans now consume [completed occurrence records](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableOccurrenceData.lean)
+whose direction is the opposite stored last direction, including the dynamic
+tail. The [finite-state compiler](LeanTrominoes/PeriodicCNFStripHorizontalRoutedVariableOccurrenceCompiler.lean)
+retains only the tail's last symbol; its exactness follows from the
+[endpoint summary lemmas](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteHeaderEndpointDirections.lean).
+The preliminary header projection remains available for identity compilation.
+The [direct endpoint-column theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalEndpointDirections.lean)
+identifies the variable fan input directions with the actual horizontal route
+words. The grouped fan field proofs now use these completed records.
+
 Next prove agreement of the finite endpoint frames and grouped occurrence
 identities and bodies with the horizontal construction, then derive the
 canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -102,3 +116,9 @@ The complete source-word proofs, direct stream specialization, horizontal
 route-word presentation, and colored occurrence lift passed a targeted Lake
 build on 2026-09-07: all 8,485 jobs succeeded. This includes the exact
 polarity-list geometry lemma and the rebuilt dependencies.
+
+The endpoint orientation corrections and completed variable occurrence
+compiler passed a combined targeted Lake build on 2026-09-07: all 9,005
+jobs succeeded. The targets cover horizontal endpoint-column agreement,
+grouped fan direction/polarity/kind alignment, and canonical degree-column
+agreement with the horizontal construction.

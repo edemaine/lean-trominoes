@@ -88,18 +88,18 @@ private theorem directSourceFinalVariableElementDegrees_eq_groupedData
   rw [relation]
   rfl
 
-private theorem directSourceFinalGroupedOccurrenceData_perm_compiled
+private theorem directSourceFinalGroupedOccurrenceData_perm_variableData
     (symbols : List encoding.Γ) :
     (directSourceFinalGroupedOccurrenceData decider symbols).Perm
-      (directSourceFinalCompiledOccurrenceData decider symbols) := by
+      (directSourceFinalVariableOccurrenceData decider symbols) := by
   let keys := directSourceFinalOccurrenceCandidateKeys decider symbols
   let queries := directSourceFinalUniqueFanQueryKeys decider symbols
-  let data := directSourceFinalCompiledOccurrenceData decider symbols
+  let data := directSourceFinalVariableOccurrenceData decider symbols
   let datum := FiniteAlphabetKeyedValueLookup.alignedDatum keys data
   have keysNodup : keys.Nodup :=
     directSourceFinalOccurrenceCandidateKeys_nodup decider symbols
   have keysDataLength : keys.length = data.length := by
-    exact directSourceFinalOccurrenceCandidateKeys_length decider symbols
+    simp [keys, data, directSourceFinalOccurrenceCandidateKeys_length]
   have dataEq : data = keys.map datum := by
     exact FiniteAlphabetKeyedValueLookup.candidateValues_eq_map_alignedDatum
       keys data keysDataLength keysNodup
@@ -201,9 +201,17 @@ private theorem directSourceFinalVariableElementDegrees_eq_clauseFans
       (directSourceFinalClauseFans decider symbols).flatMap
         (fun fan => variableElementDegreesOfTernary fan.hasRight) := by
   have dataPerm :=
-    directSourceFinalGroupedOccurrenceData_perm_compiled decider symbols
+    directSourceFinalGroupedOccurrenceData_perm_variableData decider symbols
   have blockPerm := dataPerm.flatMap fun data _ => List.Perm.refl
     (variableElementDegreesOfKind data.kind)
+  have degreeBlocksEq :
+      (directSourceFinalVariableOccurrenceData decider symbols).flatMap
+          (fun data => variableElementDegreesOfKind data.kind) =
+        (directSourceFinalCompiledOccurrenceData decider symbols).flatMap
+          (fun data => variableElementDegreesOfKind data.kind) := by
+    simpa only [List.flatMap_map] using congrArg (List.flatMap variableElementDegreesOfKind)
+      (directSourceFinalVariableOccurrenceData_map_kind decider symbols)
+  rw [degreeBlocksEq] at blockPerm
   have lengthEq :
       (directSourceFinalVariableElementDegrees decider symbols).length =
         ((directSourceFinalClauseFans decider symbols).flatMap

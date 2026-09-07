@@ -31,7 +31,7 @@ theorem directSourceFinalFanSelectedOccurrenceDataExpected_eq_flatMap
               value))).map fun rank =>
           FiniteAlphabetKeyedValueLookup.alignedDatum
             (directSourceFinalOccurrenceCandidateKeys decider symbols)
-            (directSourceFinalCompiledOccurrenceData decider symbols)
+            (directSourceFinalVariableOccurrenceData decider symbols)
             (value * 3 + rank.val) := by
   unfold directSourceFinalFanSelectedOccurrenceDataExpected
   rw [directSourceFinalFanQueryKeys_eq_keyedBlocks]
@@ -59,7 +59,7 @@ theorem directSourceFinalVariableFanData_eq_map_stableFan
       (directSourceFinalAtomIdentityCodes decider symbols).map fun value =>
         FinalFanDataTripleAssembler.stableFan
           (directSourceFinalOccurrenceCandidateKeys decider symbols)
-          (directSourceFinalCompiledOccurrenceData decider symbols)
+          (directSourceFinalVariableOccurrenceData decider symbols)
           value
           (BoundedPositiveCountPreds.boundedPositiveCountPred
             ((directSourceFinalAtomIdentityCodes decider symbols).count
@@ -73,7 +73,7 @@ theorem directSourceFinalVariableFanData_eq_map_stableFan
   rw [FinalFanDataTripleAssembler.map_zip_stableSelected_replicate]
   exact FinalFanDataTripleAssembler.grouped_flatMap_stableFanPairBlock
     (directSourceFinalOccurrenceCandidateKeys decider symbols)
-    (directSourceFinalCompiledOccurrenceData decider symbols)
+    (directSourceFinalVariableOccurrenceData decider symbols)
     (fun value =>
       BoundedPositiveCountPreds.boundedPositiveCountPred
         ((directSourceFinalAtomIdentityCodes decider symbols).count value))

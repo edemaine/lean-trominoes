@@ -25,20 +25,20 @@ theorem directSourceFinalGroupedOccurrenceData_eq_map_routePair
     directSourceFinalGroupedOccurrenceData decider symbols =
       (directSourceFinalGroupedOccurrenceIndices decider symbols).map
         fun index =>
-          HorizontalRoutedRouteHeader.occurrenceData
-            ((directFigureNinePolarityRoutePairs
-              decider symbols).getD index default).1 := by
+          let pair := (directFigureNinePolarityRoutePairs
+            decider symbols).getD index default
+          HorizontalRoutedRouteHeader.completeOccurrenceData pair.1 pair.2 := by
   rw [directSourceFinalGroupedOccurrenceData_eq_map_getD]
   apply List.map_congr_left
   intro index indexMember
   have indexLt : index <
-      (directSourceFinalCompiledOccurrenceData decider symbols).length :=
-    directSourceFinalGroupedOccurrenceIndex_lt
+      (directSourceFinalVariableOccurrenceData decider symbols).length := by
+    simpa using directSourceFinalGroupedOccurrenceIndex_lt
       decider symbols index indexMember
-  have dataEq := directSourceFinalCompiledOccurrenceData_eq_routePairs
+  have dataEq := directSourceFinalVariableOccurrenceData_eq_routePairs
     decider symbols
   have pairLength :
-      (directSourceFinalCompiledOccurrenceData decider symbols).length =
+      (directSourceFinalVariableOccurrenceData decider symbols).length =
         (directFigureNinePolarityRoutePairs decider symbols).length := by
     simpa using congrArg List.length dataEq
   have pairLt : index <
@@ -47,7 +47,7 @@ theorem directSourceFinalGroupedOccurrenceData_eq_map_routePair
     exact indexLt
   have mappedLt : index <
       ((directFigureNinePolarityRoutePairs decider symbols).map fun pair =>
-        HorizontalRoutedRouteHeader.occurrenceData pair.1).length := by
+        HorizontalRoutedRouteHeader.completeOccurrenceData pair.1 pair.2).length := by
     simpa using pairLt
   rw [dataEq,
     List.getD_eq_getElem _ _ mappedLt,

@@ -56,7 +56,7 @@ theorem directSourceFinalGroupedVariableFanSlotPolarities
   rw [directSourceFinalOccurrenceCandidateKeys_eq_candidateKeys]
   exact FinalFanDataTripleAssembler.stableFan_polarity_of_candidateKey
     (directSourceFinalAtomIdentityCodes decider symbols)
-    (directSourceFinalCompiledOccurrenceData decider symbols)
+    (directSourceFinalVariableOccurrenceData decider symbols)
     (fun value _valueMember =>
       directSourceFinalAtomIdentityCodes_count_le_three
         decider symbols value)
@@ -87,7 +87,7 @@ theorem directSourceFinalGroupedVariableFanSlotDirections
   rw [directSourceFinalOccurrenceCandidateKeys_eq_candidateKeys]
   exact FinalFanDataTripleAssembler.stableFan_direction_of_candidateKey
     (directSourceFinalAtomIdentityCodes decider symbols)
-    (directSourceFinalCompiledOccurrenceData decider symbols)
+    (directSourceFinalVariableOccurrenceData decider symbols)
     (fun value _valueMember =>
       directSourceFinalAtomIdentityCodes_count_le_three
         decider symbols value)

@@ -32,7 +32,7 @@ def directSourceFinalGroupedOccurrenceData
   FiniteAlphabetKeyedValueLookup.values
     (directSourceFinalUniqueFanQueryKeys decider symbols)
     (directSourceFinalOccurrenceCandidateKeys decider symbols)
-    (directSourceFinalCompiledOccurrenceData decider symbols)
+    (directSourceFinalVariableOccurrenceData decider symbols)
 
 /-- Finite keyed selection compiles the variable-major occurrence-record
 column in polynomial time. -/
@@ -48,12 +48,12 @@ noncomputable def
       id
       (directSourceFinalUniqueFanQueryKeys decider)
       (directSourceFinalOccurrenceCandidateKeys decider)
-      (directSourceFinalCompiledOccurrenceData decider)
+      (directSourceFinalVariableOccurrenceData decider)
       (fun symbols => by
-        rw [directSourceFinalOccurrenceCandidateKeys_length])
+        simp [directSourceFinalOccurrenceCandidateKeys_length])
       (directSourceFinalUniqueFanQueryKeysComputableInPolyTime decider)
       (directSourceFinalOccurrenceCandidateKeysComputableInPolyTime decider)
-      (directSourceFinalCompiledOccurrenceDataComputableInPolyTime decider)
+      (directSourceFinalVariableOccurrenceDataComputableInPolyTime decider)
   else by
     letI : IsEmpty encoding.Γ :=
       ⟨fun symbol => nonemptyAlphabet ⟨symbol⟩⟩

@@ -27,11 +27,11 @@ theorem directSourceFinalGroupedOccurrenceData_eq_map_getD
     directSourceFinalGroupedOccurrenceData decider symbols =
       (directSourceFinalGroupedOccurrenceIndices decider symbols).map
         fun index =>
-          (directSourceFinalCompiledOccurrenceData
+          (directSourceFinalVariableOccurrenceData
             decider symbols).getD index default := by
   let keys := directSourceFinalOccurrenceCandidateKeys decider symbols
   let queries := directSourceFinalUniqueFanQueryKeys decider symbols
-  let occurrences := directSourceFinalCompiledOccurrenceData decider symbols
+  let occurrences := directSourceFinalVariableOccurrenceData decider symbols
   let indices := directSourceFinalOccurrenceCandidateIndices decider symbols
   apply List.eq_map_lookup_of_aligned_maps queries
     (directSourceFinalGroupedOccurrenceData decider symbols)
@@ -62,7 +62,7 @@ theorem directSourceFinalGroupedOccurrenceParents_eq_map
         (directSourceFinalGroupedParentIndices decider symbols) =
       (directSourceFinalGroupedOccurrenceIndices decider symbols).map
         fun index =>
-          ((directSourceFinalCompiledOccurrenceData
+          ((directSourceFinalVariableOccurrenceData
               decider symbols).getD index default,
             (directSourceFinalOccurrenceParentIndices
               decider symbols).getD index 0) := by
@@ -78,18 +78,20 @@ theorem directSourceFinalGroupedOccurrenceParents_perm
       (directSourceFinalGroupedOccurrenceData decider symbols)
       (directSourceFinalGroupedParentIndices decider symbols)).Perm
     (List.zipWith Prod.mk
-      (directSourceFinalCompiledOccurrenceData decider symbols)
+      (directSourceFinalVariableOccurrenceData decider symbols)
       (directSourceFinalOccurrenceParentIndices decider symbols)) := by
   rw [directSourceFinalGroupedOccurrenceParents_eq_map]
-  let occurrences := directSourceFinalCompiledOccurrenceData decider symbols
+  let occurrences := directSourceFinalVariableOccurrenceData decider symbols
   let parents := directSourceFinalOccurrenceParentIndices decider symbols
   let attach := fun index =>
     (occurrences.getD index default, parents.getD index 0)
   apply ((directSourceFinalGroupedOccurrenceIndices_perm_range
     decider symbols).map attach).trans
+  rw [← directSourceFinalVariableOccurrenceData_length]
   change ((List.range occurrences.length).map attach).Perm _
-  have parentLength : parents.length = occurrences.length :=
-    directSourceFinalOccurrenceParentIndices_length decider symbols
+  have parentLength : parents.length = occurrences.length := by
+    simpa [parents, occurrences] using
+      directSourceFinalOccurrenceParentIndices_length decider symbols
   rw [← List.zipWith_map_map_same Prod.mk
     (fun index => occurrences.getD index default)
     (fun index => parents.getD index 0)]

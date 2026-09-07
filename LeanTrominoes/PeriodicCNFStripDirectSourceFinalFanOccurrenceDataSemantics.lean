@@ -24,7 +24,7 @@ the three fan queries emitted for every final occurrence. -/
 def directSourceFinalFanSelectedOccurrenceDataExpected
     (symbols : List encoding.Γ) : List FinalFanOccurrenceData :=
   (directSourceFinalFanQueryKeys decider symbols).map fun query =>
-    (directSourceFinalCompiledOccurrenceData decider symbols).getD
+    (directSourceFinalVariableOccurrenceData decider symbols).getD
       ((directSourceFinalOccurrenceCandidateKeys decider symbols).idxOf query)
       default
 
@@ -55,7 +55,7 @@ private theorem directSourceFinalFanAlignedDatum_eq_code
         (directSourceFinalFanOccurrenceCandidateCodes decider symbols)
         query =
       finalFanOccurrenceDataCode
-        ((directSourceFinalCompiledOccurrenceData decider symbols).getD
+        ((directSourceFinalVariableOccurrenceData decider symbols).getD
           ((directSourceFinalOccurrenceCandidateKeys
             decider symbols).idxOf query) default) := by
   have candidateMember := directSourceFinalFanQueryKey_mem_candidateKeys
@@ -66,19 +66,20 @@ private theorem directSourceFinalFanAlignedDatum_eq_code
       (directSourceFinalOccurrenceCandidateKeys decider symbols).length :=
     List.idxOf_lt_length_iff.mpr candidateMember
   have occurrenceIndexLt : index <
-      (directSourceFinalCompiledOccurrenceData decider symbols).length := by
-    rw [← directSourceFinalOccurrenceCandidateKeys_length]
+      (directSourceFinalVariableOccurrenceData decider symbols).length := by
+    rw [directSourceFinalVariableOccurrenceData_length,
+      ← directSourceFinalOccurrenceCandidateKeys_length]
     exact indexLt
   have mappedIndexLt : index <
-      ((directSourceFinalCompiledOccurrenceData decider symbols).map
+      ((directSourceFinalVariableOccurrenceData decider symbols).map
         finalFanOccurrenceDataCode).length := by
     simpa using occurrenceIndexLt
   unfold UnaryKeyedValueLookup.alignedDatum
     directSourceFinalFanOccurrenceCandidateCodes
-  change ((directSourceFinalCompiledOccurrenceData decider symbols).map
+  change ((directSourceFinalVariableOccurrenceData decider symbols).map
       finalFanOccurrenceDataCode).getD index 0 =
     finalFanOccurrenceDataCode
-      ((directSourceFinalCompiledOccurrenceData decider symbols).getD
+      ((directSourceFinalVariableOccurrenceData decider symbols).getD
         index default)
   rw [List.getD_eq_getElem _ _ mappedIndexLt, List.getElem_map,
     List.getD_eq_getElem _ _ occurrenceIndexLt]

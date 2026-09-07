@@ -26,7 +26,7 @@ theorem directSourceFinalGroupedVariableFanData_eq_map_stableFan
       (directSourceFinalUniqueFanQueryKeys decider symbols).map fun key =>
         FinalFanDataTripleAssembler.stableFan
           (directSourceFinalOccurrenceCandidateKeys decider symbols)
-          (directSourceFinalCompiledOccurrenceData decider symbols)
+          (directSourceFinalVariableOccurrenceData decider symbols)
           (key / 3)
           (BoundedPositiveCountPreds.boundedPositiveCountPred
             ((directSourceFinalAtomIdentityCodes decider symbols).count
