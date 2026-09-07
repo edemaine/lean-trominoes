@@ -50,6 +50,14 @@ theorem unitSubdivisionDirections_getLastD
   simpa [AxisDirection.polylineLastDirection] using
     congrArg AxisDirection.opposite first
 
+/-- Repetition by a positive factor preserves the first direction and its fallback. -/
+theorem repeatDirections_headD
+    (factor : Nat) (positive : 0 < factor) (directions : List AxisDirection)
+    (fallback : AxisDirection) :
+    (repeatDirections factor directions).headD fallback = directions.headD fallback := by
+  obtain ⟨factor, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt positive)
+  cases directions <;> simp [repeatDirections, List.replicate_succ]
+
 /-- Repetition by a positive factor preserves the optional final direction. -/
 theorem repeatDirections_getLast?
     (factor : Nat) (positive : 0 < factor) (directions : List AxisDirection) :

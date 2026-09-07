@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFStripHorizontalClauseIncomingDirectionBlocks
 import LeanTrominoes.ListFlattenWithBlockLengths
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFrameBlockLengths
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalEndpointDirections
@@ -19,35 +20,6 @@ namespace LeanTrominoes.PeriodicCNFStripReduction
 open Gadget PeriodicOrthocrossing
 open PeriodicPlanarOneInThreeToThreeDM
 open PeriodicOneInThreePolarityNormalizationRouteSubdivision
-
-/-- Incoming directions of the stored clause-to-variable routes, retaining
-the actual clause boundaries and literal order. -/
-def clauseIncomingDirectionBlocks {Variable : Type*}
-    (source : PositionedPeriodicCNF Variable)
-    (routes : PositionedPeriodicCNF.IncidenceRoutes) : List (List AxisDirection) :=
-  source.clauses.zipIdx.map fun clause =>
-    clause.1.literals.zipIdx.map fun literal =>
-      ((unitSubdivisionDirections (routes clause.2 literal.2)).headD .invalid).opposite
-
-theorem clauseIncomingDirectionBlocks_flatten {Variable : Type*}
-    (source : PositionedPeriodicCNF Variable)
-    (routes : PositionedPeriodicCNF.IncidenceRoutes) :
-    (clauseIncomingDirectionBlocks source routes).flatten =
-      (presentedIncidenceDirectionWords source routes).map
-        (fun word => (word.headD .invalid).opposite) := by
-  unfold clauseIncomingDirectionBlocks presentedIncidenceDirectionWords
-  rw [List.flatten_eq_flatMap, List.flatMap_map, List.map_flatMap]
-  simp only [List.map_map, Function.comp_def, id_eq]
-
-theorem clauseIncomingDirectionBlocks_lengths {Variable : Type*}
-    (source : PositionedPeriodicCNF Variable)
-    (routes : PositionedPeriodicCNF.IncidenceRoutes) :
-    (clauseIncomingDirectionBlocks source routes).map List.length =
-      source.erase.clauses.map List.length := by
-  simpa only [clauseIncomingDirectionBlocks, List.map_map, List.length_map,
-    List.length_zipIdx, PositionedPeriodicCNF.erase, Function.comp_def] using
-    congrArg (List.map fun clause : PositionedPeriodicClause Variable => clause.literals.length)
-      (List.zipIdx_map_fst 0 source.clauses)
 
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}

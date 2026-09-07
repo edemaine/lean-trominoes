@@ -63,6 +63,28 @@ theorem outputBlock_groups
   rw [← List.map_map, List.zipIdx_map_snd]
   rw [← List.range_eq_range']
 
+/-- Every literal frame carries its clause's common fan and its own terminal group. -/
+theorem outputBlock_fan_groups
+    (source : List Token) (block : List Data)
+    (member : block ∈ outputBlocks source) :
+    block.map (fun frame => (frame.clauseFan, frame.group)) =
+      (List.range block.length).map fun index =>
+        (blockFan block, terminalGroupOfLiteralIndex index) := by
+  obtain ⟨headers, rfl⟩ := outputBlock_eq_frameBlock source block member
+  cases headers with
+  | nil => rfl
+  | cons header headers =>
+      have fanEq : blockFan (frameBlock (header :: headers)) =
+          clauseFanData (header :: headers) := by
+        simp [blockFan, frameBlock, frameAt]
+      rw [fanEq]
+      simp only [frameBlock, List.map_map, List.length_map, List.length_zipIdx,
+        frameAt, Function.comp_def]
+      change (header :: headers).zipIdx.map
+          ((fun index => (clauseFanData (header :: headers), terminalGroupOfLiteralIndex index)) ∘
+            Prod.snd) = _
+      rw [← List.map_map, List.zipIdx_map_snd, ← List.range_eq_range']
+
 /-- A clause fan assembled directly from its incoming direction list. -/
 def fanOfDirections (directions : List AxisDirection) : ClauseRibbonFanData where
   hasRight := decide (3 ≤ directions.length)

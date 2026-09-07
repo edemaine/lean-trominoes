@@ -75,10 +75,19 @@ and literal index. Their exact arities recover the block boundaries from the
 already equal flattened direction columns. The direct clause fans are assembled
 from those blocks, and their terminal groups are the actual literal-index groups.
 The [semantic fan lookup](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFanIndexedDirections.lean)
-now selects the stored route at that same clause and literal index.
+selects the stored route at that same clause and literal index.
+The [generic direction-block lemmas](LeanTrominoes/PeriodicCNFStripHorizontalClauseIncomingDirectionBlocks.lean)
+show that positive padding and anchor normalization preserve these blocks, and
+recover the semantic fan of every genuine clause from its ordered route words.
+Their [horizontal specialization](LeanTrominoes/PeriodicCNFStripHorizontalClauseFanDirectionBlockSemantics.lean)
+identifies the computed fan list. The [direct clause-frame theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseFanHorizontalSemantics.lean)
+now proves joint agreement of every clause fan and literal terminal group with
+the horizontal construction, both block by block and in flattened occurrence order.
+The [compiler certificates](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseFanHorizontalCompiler.lean)
+now emit these actual horizontal fan and clause-frame field streams in polynomial
+time, with their semantic agreement discharged.
 
-Next transport these clause fans through padding and normalization, and prove
-agreement of the remaining finite endpoint frames and grouped occurrence
+Next prove agreement of the variable endpoint frames and grouped occurrence
 identities and bodies with the horizontal construction, then derive the
 canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
@@ -135,3 +144,8 @@ agreement with the horizontal construction.
 The clause block arities, incoming directions, terminal groups, and generic
 semantic fan lookup passed a combined targeted Lake build on 2026-09-07:
 all 9,004 jobs succeeded.
+
+The complete clause-fan/frame agreement, normalization invariance, and actual
+horizontal clause-stream compiler certificates passed a combined targeted Lake
+build on 2026-09-07: all 9,014 jobs succeeded. This also rebuilt and checked
+the shared endpoint, grouped variable-fan, and canonical degree-column dependencies.
