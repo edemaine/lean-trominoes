@@ -269,6 +269,12 @@ It identifies the complete incidence-tag code list with typed references,
 recovers each color-major element column, and proves code equality identifies
 the same valid colored element when the full code list is duplicate-free.
 
+The [finite variable-selector interpretation](LeanTrominoes/PeriodicCNFStripVariableIncidenceTypedElementCodeSemantics.lean)
+now proves that current-occurrence, successor, and parent-clause selectors
+name the actual typed references. It covers every genuine local triple and
+color, including a cyclic successor equal to the current slot, and lifts
+the result to the complete ordered local incidence block.
+
 Next identify the compiled element identities and selected-body grouping
 with the horizontal problem, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -355,3 +361,8 @@ drafts remain local and unverified; the full project build is still pending.
 The numbered element-code bridge passes an individual library compilation
 with no diagnostics. The four-worker dependency rebuild remains active;
 its completion and the subsequent full project build are still pending.
+
+The finite variable-selector interpretation also passes an individual library
+compilation with no diagnostics. The remaining source-specific drafts now
+include numbered-column agreement, selected incidence-body grouping, and the
+contracted-edge conclusion; these remain unverified in ignored local files.
