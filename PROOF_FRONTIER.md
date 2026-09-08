@@ -323,8 +323,18 @@ now identifies the complete compiled stream with the geometric direction
 word at every canonical contracted edge. It supplies an unconditional
 polynomial-time machine for that exact delimited stream.
 
-Next combine these route words with raster-request metadata, endpoint headers,
-and framing, and construct the remaining vertex emitter. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [incidence endpoint-summary compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalIncidenceEndpointSummaryHorizontalSemantics.lean)
+now extracts each incidence's first and last directions and attaches its
+triple's complete RGB starting-direction fan. Its explicit polynomial-time
+machine preserves canonical incidence-tag order. The summaries recover the
+exact triple endpoint header data and retained-element outward side/color.
+The finite endpoint identities are proved separately from the geometric
+lookup, avoiding unnecessary unfolding of the source construction.
+
+Next regroup these summaries by the verified element keys and combine the
+appropriate endpoint data into complete route headers. Combine the headers
+and route words with raster-request metadata and framing, and construct the
+remaining vertex emitter. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -361,25 +371,21 @@ assumes one of these compiler contracts.
 and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
-The four-worker build of the 14 existing dependency targets for the source
-code-column proofs completed on 2026-09-08 with exit code 0 and 9,159 jobs.
-Its log is `tmp/element-code-semantic-dependencies-rebuild.log`. The completed
-log and all cached project trace files were checked for compiler panics;
-none were found.
-
-The 12 new modules for numbered codes, finite selectors, actual occurrence
+The four-worker full project build completed on 2026-09-08 with exit code 0
+and 10,309 jobs. Its log is
+`tmp/actual-horizontal-code-and-contraction-full-build.log`. This includes
+all 12 new modules for numbered codes, finite selectors, actual occurrence
 keys and parents, complete code columns, selected bodies, contracted edges,
-and geometric route tokens all pass individual library compilations with
-exit code 0 and no diagnostics. They were added after that dependency build
-planned its jobs and still require full integration validation.
+and geometric route tokens. The completed log and all cached project trace
+files were checked for compiler panics; none were found.
 
-A new four-worker full project build is running. Its log is
-`tmp/actual-horizontal-code-and-contraction-full-build.log`; no successful
-result is claimed until that process completes.
+The earlier four-worker dependency build also completed with exit code 0 and
+9,159 jobs; its log is `tmp/element-code-semantic-dependencies-rebuild.log`.
+The successful full build supersedes the earlier interrupted integration
+retries for the committed code and contraction modules.
 
-The last completed full integration build was the 10,272-job grouped-order
-build on 2026-09-07. Later full retries encountered library-import failures
-under memory pressure and Windows process interruptions. The affected
-modules passed individual checks, and the discovered derived-default
-compiler panics were fixed. Those retries do not establish full integration
-success for the current tree.
+The three new endpoint-summary modules pass their individual Lean checks
+with no diagnostics. The subsequent four-worker full integration build
+completed with exit code 0 and 10,312 jobs, including all three modules. Its
+log is `tmp/incidence-endpoint-summary-full-build.log`; it and all cached
+project traces were checked for compiler panics, with none found.
