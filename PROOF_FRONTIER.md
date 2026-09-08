@@ -247,6 +247,13 @@ element. Its checked enumeration lemmas retain the occurrence-entry prefix
 and clause suffix for each color. Agreement with the complete compiled code
 columns is the next step; the code interpretation alone does not establish it.
 
+The [stable field-grouping lemma](LeanTrominoes/ListGroupedFieldLookup.lean)
+transports numeric index selection to semantic filtering while preserving
+presentation order. The [incidence-tag ordering theorem](LeanTrominoes/PeriodicThreeDMIncidenceTagElementOrder.lean)
+identifies that filter with the actual per-element incidence list and lifts
+the result to arbitrary aligned fields. These lemmas will turn the remaining
+identity-column agreement into the selected-body premise of contraction.
+
 Next identify the compiled element identities and selected-body grouping
 with the horizontal problem, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -311,3 +318,7 @@ traces during the pending integration build.
 The typed element-code interpretation also passes an individual Lean check
 with no diagnostics. The four-worker integration retry is running; its log
 is retained locally in `tmp/canonical-horizontal-incidence-bodies-full-build.log`.
+
+The stable field-grouping and canonical incidence-filter modules pass
+individual Lean checks with no diagnostics. They were added after the running
+integration build planned its jobs and require a subsequent incremental build.
