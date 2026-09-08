@@ -191,9 +191,22 @@ exact correspondence of equality classes. Their [direct specialization](LeanTrom
 identifies the compiled group-size and stable-rank columns with those of the
 actual horizontal atom list in clause/literal order.
 
-Next use these ranks and the aligned occurrence fields to identify each
-variable-fan slot with its actual source incidence. This will identify the
-complete variable fans and grouped occurrence bodies, then the canonical
+The [fan rank-query bridge](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFanRankLookup.lean)
+now selects the exact presentation index used by the normalized source's
+occurrence lookup. [Filtered field lookup](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceFieldLookup.lean)
+retains that same tagged clause and literal. The [active-query semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFanOccurrenceFieldSemantics.lean)
+therefore identify the selected connector kind, polarity, and outgoing route
+direction with the actual semantic incidence.
+
+The [complete variable-fan theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableFanHorizontalSemantics.lean)
+now identifies every compiled fan with the actual horizontal fan of its atom,
+both pointwise and as a complete clause-major stream. The [shared assembly proof](LeanTrominoes/FinalFanDataSourceSemantics.lean)
+covers inactive kind/polarity slots by the same last-occurrence fallback and
+inactive directions by north. The [polynomial-time certificate](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableFanHorizontalCompiler.lean)
+emits this complete actual fan stream with semantic agreement discharged.
+
+Next identify grouped source occurrence order and combine these verified
+endpoint fields with the occurrence bodies, then obtain the canonical
 contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -230,8 +243,8 @@ assumes one of these compiler contracts.
 Build coverage and proof completion are separate: a successful build of
 conditional closure theorems does not prove the unconditional target.
 
-The complete default `lake build` passed on 2026-09-07: all 10,251 jobs
-succeeded. This includes complete numeric identity agreement with actual
-horizontal atoms, shared copied/cycle inherited-code alignment, and exact
-horizontal occurrence multiplicities and stable ranks. All seven new modules
-have no compiler diagnostics in their build traces.
+The complete default `lake build` passed on 2026-09-07: all 10,264 jobs
+succeeded. This includes complete variable-fan agreement with the actual
+horizontal construction, including inactive slots, and a polynomial-time
+certificate for the semantic fan stream. All 13 new modules have no compiler
+diagnostics in their build traces.
