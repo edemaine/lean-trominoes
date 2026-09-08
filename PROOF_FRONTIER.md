@@ -302,8 +302,13 @@ The [complete canonical element-code column](LeanTrominoes/PeriodicCNFStripDirec
 now agrees with the actual typed element enumeration for all three colors,
 preserving each variable prefix, clause suffix, and color boundary.
 
-Next identify the compiled element identities and selected-body grouping
-with the horizontal problem, then obtain the canonical contracted raster
+The [complete incidence-code column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalIncidenceElementCodeHorizontalSemantics.lean)
+now agrees with every actual typed reference in the variable-prefix and
+clause-suffix order. It combines the verified fan, current-key, successor-key,
+and parent-index fields without additional semantic premises.
+
+Next transport these typed code columns to the numbered horizontal elements
+and prove selected-body grouping, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -411,3 +416,6 @@ library compilations with no diagnostics.
 
 The complete canonical element-code agreement passes an individual library
 compilation with no diagnostics.
+
+The complete typed incidence-code agreement passes an individual library
+compilation with no diagnostics. Numbered-element transport is being checked.
