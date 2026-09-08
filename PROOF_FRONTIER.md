@@ -312,8 +312,14 @@ now identifies both compiled code columns with the actual numbered elements
 and incidence tags. Their numeric equality is exactly equality of valid
 colored horizontal elements, including across colors.
 
-Next prove selected-body grouping and contracted-edge agreement, then obtain
-the canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [actual selected-body and contracted-edge agreement](LeanTrominoes/PeriodicCNFStripDirectSourceFinalSelectedIncidenceBodyHorizontalSemantics.lean)
+now proves that compiled lookup selects precisely the geometric incidence
+bodies at each colored element. Together with the verified degree column,
+this discharges every premise of the contraction assembler: its complete
+edge blocks agree with the canonical horizontal contracted blocks.
+
+Next identify the complete emitted geometric route-token stream and combine
+it with the raster-request metadata, endpoint headers, and framing. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -427,3 +433,7 @@ compilation with no diagnostics. Numbered-element transport is being checked.
 The numbered horizontal identity bridge passes an individual library
 compilation with no diagnostics. Selected-body grouping and contracted-edge
 agreement are now being checked against these concrete identities.
+
+The actual selected-body and contracted-edge agreement passes an individual
+library compilation with no diagnostics. The final geometric direction-token
+compiler transport is now being checked.
