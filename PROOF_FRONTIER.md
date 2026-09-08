@@ -528,9 +528,19 @@ including its empty-alphabet case and aligned block laws. The
 identifies that header's tail with the original first literal's normalized
 route, including tied clockwise directions.
 
-Next combine these matching parent columns and apply the clause-origin
-recovery theorem to prove the compiled origin values. Then propagate the
-resulting coordinates through the Figure 9 refinements
+The [parent-displacement block proof](LeanTrominoes/FirstParentInheritedRouteDisplacementSemantics.lean)
+now tracks each profile beside its selected tail. Its
+[direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFirstParentRouteSemantics.lean)
+identifies the selected displacement with the actual normalized route of
+literal zero in each original parent clause. The
+[clause-origin compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseOriginCompiler.lean)
+subtracts these displacements from the compiled first-literal coordinates
+and proves agreement with every actual canonical clause origin, in parent
+order. The [zero-anchor proof](LeanTrominoes/RetainedAngularFanFinalClauseAnchors.lean)
+shows that these are also the stored clause positions: copied clauses
+preserve normalized source anchors, and cycle clauses have zero offsets.
+
+Next propagate the resulting coordinates through the Figure 9 refinements
 and polarity normalization to supply raster-request metadata and the
 remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -571,15 +581,15 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,402 jobs. Its log is
-`tmp/first-parent-coordinate-full-build.log`. It includes the five new modules for copied,
-complete inherited, and first-parent coordinates, selected-route geometry,
-and shared native-list Boolean filtering, plus the refactored
-parent-route compiler. The previously verified direction-displacement,
-clause-origin recovery, cycle and canonical coordinates, identities,
+and 10,406 jobs. Its log is
+`tmp/actual-clause-origin-full-build.log`. It includes the four new modules
+for parent-displacement block semantics, actual selected-route agreement,
+zero parent anchors, and exact canonical/stored clause-origin compilation.
+The previously verified inherited and first-parent coordinates,
+direction-displacement, cycle and canonical coordinates, identities,
 incidence and contraction compilers, headers, and normalization requests
 remain included.
 
-All six new or changed Lean modules built without diagnostics.
+All four new Lean modules built without diagnostics.
 The completed full-build log and all cached project trace files were checked
 for errors and compiler panics; none were found.
