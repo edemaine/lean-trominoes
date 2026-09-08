@@ -241,6 +241,12 @@ combines the variable and clause parts: the complete body list and its
 delimited direction-token stream now agree with the canonical horizontal
 incidence-tag selector.
 
+The [typed element-code interpretation](LeanTrominoes/PeriodicCNFStripTypedElementCodes.lean)
+now gives the structural numeric name of every actual red, green, and blue
+element. Its checked enumeration lemmas retain the occurrence-entry prefix
+and clause suffix for each color. Agreement with the complete compiled code
+columns is the next step; the code interpretation alone does not establish it.
+
 Next identify the compiled element identities and selected-body grouping
 with the horizontal problem, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -301,3 +307,7 @@ The eight new complete-body modules and two typed-route geometry refactors
 pass individual Lean checks with no diagnostics. A full project trace audit
 found only the previously fixed panic sites; Lake must refresh their cached
 traces during the pending integration build.
+
+The typed element-code interpretation also passes an individual Lean check
+with no diagnostics. The four-worker integration retry is running; its log
+is retained locally in `tmp/canonical-horizontal-incidence-bodies-full-build.log`.
