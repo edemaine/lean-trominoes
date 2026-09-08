@@ -26,7 +26,10 @@ boundary for every input record. -/
 inductive Token
   | request (value : RequestToken)
   | requestEnd
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited Token := ⟨.request (.operation .compatible)⟩
 
 def transition (active : Bool) : InputToken → Bool × List Token
   | .header header =>

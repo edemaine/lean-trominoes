@@ -215,9 +215,19 @@ emits this actual semantic stream in polynomial time. The [prefix-body theorem](
 then identifies all finite variable prefixes in canonical entry, typed-triple,
 and red/green/blue order.
 
-Next combine these verified grouped endpoint fields and prefixes with the
-coordinated occurrence bodies, then obtain the canonical contracted raster
-requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [joint endpoint-frame proof](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceFrameHorizontalFields.lean)
+now keeps the variable fan, occurrence slot, clause fan, and terminal group
+attached to one actual source entry. The [stored-word lookup](LeanTrominoes/PeriodicCNFStripDirectSourceFinalStoredWordOccurrenceSemantics.lean)
+selects that same incidence’s header/tail pair. Shared tagged-occurrence
+field lookup preserves the clause and literal indices through normalization.
+The [specified-block geometry theorem](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceSpecifiedDirectionBlock.lean)
+uses the compiler’s chosen compact block directly: the source, corridor, and
+coordinated-route lemmas now expose exact word formulas while retaining
+their earlier existential interfaces.
+
+Next combine these endpoint fields and stored words into the complete grouped
+occurrence bodies, assemble the typed variable-incidence bodies, and obtain
+the canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -253,14 +263,13 @@ assumes one of these compiler contracts.
 Build coverage and proof completion are separate: a successful build of
 conditional closure theorems does not prove the unconditional target.
 
-The complete default `lake build` passed on 2026-09-07: all 10,264 jobs
-succeeded. This includes complete variable-fan agreement with the actual
-horizontal construction, including inactive slots, and a polynomial-time
-certificate for the semantic fan stream. All 13 new modules have no compiler
-diagnostics in their build traces.
+The grouped-order integration `lake build` completed on 2026-09-07 with
+exit code 0 and 10,272 jobs. A subsequent trace audit found two code-generation
+panics reported as informational diagnostics in derived `Inhabited` instances.
+Those instances now have explicit defaults preserving the previous values;
+both modules pass individual Lean checks with no diagnostics.
 
-The eight new grouped-order, fan/slot, and typed-prefix modules passed their
-individual Lean checks with no diagnostics. A complete default rebuild is
-running to validate their integration and the generalized disjoint-block
-deduplication lemma; the last completed full-build result above predates
-this grouped-order milestone.
+The eight new occurrence-field and specified-block modules, plus the three
+refactored route geometry modules, pass individual Lean checks with no
+diagnostics. Their full integration and the two compiler fixes still need
+a fresh full build; the 10,272-job result predates these changes.

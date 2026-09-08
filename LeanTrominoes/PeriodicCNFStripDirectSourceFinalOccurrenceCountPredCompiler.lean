@@ -27,7 +27,10 @@ inductive State
   | one
   | two
   | three
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited State := ⟨.zero⟩
 
 /-- Saturated state reached after reading a unary field of the given size. -/
 def stateOfCount : Nat → State

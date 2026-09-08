@@ -35,16 +35,16 @@ def horizontalOccurrenceCoordinatedDirections
       horizontalOccurrenceRibbonCorridorDirections input block) ++
     horizontalOccurrenceClauseStubDirections input
 
-/-- Every successful horizontal occurrence lookup has a compact complete
-coordinated route word. -/
-theorem horizontalOccurrenceCoordinatedRoute_directionBlock_of_lookup
+/-- The complete geometric occurrence word is exactly the two finite stub
+words surrounding its actual corridor word. -/
+theorem horizontalOccurrenceCoordinatedRoute_directions_of_lookup
     (input : HorizontalOccurrenceColoredRouteInput)
     (tagged : PeriodicOneInThreeToThreeDM.TaggedOccurrence RoutedVariable)
     (lookup : horizontalOccurrenceLookupComputed input.1 = some tagged) :
-    ∃ block : HorizontalRoutedRouteDirectionBlock,
-      unitSubdivisionDirections
-          (horizontalOccurrenceCoordinatedRouteComputed input) =
-        horizontalOccurrenceCoordinatedDirections input block := by
+    unitSubdivisionDirections (horizontalOccurrenceCoordinatedRouteComputed input) =
+      (horizontalOccurrenceVariableStubDirections input ++
+        unitSubdivisionDirections (horizontalOccurrenceRibbonCorridorCoreComputed input)) ++
+        horizontalOccurrenceClauseStubDirections input := by
   rcases input with ⟨⟨⟨source, atom⟩, slot⟩, color⟩
   have occurrenceLookup :
       PeriodicOneInThreeToThreeDM.occurrenceAt
@@ -166,12 +166,7 @@ theorem horizontalOccurrenceCoordinatedRoute_directionBlock_of_lookup
           ((((source, atom), slot), color))).head? :=
     firstJoinLast.trans
       (corridorEndpoints.2.trans clauseEndpoints.1.symm)
-  rcases horizontalOccurrenceRibbonCorridor_directionBlock_of_lookup
-      ((((source, atom), slot), color)) tagged lookup with
-    ⟨block, corridorDirections⟩
-  refine ⟨block, ?_⟩
   unfold horizontalOccurrenceCoordinatedRouteComputed
-    horizontalOccurrenceCoordinatedDirections
   change unitSubdivisionDirections
       (joinAtEndpoint firstJoin
         (horizontalOccurrenceClauseStubComputed
@@ -187,8 +182,23 @@ theorem horizontalOccurrenceCoordinatedRoute_directionBlock_of_lookup
   rw [unitSubdivisionDirections_joinAtEndpoint
     variableNonempty firstBoundary]
   rw [unitSubdivisionDirections_horizontalOccurrenceVariableStubComputed,
-    corridorDirections,
     unitSubdivisionDirections_horizontalOccurrenceClauseStubComputed]
+
+/-- Every successful horizontal occurrence lookup has a compact complete
+coordinated route word. -/
+theorem horizontalOccurrenceCoordinatedRoute_directionBlock_of_lookup
+    (input : HorizontalOccurrenceColoredRouteInput)
+    (tagged : PeriodicOneInThreeToThreeDM.TaggedOccurrence RoutedVariable)
+    (lookup : horizontalOccurrenceLookupComputed input.1 = some tagged) :
+    ∃ block : HorizontalRoutedRouteDirectionBlock,
+      unitSubdivisionDirections
+          (horizontalOccurrenceCoordinatedRouteComputed input) =
+        horizontalOccurrenceCoordinatedDirections input block := by
+  rcases horizontalOccurrenceRibbonCorridor_directionBlock_of_lookup input tagged lookup with
+    ⟨block, corridorDirections⟩
+  have exactWord := horizontalOccurrenceCoordinatedRoute_directions_of_lookup input tagged lookup
+  rw [corridorDirections] at exactWord
+  exact ⟨block, exactWord⟩
 
 end PeriodicCNFStripReduction
 end LeanTrominoes

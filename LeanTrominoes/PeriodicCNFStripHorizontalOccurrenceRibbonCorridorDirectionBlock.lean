@@ -32,16 +32,15 @@ def horizontalOccurrenceRibbonCorridorDirections
     (horizontalOccurrenceRibbonLaneComputed input)
     (horizontalOccurrenceSourceDirections block)
 
-/-- Every successful horizontal occurrence lookup expands its compact source
-block through the finite adjacent-direction ribbon table. -/
-theorem horizontalOccurrenceRibbonCorridor_directionBlock_of_lookup
+/-- The actual corridor word is the ribbon table applied to the selected
+unit-source word on this occurrence's physical lane. -/
+theorem horizontalOccurrenceRibbonCorridor_directions_of_lookup
     (input : HorizontalOccurrenceColoredRouteInput)
     (tagged : PeriodicOneInThreeToThreeDM.TaggedOccurrence RoutedVariable)
     (lookup : horizontalOccurrenceLookupComputed input.1 = some tagged) :
-    ∃ block : HorizontalRoutedRouteDirectionBlock,
-      unitSubdivisionDirections
-          (horizontalOccurrenceRibbonCorridorCoreComputed input) =
-        horizontalOccurrenceRibbonCorridorDirections input block := by
+    unitSubdivisionDirections (horizontalOccurrenceRibbonCorridorCoreComputed input) =
+      ribbonCorridorDirectionWord (horizontalOccurrenceRibbonLaneComputed input)
+        (unitSubdivisionDirections (horizontalOccurrenceUnitSourceRouteComputed input.1)) := by
   rcases input with ⟨⟨⟨source, atom⟩, slot⟩, color⟩
   have occurrenceLookup :
       PeriodicOneInThreeToThreeDM.occurrenceAt
@@ -95,17 +94,27 @@ theorem horizontalOccurrenceRibbonCorridor_directionBlock_of_lookup
     rw [computedRouteEq]
     exact occurrenceUnitSourceRoute_unitSteps
       (horizontalSemanticNormalizedPlanarPresentation source) entry
-  rcases horizontalOccurrenceUnitSourceRoute_directionBlock_of_lookup
-      ((source, atom), slot) tagged lookup with
-    ⟨block, sourceDirections⟩
-  refine ⟨block, ?_⟩
   unfold horizontalOccurrenceRibbonCorridorCoreComputed
     horizontalOccurrenceRibbonCorridorInputComputed
-    horizontalOccurrenceRibbonCorridorDirections
   simp only
   rw [unitSubdivisionDirections_ribbonCorridorCore_of_unitSteps
     _ _ computedUnitSteps]
-  rw [sourceDirections]
+
+/-- Every successful horizontal occurrence lookup expands its compact source
+block through the finite adjacent-direction ribbon table. -/
+theorem horizontalOccurrenceRibbonCorridor_directionBlock_of_lookup
+    (input : HorizontalOccurrenceColoredRouteInput)
+    (tagged : PeriodicOneInThreeToThreeDM.TaggedOccurrence RoutedVariable)
+    (lookup : horizontalOccurrenceLookupComputed input.1 = some tagged) :
+    ∃ block : HorizontalRoutedRouteDirectionBlock,
+      unitSubdivisionDirections
+          (horizontalOccurrenceRibbonCorridorCoreComputed input) =
+        horizontalOccurrenceRibbonCorridorDirections input block := by
+  rcases horizontalOccurrenceUnitSourceRoute_directionBlock_of_lookup input.1 tagged lookup with
+    ⟨block, sourceDirections⟩
+  have exactWord := horizontalOccurrenceRibbonCorridor_directions_of_lookup input tagged lookup
+  rw [sourceDirections] at exactWord
+  exact ⟨block, exactWord⟩
 
 end PeriodicCNFStripReduction
 end LeanTrominoes

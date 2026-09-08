@@ -36,19 +36,15 @@ def horizontalOccurrenceSourceDirections
       (block.directions
         RetainedFigureNineRouteDirectionBlock.directions))
 
-/-- Every successful horizontal occurrence lookup has a compact complete
-variable-to-clause unit-source direction word. -/
-theorem horizontalOccurrenceUnitSourceRoute_directionBlock_of_lookup
+/-- The exact source word selected by a genuine occurrence lookup is the
+factor-two stored word reversed into variable-to-clause orientation. -/
+theorem horizontalOccurrenceUnitSourceRoute_directions_of_lookup
     (input : HorizontalOccurrenceRouteInput)
     (tagged : PeriodicOneInThreeToThreeDM.TaggedOccurrence RoutedVariable)
     (lookup : horizontalOccurrenceLookupComputed input = some tagged) :
-    ∃ block : HorizontalRoutedRouteDirectionBlock,
-      unitSubdivisionDirections
-          (horizontalOccurrenceUnitSourceRouteComputed input) =
-        horizontalOccurrenceSourceDirections block := by
-  rcases horizontalOccurrenceStoredRoute_directionBlock_of_lookup
-      input tagged lookup with
-    ⟨block, storedDirections⟩
+    unitSubdivisionDirections (horizontalOccurrenceUnitSourceRouteComputed input) =
+      reverseDirections (repeatDirections 2
+        (unitSubdivisionDirections (horizontalOccurrenceStoredRouteComputed (input, tagged)))) := by
   let source := input.1.1
   have occurrenceLookup :
       PeriodicOneInThreeToThreeDM.occurrenceAt
@@ -108,7 +104,6 @@ theorem horizontalOccurrenceUnitSourceRoute_directionBlock_of_lookup
       horizontalOccurrenceSourceRouteComputed input =
         horizontalOccurrenceSourceRouteSomeComputed (input, tagged) := by
     simp [horizontalOccurrenceSourceRouteComputed, lookup]
-  refine ⟨block, ?_⟩
   unfold horizontalOccurrenceUnitSourceRouteComputed
   rw [sourceRouteEq]
   rw [unitSubdivisionDirections_unitSubdividePolyline
@@ -120,8 +115,22 @@ theorem horizontalOccurrenceUnitSourceRoute_directionBlock_of_lookup
   rw [unitSubdivisionDirections_reverse _ scaledStoredOrthogonal]
   rw [← show (↑(2 : Nat) : Int) = (2 : Int) by decide]
   rw [unitSubdivisionDirections_scalePolyline 2 (by decide)]
-  rw [storedDirections]
-  rfl
+
+/-- Every successful horizontal occurrence lookup has a compact complete
+variable-to-clause unit-source direction word. -/
+theorem horizontalOccurrenceUnitSourceRoute_directionBlock_of_lookup
+    (input : HorizontalOccurrenceRouteInput)
+    (tagged : PeriodicOneInThreeToThreeDM.TaggedOccurrence RoutedVariable)
+    (lookup : horizontalOccurrenceLookupComputed input = some tagged) :
+    ∃ block : HorizontalRoutedRouteDirectionBlock,
+      unitSubdivisionDirections
+          (horizontalOccurrenceUnitSourceRouteComputed input) =
+        horizontalOccurrenceSourceDirections block := by
+  rcases horizontalOccurrenceStoredRoute_directionBlock_of_lookup input tagged lookup with
+    ⟨block, storedDirections⟩
+  have exactWord := horizontalOccurrenceUnitSourceRoute_directions_of_lookup input tagged lookup
+  rw [storedDirections] at exactWord
+  exact ⟨block, exactWord⟩
 
 end PeriodicCNFStripReduction
 end LeanTrominoes
