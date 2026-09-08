@@ -281,6 +281,12 @@ complete geometric route-word stream, including every edge delimiter and
 canonical edge position. The source-specific specialization and its
 polynomial-time compiler transport remain local drafts pending validation.
 
+The [actual occurrence-key interpretation](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeyHorizontalSemantics.lean)
+now identifies unique compiled keys with the canonical horizontal occurrence
+entries, proves injectivity on active entries, and recovers the common atom
+identity base plus each slot’s rank. This supplies the current-key field for
+the pending complete code-column proofs.
+
 Next identify the compiled element identities and selected-body grouping
 with the horizontal problem, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -358,15 +364,15 @@ The four typed-reference, successor-index, block-length, and parent-index
 modules pass individual Lean checks with no diagnostics. These also postdate
 that integration retry’s job plan and need the follow-up incremental build.
 
-Lean starts successfully in the current session. The exact existing imports
-of the occurrence-key, canonical-code, clause-incidence-code, successor-key,
-and parent-index drafts are now being rebuilt with four workers. The log is
-`tmp/element-code-semantic-dependencies-rebuild.log`. These source-specific
-drafts remain local and unverified; the full project build is still pending.
+The four-worker build of the exact existing imports of the occurrence-key,
+canonical-code, clause-incidence-code, successor-key, and parent-index drafts
+completed successfully on 2026-09-08: exit code 0, 9,159 jobs. Its log is
+`tmp/element-code-semantic-dependencies-rebuild.log`. This was a dependency-targeted
+build; a full project build covering the new proof modules is still pending.
 
 The numbered element-code bridge passes an individual library compilation
-with no diagnostics. The four-worker dependency rebuild remains active;
-its completion and the subsequent full project build are still pending.
+with no diagnostics. The dependency rebuild has completed; the subsequent
+full project build is still pending.
 
 The finite variable-selector interpretation also passes an individual library
 compilation with no diagnostics. The remaining source-specific drafts now
@@ -375,4 +381,8 @@ contracted-edge conclusion; these remain unverified in ignored local files.
 
 The contracted route-token theorem passes an individual library compilation
 with no diagnostics. Its source-specific specialization is not yet verified.
-The dependency rebuild is still running; no full integration success is claimed.
+The dependency rebuild has completed; no full integration success is claimed.
+
+The actual occurrence-key interpretation passes an individual library
+compilation with no diagnostics. Successor-key and parent-index validation
+can now use the completed dependency build.
