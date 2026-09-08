@@ -263,6 +263,12 @@ recovers each actual occurrence’s parent from the broadcast clause-index
 stream; [block-length transport](LeanTrominoes/FiniteBlockIndexShapeSemantics.lean)
 allows the compiled stream to use the same result once clause lengths agree.
 
+The [numbered element-code bridge](LeanTrominoes/PeriodicCNFStripTypedElementCodeEncoding.lean)
+now transports structural names through the actual natural-number encoding.
+It identifies the complete incidence-tag code list with typed references,
+recovers each color-major element column, and proves code equality identifies
+the same valid colored element when the full code list is duplicate-free.
+
 Next identify the compiled element identities and selected-body grouping
 with the horizontal problem, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -345,3 +351,7 @@ of the occurrence-key, canonical-code, clause-incidence-code, successor-key,
 and parent-index drafts are now being rebuilt with four workers. The log is
 `tmp/element-code-semantic-dependencies-rebuild.log`. These source-specific
 drafts remain local and unverified; the full project build is still pending.
+
+The numbered element-code bridge passes an individual library compilation
+with no diagnostics. The four-worker dependency rebuild remains active;
+its completion and the subsequent full project build are still pending.
