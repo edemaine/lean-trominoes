@@ -376,10 +376,20 @@ Its [direct-source specialization](LeanTrominoes/PeriodicCNFStripDirectSourceTer
 constructs all four signed coordinate compilers unconditionally and identifies
 their output with the actual geometric terminal positions.
 
-Next join terminal and crossing coordinate columns to the occurrence-atom
-identities, compile the original source-atom coordinates, and apply canonical
-gauging and the remaining fixed gadget refinements. The resulting horizontal
-origins supply the raster-request metadata and remaining vertex emitter.
+The [original-atom coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceOriginalAtomCoordinateCompiler.lean)
+now emits all four signed columns in deduplicated source-variable order. The
+[geometric identity](LeanTrominoes/PeriodicOrthocrossingRetainedSourceAtomPosition.lean)
+proves that the actual canonically gauged position at index `i` is
+`(160 * i + 86, 47)`. The
+[aligned key compiler](LeanTrominoes/PeriodicCNFStripDirectSourceOriginalAtomWordCompiler.lean)
+emits exactly the existing compact original-atom words, proves their
+uniqueness, and supplies one key per coordinate entry. Both compilers are
+unconditional; their inputs come from the verified formula-shape compiler.
+
+Next join the terminal, crossing, and original-atom coordinate columns to
+the occurrence-atom identities, and apply canonical gauging and the remaining
+fixed gadget refinements. The resulting horizontal origins supply the
+raster-request metadata and remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -418,12 +428,12 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,330 jobs. Its log is
-`tmp/physical-terminal-coordinate-full-build.log`. It includes all eight new
-terminal-coordinate modules and the previously verified macrocell-coordinate,
-crossing-origin, identity, incidence, contraction, endpoint-summary,
-complete-header, and normalization-request modules.
+and 10,335 jobs. Its log is
+`tmp/original-atom-coordinate-full-build.log`. It includes all five new
+original-atom coordinate and key modules and the previously verified terminal,
+macrocell-coordinate, crossing-origin, identity, incidence, contraction,
+endpoint-summary, complete-header, and normalization-request modules.
 
-All eight new modules built without diagnostics.
+All five new modules built without diagnostics.
 The completed full-build log and all cached project trace files were checked
-for compiler panics; none were found.
+for errors and compiler panics; none were found.
