@@ -466,9 +466,24 @@ Its four signed columns agree with the actual canonically gauged placement
 for every occurrence. This compiler is unconditional, including for an empty
 input alphabet.
 
-Next propagate these coordinates through the remaining fixed refinements.
-The resulting horizontal origins supply the raster-request metadata and
-remaining vertex emitter.
+The [signed affine column compiler](LeanTrominoes/SignedUnaryCoordinateRefinementCompiler.lean)
+now scales signed coordinates, adds aligned signed offsets, and normalizes
+the result. Its subtraction adapter reuses the existing unary cancellation
+machine after interleaving the columns as length-coded word pairs.
+
+The [source-split coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalSplitCoordinateCompiler.lean)
+combines the factor-1152 source refinement with the finite ring displacement.
+Angular slots are converted to compass ports before choosing the displacement:
+angular ranks begin at east, while ring indices begin at northwest.
+The [copied-literal semantics](LeanTrominoes/PeriodicCNFStripDirectSourceFinalSplitCoordinateSemantics.lean)
+identifies the outputs with the actual split placement of every literal in
+the copied-clause prefix, in clause and literal order. The compiler is
+unconditional, including for an empty input alphabet.
+
+Next compile the implication-cycle variable coordinates and clause origins,
+then propagate the resulting columns through the Figure 9 refinements and
+polarity normalization. The resulting horizontal origins supply the
+raster-request metadata and remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -507,14 +522,13 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,378 jobs. Its log is
-`tmp/canonical-terminal-coordinate-full-build.log`. It includes all eleven new
-canonical terminal affine, alignment, stream, geometry, and final-lookup
-modules, the native-list aligned-addition compiler, and the complete
-canonical coordinate compiler. It also includes the previously verified
-crossing and original-atom coordinate joins, identities, incidence and
-contraction compilers, headers, and normalization requests.
+and 10,384 jobs. Its log is
+`tmp/source-split-coordinate-full-build.log`. It includes all six new
+unary-pair, signed-difference, affine-refinement, split-placement, and direct
+copied-coordinate modules, together with the previously verified canonical
+coordinates, identities, incidence and contraction compilers, headers,
+and normalization requests.
 
-All eleven new modules built without diagnostics.
+All six new modules built without diagnostics.
 The completed full-build log and all cached project trace files were checked
 for errors and compiler panics; none were found.
