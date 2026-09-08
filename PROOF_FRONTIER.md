@@ -363,9 +363,22 @@ is unconditional and proves that these coordinate columns and the existing
 normalized source-key words use the same physical node enumeration. Terminal
 entries in these crossing-only columns are zero sentinels.
 
-Next compile the remaining terminal and source-atom grid coordinates, attach
-the finite local offsets, and propagate the positions through the occurrence,
-Figure 9, and polarity refinements to the final horizontal origins. These
+The [terminal affine-coordinate formulas](LeanTrominoes/PeriodicOrthocrossingCarrierPositionAffineTerminalSemantics.lean)
+now give both physical coordinates, including directed local port offsets and
+whole-period translations. Their finite axis/direction cases and full candidate
+order are verified. The
+[active-terminal compiler](LeanTrominoes/PeriodicOrthocrossingCarrierPositionActiveTerminalCompiler.lean)
+expands each predicate to its eighteen terminal slots and filters away inactive
+candidates. The
+[complete stream compiler](LeanTrominoes/PeriodicOrthocrossingCarrierPositionActiveTerminalStreamCompiler.lean)
+therefore emits exactly the actual endpoints in neighboring-segment order.
+Its [direct-source specialization](LeanTrominoes/PeriodicCNFStripDirectSourceTerminalCoordinateCompiler.lean)
+constructs all four signed coordinate compilers unconditionally and identifies
+their output with the actual geometric terminal positions.
+
+Next join terminal and crossing coordinate columns to the occurrence-atom
+identities, compile the original source-atom coordinates, and apply canonical
+gauging and the remaining fixed gadget refinements. The resulting horizontal
 origins supply the raster-request metadata and remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
@@ -405,12 +418,12 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,322 jobs. Its log is
-`tmp/crossing-macrocell-coordinate-full-build.log`. It includes the three new
-macrocell-coordinate and crossing-origin modules, together with the previously
-verified identity, incidence, contraction, endpoint-summary, complete-header,
-and normalization-request modules.
+and 10,330 jobs. Its log is
+`tmp/physical-terminal-coordinate-full-build.log`. It includes all eight new
+terminal-coordinate modules and the previously verified macrocell-coordinate,
+crossing-origin, identity, incidence, contraction, endpoint-summary,
+complete-header, and normalization-request modules.
 
-All three new modules also pass individual library checks with no diagnostics.
+All eight new modules built without diagnostics.
 The completed full-build log and all cached project trace files were checked
 for compiler panics; none were found.
