@@ -287,6 +287,11 @@ entries, proves injectivity on active entries, and recovers the common atom
 identity base plus each slot’s rank. This supplies the current-key field for
 the pending complete code-column proofs.
 
+The [actual parent-index bridge](LeanTrominoes/PeriodicCNFStripDirectSourceFinalParentIndexHorizontalSemantics.lean)
+now identifies compiled clause-frame lengths with the normalized source,
+proves the broadcast parent stream is exact, and shows that regrouping names
+each canonical occurrence’s actual parent clause.
+
 Next identify the compiled element identities and selected-body grouping
 with the horizontal problem, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -386,3 +391,7 @@ The dependency rebuild has completed; no full integration success is claimed.
 The actual occurrence-key interpretation passes an individual library
 compilation with no diagnostics. Successor-key and parent-index validation
 can now use the completed dependency build.
+
+The actual parent-index bridge passes an individual library compilation
+with no diagnostics. The successful dependency build log and all cached
+project trace files were checked for compiler panics; none were found.
