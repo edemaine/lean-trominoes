@@ -386,10 +386,27 @@ emits exactly the existing compact original-atom words, proves their
 uniqueness, and supplies one key per coordinate entry. Both compilers are
 unconditional; their inputs come from the verified formula-shape compiler.
 
-Next join the terminal, crossing, and original-atom coordinate columns to
-the occurrence-atom identities, and apply canonical gauging and the remaining
-fixed gadget refinements. The resulting horizontal origins supply the
-raster-request metadata and remaining vertex emitter.
+The [binary-word keyed lookup compiler](LeanTrominoes/DelimitedBinaryWordKeyedValueLookupCompiler.lean)
+now selects aligned unary values by literal word equality, preserving repeated
+queries and returning zero for missing keys. Its
+[semantics](LeanTrominoes/DelimitedBinaryWordKeyedValueLookupSemantics.lean)
+recover the exact last matching candidate without converting binary keys into
+unary integers. The
+[original-atom occurrence-coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOriginalAtomCoordinateCompiler.lean)
+uses this lookup to emit all four original-atom contributions in the exact
+final five-family occurrence order. The
+[key-separation proof](LeanTrominoes/PeriodicCNFStripOriginalAtomCoordinateLookupSemantics.lean)
+shows that original keys cannot alias other constructor families, whose
+contributions are zero. The
+[geometric-case theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOriginalAtomCoordinateSemantics.lean)
+identifies the queries with the actual retained source, proves their validity,
+and removes the remaining dictionary-membership test from the coordinate
+identity. No source-specific emission or validity premise remains.
+
+Next join terminal and crossing coordinates to the same occurrence-atom
+identities, then apply canonical gauging and the remaining fixed gadget
+refinements. The resulting horizontal origins supply the raster-request
+metadata and remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -428,10 +445,10 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,335 jobs. Its log is
-`tmp/original-atom-coordinate-full-build.log`. It includes all five new
-original-atom coordinate and key modules and the previously verified terminal,
-macrocell-coordinate, crossing-origin, identity, incidence, contraction,
+and 10,340 jobs. Its log is
+`tmp/original-occurrence-geometry-full-build.log`. It includes all five new
+binary-key lookup and original-atom occurrence-coordinate modules, together
+with the previously verified coordinate, identity, incidence, contraction,
 endpoint-summary, complete-header, and normalization-request modules.
 
 All five new modules built without diagnostics.
