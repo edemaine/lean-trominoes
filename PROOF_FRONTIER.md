@@ -254,6 +254,15 @@ identifies that filter with the actual per-element incidence list and lifts
 the result to arbitrary aligned fields. These lemmas will turn the remaining
 identity-column agreement into the selected-body premise of contraction.
 
+The [typed incidence-code interpretation](LeanTrominoes/PeriodicCNFStripTypedIncidenceElementCodes.lean)
+now codes actual triple references and proves the complete clause suffix is
+one fixed 27-reference block per clause index. The [successor-index theorem](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMOccurrenceSuccessorIndex.lean)
+identifies the assembly’s next slot with modular rank succession. The
+[parent-index theorem](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMOccurrenceParentIndex.lean)
+recovers each actual occurrence’s parent from the broadcast clause-index
+stream; [block-length transport](LeanTrominoes/FiniteBlockIndexShapeSemantics.lean)
+allows the compiled stream to use the same result once clause lengths agree.
+
 Next identify the compiled element identities and selected-body grouping
 with the horizontal problem, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -322,3 +331,7 @@ is retained locally in `tmp/canonical-horizontal-incidence-bodies-full-build.log
 The stable field-grouping and canonical incidence-filter modules pass
 individual Lean checks with no diagnostics. They were added after the running
 integration build planned its jobs and require a subsequent incremental build.
+
+The four typed-reference, successor-index, block-length, and parent-index
+modules pass individual Lean checks with no diagnostics. These also postdate
+the running integration build’s job plan and need the follow-up incremental build.
