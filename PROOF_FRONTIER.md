@@ -298,6 +298,10 @@ including one-occurrence cycles. The [complete clause-incidence code suffix](Lea
 now agrees with all actual typed clause references in clause, triple, and
 red/green/blue order.
 
+The [complete canonical element-code column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementCodeHorizontalSemantics.lean)
+now agrees with the actual typed element enumeration for all three colors,
+preserving each variable prefix, clause suffix, and color boundary.
+
 Next identify the compiled element identities and selected-body grouping
 with the horizontal problem, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -404,3 +408,6 @@ project trace files were checked for compiler panics; none were found.
 
 The actual successor-key and clause-incidence-code bridges pass individual
 library compilations with no diagnostics.
+
+The complete canonical element-code agreement passes an individual library
+compilation with no diagnostics.
