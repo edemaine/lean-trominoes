@@ -225,9 +225,15 @@ uses the compiler’s chosen compact block directly: the source, corridor, and
 coordinated-route lemmas now expose exact word formulas while retaining
 their earlier existential interfaces.
 
-Next combine these endpoint fields and stored words into the complete grouped
-occurrence bodies, assemble the typed variable-incidence bodies, and obtain
-the canonical contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [complete occurrence-body proof](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceBodyHorizontalSemantics.lean)
+now identifies every compiled red/green/blue body with its actual coordinated
+geometric route. A generic renderer lemma combines the coherent endpoint
+fields with the selected stored word. The [grouped body theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceBodyHorizontalSemantics.lean)
+preserves these complete bodies in canonical atom/slot entry order.
+
+Next assemble the complete variable-incidence bodies from these verified
+local bodies and typed prefixes, then obtain the canonical contracted raster
+requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -269,7 +275,7 @@ panics reported as informational diagnostics in derived `Inhabited` instances.
 Those instances now have explicit defaults preserving the previous values;
 both modules pass individual Lean checks with no diagnostics.
 
-The eight new occurrence-field and specified-block modules, plus the three
+The ten new occurrence-field and complete-body modules, plus the three
 refactored route geometry modules, pass individual Lean checks with no
 diagnostics. Their full integration and the two compiler fixes still need
-a fresh full build; the 10,272-job result predates these changes.
+a fresh full-build result; the 10,272-job result predates these changes.
