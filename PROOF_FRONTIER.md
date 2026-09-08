@@ -453,11 +453,20 @@ emits all four signed columns separately for boundary and internal
 occurrences. Each output agrees with the actual canonically gauged placement,
 including its local offset, and contributes zero for other atom families.
 
-Next compile canonical terminal coordinates, assemble the four atom-family
-contributions, and propagate the remaining fixed refinements. The existing
-[terminal-gauge certificates](LeanTrominoes/PeriodicOrthocrossingCarrierNormalizationOffsetTerminalCandidateSemantics.lean)
-identify finite endpoint shifts through `GaugedSegment.HasPeriodGauges`;
-these can adjust the affine terminal expressions before lookup.
+The [canonical terminal compiler](LeanTrominoes/PeriodicOrthocrossingCarrierCanonicalTerminalCoordinateCompiler.lean)
+subtracts the finite endpoint gauges from the affine terminal expressions.
+The gauge identity removes each retained period translate; the existing
+activity filter and terminal dictionary preserve the exact occurrence order.
+The [final terminal join](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalTerminalCoordinateCompiler.lean)
+agrees with the actual canonically gauged terminal placement.
+
+The [complete canonical coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalCoordinateCompiler.lean)
+adds the four disjoint atom-family contributions in final occurrence order.
+Its four signed columns agree with the actual canonically gauged placement
+for every occurrence. This compiler is unconditional, including for an empty
+input alphabet.
+
+Next propagate these coordinates through the remaining fixed refinements.
 The resulting horizontal origins supply the raster-request metadata and
 remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -498,13 +507,14 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,367 jobs. Its log is
-`tmp/canonical-crossing-coordinate-full-build.log`. It includes all seven new
-canonical crossing affine, candidate-alignment, stream, generic ranking,
-and direct final-coordinate modules, together with the previously verified
-internal, boundary, terminal, and original-atom coordinate joins, identities,
-incidence and contraction compilers, headers, and normalization requests.
+and 10,378 jobs. Its log is
+`tmp/canonical-terminal-coordinate-full-build.log`. It includes all eleven new
+canonical terminal affine, alignment, stream, geometry, and final-lookup
+modules, the native-list aligned-addition compiler, and the complete
+canonical coordinate compiler. It also includes the previously verified
+crossing and original-atom coordinate joins, identities, incidence and
+contraction compilers, headers, and normalization requests.
 
-All seven new modules built without diagnostics.
+All eleven new modules built without diagnostics.
 The completed full-build log and all cached project trace files were checked
 for errors and compiler panics; none were found.
