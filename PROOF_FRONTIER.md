@@ -205,9 +205,19 @@ covers inactive kind/polarity slots by the same last-occurrence fallback and
 inactive directions by north. The [polynomial-time certificate](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableFanHorizontalCompiler.lean)
 emits this complete actual fan stream with semantic agreement discharged.
 
-Next identify grouped source occurrence order and combine these verified
-endpoint fields with the occurrence bodies, then obtain the canonical
-contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [exact grouping proof](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceEntryOrder.lean)
+identifies the compiled occurrence indices with the canonical source's
+atom/slot entry enumeration. Both use last-representative variable order and
+increasing active occurrence rank. The [complete grouped fan/slot theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableFanHorizontalSemantics.lean)
+keeps every actual horizontal fan and active slot attached to its own entry;
+the [grouped compiler certificate](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableFanHorizontalCompiler.lean)
+emits this actual semantic stream in polynomial time. The [prefix-body theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidencePrefixHorizontalSemantics.lean)
+then identifies all finite variable prefixes in canonical entry, typed-triple,
+and red/green/blue order.
+
+Next combine these verified grouped endpoint fields and prefixes with the
+coordinated occurrence bodies, then obtain the canonical contracted raster
+requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -248,3 +258,9 @@ succeeded. This includes complete variable-fan agreement with the actual
 horizontal construction, including inactive slots, and a polynomial-time
 certificate for the semantic fan stream. All 13 new modules have no compiler
 diagnostics in their build traces.
+
+The eight new grouped-order, fan/slot, and typed-prefix modules passed their
+individual Lean checks with no diagnostics. A complete default rebuild is
+running to validate their integration and the generalized disjoint-block
+deduplication lemma; the last completed full-build result above predates
+this grouped-order milestone.

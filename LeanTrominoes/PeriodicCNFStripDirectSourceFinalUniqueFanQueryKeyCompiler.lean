@@ -24,7 +24,7 @@ noncomputable local instance directFinalUniqueFanQueryKeyStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-/-- One occurrence key per active final occurrence, grouped by the first
+/-- One occurrence key per active final occurrence, grouped by the last
 presentation of its atom identity and then by stable occurrence rank. -/
 def directSourceFinalUniqueFanQueryKeys
     (symbols : List encoding.Γ) : List Nat :=

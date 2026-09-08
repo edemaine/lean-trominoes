@@ -9,20 +9,18 @@ import Mathlib.Data.List.Dedup
 
 namespace LeanTrominoes
 
-/-- With duplicate-free blocks whose values identify their key,
-last-occurrence-preserving deduplication may be performed on the keys before
-flattening the blocks. -/
-theorem List.dedup_flatMap_blocks
+/-- For blocks whose values identify their key, last-occurrence-preserving
+deduplication acts on both the keys and the individual blocks. -/
+theorem List.dedup_flatMap_disjoint_blocks
     {Key Value : Type*}
     [DecidableEq Key] [DecidableEq Value]
     (keys : List Key)
     (block : Key → List Value)
-    (blockNodup : ∀ key, (block key).Nodup)
     (blockDisjoint :
       ∀ {first second}, first ≠ second →
         List.Disjoint (block first) (block second)) :
     (keys.flatMap block).dedup =
-      keys.dedup.flatMap block := by
+      keys.dedup.flatMap (fun key => (block key).dedup) := by
   induction keys with
   | nil =>
       rfl
@@ -50,9 +48,19 @@ theorem List.dedup_flatMap_blocks
             valueMember valueOtherMember
         rw [List.flatMap_cons,
           blocksDisjoint.dedup_append,
-          List.dedup_eq_self.mpr (blockNodup key),
           List.dedup_cons_of_notMem keyMember,
           List.flatMap_cons,
           induction]
+
+/-- Duplicate-free disjoint blocks need only deduplicate their keys. -/
+theorem List.dedup_flatMap_blocks
+    {Key Value : Type*} [DecidableEq Key] [DecidableEq Value]
+    (keys : List Key) (block : Key → List Value)
+    (blockNodup : ∀ key, (block key).Nodup)
+    (blockDisjoint : ∀ {first second}, first ≠ second →
+      List.Disjoint (block first) (block second)) :
+    (keys.flatMap block).dedup = keys.dedup.flatMap block := by
+  rw [List.dedup_flatMap_disjoint_blocks keys block blockDisjoint]
+  simp only [List.dedup_eq_self.mpr (blockNodup _)]
 
 end LeanTrominoes
