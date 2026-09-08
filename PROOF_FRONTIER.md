@@ -275,6 +275,12 @@ name the actual typed references. It covers every genuine local triple and
 color, including a cyclic successor equal to the current slot, and lifts
 the result to the complete ordered local incidence block.
 
+The [contracted route-token theorem](LeanTrominoes/PeriodicCNFStripHorizontalContractedDirectionTokenSemantics.lean)
+now identifies the assembler output of correct incidence blocks with the
+complete geometric route-word stream, including every edge delimiter and
+canonical edge position. The source-specific specialization and its
+polynomial-time compiler transport remain local drafts pending validation.
+
 Next identify the compiled element identities and selected-body grouping
 with the horizontal problem, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -366,3 +372,7 @@ The finite variable-selector interpretation also passes an individual library
 compilation with no diagnostics. The remaining source-specific drafts now
 include numbered-column agreement, selected incidence-body grouping, and the
 contracted-edge conclusion; these remain unverified in ignored local files.
+
+The contracted route-token theorem passes an individual library compilation
+with no diagnostics. Its source-specific specialization is not yet verified.
+The dependency rebuild is still running; no full integration success is claimed.
