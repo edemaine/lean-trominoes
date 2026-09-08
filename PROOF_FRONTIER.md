@@ -415,10 +415,22 @@ in the exact final occurrence order, with zero for other atom families.
 The compiler and its geometric-position identity are unconditional. These
 terminal coordinates are before canonical gauging.
 
-Next join crossing coordinates to the same occurrence-atom identities, then
-apply canonical gauging and the remaining fixed gadget refinements. The
-resulting horizontal origins supply the raster-request metadata and remaining
-vertex emitter.
+The [physical crossing-key compiler](LeanTrominoes/PeriodicOrthocrossingCarrierCrossingCoordinateKeyCompiler.lean)
+now retags the existing ranked source-pair words into a dictionary aligned
+with the crossing-origin columns. Its
+[membership and identity proof](LeanTrominoes/PeriodicOrthocrossingCarrierCrossingCoordinateKeySemantics.lean)
+shows that global datum ranking preserves the complete retained node set and
+that every valid boundary has a unique physical key. The
+[direct boundary-origin compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalBoundaryCrossingOriginCompiler.lean)
+emits all four signed crossing macrocell origins in final occurrence order,
+with zero on non-boundary atoms. Its output agrees with each boundary's
+actual crossing origin, without source-specific dictionary assumptions.
+Local side offsets and canonical gauging are still separate steps.
+
+Next compile crossover-internal origins, apply canonical gauging, add the
+finite crossing-gadget offsets, and propagate the remaining fixed refinements.
+The resulting horizontal origins supply the raster-request metadata and
+remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -457,12 +469,13 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,347 jobs. Its log is
-`tmp/terminal-occurrence-coordinate-full-build.log`. It includes all seven
-new terminal-key, lookup, and occurrence-coordinate modules, together with
-the previously verified original-atom coordinates, crossing origins, identities,
-incidences, contraction, endpoint summaries, headers, and normalization requests.
+and 10,353 jobs. Its log is
+`tmp/boundary-crossing-origin-full-build.log`. It includes all six new
+crossing-key, ranked-node membership, lookup, and boundary-origin modules,
+together with the previously verified terminal and original-atom coordinate
+joins, identities, incidence and contraction compilers, headers, and
+normalization requests.
 
-All seven new modules built without diagnostics.
+All six new modules built without diagnostics.
 The completed full-build log and all cached project trace files were checked
 for errors and compiler panics; none were found.
