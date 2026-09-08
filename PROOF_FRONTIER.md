@@ -441,8 +441,23 @@ complete final occurrence presentation. The underlying
 [finite-family concatenation closure](LeanTrominoes/FiniteFamilyColumnConcatCompiler.lean)
 preserves the alignment of role-major keys and coordinate columns.
 
-Next apply canonical gauging, compile the boundary-side offsets, assemble
-coordinates, and propagate the remaining fixed refinements.
+The [canonical crossing affine compiler](LeanTrominoes/PeriodicOrthocrossingCarrierCanonicalCrossingCoordinateCompiler.lean)
+uses the active slot's already canonical, unshifted crossing point. It
+therefore compiles wrapping without a division machine, and adds the finite
+side or internal-role offset in the same affine expression. The
+[aligned stream](LeanTrominoes/PeriodicOrthocrossingCarrierCanonicalCrossingCoordinateStreamCompiler.lean)
+and [generic ranked-value compiler](LeanTrominoes/PeriodicOrthocrossingCarrierSourceKeyRankOrderedValueCompiler.lean)
+retain the exact physical dictionary order. The
+[final canonical crossing-coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalCrossingCoordinateCompiler.lean)
+emits all four signed columns separately for boundary and internal
+occurrences. Each output agrees with the actual canonically gauged placement,
+including its local offset, and contributes zero for other atom families.
+
+Next compile canonical terminal coordinates, assemble the four atom-family
+contributions, and propagate the remaining fixed refinements. The existing
+[terminal-gauge certificates](LeanTrominoes/PeriodicOrthocrossingCarrierNormalizationOffsetTerminalCandidateSemantics.lean)
+identify finite endpoint shifts through `GaugedSegment.HasPeriodGauges`;
+these can adjust the affine terminal expressions before lookup.
 The resulting horizontal origins supply the raster-request metadata and
 remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -483,12 +498,12 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,360 jobs. Its log is
-`tmp/internal-crossing-coordinate-full-build.log`. It includes all seven new
-finite-family concatenation, internal crossing dictionary, lookup, origin,
-and local-coordinate modules, together with the previously verified
-boundary, terminal, and original-atom coordinate joins, identities, incidence
-and contraction compilers, headers, and normalization requests.
+and 10,367 jobs. Its log is
+`tmp/canonical-crossing-coordinate-full-build.log`. It includes all seven new
+canonical crossing affine, candidate-alignment, stream, generic ranking,
+and direct final-coordinate modules, together with the previously verified
+internal, boundary, terminal, and original-atom coordinate joins, identities,
+incidence and contraction compilers, headers, and normalization requests.
 
 All seven new modules built without diagnostics.
 The completed full-build log and all cached project trace files were checked
