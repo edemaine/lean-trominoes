@@ -292,6 +292,12 @@ now identifies compiled clause-frame lengths with the normalized source,
 proves the broadcast parent stream is exact, and shows that regrouping names
 each canonical occurrence’s actual parent clause.
 
+The [actual successor-key bridge](LeanTrominoes/PeriodicCNFStripDirectSourceFinalNextOccurrenceKeyHorizontalSemantics.lean)
+now identifies the numeric cyclic map with the next used occurrence,
+including one-occurrence cycles. The [complete clause-incidence code suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceElementCodeHorizontalSemantics.lean)
+now agrees with all actual typed clause references in clause, triple, and
+red/green/blue order.
+
 Next identify the compiled element identities and selected-body grouping
 with the horizontal problem, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -395,3 +401,6 @@ can now use the completed dependency build.
 The actual parent-index bridge passes an individual library compilation
 with no diagnostics. The successful dependency build log and all cached
 project trace files were checked for compiler panics; none were found.
+
+The actual successor-key and clause-incidence-code bridges pass individual
+library compilations with no diagnostics.
