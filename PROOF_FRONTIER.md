@@ -173,8 +173,26 @@ classifies every atom in the complete pre-Figure 9 source as a genuine compass
 or separator copy of a represented retained atom, and identifies the actual
 cycle literal rows in stable source-atom order.
 
-Next prove the inherited identity comparisons involving cycle occurrences, then
-identify stable occurrence ranks with source order. This will identify the
+The [parent value rows](LeanTrominoes/PeriodicCNFStripDirectSourceFinalAtomValueRows.lean)
+combine copied and cycle literals in actual parent order, retaining each
+phase's unused fallback value at parent-local positions. The
+[shared row projection](LeanTrominoes/PeriodicCNFStripHorizontalSourceOccurrenceAtomValueRows.lean)
+and [complete code alignment](LeanTrominoes/PeriodicCNFStripDirectSourceFinalAtomValueRowCodes.lean)
+identify every inherited-column entry with its coherent occurrence's own row.
+The [full inherited proof](LeanTrominoes/PeriodicCNFStripDirectSourceFinalInheritedAtomHorizontalSemantics.lean)
+therefore covers copied and cycle incidences with one argument. Combined with
+the fresh and auxiliary cases, the [complete identity theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalAtomIdentityHorizontalSemantics.lean)
+proves that any two compiled identities are equal exactly when their actual
+horizontal atoms are equal.
+
+The [partition transport lemmas](LeanTrominoes/StableOccurrenceRanksPartition.lean)
+preserve all prefix counts, total multiplicities, and stable ranks under an
+exact correspondence of equality classes. Their [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceStableRankHorizontalSemantics.lean)
+identifies the compiled group-size and stable-rank columns with those of the
+actual horizontal atom list in clause/literal order.
+
+Next use these ranks and the aligned occurrence fields to identify each
+variable-fan slot with its actual source incidence. This will identify the
 complete variable fans and grouped occurrence bodies, then the canonical
 contracted raster requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
@@ -212,9 +230,8 @@ assumes one of these compiler contracts.
 Build coverage and proof completion are separate: a successful build of
 conditional closure theorems does not prove the unconditional target.
 
-The complete default `lake build` passed on 2026-09-07: all 10,244 jobs
-succeeded. This includes the complete fresh and auxiliary identity comparisons,
-the global identity comparison for inherited copied incidences, exact
-occurrence-block decomposition, and actual copied/cycle ring membership and
-literal-row semantics. The changed modules and their rebuilt dependent module
+The complete default `lake build` passed on 2026-09-07: all 10,251 jobs
+succeeded. This includes complete numeric identity agreement with actual
+horizontal atoms, shared copied/cycle inherited-code alignment, and exact
+horizontal occurrence multiplicities and stable ranks. All seven new modules
 have no compiler diagnostics in their build traces.
