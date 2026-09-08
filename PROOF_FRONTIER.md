@@ -336,9 +336,15 @@ now selects exactly the actual endpoint records at each colored element in
 canonical incidence order. It reuses the counted occurrence keys directly
 with finite-value lookup and emits one record for every contraction role.
 
-Next assemble complete route headers from the grouped endpoint records.
-Combine the headers and route words with raster-request metadata and framing,
-and construct the remaining vertex emitter. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [complete route-header compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalContractedRouteHeaderSemantics.lean)
+now pairs the compiled roles and endpoint records and assembles the exact
+geometric header for every canonical contracted edge. Degree-two elements
+produce one header between triple endpoints; degree-three elements produce
+three headers sharing their correctly ordered retained fan.
+
+Next combine the verified headers and route words into complete normalization
+requests, then add raster-request metadata and construct the remaining
+vertex emitter. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -396,3 +402,7 @@ project traces were checked for compiler panics, with none found.
 
 The two new finite-value grouping modules pass individual library checks
 with exit code 0 and no diagnostics; full integration validation is pending.
+
+The three new aligned-pairing and complete-header modules also pass individual
+library checks with exit code 0 and no diagnostics. Full integration
+validation of these and the finite-value grouping modules is pending.
