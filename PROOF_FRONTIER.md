@@ -244,15 +244,15 @@ incidence-tag selector.
 The [typed element-code interpretation](LeanTrominoes/PeriodicCNFStripTypedElementCodes.lean)
 now gives the structural numeric name of every actual red, green, and blue
 element. Its checked enumeration lemmas retain the occurrence-entry prefix
-and clause suffix for each color. Agreement with the complete compiled code
-columns is the next step; the code interpretation alone does not establish it.
+and clause suffix for each color. The actual column and numbered-identity
+bridges below now connect this interpretation to the complete compiled codes.
 
 The [stable field-grouping lemma](LeanTrominoes/ListGroupedFieldLookup.lean)
 transports numeric index selection to semantic filtering while preserving
 presentation order. The [incidence-tag ordering theorem](LeanTrominoes/PeriodicThreeDMIncidenceTagElementOrder.lean)
 identifies that filter with the actual per-element incidence list and lifts
-the result to arbitrary aligned fields. These lemmas will turn the remaining
-identity-column agreement into the selected-body premise of contraction.
+the result to arbitrary aligned fields. The actual selected-body theorem
+below uses these lemmas to discharge the grouping premise of contraction.
 
 The [typed incidence-code interpretation](LeanTrominoes/PeriodicCNFStripTypedIncidenceElementCodes.lean)
 now codes actual triple references and proves the complete clause suffix is
@@ -278,8 +278,8 @@ the result to the complete ordered local incidence block.
 The [contracted route-token theorem](LeanTrominoes/PeriodicCNFStripHorizontalContractedDirectionTokenSemantics.lean)
 now identifies the assembler output of correct incidence blocks with the
 complete geometric route-word stream, including every edge delimiter and
-canonical edge position. The source-specific specialization and its
-polynomial-time compiler transport remain local drafts pending validation.
+canonical edge position. Its checked source-specific specialization and
+polynomial-time compiler transport are recorded below.
 
 The [actual occurrence-key interpretation](LeanTrominoes/PeriodicCNFStripDirectSourceFinalOccurrenceKeyHorizontalSemantics.lean)
 now identifies unique compiled keys with the canonical horizontal occurrence
@@ -318,8 +318,13 @@ bodies at each colored element. Together with the verified degree column,
 this discharges every premise of the contraction assembler: its complete
 edge blocks agree with the canonical horizontal contracted blocks.
 
-Next identify the complete emitted geometric route-token stream and combine
-it with the raster-request metadata, endpoint headers, and framing. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [actual geometric route-token compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalContractedDirectionTokenHorizontalSemantics.lean)
+now identifies the complete compiled stream with the geometric direction
+word at every canonical contracted edge. It supplies an unconditional
+polynomial-time machine for that exact delimited stream.
+
+Next combine these route words with raster-request metadata, endpoint headers,
+and framing, and construct the remaining vertex emitter. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -329,7 +334,7 @@ All names below are in `LeanTrominoes.PeriodicCNFStripReduction`. Each witness
 is uniform in an arbitrary encoded source language and its
 `Complexity.DeciderInPolySpace` decider.
 
-| Required witness | Exact type | Consumer |
+| Construction stage | Available sufficient witness | Consumer |
 | --- | --- | --- |
 | Affine vertex emission | `DirectSparseAffineTablePhaseFamilies decider` | [directSparseVertexRecordAppenderOfTablePhases](LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseCompiler.lean) |
 | Compact framed route emission and semantic agreement | `DirectSparseCompactContractedRouteRasterSourceCompiler decider` | [directSparseRouteRasterRequestTokenCompilerOfCompactSource](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceCompiler.lean) |
@@ -341,8 +346,9 @@ families carry exact output proofs for variable triples,
 clause triples, and red/green/blue elements. The compact route compiler
 carries an explicit token function, its polynomial-time certificate, and
 equality of the fixed bridge's output with the canonical raster requests.
-The raster-request row is obtained from the compact-source row, not an
-independent additional machine.
+The compact-source row is one way to obtain the raster-request row. The
+verified geometric route-token compiler also supplies the direction component
+for a direct construction of the raster-request emitter.
 
 Alternative existing appender constructors can bypass the five-family
 interface. In either case, instantiate actual witnesses before invoking a
@@ -351,89 +357,29 @@ assumes one of these compiler contracts.
 
 ## Validation
 
-`lake build` is configured to include every module through the library glob.
-Build coverage and proof completion are separate: a successful build of
-conditional closure theorems does not prove the unconditional target.
+`lake build` includes every module through the library glob. Build coverage
+and proof completion are separate: compiling conditional closure theorems
+does not prove the unconditional target.
 
-The grouped-order integration `lake build` completed on 2026-09-07 with
-exit code 0 and 10,272 jobs. A subsequent trace audit found two code-generation
-panics reported as informational diagnostics in derived `Inhabited` instances.
-Those instances now have explicit defaults preserving the previous values;
-both modules pass individual Lean checks with no diagnostics.
+The four-worker build of the 14 existing dependency targets for the source
+code-column proofs completed on 2026-09-08 with exit code 0 and 9,159 jobs.
+Its log is `tmp/element-code-semantic-dependencies-rebuild.log`. The completed
+log and all cached project trace files were checked for compiler panics;
+none were found.
 
-The ten new occurrence-field and complete-body modules, plus the three
-refactored route geometry modules, pass individual Lean checks with no
-diagnostics. The subsequent full rebuild on 2026-09-08 failed on two
-library-import reads under memory pressure. Both affected modules passed
-individual checks after that build stopped.
+The 12 new modules for numbered codes, finite selectors, actual occurrence
+keys and parents, complete code columns, selected bodies, contracted edges,
+and geometric route tokens all pass individual library compilations with
+exit code 0 and no diagnostics. They were added after that dependency build
+planned its jobs and still require full integration validation.
 
-Full diagnostic logging also exposed ten older code-generation panics in
-seven cached modules. Their derived defaults have been replaced by explicit
-instances preserving the selected constructors. All seven modules pass
-individual Lean checks without panics; two existing unused-simp warnings
-remain in `GadgetPixelFiniteTokens`. A clean full-build result is still pending.
+A new four-worker full project build is running. Its log is
+`tmp/actual-horizontal-code-and-contraction-full-build.log`; no successful
+result is claimed until that process completes.
 
-The eight new complete-body modules and two typed-route geometry refactors
-pass individual Lean checks with no diagnostics. A full project trace audit
-found only the previously fixed panic sites; Lake must refresh their cached
-traces during the pending integration build.
-
-The typed element-code interpretation also passes an individual Lean check
-with no diagnostics. The four-worker integration retry was interrupted on
-2026-09-08: four Lean workers exited with code `1073807364`, followed by
-fourteen exits with Windows code `3221226091` (`0xC000026B`). The build
-process and its workers are no longer running. Its log is retained locally
-in `tmp/canonical-horizontal-incidence-bodies-full-build.log`; it does not
-establish a successful integration build.
-
-The stable field-grouping and canonical incidence-filter modules pass
-individual Lean checks with no diagnostics. They were added after that
-integration retry planned its jobs and require a subsequent incremental build.
-
-The four typed-reference, successor-index, block-length, and parent-index
-modules pass individual Lean checks with no diagnostics. These also postdate
-that integration retry’s job plan and need the follow-up incremental build.
-
-The four-worker build of the exact existing imports of the occurrence-key,
-canonical-code, clause-incidence-code, successor-key, and parent-index drafts
-completed successfully on 2026-09-08: exit code 0, 9,159 jobs. Its log is
-`tmp/element-code-semantic-dependencies-rebuild.log`. This was a dependency-targeted
-build; a full project build covering the new proof modules is still pending.
-
-The numbered element-code bridge passes an individual library compilation
-with no diagnostics. The dependency rebuild has completed; the subsequent
-full project build is still pending.
-
-The finite variable-selector interpretation also passes an individual library
-compilation with no diagnostics. The remaining source-specific drafts now
-include numbered-column agreement, selected incidence-body grouping, and the
-contracted-edge conclusion; these remain unverified in ignored local files.
-
-The contracted route-token theorem passes an individual library compilation
-with no diagnostics. Its source-specific specialization is not yet verified.
-The dependency rebuild has completed; no full integration success is claimed.
-
-The actual occurrence-key interpretation passes an individual library
-compilation with no diagnostics. Successor-key and parent-index validation
-can now use the completed dependency build.
-
-The actual parent-index bridge passes an individual library compilation
-with no diagnostics. The successful dependency build log and all cached
-project trace files were checked for compiler panics; none were found.
-
-The actual successor-key and clause-incidence-code bridges pass individual
-library compilations with no diagnostics.
-
-The complete canonical element-code agreement passes an individual library
-compilation with no diagnostics.
-
-The complete typed incidence-code agreement passes an individual library
-compilation with no diagnostics. Numbered-element transport is being checked.
-
-The numbered horizontal identity bridge passes an individual library
-compilation with no diagnostics. Selected-body grouping and contracted-edge
-agreement are now being checked against these concrete identities.
-
-The actual selected-body and contracted-edge agreement passes an individual
-library compilation with no diagnostics. The final geometric direction-token
-compiler transport is now being checked.
+The last completed full integration build was the 10,272-job grouped-order
+build on 2026-09-07. Later full retries encountered library-import failures
+under memory pressure and Windows process interruptions. The affected
+modules passed individual checks, and the discovered derived-default
+compiler panics were fixed. Those retries do not establish full integration
+success for the current tree.
