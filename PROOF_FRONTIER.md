@@ -342,9 +342,15 @@ geometric header for every canonical contracted edge. Degree-two elements
 produce one header between triple endpoints; degree-three elements produce
 three headers sharing their correctly ordered retained fan.
 
-Next combine the verified headers and route words into complete normalization
-requests, then add raster-request metadata and construct the remaining
-vertex emitter. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [canonical normalization-request compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRouteDirectionRequestCompiler.lean)
+now joins the verified headers and direction words with exact request
+boundaries. It constructs the unconditional
+`directSparseRouteDirectionRequestTokenCompiler` witness and composes all
+three normalization rounds to compile the exact final direction words and
+edge delimiters. No source-specific request-emission premise remains.
+
+Next add the raster-request metadata and construct the remaining vertex
+emitter. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -382,27 +388,12 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,309 jobs. Its log is
-`tmp/actual-horizontal-code-and-contraction-full-build.log`. This includes
-all 12 new modules for numbered codes, finite selectors, actual occurrence
-keys and parents, complete code columns, selected bodies, contracted edges,
-and geometric route tokens. The completed log and all cached project trace
-files were checked for compiler panics; none were found.
+and 10,319 jobs. Its log is
+`tmp/canonical-normalization-request-full-build.log`. This includes all seven
+new finite-value grouping, aligned-pairing, complete-header, and normalization-
+request modules, together with the previously verified identity, incidence,
+contraction, and endpoint-summary modules.
 
-The earlier four-worker dependency build also completed with exit code 0 and
-9,159 jobs; its log is `tmp/element-code-semantic-dependencies-rebuild.log`.
-The successful full build supersedes the earlier interrupted integration
-retries for the committed code and contraction modules.
-
-The three new endpoint-summary modules pass their individual Lean checks
-with no diagnostics. The subsequent four-worker full integration build
-completed with exit code 0 and 10,312 jobs, including all three modules. Its
-log is `tmp/incidence-endpoint-summary-full-build.log`; it and all cached
-project traces were checked for compiler panics, with none found.
-
-The two new finite-value grouping modules pass individual library checks
-with exit code 0 and no diagnostics; full integration validation is pending.
-
-The three new aligned-pairing and complete-header modules also pass individual
-library checks with exit code 0 and no diagnostics. Full integration
-validation of these and the finite-value grouping modules is pending.
+All seven new modules also pass individual library checks with no diagnostics.
+The completed full-build log and all cached project trace files were checked
+for compiler panics; none were found.
