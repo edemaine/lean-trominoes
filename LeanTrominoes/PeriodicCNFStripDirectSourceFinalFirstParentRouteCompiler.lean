@@ -6,7 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.FirstParentInheritedRouteCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalTailDisplacementCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseDescriptorSourceSemantics
-import LeanTrominoes.UnaryFieldBooleanFilterCompiler
+import LeanTrominoes.UnaryFieldBooleanFilterNativeListCompiler
 
 /-! # Compiled first-literal route displacement candidates and selection -/
 
@@ -24,20 +24,6 @@ private theorem sourceHeaders_append_variables (source : List Token) (count : Na
     | zero => rfl
     | succ count _induction => simp [List.replicate_succ, PeriodicCNF.FormulaShapeFigureNinePolarityRouteHeader.tokenBlock]
   rw [empty, List.append_nil]
-
-private noncomputable def selectedNativeCompiler {Symbol : Type} [Fintype Symbol]
-    (controls : List Symbol → List Bool) (values : List Symbol → List Nat)
-    (controlCompiler : TM2ComputableInPolyTime id id controls)
-    (valueCompiler : TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields values) :
-    TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
-      (fun input => UnaryFieldBooleanFilter.selectedValues (controls input) (values input)) := by
-  classical
-  exact if nonemptyAlphabet : Nonempty Symbol then by
-    letI : Inhabited Symbol := ⟨Classical.choice nonemptyAlphabet⟩
-    exact UnaryFieldBooleanFilter.selectedValuesComputableInPolyTime id controls values controlCompiler valueCompiler
-  else by
-    letI : IsEmpty Symbol := ⟨fun symbol => nonemptyAlphabet ⟨symbol⟩⟩
-    exact TM2EmptyAlphabetListInputCompiler.computableInPolyTime UnaryFieldEncoderMachine.unaryFields _
 
 private theorem refinementComponent_length (factor : Nat) (source offset : List Nat)
     (aligned : source.length = offset.length) :
@@ -146,7 +132,7 @@ noncomputable def directSourceFinalFirstParentRouteDisplacementsComputableInPoly
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (directSourceFinalFirstParentRouteDisplacements decider horizontal keepPositive) := by
   unfold directSourceFinalFirstParentRouteDisplacements
-  exact selectedNativeCompiler (directSourceFinalFirstParentRouteControls decider)
+  exact UnaryFieldBooleanFilter.selectedValuesNativeListComputableInPolyTime (directSourceFinalFirstParentRouteControls decider)
     (directSourceFinalParentRouteDisplacementCandidates decider horizontal keepPositive)
     (directSourceFinalFirstParentRouteControlsComputableInPolyTime decider)
     (directSourceFinalParentRouteDisplacementCandidatesComputableInPolyTime decider horizontal keepPositive)

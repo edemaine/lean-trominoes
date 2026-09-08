@@ -513,10 +513,24 @@ The [direct parent-route compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFin
 compiles the aligned selector, first-step fields, and selected displacement
 candidates uniformly from source symbols, including empty alphabets.
 
-Next broadcast copied coordinates into the final occurrence order and append
-the cycle coordinates. Apply the same first-parent selector to that coordinate
-column and connect its selected tail to the clause-origin recovery theorem.
-Then propagate the resulting coordinates through the Figure 9 refinements
+The [copied-coordinate broadcast](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCopiedCoordinateCompiler.lean)
+now reuses the compiled presentation-slot queries. The
+[complete inherited-coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalInheritedCoordinateCompiler.lean)
+appends the cycle suffix and proves agreement with actual parent literal rows
+and coherent occurrence lookups. The
+[first-parent coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalFirstParentCoordinateCompiler.lean)
+selects exactly one first-literal coordinate per actual parent clause. Its
+output length agrees with the selected route-displacement column. Both
+compilers use the shared
+[native-list Boolean filter](LeanTrominoes/UnaryFieldBooleanFilterNativeListCompiler.lean),
+including its empty-alphabet case and aligned block laws. The
+[selected-route geometry](LeanTrominoes/FirstParentInheritedRouteGeometry.lean)
+identifies that header's tail with the original first literal's normalized
+route, including tied clockwise directions.
+
+Next combine these matching parent columns and apply the clause-origin
+recovery theorem to prove the compiled origin values. Then propagate the
+resulting coordinates through the Figure 9 refinements
 and polarity normalization to supply raster-request metadata and the
 remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -557,14 +571,15 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,397 jobs. Its log is
-`tmp/source-clause-displacement-full-build.log`. It includes all seven new
-signed direction-displacement, unit-route endpoint recovery, retained clause
-origin, first-parent selection, and direct tail/parent-route compiler modules,
-together with the previously verified copied and cycle coordinates, canonical
-coordinates, identities, incidence and contraction compilers, headers, and
-normalization requests.
+and 10,402 jobs. Its log is
+`tmp/first-parent-coordinate-full-build.log`. It includes the five new modules for copied,
+complete inherited, and first-parent coordinates, selected-route geometry,
+and shared native-list Boolean filtering, plus the refactored
+parent-route compiler. The previously verified direction-displacement,
+clause-origin recovery, cycle and canonical coordinates, identities,
+incidence and contraction compilers, headers, and normalization requests
+remain included.
 
-All seven new modules built without diagnostics.
+All six new or changed Lean modules built without diagnostics.
 The completed full-build log and all cached project trace files were checked
 for errors and compiler panics; none were found.
