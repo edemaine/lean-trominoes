@@ -427,8 +427,22 @@ with zero on non-boundary atoms. Its output agrees with each boundary's
 actual crossing origin, without source-specific dictionary assumptions.
 Local side offsets and canonical gauging are still separate steps.
 
-Next compile crossover-internal origins, apply canonical gauging, add the
-finite crossing-gadget offsets, and propagate the remaining fixed refinements.
+The [internal crossing dictionary](LeanTrominoes/PeriodicOrthocrossingInternalCrossingCoordinateKeyCompiler.lean)
+adds each of the nine internal roles to the physical crossing identity.
+Its [lookup theorem](LeanTrominoes/PeriodicOrthocrossingInternalCrossingCoordinateLookupSemantics.lean)
+proves exact crossing and role selection for every valid internal occurrence.
+The [direct internal-origin compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalInternalCrossingOriginCompiler.lean)
+now emits all four signed physical macrocell-origin columns in final
+occurrence order, with zero for other atom families.
+The [internal local-coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalInternalLocalCoordinateCompiler.lean)
+also emits the exact finite gadget offsets, using a general compiler for
+fixed internal-role data. Both joins are unconditional and use the same
+complete final occurrence presentation. The underlying
+[finite-family concatenation closure](LeanTrominoes/FiniteFamilyColumnConcatCompiler.lean)
+preserves the alignment of role-major keys and coordinate columns.
+
+Next apply canonical gauging, compile the boundary-side offsets, assemble
+coordinates, and propagate the remaining fixed refinements.
 The resulting horizontal origins supply the raster-request metadata and
 remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
@@ -469,13 +483,13 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,353 jobs. Its log is
-`tmp/boundary-crossing-origin-full-build.log`. It includes all six new
-crossing-key, ranked-node membership, lookup, and boundary-origin modules,
-together with the previously verified terminal and original-atom coordinate
-joins, identities, incidence and contraction compilers, headers, and
-normalization requests.
+and 10,360 jobs. Its log is
+`tmp/internal-crossing-coordinate-full-build.log`. It includes all seven new
+finite-family concatenation, internal crossing dictionary, lookup, origin,
+and local-coordinate modules, together with the previously verified
+boundary, terminal, and original-atom coordinate joins, identities, incidence
+and contraction compilers, headers, and normalization requests.
 
-All six new modules built without diagnostics.
+All seven new modules built without diagnostics.
 The completed full-build log and all cached project trace files were checked
 for errors and compiler panics; none were found.
