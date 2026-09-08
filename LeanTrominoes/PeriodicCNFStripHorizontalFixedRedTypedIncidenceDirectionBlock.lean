@@ -23,9 +23,9 @@ attribute [local instance]
   horizontalRoutedRoutesSourceVariableDecidableEq
   horizontalRibbonRoutedVariableDecidableEq
 
-/-- Every genuine fixed-red typed incidence is either its finite variable-site
-word or that word followed by the selected compact occurrence route. -/
-theorem horizontalFixedRedVariableTypedIncidenceRoute_directionBlock
+/-- The actual typed incidence word is its finite prefix followed by the
+coordinated route exactly when this is the routed occurrence triple. -/
+theorem horizontalFixedRedVariableTypedIncidenceRoute_directions
     (source : PeriodicCNF Nat)
     (atom : RoutedVariable) (slot : OccurrenceSlot)
     (localTriple : FixedRedConnectorTriple)
@@ -35,19 +35,25 @@ theorem horizontalFixedRedVariableTypedIncidenceRoute_directionBlock
     let input : HorizontalVariableTypedIncidenceRouteInput :=
       ((((source, atom), slot),
         Triple.fixedRed atom slot localTriple), color)
-    ∃ block : HorizontalVariableTypedIncidenceDirectionBlock,
-      unitSubdivisionDirections
-          (horizontalVariableTypedIncidenceRouteComputed input) =
-        horizontalVariableTypedIncidenceDirections input block := by
+    unitSubdivisionDirections (horizontalVariableTypedIncidenceRouteComputed input) =
+      horizontalVariableIncidencePrefixDirections (horizontalVariableRoutePrefixQueryComputed input) ++
+        if Triple.fixedRed atom slot localTriple = routedOccurrenceTriple
+            (horizontalSemanticNormalizedRibbonSource source).erase atom slot color then
+          unitSubdivisionDirections (horizontalOccurrenceCoordinatedRouteComputed
+            (horizontalVariableOccurrenceRouteQueryComputed input))
+        else [] := by
   dsimp only
   let typed : Triple RoutedVariable :=
     .fixedRed atom slot localTriple
   let input : HorizontalVariableTypedIncidenceRouteInput :=
     ((((source, atom), slot), typed), color)
-  change ∃ block : HorizontalVariableTypedIncidenceDirectionBlock,
-    unitSubdivisionDirections
-        (horizontalVariableTypedIncidenceRouteComputed input) =
-      horizontalVariableTypedIncidenceDirections input block
+  change unitSubdivisionDirections (horizontalVariableTypedIncidenceRouteComputed input) =
+    horizontalVariableIncidencePrefixDirections (((source, atom), typed), color) ++
+        if typed = routedOccurrenceTriple
+            (horizontalSemanticNormalizedRibbonSource source).erase atom slot color then
+          unitSubdivisionDirections (horizontalOccurrenceCoordinatedRouteComputed
+            (horizontalVariableOccurrenceRouteQueryComputed input))
+        else []
   let location := fixedRedTriple_location
     (horizontalSemanticNormalizedRibbonSource source).erase
     atom slot localTriple member
@@ -73,12 +79,7 @@ theorem horizontalFixedRedVariableTypedIncidenceRoute_directionBlock
       typed = routedOccurrenceTriple
         (horizontalSemanticNormalizedRibbonSource source).erase
         atom slot color
-  · rcases exists_horizontalOccurrenceLookupComputed_of_slot_mem
-        source atom slot location.2.1 with
-      ⟨tagged, lookup⟩
-    rcases horizontalOccurrenceCoordinatedRoute_directionBlock_of_lookup
-        ((((source, atom), slot), color)) tagged lookup with
-      ⟨occurrenceBlock, occurrenceDirections⟩
+  ·
     have prefixEq :=
       horizontalVariableIncidencePrefixComputed_eq_assembledFixedRed
         source width compatible atom slot localTriple member color
@@ -109,57 +110,77 @@ theorem horizontalFixedRedVariableTypedIncidenceRoute_directionBlock
       rw [empty] at prefixLastComputed
       simp at prefixLastComputed
     have boundary := prefixLastComputed.trans occurrenceHeadComputed.symm
-    have occurrenceDirections' :
-        unitSubdivisionDirections
-            (horizontalOccurrenceCoordinatedRouteComputed
-              (horizontalVariableOccurrenceRouteQueryComputed input)) =
-          horizontalOccurrenceCoordinatedDirections
-            (horizontalVariableOccurrenceRouteQueryComputed input)
-            occurrenceBlock := by
-      simpa only [horizontalVariableOccurrenceRouteQueryComputed,
-        horizontalVariableTypedIncidenceMetadataComputed, input, typed] using
-        occurrenceDirections
-    refine ⟨.routed occurrenceBlock, ?_⟩
     unfold horizontalVariableTypedIncidenceRouteComputed
-      horizontalVariableTypedIncidenceDirections
     change unitSubdivisionDirections
         (if typed = horizontalRoutedOccurrenceTripleQueryComputed input then
           joinAtEndpoint
-            (horizontalVariableIncidencePrefixComputed
-              (((source, atom), typed), color))
+            (horizontalVariableIncidencePrefixComputed (((source, atom), typed), color))
             (horizontalOccurrenceCoordinatedRouteComputed
               (horizontalVariableOccurrenceRouteQueryComputed input))
-        else
-          horizontalVariableIncidencePrefixComputed
-            (((source, atom), typed), color)) =
-      horizontalVariableIncidencePrefixDirections
-          (((source, atom), typed), color) ++
-        horizontalOccurrenceCoordinatedDirections
-          (horizontalVariableOccurrenceRouteQueryComputed input)
-          occurrenceBlock
-    rw [routedQuery, if_pos isRouted]
-    rw [unitSubdivisionDirections_joinAtEndpoint
-      prefixNonempty boundary]
-    rw [unitSubdivisionDirections_horizontalVariableIncidencePrefixComputed,
-      occurrenceDirections']
-  · refine ⟨.local, ?_⟩
-    unfold horizontalVariableTypedIncidenceRouteComputed
-      horizontalVariableTypedIncidenceDirections
+        else horizontalVariableIncidencePrefixComputed (((source, atom), typed), color)) =
+      horizontalVariableIncidencePrefixDirections (((source, atom), typed), color) ++
+        if typed = routedOccurrenceTriple
+            (horizontalSemanticNormalizedRibbonSource source).erase atom slot color then
+          unitSubdivisionDirections (horizontalOccurrenceCoordinatedRouteComputed
+            (horizontalVariableOccurrenceRouteQueryComputed input))
+        else []
+    rw [routedQuery]
+    simp only [if_pos isRouted]
+    rw [unitSubdivisionDirections_joinAtEndpoint prefixNonempty boundary,
+      unitSubdivisionDirections_horizontalVariableIncidencePrefixComputed]
+  · unfold horizontalVariableTypedIncidenceRouteComputed
     change unitSubdivisionDirections
         (if typed = horizontalRoutedOccurrenceTripleQueryComputed input then
           joinAtEndpoint
-            (horizontalVariableIncidencePrefixComputed
-              (((source, atom), typed), color))
+            (horizontalVariableIncidencePrefixComputed (((source, atom), typed), color))
             (horizontalOccurrenceCoordinatedRouteComputed
               (horizontalVariableOccurrenceRouteQueryComputed input))
-        else
-          horizontalVariableIncidencePrefixComputed
-            (((source, atom), typed), color)) =
-      horizontalVariableIncidencePrefixDirections
-        (((source, atom), typed), color)
-    rw [routedQuery, if_neg isRouted]
+        else horizontalVariableIncidencePrefixComputed (((source, atom), typed), color)) =
+      horizontalVariableIncidencePrefixDirections (((source, atom), typed), color) ++
+        if typed = routedOccurrenceTriple
+            (horizontalSemanticNormalizedRibbonSource source).erase atom slot color then
+          unitSubdivisionDirections (horizontalOccurrenceCoordinatedRouteComputed
+            (horizontalVariableOccurrenceRouteQueryComputed input))
+        else []
+    rw [routedQuery]
+    simp only [if_neg isRouted, List.append_nil]
     exact unitSubdivisionDirections_horizontalVariableIncidencePrefixComputed
       (((source, atom), typed), color)
+
+/-- Every genuine typed incidence has its existing compact direction block. -/
+theorem horizontalFixedRedVariableTypedIncidenceRoute_directionBlock
+    (source : PeriodicCNF Nat)
+    (atom : RoutedVariable) (slot : OccurrenceSlot)
+    (localTriple : FixedRedConnectorTriple)
+    (member : Triple.fixedRed atom slot localTriple ∈
+      triples (horizontalSemanticNormalizedRibbonSource source).erase)
+    (color : WireColor) :
+    let input : HorizontalVariableTypedIncidenceRouteInput :=
+      ((((source, atom), slot),
+        Triple.fixedRed atom slot localTriple), color)
+    ∃ block : HorizontalVariableTypedIncidenceDirectionBlock,
+      unitSubdivisionDirections
+          (horizontalVariableTypedIncidenceRouteComputed input) =
+        horizontalVariableTypedIncidenceDirections input block := by
+  dsimp only
+  have directions := horizontalFixedRedVariableTypedIncidenceRoute_directions source atom slot localTriple member color
+  dsimp only at directions
+  by_cases isRouted : Triple.fixedRed atom slot localTriple = routedOccurrenceTriple
+      (horizontalSemanticNormalizedRibbonSource source).erase atom slot color
+  · have location := fixedRedTriple_location
+      (horizontalSemanticNormalizedRibbonSource source).erase atom slot localTriple member
+    obtain ⟨tagged, lookup⟩ := exists_horizontalOccurrenceLookupComputed_of_slot_mem
+      source atom slot location.2.1
+    obtain ⟨block, occurrenceDirections⟩ := horizontalOccurrenceCoordinatedRoute_directionBlock_of_lookup
+      (((source, atom), slot), color) tagged lookup
+    refine ⟨.routed block, ?_⟩
+    rw [directions, if_pos isRouted]
+    simp only [horizontalVariableTypedIncidenceDirections,
+      horizontalVariableOccurrenceRouteQueryComputed, horizontalVariableTypedIncidenceMetadataComputed]
+    rw [occurrenceDirections]
+  · refine ⟨.local, ?_⟩
+    rw [directions, if_neg isRouted, List.append_nil]
+    rfl
 
 end PeriodicCNFStripReduction
 end LeanTrominoes

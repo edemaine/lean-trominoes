@@ -231,8 +231,18 @@ geometric route. A generic renderer lemma combines the coherent endpoint
 fields with the selected stored word. The [grouped body theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedOccurrenceBodyHorizontalSemantics.lean)
 preserves these complete bodies in canonical atom/slot entry order.
 
-Next assemble the complete variable-incidence bodies from these verified
-local bodies and typed prefixes, then obtain the canonical contracted raster
+The [complete variable-incidence proof](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceBodyHorizontalSemantics.lean)
+now assembles these local bodies and typed prefixes in canonical triple and
+red/green/blue order. Opaque aligned columns keep the finite assembly proof
+independent of the full source computation. Exact ordinary and fixed-red
+typed-route formulas identify every resulting word with its geometric route.
+The [canonical body theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalIncidenceBodyHorizontalSemantics.lean)
+combines the variable and clause parts: the complete body list and its
+delimited direction-token stream now agree with the canonical horizontal
+incidence-tag selector.
+
+Next identify the compiled element identities and selected-body grouping
+with the horizontal problem, then obtain the canonical contracted raster
 requests. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -286,3 +296,8 @@ seven cached modules. Their derived defaults have been replaced by explicit
 instances preserving the selected constructors. All seven modules pass
 individual Lean checks without panics; two existing unused-simp warnings
 remain in `GadgetPixelFiniteTokens`. A clean full-build result is still pending.
+
+The eight new complete-body modules and two typed-route geometry refactors
+pass individual Lean checks with no diagnostics. A full project trace audit
+found only the previously fixed panic sites; Lake must refresh their cached
+traces during the pending integration build.
