@@ -70,4 +70,23 @@ theorem selectedValues_eq_sourceOccurrences_map_copiedValue
         (sourceOccurrenceCopiedValue (blocks.map Prod.snd)) := by
   rw [selectedValues_clauseBlocks blocks lengths, sourceOccurrences_map_copiedValue_blocks]
 
+/-- A genuine parent lookup and remapped inherited-slot lookup identify the
+selected value with the code of that exact literal atom. -/
+theorem sourceOccurrenceCopiedValue_eq_literal
+    {Atom : Type} (clauses : List (PositionedPeriodicClause Atom))
+    (atomValue : Atom → Nat) (occurrence : SourceOccurrence)
+    (clause : PositionedPeriodicClause Atom) (literal : PeriodicLiteral Atom)
+    (slot : PeriodicCNF.ClauseProfilePolarityRouteOperation.SourceLiteralSlot)
+    (parentLookup : clauses[occurrence.parentClauseIndex]? = some clause)
+    (scope : outputAtomScopeControl occurrence.header = .inherited slot)
+    (literalLookup : clause.literals[
+      PeriodicCNF.FormulaShapeFigureNinePolarityRouteHeader.sourceSlotNat
+        (presentationSlotAt occurrence.profile slot)]? = some literal) :
+    sourceOccurrenceCopiedValue
+        (clauses.map (fun parent => parent.literals.map (fun entry => atomValue entry.atom))) occurrence =
+      atomValue literal.atom := by
+  simp only [sourceOccurrenceCopiedValue, List.getD_eq_getElem?_getD, List.getElem?_map,
+    parentLookup, Option.map_some, Option.getD_some, scope, remapScopeControl, scopeOffset,
+    literalLookup]
+
 end LeanTrominoes.PeriodicCNFStripReduction
