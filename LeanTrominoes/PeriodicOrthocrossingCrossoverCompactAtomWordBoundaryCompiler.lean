@@ -23,14 +23,20 @@ inductive BoundaryPhase
   | segment
   | retain
   | discard
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited BoundaryPhase := ⟨.between⟩
 
 inductive BoundaryAmount
   | zero
   | one
   | two
   | three
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited BoundaryAmount := ⟨.zero⟩
 
 def BoundaryAmount.value : BoundaryAmount → Nat
   | .zero => 0

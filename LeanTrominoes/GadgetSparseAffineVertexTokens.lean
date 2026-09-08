@@ -24,7 +24,10 @@ inductive Token
   | verticalOffset
   | fieldEnd
   | cellType (value : OrthogonalCellType)
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited Token := ⟨.scaledCoordinateUnit⟩
 
 /-- First-stage symbols.  A `scale144Unit` still needs two factor-12
 expansions; a `scale12Unit` needs one. -/
@@ -34,7 +37,10 @@ inductive IntermediateToken
   | coordinateUnit
   | fieldEnd
   | cellType (value : OrthogonalCellType)
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited IntermediateToken := ⟨.scale144Unit⟩
 
 /-- Second-stage symbols, after all factor-144 units have been expanded. -/
 inductive PreparedToken
@@ -42,7 +48,10 @@ inductive PreparedToken
   | coordinateUnit
   | fieldEnd
   | cellType (value : OrthogonalCellType)
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited PreparedToken := ⟨.scale12Unit⟩
 
 /-- First factor-12 expansion.  The two offsets use
 `471 = 3·144 + 3·12 + 3` and `1257 = 8·144 + 8·12 + 9`. -/

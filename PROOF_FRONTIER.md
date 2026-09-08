@@ -277,5 +277,12 @@ both modules pass individual Lean checks with no diagnostics.
 
 The ten new occurrence-field and complete-body modules, plus the three
 refactored route geometry modules, pass individual Lean checks with no
-diagnostics. Their full integration and the two compiler fixes still need
-a fresh full-build result; the 10,272-job result predates these changes.
+diagnostics. The subsequent full rebuild on 2026-09-08 failed on two
+library-import reads under memory pressure. Both affected modules passed
+individual checks after that build stopped.
+
+Full diagnostic logging also exposed ten older code-generation panics in
+seven cached modules. Their derived defaults have been replaced by explicit
+instances preserving the selected constructors. All seven modules pass
+individual Lean checks without panics; two existing unused-simp warnings
+remain in `GadgetPixelFiniteTokens`. A clean full-build result is still pending.

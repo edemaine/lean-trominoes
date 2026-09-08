@@ -34,7 +34,10 @@ inductive Token
   | localOffset (offset : Fin 6)
   | fieldEnd
   | cellMarker
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited Token := ⟨.headerUnit⟩
 
 /-- Fixed expansion of one affine-coordinate symbol. -/
 def block : Token → List PeriodicCNF.UnaryProgramTokens.Token

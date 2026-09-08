@@ -22,7 +22,10 @@ inductive CleanupControl
   | guard
   | retain
   | discard
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited CleanupControl := ⟨.between⟩
 
 def internalTransition : CleanupControl → DelimitedBinaryWords.Token →
     CleanupControl × List DelimitedBinaryWords.Token

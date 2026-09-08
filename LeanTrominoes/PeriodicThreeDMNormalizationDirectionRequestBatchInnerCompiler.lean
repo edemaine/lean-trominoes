@@ -24,7 +24,10 @@ open Computability Turing
 inductive NormalizedToken
   | direction (value : AxisDirection)
   | routeEnd
-  deriving DecidableEq, Fintype, Inhabited, Repr
+  deriving DecidableEq, Fintype, Repr
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited NormalizedToken := ⟨.routeEnd⟩
 
 def untagBlock : Batch.Token → List NormalizationDirectionRequest.Token
   | .request token => [token]

@@ -24,7 +24,10 @@ inductive Control
   | firstBit
   | retain
   | discard
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited Control := ⟨.between⟩
 
 /-- Discard false-headed sentinel words. For a true-headed active word,
 replace that support bit by the compact terminal constructor `00` and copy

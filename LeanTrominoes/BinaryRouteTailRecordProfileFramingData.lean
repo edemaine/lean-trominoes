@@ -54,7 +54,10 @@ def profilePrefixes : List Profile → List RouteToken
 inductive PrefixControl
   | empty
   | first (profile : Profile)
-  deriving DecidableEq, Fintype, Inhabited
+  deriving DecidableEq, Fintype
+
+-- An explicit default avoids a code-generation failure in the derived instance.
+instance : Inhabited PrefixControl := ⟨.empty⟩
 
 def prefixTransition : PrefixControl → Profile →
     PrefixControl × List RouteToken
