@@ -331,10 +331,14 @@ exact triple endpoint header data and retained-element outward side/color.
 The finite endpoint identities are proved separately from the geometric
 lookup, avoiding unnecessary unfolding of the source construction.
 
-Next regroup these summaries by the verified element keys and combine the
-appropriate endpoint data into complete route headers. Combine the headers
-and route words with raster-request metadata and framing, and construct the
-remaining vertex emitter. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [keyed endpoint regrouping compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalSelectedIncidenceEndpointSummarySemantics.lean)
+now selects exactly the actual endpoint records at each colored element in
+canonical incidence order. It reuses the counted occurrence keys directly
+with finite-value lookup and emits one record for every contraction role.
+
+Next assemble complete route headers from the grouped endpoint records.
+Combine the headers and route words with raster-request metadata and framing,
+and construct the remaining vertex emitter. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -389,3 +393,6 @@ with no diagnostics. The subsequent four-worker full integration build
 completed with exit code 0 and 10,312 jobs, including all three modules. Its
 log is `tmp/incidence-endpoint-summary-full-build.log`; it and all cached
 project traces were checked for compiler panics, with none found.
+
+The two new finite-value grouping modules pass individual library checks
+with exit code 0 and no diagnostics; full integration validation is pending.
