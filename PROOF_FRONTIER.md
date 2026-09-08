@@ -403,10 +403,22 @@ identifies the queries with the actual retained source, proves their validity,
 and removes the remaining dictionary-membership test from the coordinate
 identity. No source-specific emission or validity premise remains.
 
-Next join terminal and crossing coordinates to the same occurrence-atom
-identities, then apply canonical gauging and the remaining fixed gadget
-refinements. The resulting horizontal origins supply the raster-request
-metadata and remaining vertex emitter.
+The [active terminal-key compiler](LeanTrominoes/PeriodicOrthocrossingActiveTerminalCompactKeyCompiler.lean)
+now projects the existing paired source-key emission to one compact key per
+physical terminal coordinate. Its
+[identity semantics](LeanTrominoes/PeriodicOrthocrossingTerminalCompactKeySemantics.lean)
+prove key uniqueness, exclude the other atom constructors, and place every
+valid periodic terminal's translation-zero representative in the dictionary.
+The [direct terminal-coordinate join](LeanTrominoes/PeriodicCNFStripDirectSourceFinalTerminalCoordinateCompiler.lean)
+therefore emits all four signed physical terminal-coordinate contributions
+in the exact final occurrence order, with zero for other atom families.
+The compiler and its geometric-position identity are unconditional. These
+terminal coordinates are before canonical gauging.
+
+Next join crossing coordinates to the same occurrence-atom identities, then
+apply canonical gauging and the remaining fixed gadget refinements. The
+resulting horizontal origins supply the raster-request metadata and remaining
+vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -445,12 +457,12 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,340 jobs. Its log is
-`tmp/original-occurrence-geometry-full-build.log`. It includes all five new
-binary-key lookup and original-atom occurrence-coordinate modules, together
-with the previously verified coordinate, identity, incidence, contraction,
-endpoint-summary, complete-header, and normalization-request modules.
+and 10,347 jobs. Its log is
+`tmp/terminal-occurrence-coordinate-full-build.log`. It includes all seven
+new terminal-key, lookup, and occurrence-coordinate modules, together with
+the previously verified original-atom coordinates, crossing origins, identities,
+incidences, contraction, endpoint summaries, headers, and normalization requests.
 
-All five new modules built without diagnostics.
+All seven new modules built without diagnostics.
 The completed full-build log and all cached project trace files were checked
 for errors and compiler panics; none were found.
