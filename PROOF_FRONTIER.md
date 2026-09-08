@@ -325,13 +325,23 @@ found only the previously fixed panic sites; Lake must refresh their cached
 traces during the pending integration build.
 
 The typed element-code interpretation also passes an individual Lean check
-with no diagnostics. The four-worker integration retry is running; its log
-is retained locally in `tmp/canonical-horizontal-incidence-bodies-full-build.log`.
+with no diagnostics. The four-worker integration retry was interrupted on
+2026-09-08: four Lean workers exited with code `1073807364`, followed by
+fourteen exits with Windows code `3221226091` (`0xC000026B`). The build
+process and its workers are no longer running. Its log is retained locally
+in `tmp/canonical-horizontal-incidence-bodies-full-build.log`; it does not
+establish a successful integration build.
 
 The stable field-grouping and canonical incidence-filter modules pass
-individual Lean checks with no diagnostics. They were added after the running
-integration build planned its jobs and require a subsequent incremental build.
+individual Lean checks with no diagnostics. They were added after that
+integration retry planned its jobs and require a subsequent incremental build.
 
 The four typed-reference, successor-index, block-length, and parent-index
 modules pass individual Lean checks with no diagnostics. These also postdate
-the running integration build’s job plan and need the follow-up incremental build.
+that integration retry’s job plan and need the follow-up incremental build.
+
+Lean starts successfully in the current session. The exact existing imports
+of the occurrence-key, canonical-code, clause-incidence-code, successor-key,
+and parent-index drafts are now being rebuilt with four workers. The log is
+`tmp/element-code-semantic-dependencies-rebuild.log`. These source-specific
+drafts remain local and unverified; the full project build is still pending.
