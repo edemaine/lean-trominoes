@@ -349,8 +349,25 @@ boundaries. It constructs the unconditional
 three normalization rounds to compile the exact final direction words and
 edge delimiters. No source-specific request-emission premise remains.
 
-Next add the raster-request metadata and construct the remaining vertex
-emitter. The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
+The [macrocell-coordinate identity](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATMacrocellCoordinates.lean)
+now expresses every canonically gauged planar-variable position as its wrapped
+drawing-grid point plus its unchanged finite local offset. For crossing
+boundaries, the correction is exactly the already compiled ownership quotient;
+no separate division at the refined gadget scale is needed.
+
+The [crossing-origin compiler](LeanTrominoes/PeriodicOrthocrossingCarrierCrossingMacroOriginCompiler.lean)
+scales the four signed crossing-point columns to physical macrocell origins
+and proves their exact global carrier order. Its
+[direct-source specialization](LeanTrominoes/PeriodicCNFStripDirectSourceCarrierCrossingMacroOriginCompiler.lean)
+is unconditional and proves that these coordinate columns and the existing
+normalized source-key words use the same physical node enumeration. Terminal
+entries in these crossing-only columns are zero sentinels.
+
+Next compile the remaining terminal and source-atom grid coordinates, attach
+the finite local offsets, and propagate the positions through the occurrence,
+Figure 9, and polarity refinements to the final horizontal origins. These
+origins supply the raster-request metadata and remaining vertex emitter.
+The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
 
@@ -388,12 +405,12 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-08 with exit code 0
-and 10,319 jobs. Its log is
-`tmp/canonical-normalization-request-full-build.log`. This includes all seven
-new finite-value grouping, aligned-pairing, complete-header, and normalization-
-request modules, together with the previously verified identity, incidence,
-contraction, and endpoint-summary modules.
+and 10,322 jobs. Its log is
+`tmp/crossing-macrocell-coordinate-full-build.log`. It includes the three new
+macrocell-coordinate and crossing-origin modules, together with the previously
+verified identity, incidence, contraction, endpoint-summary, complete-header,
+and normalization-request modules.
 
-All seven new modules also pass individual library checks with no diagnostics.
+All three new modules also pass individual library checks with no diagnostics.
 The completed full-build log and all cached project trace files were checked
 for compiler panics; none were found.
