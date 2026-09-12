@@ -11,11 +11,10 @@ The eventual goal is every theorem and lemma in the paper. Theorem 5.2 is
 proved: for either single tromino, periodic-subset tiling is co-r.e.-complete
 in the plane and PSPACE-complete in a strip.
 
-The next target is the plane assertion of Theorem 5.5, using a fixed connected
-15-omino and an input-dependent disconnected polyomino. The exact geometric
-tileability equivalence is proved under explicit corner-margin and source-block
-promises, including arbitrary rotations and reflections. The full complexity
-theorem remains open; [THEOREM55_FRONTIER.md](THEOREM55_FRONTIER.md) records the gap.
+The plane assertion of Theorem 5.5 is also proved: tiling by a fixed connected
+15-omino and an input disconnected polyomino is co-r.e.-complete, allowing
+arbitrary rotations and reflections. The strip assertion remains open.
+[THEOREM55_FRONTIER.md](THEOREM55_FRONTIER.md) records the construction and validation.
 
 ## Main statements and proofs
 
@@ -38,6 +37,7 @@ otherwise.
 | Theorem 5.2, complete result | `Theorem52.proved` | [Theorem52Proof](LeanTrominoes/Theorem52Proof.lean) |
 | Theorem 5.2, strip PSPACE completeness | `Theorem52.stripProved` | [Theorem52Proof](LeanTrominoes/Theorem52Proof.lean) |
 | Theorem 5.2, complete plane result | `PeriodicWangPlanarThreeDMReduction.theorem52_planeStatement` | [PeriodicWangPlanarThreeDMReduction](LeanTrominoes/PeriodicWangPlanarThreeDMReduction.lean) |
+| Theorem 5.5, plane co-r.e. completeness | `Theorem55.planeProved` | [Theorem55Proof](LeanTrominoes/Theorem55Proof.lean) |
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE hardness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEHard` | [PeriodicCNFPolySpaceHardness](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean) |
@@ -90,7 +90,7 @@ a paper theorem.
 | Theorem 3.1 | Imported Wang tiling theorem |
 | Theorem 3.2 | Local 1D CNF SAT hardness proved; full theorem open |
 | Theorem 5.2 | Fully proved |
-| Theorem 5.5, plane | Co-r.e. hardness proved; upper bound remains open |
+| Theorem 5.5 | Plane co-r.e. completeness proved; strip assertion open |
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 | Open |
 

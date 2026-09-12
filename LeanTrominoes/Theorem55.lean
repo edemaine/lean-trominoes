@@ -12,7 +12,7 @@ import LeanWang.CoRE
 
 P is the fixed connected 15-omino. The input is an explicit list of cells
 for Q; repeated cells are ignored. Empty or connected Q inputs are rejected.
-This module defines the target proposition, without asserting a proof.
+This module defines the target proposition. `Theorem55Proof` supplies its proof.
 -/
 
 namespace LeanTrominoes.Theorem55

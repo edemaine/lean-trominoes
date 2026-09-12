@@ -3,7 +3,9 @@
 The plane target is `LeanTrominoes.Theorem55.planeStatement`, defined in
 [Theorem55.lean](LeanTrominoes/Theorem55.lean). It fixes the connected
 15-omino P and takes an explicit list of cells for Q. Empty and connected
-Q inputs are rejected. **Co-r.e. hardness is proved; the upper bound remains open.**
+Q inputs are rejected. **The plane co-r.e.-completeness theorem is proved** by
+`LeanTrominoes.Theorem55.planeProved` in
+[Theorem55Proof.lean](LeanTrominoes/Theorem55Proof.lean).
 
 ## Established geometric reduction
 
@@ -126,7 +128,7 @@ carrier and all corner promises. `Theorem55Source.planeProblem_iff` therefore
 applies the geometric reduction to every concrete source presentation without
 additional geometric hypotheses, including Q's disconnectedness.
 
-## Remaining work
+## Computable reduction
 
 [Theorem55Compiler.lean](LeanTrominoes/Theorem55Compiler.lean) gives the
 executable cell list, and [Theorem55CompilerComputability.lean](LeanTrominoes/Theorem55CompilerComputability.lean)
@@ -136,8 +138,29 @@ The new geometric and compiler certificates use only the standard axioms;
 the composed hardness theorem inherits native-evaluation certificates from
 the existing source reduction and Wang theorem.
 
-Prove co-r.e. membership of the target two-tile problem, then close
-`Theorem55.planeStatement`.
+## Upper bound and completion
+
+[PlaneTilingFiniteSearch.lean](LeanTrominoes/PlaneTilingFiniteSearch.lean)
+enumerates the placements that can cover each finite box and all subsets of
+those candidates. Compactness proves that consistent coverage of every box
+is equivalent to a plane tiling, for any pair of finite shapes.
+[PlaneTilingSearchComputability.lean](LeanTrominoes/PlaneTilingSearchComputability.lean)
+certifies the search primitive recursive and proves the general co-r.e. upper bound.
+
+[PolyominoConnectivitySearch.lean](LeanTrominoes/PolyominoConnectivitySearch.lean)
+characterizes disconnectedness of a nonempty shape by a nontrivial cut closed
+under side adjacency. Its [computability certificate](LeanTrominoes/PolyominoConnectivityComputability.lean)
+enumerates all cuts. [Theorem55UpperBound.lean](LeanTrominoes/Theorem55UpperBound.lean)
+combines the connectivity and finite-tiling checks, including rejection of
+empty inputs, to prove `Theorem55.coRE`. Together with `Theorem55.coREHard`,
+this closes `Theorem55.planeProved` without geometric or compiler hypotheses.
+
+The construction modules and public root are checked with Lean 4.31.0.
+The completion audit checks for `sorryAx` and compares the theorem's axioms
+with the existing Theorem 5.2 plane proof. The upper bound uses only the
+standard axioms; the completed theorem adds no axioms to that source proof.
+
+## Remaining paper results
 
 The strip PSPACE assertion and the translation-only corollary are later
 targets. No unproved compiler, drawing, grid-forcing, or complexity witness

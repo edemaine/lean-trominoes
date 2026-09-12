@@ -9,8 +9,9 @@ import LeanTrominoes.KeyedComplementGridRecovery
 /-! # Exact tileability equivalence for the two-polyomino construction
 
 The geometric reduction is valid for masks on the cross grid with reserved
-corner margins. Establishing these promises and disconnectedness for a
-computable family of hard instances is still required for Theorem 5.5.
+corner margins. `Theorem55SourceMask` establishes these promises and
+disconnectedness for the concrete hard-source family; `Theorem55Proof`
+supplies the completed plane co-r.e.-completeness theorem.
 -/
 
 namespace LeanTrominoes.Theorem55

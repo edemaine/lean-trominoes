@@ -1,8 +1,6 @@
 import LeanTrominoes.Theorem52Proof
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
-import LeanTrominoes.Theorem55Geometry
-import LeanTrominoes.Theorem55SourceMask
-import LeanTrominoes.Theorem55Hardness
+import LeanTrominoes.Theorem55Proof
 
 /-!
 # Main theorem interface
@@ -13,11 +11,10 @@ import LeanTrominoes.Theorem55Hardness
 See README.md for the main declarations and PROOF_FRONTIER.md for the
 completed construction and validation.
 
-`Theorem55Geometry` also proves the exact two-polyomino tileability equivalence
-under explicit source promises, now discharged for the concrete prepared source
-by `Theorem55Source.planeProblem_iff`. `Theorem55.coREHard` proves plane hardness.
-The co-r.e. upper bound and full Theorem 5.5 plane statement remain open;
-see THEOREM55_FRONTIER.md.
+`Theorem55.planeProved` proves co-r.e. completeness of plane tiling by a fixed
+connected 15-omino and an input disconnected polyomino, allowing rotations
+and reflections. The strip assertion remains open. See THEOREM55_FRONTIER.md
+for the construction and validation.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.

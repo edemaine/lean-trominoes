@@ -1,7 +1,7 @@
 # Theorem 5.2 proof status
 
-The next target, Theorem 5.5 in the plane, has its own
-[proof frontier](THEOREM55_FRONTIER.md). The record below concerns the
+The completed plane proof of Theorem 5.5 has its own
+[construction record](THEOREM55_FRONTIER.md). The record below concerns the
 completed Theorem 5.2 construction.
 
 The unconditional proof is
