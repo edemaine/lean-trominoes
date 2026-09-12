@@ -12,6 +12,8 @@ import LeanTrominoes.KeyedComplementEnvelope
 import LeanTrominoes.KeyedComplementRefinedExclusion
 import LeanTrominoes.TilingPairNormalization
 import LeanTrominoes.TilingPrescribedCompactness
+import LeanTrominoes.KeyedComplementGridRecovery
+import LeanTrominoes.KeyedComplementDisconnected
 
 /-!
 # Established parts of the two-polyomino construction

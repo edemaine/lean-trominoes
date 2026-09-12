@@ -23,6 +23,9 @@ exposes the proved geometric components:
 | `Theorem55.recover_tromino_of_background` | Extracts the original I-tromino tiling once the actual Q placements tile the intended complement. |
 | `KeyedPeriodicComplement.tile_upper`, `lower_tile` | The actual Q lies between the matching envelopes when the holes satisfy `AdmissibleHoles`. |
 | `KeyedPeriodicComplement.tile_not_inside_refinement` | A rigid copy of Q cannot lie entirely in a refined region: its reserved corner contains a 2-by-2 block. |
+| `KeyedPeriodicComplement.recover_tromino_of_grid` | A mixed tiling containing the canonical Q grid recovers an I-tromino tiling of the source. Additional Q placements are excluded. |
+| `KeyedPeriodicComplement.tile_nonempty` | Every admissible Q is nonempty. |
+| `KeyedPeriodicComplement.tile_disconnected_of_source_square` | A source 2-by-2 block away from the period boundary isolates a 2-by-2 component of Q and proves Q disconnected. |
 
 The two keys move the five cells of each lock across a period boundary.
 The residue-representative proof establishes exact coverage and disjointness
@@ -83,10 +86,10 @@ The supporting translation and symmetry lemmas preserve exact tilings.
    square masks with sufficient empty corner margins and period at least
    96 divisible by three. Prove these guarantees for the actual construction.
    The abstract completeness statement of 5.2 does not provide them.
-5. Ensure Q is nonempty and disconnected on every reduction output. A
-   separated, independently I-tileable square can provide a bounded
-   component of Q; its isolation and preservation of source tileability
-   need proofs.
+5. Exhibit a source 2-by-2 block away from the period boundary on the hard
+   instances, invoking `tile_disconnected_of_source_square`. If needed, add
+   a separated, independently I-tileable rectangle containing such a block;
+   preservation of source tileability under this padding still needs proof.
 6. Certify the computable reduction and co-r.e. membership of the target
    two-tile problem, then close `Theorem55.planeStatement`.
 
