@@ -12,10 +12,10 @@ proved: for either single tromino, periodic-subset tiling is co-r.e.-complete
 in the plane and PSPACE-complete in a strip.
 
 The next target is the plane assertion of Theorem 5.5, using a fixed connected
-15-omino and an input-dependent disconnected polyomino. The small-tile
-properties, exact cross-refinement equivalence, keyed complement's canonical
-tiling, and forward construction are proved. The full complexity theorem
-remains open; [THEOREM55_FRONTIER.md](THEOREM55_FRONTIER.md) records the gap.
+15-omino and an input-dependent disconnected polyomino. The exact geometric
+tileability equivalence is proved under explicit corner-margin and source-block
+promises, including arbitrary rotations and reflections. The full complexity
+theorem remains open; [THEOREM55_FRONTIER.md](THEOREM55_FRONTIER.md) records the gap.
 
 ## Main statements and proofs
 
@@ -90,7 +90,7 @@ a paper theorem.
 | Theorem 3.1 | Imported Wang tiling theorem |
 | Theorem 3.2 | Local 1D CNF SAT hardness proved; full theorem open |
 | Theorem 5.2 | Fully proved |
-| Theorem 5.5, plane | Geometric components and forward construction proved; full theorem open |
+| Theorem 5.5, plane | Geometric reduction proved under source promises; full complexity theorem open |
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 | Open |
 

@@ -5,7 +5,20 @@ The plane target is `LeanTrominoes.Theorem55.planeStatement`, defined in
 15-omino P and takes an explicit list of cells for Q. Empty and connected
 Q inputs are rejected. **The co-r.e.-completeness theorem is not yet proved.**
 
-## Established construction
+## Established geometric reduction
+
+[Theorem55Geometry.lean](LeanTrominoes/Theorem55Geometry.lean) proves:
+
+- `Theorem55.pair_tileable_iff`: the explicit P/Q pair tiles the plane iff
+  I trominoes tile the source, assuming the square-periodic mask is its cross
+  refinement, the holes avoid the reserved corners, and the period is at least
+  96 and divisible by three.
+- `Theorem55.planeProblem_iff_of_source_square`: a source 2-by-2 block away
+  from the period boundary additionally certifies Q's disconnectedness, giving
+  equivalence with the exact target predicate, including its connectivity check.
+
+Both results permit all rotations and reflections. The promises have **not**
+yet been established for a computable family of co-r.e.-hard source instances.
 
 [Theorem55Construction.lean](LeanTrominoes/Theorem55Construction.lean)
 exposes the proved geometric components:
@@ -26,6 +39,10 @@ exposes the proved geometric components:
 | `KeyedPeriodicComplement.recover_tromino_of_grid` | A mixed tiling containing the canonical Q grid recovers an I-tromino tiling of the source. Additional Q placements are excluded. |
 | `KeyedPeriodicComplement.tile_nonempty` | Every admissible Q is nonempty. |
 | `KeyedPeriodicComplement.tile_disconnected_of_source_square` | A source 2-by-2 block away from the period boundary isolates a 2-by-2 component of Q and proves Q disconnected. |
+| `KeyCornerArithmetic.vertical_match`, `right_match` | Occupied corner witnesses force the unique matching Q orientation and offset, uniformly for all allowed periods. |
+| `KeyedPeriodicComplement.vertical_neighbor`, `right_neighbor` | In a mixed tiling, each lock forces the corresponding neighboring Q. |
+| `KeyedPeriodicComplement.quadrant_placements` | The forced neighbors propagate through a canonical quadrant. |
+| `KeyedPeriodicComplement.exists_tiling_with_grid` | Compactness produces a new mixed tiling containing the entire canonical Q grid. |
 
 The two keys move the five cells of each lock across a period boundary.
 The residue-representative proof establishes exact coverage and disjointness
@@ -54,6 +71,13 @@ cell `(2,3)`:
 The right lock has seven witnesses relative to `(n-4,2)`:
 `(1,0), (-9,1), (-1,-1), (0,13), (0,-2), (-1,1), (1,-1)`.
 
+[KeyCornerFinite.lean](LeanTrominoes/KeyCornerFinite.lean) combines four
+independently checked certificate modules, covering direct and reflected
+orientations for each lock. Each module splits the first coordinate and checks
+the remaining finite row with `decide +kernel`. No native evaluation axiom is
+used. [KeyCornerArithmetic.lean](LeanTrominoes/KeyCornerArithmetic.lean) then
+transfers the certificates to arbitrary allowed periods using compression.
+
 ## Compactness and normalization
 
 [TilingPrescribedCompactness.lean](LeanTrominoes/TilingPrescribedCompactness.lean)
@@ -68,29 +92,23 @@ proves `tileable_pair_normalize`: when P cannot tile alone, a rigid change
 of coordinates puts a Q at the origin in its original orientation.
 The supporting translation and symmetry lemmas preserve exact tilings.
 
+[KeyedComplementGridCompactness.lean](LeanTrominoes/KeyedComplementGridCompactness.lean)
+recenters the forced quadrant to realize arbitrarily large centered Q-grid
+patches. Compactness gives a new tiling containing all canonical Q placements;
+the solid-square exclusion eliminates any additional Q. This does not assert
+that the original mixed tiling already had a complete global Q grid.
+
 ## Remaining work
 
-1. Complete and validate the finite reference matching certificates and
-   their uniform consequences in `KeyCornerFinite` and `KeyCornerArithmetic`.
-2. Combine the proved envelope bounds and matching lemmas with the P lock
-   obstructions to force neighbors
-   in arbitrary mixed P/Q tilings, allowing all eight symmetries.
-3. Apply the proved compactness theorem to increasingly large Q-grid
-   patches obtained by recentering the forced quadrant. The resulting
-   mixed tiling contains the entire canonical Q grid. Then
-   `tile_not_inside_refinement` excludes additional Q placements and
-   `recover_tromino_of_background` extracts the source tiling.
-   This connection still needs proof. Above/right closure alone must not
-   be treated as a proof of a complete global Q grid in the original tiling.
-4. Connect the concrete hard instances from the proof of Theorem 5.2 to
+1. Connect the concrete hard instances from the proof of Theorem 5.2 to
    square masks with sufficient empty corner margins and period at least
    96 divisible by three. Prove these guarantees for the actual construction.
    The abstract completeness statement of 5.2 does not provide them.
-5. Exhibit a source 2-by-2 block away from the period boundary on the hard
+2. Exhibit a source 2-by-2 block away from the period boundary on the hard
    instances, invoking `tile_disconnected_of_source_square`. If needed, add
    a separated, independently I-tileable rectangle containing such a block;
    preservation of source tileability under this padding still needs proof.
-6. Certify the computable reduction and co-r.e. membership of the target
+3. Certify the computable reduction and co-r.e. membership of the target
    two-tile problem, then close `Theorem55.planeStatement`.
 
 The strip PSPACE assertion and the translation-only corollary are later
