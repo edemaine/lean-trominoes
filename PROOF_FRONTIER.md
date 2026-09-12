@@ -646,13 +646,34 @@ uses the existing canonical occurrence-index queries for every signed coordinate
 column. Its lookup proof attaches each origin to the same actual atom as the
 grouped fan and slot fields, including repeated active slots.
 
-Next combine the grouped variable origins with the finite fan/slot fields and
-canonical occurrence numbering to emit vertex records and raster-request
-metadata. The direction requests already have an unconditional compiler;
-the raster prefix still needs the actual assembled-route starting point and
-grid fields. The variable-triple prefix still needs its finite local offsets. Both triple
-phases then need grid reflection and record serialization; retained element
-phases still need their local tables and selection.
+The [metadata-selected signed expansion](LeanTrominoes/SignedUnaryCoordinateIndexedTableExpansion.lean)
+now broadcasts each origin over its finite local table using the existing
+block-index and value-lookup compilers, then applies signed affine addition.
+Its exactness theorem preserves metadata, source, and table order. The
+[variable-table geometry proof](LeanTrominoes/PeriodicCNFStripGroupedVariableTriplePositionTable.lean)
+identifies the actual connector kind, polarity, and active slot, including an
+explicit transport between the geometric and ribbon equality instances.
+The [variable-triple compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVariableTripleCoordinateCompiler.lean)
+therefore emits the actual variable prefix, with seven positions for fixed-red
+connectors and three for either other connector.
+
+The [complete triple-coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalTripleCoordinateCompiler.lean)
+appends the clause suffix and emits all four signed coordinate columns in
+canonical triple order. Repeating each position three times gives the RGB
+incidence source column. Its
+[drawing agreement proof](LeanTrominoes/PeriodicCNFStripDirectSourceFinalIncidenceSourceCoordinateSemantics.lean)
+identifies every entry with the actual drawing position of that incidence's
+source triple, in the same tag order used by incidence identities and directions.
+All these native compiler certificates are unconditional, including empty
+source alphabets.
+
+Next apply the existing canonical element/rank selection to the incidence
+source coordinates, retaining the first incidence of each through edge and
+all retained incidences. The resulting positions and the grid column supply
+the missing raster metadata; the direction requests already have an
+unconditional compiler. Triple vertex records still need grid reflection,
+cell-type fields, and serialization. Retained element phases still need their
+local coordinate tables and selection.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -691,13 +712,13 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-12 with exit code 0,
-10,446 jobs, and an elapsed time of 239.409 seconds. Its log is
-`tmp/clause-triple-and-grouped-origin-full-build.log`. It includes all nine
-new modules for first-clause selection, fixed signed translation tables,
-actual indexed clause origins and clause-triple coordinates, and variable
-origins in canonical occurrence-entry order.
+10,451 jobs, and an elapsed time of 132.913 seconds. Its log is
+`tmp/complete-triple-and-incidence-coordinates-full-build.log`. It includes all
+five new modules for metadata-selected signed table expansion, exact variable
+triple offsets, the complete variable and clause coordinate columns, and RGB
+incidence source coordinates with actual drawing agreement.
 
-All nine new Lean modules built without diagnostics. The prior coordinate,
+All five new Lean modules built without diagnostics. The prior coordinate,
 identity, incidence, direction and route-request compilers remain included.
 The completed full-build log and all cached project trace files were checked
 for errors and compiler panics; none were found.
