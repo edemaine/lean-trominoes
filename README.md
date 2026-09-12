@@ -44,6 +44,8 @@ The [final source-emitter closure](LeanTrominoes/Theorem52DirectSparseSourceEmit
 and [appender closure](LeanTrominoes/Theorem52DirectSparseClosure.lean) prove
 Theorem 5.2 **assuming** the remaining compiler witnesses. They do not yet
 give an unconditional proof of `Theorem52.statement`.
+The [route-record appender](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRouteRasterRequestCompiler.lean)
+is constructed; the vertex-record appender remains.
 
 ## Definitions
 

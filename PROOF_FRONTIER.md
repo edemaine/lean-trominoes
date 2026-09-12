@@ -3,7 +3,8 @@
 The target is an unconditional proof of
 [`LeanTrominoes.Theorem52.statement`](LeanTrominoes/Theorem52.lean).
 The plane conjunct and strip PSPACE membership have proofs. The outstanding
-work is the strip hardness reduction. This file tracks witnesses consumed by
+work is the strip hardness reduction. The route-record appender is constructed;
+the vertex-record appender remains. This file tracks witnesses consumed by
 the final construction; the old intermediate checklist is in
 [PROGRESS_ARCHIVE.md](PROGRESS_ARCHIVE.md).
 
@@ -687,11 +688,27 @@ provides an unconditional native compiler for the canonical horizontal header
 field, and identifies grid reflection of the compiled vertical column with
 the canonical vertical-complement field.
 
-Next broadcast the compiled grid field, compute vertical complements, and
-attach the finite color fields to serialize complete raster metadata beside
-the already compiled direction requests. Triple vertex records still need
-grid reflection, cell-type fields, and serialization. Retained element phases
-still need their local coordinate tables and selection.
+The [unit-length broadcast compiler](LeanTrominoes/UnaryFieldUnitLengthBroadcastCompiler.lean)
+turns the compiled drawing-grid unit word into one grid-size field per route.
+The [vertical-field compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRasterVerticalCoordinateCompiler.lean)
+subtracts the source vertical coordinate and one from twice that grid size,
+with exact agreement with the canonical raster metadata. The
+[color compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRasterColorCompiler.lean)
+emits RGB codes per triple, applies the verified incidence ordering and source
+filter, and decodes the actual contracted-edge colors.
+
+The [request assembler](LeanTrominoes/GadgetSparseRouteRasterRequestAssemblyCompiler.lean)
+joins the three unary fields, finite color field, and normalization batch in
+exact edge order. The [direct specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRouteRasterRequestCompiler.lean)
+constructs the unconditional raster-request compiler and complete route-record
+appender required by the final closure.
+
+Next compile the vertex-record prefix. Triple records need grid reflection,
+cell-type fields, and serialization. All retained colored element vertices
+come from the [clause tables](LeanTrominoes/PeriodicCNFStripDirectSparseAffineClauseElementTableScan.lean):
+three local positions per binary clause and four per ternary clause, for each
+color. Their coordinates require those tables at the compiled clause origins;
+there is no separate retained variable-element pass.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -702,26 +719,20 @@ All names below are in `LeanTrominoes.PeriodicCNFStripReduction`. Each witness
 is uniform in an arbitrary encoded source language and its
 `Complexity.DeciderInPolySpace` decider.
 
-| Construction stage | Available sufficient witness | Consumer |
+| Construction stage | Witness | Status |
 | --- | --- | --- |
-| Affine vertex emission | `DirectSparseAffineTablePhaseFamilies decider` | [directSparseVertexRecordAppenderOfTablePhases](LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseCompiler.lean) |
-| Compact framed route emission and semantic agreement | `DirectSparseCompactContractedRouteRasterSourceCompiler decider` | [directSparseRouteRasterRequestTokenCompilerOfCompactSource](LeanTrominoes/PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceCompiler.lean) |
-| Canonical raster-request emission | `DirectSparseRouteRasterRequestTokenCompiler decider` | [directSparseRouteRecordAppenderOfRasterRequests](LeanTrominoes/PeriodicCNFStripDirectSparseRouteRasterRecordCompiler.lean) |
-| Vertex and route appenders for every source decider | `DirectSparseSplitRecordAppenders` | [theorem52_statement_of_directSparseSplitRecordAppenders](LeanTrominoes/Theorem52DirectSparseClosure.lean) |
+| Canonical raster-request emission | `directSparseRouteRasterRequestTokenCompiler decider` | Constructed in [the direct route compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRouteRasterRequestCompiler.lean) |
+| Canonical route-record suffix | `directSparseCanonicalRouteRecordCompiler decider` | Constructed in the same module |
+| Retained-workspace route appender | `directSparseRouteRecordAppender decider` | Constructed in the same module |
+| Vertex-record prefix | `DirectSparseVertexRecordAppender decider` | Still required |
+| Uniform split appenders | `DirectSparseSplitRecordAppenders` | Still requires the vertex appender; consumed by [the final closure](LeanTrominoes/Theorem52DirectSparseClosure.lean) |
 
-These final witnesses have not yet been constructed. The five affine
-families carry exact output proofs for variable triples,
-clause triples, and red/green/blue elements. The compact route compiler
-carries an explicit token function, its polynomial-time certificate, and
-equality of the fixed bridge's output with the canonical raster requests.
-The compact-source row is one way to obtain the raster-request row. The
-verified geometric route-token compiler also supplies the direction component
-for a direct construction of the raster-request emitter.
-
-Alternative existing appender constructors can bypass the five-family
-interface. In either case, instantiate actual witnesses before invoking a
-closure theorem. Do not mark the full theorem proved while its proof still
-assumes one of these compiler contracts.
+The [five-family interface](LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseCompiler.lean)
+remains one sufficient route to the vertex appender, with exact outputs for
+variable triples, clause triples, and red/green/blue retained elements.
+Existing appender constructors also accept a direct compiler for the canonical
+vertex requests. Construct that remaining witness before invoking the final
+closure; the route appender alone does not prove `Theorem52.statement`.
 
 ## Validation
 
@@ -730,13 +741,11 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-12 with exit code 0,
-10,456 jobs, and an elapsed time of 264.759 seconds. Its log is
-`tmp/contracted-start-and-raster-horizontal-full-build.log`. It includes the
-shared incidence-index proof, arbitrary natural-value selection, contracted
-source filtering, all four actual route-start coordinate columns, and the
-canonical horizontal raster field.
+10,461 jobs, and an elapsed time of 123.168 seconds. Its log is
+`tmp/complete-route-raster-appender-full-build.log`. It includes all five new
+modules for unit-length broadcasting, exact grid and vertical raster fields,
+canonical colors, request serialization, and the unconditional route appender.
 
-All five new Lean modules and the refactored ranked-body module built without
-diagnostics. Their downstream direction and route-request consumers also
-built successfully. The completed full-build log and all cached project trace
-files were checked for errors and compiler panics; none were found.
+All five new Lean modules built without diagnostics. The completed full-build
+log and all cached project trace files were checked for errors and compiler
+panics; none were found.
