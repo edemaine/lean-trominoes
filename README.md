@@ -16,6 +16,11 @@ The plane assertion of Theorem 5.5 is also proved: tiling by a fixed connected
 arbitrary rotations and reflections. The strip assertion remains open.
 [THEOREM55_FRONTIER.md](THEOREM55_FRONTIER.md) records the construction and validation.
 
+The next construction targets two connected polycubes in a height-2 slab
+and in full 3D. Connectivity and slab orientation/non-tiling lemmas are
+proved; completeness remains open. [POLYCUBE_FRONTIER.md](POLYCUBE_FRONTIER.md)
+records the established results and remaining obligations.
+
 ## Main statements and proofs
 
 Start with [Theorem52.lean](LeanTrominoes/Theorem52.lean) to read the complete
