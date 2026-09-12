@@ -606,9 +606,33 @@ positions, discharges all source conditions, and gives an unconditional native
 polynomial-time certificate. The auxiliary compiler's local finite-instance
 name is also distinct from the clause compiler's, allowing both imports together.
 
-Next assemble the complete polarity clause-coordinate column using the scaled
-clause origins and point-2 coordinates, then supply raster-request metadata
-and the remaining vertex emitter.
+The [source-indexed clause-position theorem](LeanTrominoes/PeriodicOneInThreePolarityNormalizationSourceIndexedClausePositions.lean)
+identifies every descriptor's canonical clause origin and the complete output
+order. The [polarity clause compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPolarityClauseCoordinateCompiler.lean)
+uses one affine refinement: three times the source origin, plus zero for a main
+clause or two source-direction steps for a complement clause. Its
+[exact lookup proof](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPolarityClauseCoordinateSemantics.lean)
+recovers genuine refined source members from the actual atom decoder. The
+[horizontal agreement theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPolarityClauseCoordinateHorizontalSemantics.lean)
+discharges every source and decoder premise and supplies an unconditional
+native polynomial-time compiler for all actual canonical clause origins,
+repeated in clause-major, literal-minor order.
+
+The [gadget-origin geometry proof](LeanTrominoes/PeriodicCNFStripHorizontalGadgetOriginAffineCoordinates.lean)
+accounts for doubled padding, zero-anchor clause normalization, and macrocell
+placement. Both actual origin columns are affine in the routed endpoints:
+factor 256 with offset (20, 64) for variables or (50, 60) for clauses. The
+[shared native origin compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGadgetOriginCoordinateCompiler.lean)
+uses the complete endpoint columns and a finite constant-header offset column.
+Its certificate emits the actual variable or clause gadget origins in occurrence
+order, including empty source alphabets.
+
+Next combine these origins with the existing finite fan/slot fields and
+canonical occurrence numbering to emit vertex records and raster-request
+metadata. The direction requests already have an unconditional compiler;
+the raster prefix still needs the actual assembled-route starting point and
+grid fields. The occurrence-order origin columns also need the existing
+canonical grouping/selection passes before phase-major vertex emission.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -647,14 +671,14 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-12 with exit code 0,
-10,431 jobs, and an elapsed time of 308.779 seconds. Its log is
-`tmp/polarity-variable-coordinates-full-build.log`. It includes all nine new
-modules for initial route coordinates, polarity refinement, source directions,
-exact subdivision and fresh positions, finite header offsets, and the complete
-polarity variable-coordinate compiler and horizontal agreement theorem.
+10,437 jobs, and an elapsed time of 61.893 seconds. Its log is
+`tmp/polarity-clause-and-gadget-origins-full-build.log`. It includes all six
+new modules for source-indexed canonical clause positions, the single affine
+polarity clause compiler, exact decoder lookup and complete horizontal
+agreement, padding and macrocell geometry, and the shared native compiler
+for both actual gadget-origin columns.
 
-All nine new Lean modules built without diagnostics. The shared refined-source
-lookup lemma and renamed auxiliary finite instance also rebuilt successfully,
-along with their affected identity, incidence, direction and route-request
-dependents. The completed full-build log and all cached project trace files
-were checked for errors and compiler panics; none were found.
+All six new Lean modules built without diagnostics. The prior variable,
+clause-origin, identity, incidence, direction and route-request compilers remain
+included. The completed full-build log and all cached project trace files were
+checked for errors and compiler panics; none were found.
