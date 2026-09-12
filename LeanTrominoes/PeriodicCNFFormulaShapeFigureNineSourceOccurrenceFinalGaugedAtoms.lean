@@ -102,7 +102,7 @@ theorem OccurrenceWitness.finalGaugedLiteralAtom
   have literalAtomEq := congrArg PeriodicLiteral.atom literalEq
   exact atomEq.trans literalAtomEq
 
-private theorem exists_sourceLiteral_of_refinedSource_lookup
+theorem exists_sourceLiteral_of_refinedSource_lookup
     {Variable : Type} (source : PositionedPeriodicCNF Variable)
     (placement : PeriodicVariablePlacement Variable)
     {clauseIndex literalIndex : Nat} {clause : PeriodicClause Variable}

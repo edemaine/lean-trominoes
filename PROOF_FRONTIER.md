@@ -583,12 +583,32 @@ The [combined variable compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinal
 selects these two columns with the existing atom-scope bits. It has an
 unconditional polynomial-time certificate, including empty source alphabets,
 and exact final-gauged literal lookup semantics for every original polarity
-occurrence. Entries for fresh polarity variables remain candidates until
-the next stage supplies their actual route-subdivision positions.
+occurrence.
 
-Next propagate clause and variable coordinates through polarity normalization,
-including fresh variables and complement clauses, then supply raster-request
-metadata and the remaining vertex emitter.
+The [initial-route coordinate lemma](LeanTrominoes/UnitRouteInitialCoordinates.lean)
+and its [polarity refinement specialization](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRoutePointAffine.lean)
+recover the first two refined points from the source origin and first direction.
+The direction comes from the route before polarity normalization; a complement
+operation can reverse the output route's first edge. A
+[finite header-point compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalHeaderCoordinateCompiler.lean)
+supplies these direction offsets, and the
+[subdivision coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPolaritySubdivisionCoordinateCompiler.lean)
+adds them to three times the exact final-gauged clause origin. Its occurrence
+proof identifies both actual refined points, including the fresh variable at
+point 1 and the complement-clause position at point 2.
+
+The [complete polarity variable compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPolarityVariableCoordinateCompiler.lean)
+selects the fresh point or three times the original variable position for all
+four polarity operations. The
+[horizontal agreement theorem](LeanTrominoes/PeriodicCNFStripDirectSourceFinalPolarityVariableCoordinateHorizontalSemantics.lean)
+identifies the entire emitted column with actual horizontal routed variable
+positions, discharges all source conditions, and gives an unconditional native
+polynomial-time certificate. The auxiliary compiler's local finite-instance
+name is also distinct from the clause compiler's, allowing both imports together.
+
+Next assemble the complete polarity clause-coordinate column using the scaled
+clause origins and point-2 coordinates, then supply raster-request metadata
+and the remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -626,16 +646,15 @@ assumes one of these compiler contracts.
 and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
-The four-worker full project build completed on 2026-09-12 with exit code 0
-and 10,422 jobs. Its log is
-`tmp/figure-nine-variable-coordinates-full-build.log`. It includes all eight
-new modules for auxiliary physical positions, bounded-literal gauge recovery,
-exact auxiliary occurrence positions, inherited gauge preservation, finite
-variable offsets, inherited and auxiliary coordinate compilers, and their
-combined final-gauged literal lookup. The existing header-order proof is now
-shared by the clause and variable template compilers.
+The four-worker full project build completed on 2026-09-12 with exit code 0,
+10,431 jobs, and an elapsed time of 308.779 seconds. Its log is
+`tmp/polarity-variable-coordinates-full-build.log`. It includes all nine new
+modules for initial route coordinates, polarity refinement, source directions,
+exact subdivision and fresh positions, finite header offsets, and the complete
+polarity variable-coordinate compiler and horizontal agreement theorem.
 
-All eight new Lean modules built without diagnostics. The prior clause-origin,
-coordinate, identity, incidence, direction and contraction compilers remain
-included. The completed full-build log and all cached project trace files were
-checked for errors and compiler panics; none were found.
+All nine new Lean modules built without diagnostics. The shared refined-source
+lookup lemma and renamed auxiliary finite instance also rebuilt successfully,
+along with their affected identity, incidence, direction and route-request
+dependents. The completed full-build log and all cached project trace files
+were checked for errors and compiler panics; none were found.
