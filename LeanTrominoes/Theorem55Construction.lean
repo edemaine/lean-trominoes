@@ -10,6 +10,8 @@ import LeanTrominoes.KeyedPeriodicComplement
 import LeanTrominoes.CornerKeyObstruction
 import LeanTrominoes.KeyedComplementEnvelope
 import LeanTrominoes.KeyedComplementRefinedExclusion
+import LeanTrominoes.TilingPairNormalization
+import LeanTrominoes.TilingPrescribedCompactness
 
 /-!
 # Established parts of the two-polyomino construction

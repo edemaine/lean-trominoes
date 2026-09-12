@@ -51,6 +51,20 @@ cell `(2,3)`:
 The right lock has seven witnesses relative to `(n-4,2)`:
 `(1,0), (-9,1), (-1,-1), (0,13), (0,-2), (-1,1), (1,-1)`.
 
+## Compactness and normalization
+
+[TilingPrescribedCompactness.lean](LeanTrominoes/TilingPrescribedCompactness.lean)
+proves `TilingSelection.exists_tiling_of_prescriptions` for any finite family
+of finite polyominoes: increasing requirements on selected placements can
+be imposed simultaneously if each stage is realized by a plane tiling.
+The proof uses the compact product of Boolean placement selections; exact
+coverage is closed because each cell has finitely many candidate placements.
+
+[TilingPairNormalization.lean](LeanTrominoes/TilingPairNormalization.lean)
+proves `tileable_pair_normalize`: when P cannot tile alone, a rigid change
+of coordinates puts a Q at the origin in its original orientation.
+The supporting translation and symmetry lemmas preserve exact tilings.
+
 ## Remaining work
 
 1. Complete and validate the finite reference matching certificates and
@@ -58,15 +72,13 @@ The right lock has seven witnesses relative to `(n-4,2)`:
 2. Combine the proved envelope bounds and matching lemmas with the P lock
    obstructions to force neighbors
    in arbitrary mixed P/Q tilings, allowing all eight symmetries.
-3. Prefer a compactness argument for the reverse implication. Above/right
-   propagation gives arbitrarily large canonical grid patches. In windows
-   sufficiently far from their boundaries, `tile_not_inside_refinement`
-   excludes stray Q tiles; contract the remaining P placements and apply
-   `TrominoAssignment.tileable_iff_forall_exists_isValidInBox` from
-   [TilingCompactness.lean](LeanTrominoes/TilingCompactness.lean).
-   The window bounds, periodic translation, and normalization of the first
-   Q's rigid motion still require proofs. Above/right closure alone must
-   not be treated as a proof of a complete global Q grid.
+3. Apply the proved compactness theorem to increasingly large Q-grid
+   patches obtained by recentering the forced quadrant. The resulting
+   mixed tiling contains the entire canonical Q grid. Then
+   `tile_not_inside_refinement` excludes additional Q placements and
+   `recover_tromino_of_background` extracts the source tiling.
+   This connection still needs proof. Above/right closure alone must not
+   be treated as a proof of a complete global Q grid in the original tiling.
 4. Connect the concrete hard instances from the proof of Theorem 5.2 to
    square masks with sufficient empty corner margins and period at least
    96 divisible by three. Prove these guarantees for the actual construction.
