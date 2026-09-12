@@ -667,13 +667,31 @@ source triple, in the same tag order used by incidence identities and directions
 All these native compiler certificates are unconditional, including empty
 source alphabets.
 
-Next apply the existing canonical element/rank selection to the incidence
-source coordinates, retaining the first incidence of each through edge and
-all retained incidences. The resulting positions and the grid column supply
-the missing raster metadata; the direction requests already have an
-unconditional compiler. Triple vertex records still need grid reflection,
-cell-type fields, and serialization. Retained element phases still need their
-local coordinate tables and selection.
+The [shared ranked-index proof](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceRankedIndexSemantics.lean)
+now identifies canonical element/rank lookup with the actual incidence
+presentation indices. The existing direction-body theorems are short map
+corollaries of that proof. The
+[scalar selection compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalIncidenceValueSelection.lean)
+reuses the same keys for any compiled natural-number field and proves exact
+agreement with the actual element-major incidence groups.
+
+The [source filter](LeanTrominoes/PeriodicCNFStripCountedContractedIncidenceSourceFilter.lean)
+keeps all three incidences of each degree-three element and only the first
+incidence of each degree-two element. Its proof identifies the resulting
+fields with the source tags of the actual contracted edges, in their complete
+canonical order. The
+[contracted-coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalContractedSourceCoordinateCompiler.lean)
+therefore emits all four signed coordinate columns of the actual route starts.
+The [raster field bridge](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRasterHorizontalCoordinateCompiler.lean)
+provides an unconditional native compiler for the canonical horizontal header
+field, and identifies grid reflection of the compiled vertical column with
+the canonical vertical-complement field.
+
+Next broadcast the compiled grid field, compute vertical complements, and
+attach the finite color fields to serialize complete raster metadata beside
+the already compiled direction requests. Triple vertex records still need
+grid reflection, cell-type fields, and serialization. Retained element phases
+still need their local coordinate tables and selection.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -712,13 +730,13 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-12 with exit code 0,
-10,451 jobs, and an elapsed time of 132.913 seconds. Its log is
-`tmp/complete-triple-and-incidence-coordinates-full-build.log`. It includes all
-five new modules for metadata-selected signed table expansion, exact variable
-triple offsets, the complete variable and clause coordinate columns, and RGB
-incidence source coordinates with actual drawing agreement.
+10,456 jobs, and an elapsed time of 264.759 seconds. Its log is
+`tmp/contracted-start-and-raster-horizontal-full-build.log`. It includes the
+shared incidence-index proof, arbitrary natural-value selection, contracted
+source filtering, all four actual route-start coordinate columns, and the
+canonical horizontal raster field.
 
-All five new Lean modules built without diagnostics. The prior coordinate,
-identity, incidence, direction and route-request compilers remain included.
-The completed full-build log and all cached project trace files were checked
-for errors and compiler panics; none were found.
+All five new Lean modules and the refactored ranked-body module built without
+diagnostics. Their downstream direction and route-request consumers also
+built successfully. The completed full-build log and all cached project trace
+files were checked for errors and compiler panics; none were found.
