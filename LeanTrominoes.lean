@@ -1,7 +1,7 @@
 import LeanTrominoes.Theorem52Proof
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
 import LeanTrominoes.Theorem55Geometry
-import LeanTrominoes.PeriodicThreeDMSourceBlankRegion
+import LeanTrominoes.Theorem55SourcePreparation
 
 /-!
 # Main theorem interface

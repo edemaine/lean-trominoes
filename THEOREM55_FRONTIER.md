@@ -112,6 +112,13 @@ modulo 72 contain no source cells. Translating the origin to `(54,18)` gives
 the empty rectangle `[-12,18)²`. Both the drawing and source-region results
 use only the standard axioms; the paper-pixel bounds are checked in the kernel.
 
+[Theorem55SourcePreparation.lean](LeanTrominoes/Theorem55SourcePreparation.lean)
+centers the source there and adds a periodic 2-by-3 rectangle at `(14,4)`.
+`Theorem55Source.tileable_iff` proves exact preservation of source tileability;
+`source_square` supplies the required 2-by-2 block, and `blank_corners` proves
+that all corner neighborhoods remain empty. The padding proof handles every
+orientation of an I tromino and uses a blank gap to exclude mixed placements.
+
 ## Remaining work
 
 1. Connect the concrete hard instances from the proof of Theorem 5.2 to
@@ -119,11 +126,7 @@ use only the standard axioms; the paper-pixel bounds are checked in the kernel.
    96 divisible by three. The source margin is now proved, but its transfer
    to the refined square mask and exact carrier equality still need proofs.
    The abstract completeness statement of 5.2 alone does not provide them.
-2. Exhibit a source 2-by-2 block away from the period boundary on the hard
-   instances, invoking `tile_disconnected_of_source_square`. If needed, add
-   a separated, independently I-tileable rectangle containing such a block;
-   preservation of source tileability under this padding still needs proof.
-3. Certify the computable reduction and co-r.e. membership of the target
+2. Certify the computable reduction and co-r.e. membership of the target
    two-tile problem, then close `Theorem55.planeStatement`.
 
 The strip PSPACE assertion and the translation-only corollary are later
