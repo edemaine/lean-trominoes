@@ -17,8 +17,9 @@ Q inputs are rejected. **The co-r.e.-completeness theorem is not yet proved.**
   from the period boundary additionally certifies Q's disconnectedness, giving
   equivalence with the exact target predicate, including its connectivity check.
 
-Both results permit all rotations and reflections. The promises have **not**
-yet been established for a computable family of co-r.e.-hard source instances.
+Both results permit all rotations and reflections. The geometric promises are
+now established for the concrete hard-source presentations; the computability
+certificate for the resulting finite tile construction remains open.
 
 [Theorem55Construction.lean](LeanTrominoes/Theorem55Construction.lean)
 exposes the proved geometric components:
@@ -119,15 +120,18 @@ centers the source there and adds a periodic 2-by-3 rectangle at `(14,4)`.
 that all corner neighborhoods remain empty. The padding proof handles every
 orientation of an I tromino and uses a blank gap to exclude mixed placements.
 
+[Theorem55SourceMask.lean](LeanTrominoes/Theorem55SourceMask.lean) constructs
+the finite mask of the cross-refined source and proves its exact periodic
+carrier and all corner promises. `Theorem55Source.planeProblem_iff` therefore
+applies the geometric reduction to every concrete source presentation without
+additional geometric hypotheses, including Q's disconnectedness.
+
 ## Remaining work
 
-1. Connect the concrete hard instances from the proof of Theorem 5.2 to
-   square masks with sufficient empty corner margins and period at least
-   96 divisible by three. The source margin is now proved, but its transfer
-   to the refined square mask and exact carrier equality still need proofs.
-   The abstract completeness statement of 5.2 alone does not provide them.
-2. Certify the computable reduction and co-r.e. membership of the target
-   two-tile problem, then close `Theorem55.planeStatement`.
+1. Certify an executable finite tile construction and compose it with the
+   concrete hard-source compiler from Theorem 5.2.
+2. Prove co-r.e. membership of the target two-tile problem, then close
+   `Theorem55.planeStatement`.
 
 The strip PSPACE assertion and the translation-only corollary are later
 targets. No unproved compiler, drawing, grid-forcing, or complexity witness

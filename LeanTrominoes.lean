@@ -1,7 +1,7 @@
 import LeanTrominoes.Theorem52Proof
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
 import LeanTrominoes.Theorem55Geometry
-import LeanTrominoes.Theorem55SourcePreparation
+import LeanTrominoes.Theorem55SourceMask
 
 /-!
 # Main theorem interface
@@ -13,7 +13,8 @@ See README.md for the main declarations and PROOF_FRONTIER.md for the
 completed construction and validation.
 
 `Theorem55Geometry` also proves the exact two-polyomino tileability equivalence
-under explicit source promises. The full Theorem 5.5 plane statement remains open;
+under explicit source promises, now discharged for the concrete prepared source
+by `Theorem55Source.planeProblem_iff`. The full Theorem 5.5 plane statement remains open;
 see THEOREM55_FRONTIER.md.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob

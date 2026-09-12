@@ -90,7 +90,7 @@ a paper theorem.
 | Theorem 3.1 | Imported Wang tiling theorem |
 | Theorem 3.2 | Local 1D CNF SAT hardness proved; full theorem open |
 | Theorem 5.2 | Fully proved |
-| Theorem 5.5, plane | Geometric reduction proved under source promises; full complexity theorem open |
+| Theorem 5.5, plane | Geometric reduction and concrete source promises proved; full complexity theorem open |
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 | Open |
 
