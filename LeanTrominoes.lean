@@ -1,15 +1,14 @@
-import LeanTrominoes.Theorem52
-import LeanTrominoes.PeriodicWangPlanarThreeDMReduction
-import LeanTrominoes.PartrecFlatStripDeciderSpace
+import LeanTrominoes.Theorem52Proof
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
 
 /-!
 # Main theorem interface
 
-`Theorem52` states the plane, strip, and combined targets. The imports expose
-the complete plane theorem, strip PSPACE membership, and the local periodic
-CNF SAT hardness theorem used by the unfinished strip reduction. See README.md
-for their declaration names and PROOF_FRONTIER.md for remaining obligations.
+`Theorem52.proved` proves the complete plane and strip result, and
+`Theorem52.stripProved` exposes strip PSPACE completeness. Import
+`LeanTrominoes.Theorem52` separately to read only the target statements.
+See README.md for the main declarations and PROOF_FRONTIER.md for the
+completed construction and validation.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.

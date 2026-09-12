@@ -1,12 +1,14 @@
-# Current proof frontier
+# Theorem 5.2 proof status
 
-The target is an unconditional proof of
-[`LeanTrominoes.Theorem52.statement`](LeanTrominoes/Theorem52.lean).
-The plane conjunct and strip PSPACE membership have proofs. The outstanding
-work is the strip hardness reduction. The route-record appender is constructed;
-the vertex-record appender remains. This file tracks witnesses consumed by
-the final construction; the old intermediate checklist is in
-[PROGRESS_ARCHIVE.md](PROGRESS_ARCHIVE.md).
+The unconditional proof is
+[`LeanTrominoes.Theorem52.proved`](LeanTrominoes/Theorem52Proof.lean).
+It proves the complete [target statement](LeanTrominoes/Theorem52.lean):
+for each tromino, periodic plane tiling is co-r.e.-complete and periodic strip
+tiling under the flat encoding is PSPACE-complete. Both source-specific
+geometry appenders are constructed; no compiler witness remains assumed.
+
+The construction and validation are recorded below. Earlier development
+history is in [PROGRESS_ARCHIVE.md](PROGRESS_ARCHIVE.md).
 
 ## Route-word agreement
 
@@ -703,12 +705,28 @@ exact edge order. The [direct specialization](LeanTrominoes/PeriodicCNFStripDire
 constructs the unconditional raster-request compiler and complete route-record
 appender required by the final closure.
 
-Next compile the vertex-record prefix. Triple records need grid reflection,
-cell-type fields, and serialization. All retained colored element vertices
-come from the [clause tables](LeanTrominoes/PeriodicCNFStripDirectSparseAffineClauseElementTableScan.lean):
-three local positions per binary clause and four per ternary clause, for each
-color. Their coordinates require those tables at the compiled clause origins;
-there is no separate retained variable-element pass.
+The [retained-element coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRetainedElementCoordinateCompiler.lean)
+uses the exact clause arity bits to select three or four local positions per
+color and translates them by the compiled clause origins. The
+[record compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRetainedElementRecordCompiler.lean)
+adds grid reflection and monochromatic cell types. These are all retained
+element vertices, in canonical red/green/blue block order.
+
+The [triple cell-type compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalTripleCellTypeCompiler.lean)
+selects each triple's red incidence summary, which already contains the full
+RGB fan, and computes the actual normalized cell type. The
+[triple-record compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalTripleRecordCompiler.lean)
+combines this finite column with the complete triple coordinates and stable
+indices, covering both the variable prefix and clause suffix.
+
+The [shared column joiner](LeanTrominoes/FiniteAlphabetRecordColumnCompiler.lean)
+and [affine vertex assembler](LeanTrominoes/GadgetSparseAffineVertexRecordColumnCompiler.lean)
+serialize independently compiled fields in their common row order. The
+[complete vertex appender](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVertexRecordCompiler.lean)
+concatenates the four exact blocks, retains the source word, and applies the
+verified affine expansion. All source compiler certificates include empty
+source alphabets.
+
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -719,33 +737,38 @@ All names below are in `LeanTrominoes.PeriodicCNFStripReduction`. Each witness
 is uniform in an arbitrary encoded source language and its
 `Complexity.DeciderInPolySpace` decider.
 
-| Construction stage | Witness | Status |
+| Construction stage | Constructed witness | Module |
 | --- | --- | --- |
-| Canonical raster-request emission | `directSparseRouteRasterRequestTokenCompiler decider` | Constructed in [the direct route compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRouteRasterRequestCompiler.lean) |
-| Canonical route-record suffix | `directSparseCanonicalRouteRecordCompiler decider` | Constructed in the same module |
-| Retained-workspace route appender | `directSparseRouteRecordAppender decider` | Constructed in the same module |
-| Vertex-record prefix | `DirectSparseVertexRecordAppender decider` | Still required |
-| Uniform split appenders | `DirectSparseSplitRecordAppenders` | Still requires the vertex appender; consumed by [the final closure](LeanTrominoes/Theorem52DirectSparseClosure.lean) |
+| Canonical raster-request emission | `directSparseRouteRasterRequestTokenCompiler decider` | [Route compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRouteRasterRequestCompiler.lean) |
+| Retained-workspace route appender | `directSparseRouteRecordAppender decider` | Same module |
+| Compact vertex requests | `directSparseAffineVertexRequestTokenCompiler decider` | [Vertex compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVertexRecordCompiler.lean) |
+| Retained-workspace vertex appender | `directSparseVertexRecordAppender decider` | Same module |
+| Uniform split appenders | `directSparseSplitRecordAppenders` | [Complete proof](LeanTrominoes/Theorem52Proof.lean) |
+| Complete Theorem 5.2 | `LeanTrominoes.Theorem52.proved` | Same module |
 
-The [five-family interface](LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseCompiler.lean)
-remains one sufficient route to the vertex appender, with exact outputs for
-variable triples, clause triples, and red/green/blue retained elements.
-Existing appender constructors also accept a direct compiler for the canonical
-vertex requests. Construct that remaining witness before invoking the final
-closure; the route appender alone does not prove `Theorem52.statement`.
+The concrete vertex and route appenders instantiate the
+[final closure](LeanTrominoes/Theorem52DirectSparseClosure.lean), which combines
+strip membership and hardness with the established plane completeness proof.
 
 ## Validation
 
-`lake build` includes every module through the library glob. Build coverage
-and proof completion are separate: compiling conditional closure theorems
-does not prove the unconditional target.
+`lake build` includes every module through the library glob, including the
+public theorem interface and the unconditional `Theorem52.proved` declaration.
 
 The four-worker full project build completed on 2026-09-12 with exit code 0,
-10,461 jobs, and an elapsed time of 123.168 seconds. Its log is
-`tmp/complete-route-raster-appender-full-build.log`. It includes all five new
-modules for unit-length broadcasting, exact grid and vertical raster fields,
-canonical colors, request serialization, and the unconditional route appender.
+10,469 jobs, and an elapsed time of 213.265 seconds. Its log is
+`tmp/theorem52-complete-full-build.log`. All eight new Lean modules built
+without diagnostics. The completed build log and cached project trace files
+contain no errors or compiler panics.
 
-All five new Lean modules built without diagnostics. The completed full-build
-log and all cached project trace files were checked for errors and compiler
-panics; none were found.
+A separate public-import audit completed with exit code 0 in 146.108 seconds.
+It checks `Theorem52.proved : Theorem52.statement`, the strip projection, and
+both universal completeness assertions through `import LeanTrominoes`. Its
+source and log are `tmp/Theorem52CompletionAudit.lean` and
+`tmp/theorem52-completion-audit.log`.
+
+Both axiom lists contain `propext`, `Classical.choice`, and `Quot.sound`, plus
+5,877 generated `native_decide` certificates from the existing construction
+and dependencies. There is no `sorryAx` or other axiom in either list. The
+proof therefore retains the existing reliance on native evaluation; this is
+not an audit restricted to kernel reduction alone.

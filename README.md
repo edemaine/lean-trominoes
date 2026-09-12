@@ -7,10 +7,9 @@ Erik D. Demaine, Jenny Diomidova, Della Hendrickson, Stefan Langerman, and
 Jayson Lynch. The working paper is included as
 [PDF](trominoes.pdf) and [source](trominoes.texlish).
 
-The eventual goal is every theorem and lemma in the paper. The current focus
-is Theorem 5.2: tiling a periodic subset by either single tromino. Its plane
-co-r.e.-completeness result and strip PSPACE membership are proved; strip
-PSPACE hardness remains unfinished.
+The eventual goal is every theorem and lemma in the paper. Theorem 5.2 is
+proved: for either single tromino, periodic-subset tiling is co-r.e.-complete
+in the plane and PSPACE-complete in a strip.
 
 ## Main statements and proofs
 
@@ -21,8 +20,8 @@ target without importing its construction. In namespace
 | Declaration | Statement | Status |
 | --- | --- | --- |
 | `planeStatement` | For each tromino, periodic-subset tiling in 2D is co-r.e.-complete. | Proved |
-| `stripStatement` | For each tromino, periodic-strip tiling under the flat encoding is PSPACE-complete. | Membership proved; hardness open |
-| `statement` | `planeStatement ∧ stripStatement`, the complete Theorem 5.2. | Open |
+| `stripStatement` | For each tromino, periodic-strip tiling under the flat encoding is PSPACE-complete. | Proved |
+| `statement` | `planeStatement ∧ stripStatement`, the complete Theorem 5.2. | Proved |
 
 These are **definitions of propositions**, not proofs. The main proof
 declarations are below; names are relative to `LeanTrominoes` unless marked
@@ -30,6 +29,8 @@ otherwise.
 
 | Result | Proof declaration | Module |
 | --- | --- | --- |
+| Theorem 5.2, complete result | `Theorem52.proved` | [Theorem52Proof](LeanTrominoes/Theorem52Proof.lean) |
+| Theorem 5.2, strip PSPACE completeness | `Theorem52.stripProved` | [Theorem52Proof](LeanTrominoes/Theorem52Proof.lean) |
 | Theorem 5.2, complete plane result | `PeriodicWangPlanarThreeDMReduction.theorem52_planeStatement` | [PeriodicWangPlanarThreeDMReduction](LeanTrominoes/PeriodicWangPlanarThreeDMReduction.lean) |
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
@@ -40,12 +41,10 @@ otherwise.
 `LeanTrominoes.Theorem52` when only the target statements are needed, or an
 individual construction module for its implementation API.
 
-The [final source-emitter closure](LeanTrominoes/Theorem52DirectSparseSourceEmitterClosure.lean)
-and [appender closure](LeanTrominoes/Theorem52DirectSparseClosure.lean) prove
-Theorem 5.2 **assuming** the remaining compiler witnesses. They do not yet
-give an unconditional proof of `Theorem52.statement`.
-The [route-record appender](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRouteRasterRequestCompiler.lean)
-is constructed; the vertex-record appender remains.
+The full proof instantiates the [appender closure](LeanTrominoes/Theorem52DirectSparseClosure.lean)
+with the concrete [vertex](LeanTrominoes/PeriodicCNFStripDirectSourceFinalVertexRecordCompiler.lean)
+and [route](LeanTrominoes/PeriodicCNFStripDirectSourceFinalRouteRasterRequestCompiler.lean)
+compilers. No compiler witness remains assumed.
 
 ## Definitions
 
@@ -77,7 +76,7 @@ a paper theorem.
 | --- | --- |
 | Theorem 3.1 | Imported Wang tiling theorem |
 | Theorem 3.2 | Local 1D CNF SAT hardness proved; full theorem open |
-| Theorem 5.2 | Plane result and strip membership proved; strip hardness open |
+| Theorem 5.2 | Fully proved |
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
 | Section 4, Lemma 5.1 in its full generality, and results 5.3–5.15 | Open |
 
