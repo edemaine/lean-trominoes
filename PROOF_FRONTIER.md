@@ -562,8 +562,32 @@ The [gauge transport](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccur
 identifies the same raw stored position with the canonical clause origin
 after final clockwise ordering and variable gauging.
 
-Next compile the remaining Figure 9 variable coordinates and propagate both
-vertex types through polarity normalization, then supply raster-request
+The [finite variable-offset compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalTemplateVariableCoordinateCompiler.lean)
+now uses the same coherent header stream as the clause-offset compiler.
+The [auxiliary coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalAuxiliaryCoordinateCompiler.lean)
+adds those offsets to the factor-72 clearance parent origin. Its
+[occurrence proof](LeanTrominoes/PeriodicCNFFormulaShapeFigureNineSourceOccurrenceAuxiliaryPositions.lean)
+identifies the exact instantiated template role, then reuses the existing
+physical endpoint and fundamental-square bounds. The shared
+[gauge lemma](LeanTrominoes/PeriodicVariablePlacementCanonicalGaugeLiteralPosition.lean)
+recovers a variable's canonical representative from any bounded physical
+literal occurrence; no modulo compiler is needed.
+
+The [inherited coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalComposedInheritedCoordinateCompiler.lean)
+scales the complete ring-coordinate column by 144, accounting for clearance,
+Figure 9, and unit elimination. Its source witness retains the same actual
+ring atom and parent literal lookup, and the
+[inherited gauge proof](LeanTrominoes/PeriodicCNFPlanarRetainedFinalGaugedInheritedPosition.lean)
+shows that this natural position is already inside the final period.
+The [combined variable compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalComposedVariableCoordinateCompiler.lean)
+selects these two columns with the existing atom-scope bits. It has an
+unconditional polynomial-time certificate, including empty source alphabets,
+and exact final-gauged literal lookup semantics for every original polarity
+occurrence. Entries for fresh polarity variables remain candidates until
+the next stage supplies their actual route-subdivision positions.
+
+Next propagate clause and variable coordinates through polarity normalization,
+including fresh variables and complement clauses, then supply raster-request
 metadata and the remaining vertex emitter.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
@@ -603,16 +627,15 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-12 with exit code 0
-and 10,414 jobs. Its log is
-`tmp/figure-nine-clause-origins-full-build.log`. It includes the eight new
-modules for coherent source-parent indices, occurrence and clearance origin
-columns, finite template clause positions, signed refinement lookup, composed
-Figure 9 clause coordinates, and canonical clause-position gauge transport.
-The previously verified parent origins, inherited and first-parent
-coordinates, direction-displacement, cycle and canonical coordinates,
-identities, incidence and contraction compilers, headers, and normalization
-requests remain included.
+and 10,422 jobs. Its log is
+`tmp/figure-nine-variable-coordinates-full-build.log`. It includes all eight
+new modules for auxiliary physical positions, bounded-literal gauge recovery,
+exact auxiliary occurrence positions, inherited gauge preservation, finite
+variable offsets, inherited and auxiliary coordinate compilers, and their
+combined final-gauged literal lookup. The existing header-order proof is now
+shared by the clause and variable template compilers.
 
-All eight new Lean modules built without diagnostics.
-The completed full-build log and all cached project trace files were checked
-for errors and compiler panics; none were found.
+All eight new Lean modules built without diagnostics. The prior clause-origin,
+coordinate, identity, incidence, direction and contraction compilers remain
+included. The completed full-build log and all cached project trace files were
+checked for errors and compiler panics; none were found.

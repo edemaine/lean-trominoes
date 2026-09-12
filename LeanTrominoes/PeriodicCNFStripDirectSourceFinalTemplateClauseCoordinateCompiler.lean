@@ -47,7 +47,7 @@ noncomputable def directSourceFinalTemplateClauseCoordinatesComputableInPolyTime
       sourceHeadersComputableInPolyTime)
     (FiniteUnaryFieldMap.computableInPolyTime _)
 
-private theorem directHeaders_eq_occurrences (symbols : List encoding.Γ) :
+theorem directSourceFinalHeaders_eq_occurrences (symbols : List encoding.Γ) :
     sourceHeaders (directSourceFinalClauseDescriptors decider symbols) =
       (directSourceFinalOccurrences decider symbols).map SourceOccurrence.header := by
   have headers := congrArg (List.map Prod.fst)
@@ -67,7 +67,7 @@ theorem directSourceFinalTemplateClauseCoordinates_eq_occurrences (horizontal ke
         CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)
           (headerTemplateClausePosition occurrence.header) := by
   unfold directSourceFinalTemplateClauseCoordinates FiniteUnaryFieldMap.values
-  rw [directHeaders_eq_occurrences, List.map_map]
+  rw [directSourceFinalHeaders_eq_occurrences, List.map_map]
   simp only [Function.comp_def]
 
 @[simp] theorem directSourceFinalTemplateClauseCoordinates_length (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
