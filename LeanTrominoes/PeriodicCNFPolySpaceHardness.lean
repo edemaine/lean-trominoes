@@ -109,7 +109,8 @@ theorem polyTimeManyOneReducible
     Complexity.PolyTimeManyOneReducible encoding
       PeriodicCNFFlatEncoding.finEncoding language LocalPeriodicCNF1DSAT := by
   refine ⟨PolySpaceReduction.formula decider, ?_, ?_⟩
-  · exact ⟨reductionComputableInPolyTime decider generator⟩
+  · exact ⟨Complexity.FiniteAlphabetComputableInPolyTime.ofComputableInPolyTime
+      (reductionComputableInPolyTime decider generator)⟩
   · intro input
     exact PolySpaceReduction.mem_iff_localPeriodicCNF1DSAT decider input
 
@@ -187,7 +188,8 @@ theorem directPolyTimeManyOneReducible :
       PeriodicCNFFlatEncoding.finEncoding language LocalPeriodicCNF1DSAT := by
   intro decider
   refine ⟨PolySpaceReduction.formula decider, ?_, ?_⟩
-  · exact ⟨directReductionComputableInPolyTime decider⟩
+  · exact ⟨Complexity.FiniteAlphabetComputableInPolyTime.ofComputableInPolyTime
+      (directReductionComputableInPolyTime decider)⟩
   · intro input
     exact PolySpaceReduction.mem_iff_localPeriodicCNF1DSAT decider input
 

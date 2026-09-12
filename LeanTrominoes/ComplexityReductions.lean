@@ -37,8 +37,9 @@ theorem PolyTimeManyOneReducible.trans
   obtain ⟨reduceSecond, ⟨secondComputer⟩, secondCorrect⟩ := second
   letI : Fintype encodingB.Γ := encodingB.ΓFin
   refine ⟨fun input => reduceSecond (reduceFirst input), ?_, ?_⟩
-  · exact ⟨TM2CompositionMachine.computableInPolyTime
-      firstComputer secondComputer⟩
+  · exact ⟨FiniteAlphabetComputableInPolyTime.ofComputableInPolyTime
+      (TM2CompositionMachine.computableInPolyTime
+        firstComputer.toTM2ComputableInPolyTime secondComputer.toTM2ComputableInPolyTime)⟩
   · intro input
     exact (firstCorrect input).trans (secondCorrect (reduceFirst input))
 

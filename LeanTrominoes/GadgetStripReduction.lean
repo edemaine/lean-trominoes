@@ -59,8 +59,9 @@ theorem polyTimeManyOneReducible
     Complexity.PolyTimeManyOneReducible sourceEncoding
       PeriodicStripFlatEncoding.finEncoding source
       (PeriodicStripTrominoTiling tromino) := by
-  refine ⟨fun input => (reduction.drawing input).periodicStrip tromino,
-    reduction.stripComputableInPolyTime tromino, ?_⟩
+  refine Complexity.PolyTimeManyOneReducible.of_computableInPolyTime
+    (fun input => (reduction.drawing input).periodicStrip tromino)
+    (reduction.stripComputableInPolyTime tromino) ?_
   intro input
   exact (reduction.correct input).trans
     (PeriodicOrthogonalDrawing.periodicStrip_correct_of_normalized_blankBoundary

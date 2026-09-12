@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.FiniteAlphabetPolyTime
 import Mathlib.Computability.Primrec.List
 import Mathlib.Computability.TuringMachine.Computable
 import Mathlib.Computability.TuringMachine.ToPartrec
@@ -127,13 +128,26 @@ encoding. -/
 def InPSPACE {α : Type} (encoding : FinEncoding α) (language : α → Prop) : Prop :=
   Nonempty (DeciderInPolySpace encoding language)
 
-/-- Polynomial-time many-one reducibility between encoded decision predicates. -/
+/-- Polynomial-time many-one reducibility between encoded decision predicates,
+with finite alphabets on every stack of the reduction machine. -/
 def PolyTimeManyOneReducible {α β : Type}
     (encodingA : FinEncoding α) (encodingB : FinEncoding β)
     (p : α → Prop) (q : β → Prop) : Prop :=
   ∃ reduce : α → β,
-    Nonempty (TM2ComputableInPolyTime encodingA.encode encodingB.encode reduce) ∧
+    Nonempty (FiniteAlphabetComputableInPolyTime encodingA.encode encodingB.encode reduce) ∧
       ∀ input, p input ↔ q (reduce input)
+
+/-- Restrict a Mathlib reduction machine to finite stack alphabets before
+packaging it. The reduction function and polynomial time bound are preserved. -/
+theorem PolyTimeManyOneReducible.of_computableInPolyTime {α β : Type}
+    {encodingA : FinEncoding α} {encodingB : FinEncoding β}
+    {p : α → Prop} {q : β → Prop}
+    (reduce : α → β)
+    (compiler : Nonempty
+      (TM2ComputableInPolyTime encodingA.encode encodingB.encode reduce))
+    (correct : ∀ input, p input ↔ q (reduce input)) :
+    PolyTimeManyOneReducible encodingA encodingB p q :=
+  ⟨reduce, compiler.map FiniteAlphabetComputableInPolyTime.ofComputableInPolyTime, correct⟩
 
 /-- Every PSPACE predicate polynomial-time many-one reduces to `language`. -/
 def PSPACEHard {β : Type} (encoding : FinEncoding β) (language : β → Prop) : Prop :=

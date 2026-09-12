@@ -65,6 +65,13 @@ input has a finite motif in a bounded-height strip and one positive
 horizontal period. Malformed presentations are no-instances. Complexity
 claims use the explicit encodings named in their statements.
 
+PSPACE hardness uses polynomial-time many-one reductions from every encoded
+polynomial-space language. Both deciders and reduction machines require finite
+alphabets on every stack. The [finite-alphabet certificate](LeanTrominoes/FiniteAlphabetPolyTime.lean)
+strengthens Mathlib’s machine interface; a [verified alphabet restriction](LeanTrominoes/TM2FiniteAlphabetRestriction.lean)
+converts existing certificates without changing their encodings or running time.
+Finite control ensures that each program can write only finitely many symbols.
+
 ## Current work and paper coverage
 
 [PROOF_FRONTIER.md](PROOF_FRONTIER.md) records the exact outstanding witness

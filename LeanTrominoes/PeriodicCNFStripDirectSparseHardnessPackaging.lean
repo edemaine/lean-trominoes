@@ -54,8 +54,9 @@ theorem directSparsePolyTimeManyOneReducible
     Complexity.PolyTimeManyOneReducible encoding
       PeriodicStripFlatEncoding.finEncoding language
       (PeriodicStripTrominoTiling tromino) :=
-  ⟨directSparseCompiledTrominoStrip decider tromino, compiler,
-    directSparseCompiledTrominoStrip_correct decider tromino behavior⟩
+  Complexity.PolyTimeManyOneReducible.of_computableInPolyTime
+    (directSparseCompiledTrominoStrip decider tromino) compiler
+    (directSparseCompiledTrominoStrip_correct decider tromino behavior)
 
 /-- Uniform sparse compiler contract for the remaining machine construction. -/
 def DirectSparseCompiledTrominoStripMachines : Prop :=

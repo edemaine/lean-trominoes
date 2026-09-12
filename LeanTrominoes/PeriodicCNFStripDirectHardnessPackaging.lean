@@ -57,8 +57,9 @@ theorem directPolyTimeManyOneReducible
     Complexity.PolyTimeManyOneReducible encoding
       PeriodicStripFlatEncoding.finEncoding language
       (PeriodicStripTrominoTiling tromino) := by
-  exact ⟨directCompiledTrominoStrip decider tromino, compiler,
-    directCompiledTrominoStrip_correct decider tromino behavior⟩
+  exact Complexity.PolyTimeManyOneReducible.of_computableInPolyTime
+    (directCompiledTrominoStrip decider tromino) compiler
+    (directCompiledTrominoStrip_correct decider tromino behavior)
 
 /-- Uniform machine contract on the highly structured formulas emitted by
 the existing PSPACE reduction. -/
