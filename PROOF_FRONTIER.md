@@ -1,5 +1,9 @@
 # Theorem 5.2 proof status
 
+The next target, Theorem 5.5 in the plane, has its own
+[proof frontier](THEOREM55_FRONTIER.md). The record below concerns the
+completed Theorem 5.2 construction.
+
 The unconditional proof is
 [`LeanTrominoes.Theorem52.proved`](LeanTrominoes/Theorem52Proof.lean).
 It proves the complete [target statement](LeanTrominoes/Theorem52.lean):
