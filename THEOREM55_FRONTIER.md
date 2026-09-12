@@ -98,12 +98,27 @@ patches. Compactness gives a new tiling containing all canonical Q placements;
 the solid-square exclusion eliminates any additional Q. This does not assert
 that the original mixed tiling already had a complete global Q grid.
 
+## Source margins
+
+[PeriodicThreeDMNormalizationBlankMargin.lean](LeanTrominoes/PeriodicThreeDMNormalizationBlankMargin.lean)
+proves that the actual normalized drawing lookup is blank when the horizontal
+coordinate modulo 12 lies in `[7,11]` and the vertical coordinate modulo 12
+lies in `[1,5]`. The proof follows the final normalization round, including
+its local templates and magnified routes; it assumes no extra source promise.
+
+[PeriodicThreeDMSourceBlankRegion.lean](LeanTrominoes/PeriodicThreeDMSourceBlankRegion.lean)
+transfers this to the substituted tromino region: residues `[42,71] × [6,35]`
+modulo 72 contain no source cells. Translating the origin to `(54,18)` gives
+the empty rectangle `[-12,18)²`. Both the drawing and source-region results
+use only the standard axioms; the paper-pixel bounds are checked in the kernel.
+
 ## Remaining work
 
 1. Connect the concrete hard instances from the proof of Theorem 5.2 to
    square masks with sufficient empty corner margins and period at least
-   96 divisible by three. Prove these guarantees for the actual construction.
-   The abstract completeness statement of 5.2 does not provide them.
+   96 divisible by three. The source margin is now proved, but its transfer
+   to the refined square mask and exact carrier equality still need proofs.
+   The abstract completeness statement of 5.2 alone does not provide them.
 2. Exhibit a source 2-by-2 block away from the period boundary on the hard
    instances, invoking `tile_disconnected_of_source_square`. If needed, add
    a separated, independently I-tileable rectangle containing such a block;
