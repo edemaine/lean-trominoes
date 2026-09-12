@@ -3,7 +3,7 @@
 The plane target is `LeanTrominoes.Theorem55.planeStatement`, defined in
 [Theorem55.lean](LeanTrominoes/Theorem55.lean). It fixes the connected
 15-omino P and takes an explicit list of cells for Q. Empty and connected
-Q inputs are rejected. **The co-r.e.-completeness theorem is not yet proved.**
+Q inputs are rejected. **Co-r.e. hardness is proved; the upper bound remains open.**
 
 ## Established geometric reduction
 
@@ -18,8 +18,8 @@ Q inputs are rejected. **The co-r.e.-completeness theorem is not yet proved.**
   equivalence with the exact target predicate, including its connectivity check.
 
 Both results permit all rotations and reflections. The geometric promises are
-now established for the concrete hard-source presentations; the computability
-certificate for the resulting finite tile construction remains open.
+now established for the concrete hard-source presentations, with a certified
+computable finite tile construction.
 
 [Theorem55Construction.lean](LeanTrominoes/Theorem55Construction.lean)
 exposes the proved geometric components:
@@ -128,10 +128,16 @@ additional geometric hypotheses, including Q's disconnectedness.
 
 ## Remaining work
 
-1. Certify an executable finite tile construction and compose it with the
-   concrete hard-source compiler from Theorem 5.2.
-2. Prove co-r.e. membership of the target two-tile problem, then close
-   `Theorem55.planeStatement`.
+[Theorem55Compiler.lean](LeanTrominoes/Theorem55Compiler.lean) gives the
+executable cell list, and [Theorem55CompilerComputability.lean](LeanTrominoes/Theorem55CompilerComputability.lean)
+certifies it primitive recursive. [Theorem55Hardness.lean](LeanTrominoes/Theorem55Hardness.lean)
+composes it with the existing Wang source and proves `Theorem55.coREHard`.
+The new geometric and compiler certificates use only the standard axioms;
+the composed hardness theorem inherits native-evaluation certificates from
+the existing source reduction and Wang theorem.
+
+Prove co-r.e. membership of the target two-tile problem, then close
+`Theorem55.planeStatement`.
 
 The strip PSPACE assertion and the translation-only corollary are later
 targets. No unproved compiler, drawing, grid-forcing, or complexity witness
