@@ -627,12 +627,32 @@ uses the complete endpoint columns and a finite constant-header offset column.
 Its certificate emits the actual variable or clause gadget origins in occurrence
 order, including empty source alphabets.
 
-Next combine these origins with the existing finite fan/slot fields and
+The [first-occurrence control proof](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseFirstOccurrenceBits.lean)
+identifies the top-terminal flag with the first literal of each actual clause.
+The [clause-origin selector](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseGadgetOriginCompiler.lean)
+therefore emits one origin per clause, using the proved binary-or-ternary arity.
+The [fixed-table coordinate compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseVertexCoordinateCompiler.lean)
+translates any finite local vertex table at those origins. Its
+[index semantics](LeanTrominoes/PeriodicCNFStripHorizontalClauseGadgetOriginIndexSemantics.lean)
+retain the actual clause indices, and the
+[clause-triple specialization](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseTripleCoordinateCompiler.lean)
+now compiles all four signed coordinate columns of the actual nine-triples-per-clause
+suffix, in canonical order, with no source-specific compiler assumptions.
+The reusable [signed table expansion](LeanTrominoes/SignedUnaryCoordinateTableExpansion.lean)
+composes existing finite scans, fixed copying, and affine arithmetic.
+
+The [grouped variable-origin compiler](LeanTrominoes/PeriodicCNFStripDirectSourceFinalGroupedVariableOriginCompiler.lean)
+uses the existing canonical occurrence-index queries for every signed coordinate
+column. Its lookup proof attaches each origin to the same actual atom as the
+grouped fan and slot fields, including repeated active slots.
+
+Next combine the grouped variable origins with the finite fan/slot fields and
 canonical occurrence numbering to emit vertex records and raster-request
 metadata. The direction requests already have an unconditional compiler;
 the raster prefix still needs the actual assembled-route starting point and
-grid fields. The occurrence-order origin columns also need the existing
-canonical grouping/selection passes before phase-major vertex emission.
+grid fields. The variable-triple prefix still needs its finite local offsets. Both triple
+phases then need grid reflection and record serialization; retained element
+phases still need their local tables and selection.
 The [canonical degree column](LeanTrominoes/PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeHorizontalSemantics.lean)
 and [clause-incidence body suffix](LeanTrominoes/PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics.lean)
 already agree with the horizontal construction.
@@ -671,14 +691,13 @@ and proof completion are separate: compiling conditional closure theorems
 does not prove the unconditional target.
 
 The four-worker full project build completed on 2026-09-12 with exit code 0,
-10,437 jobs, and an elapsed time of 61.893 seconds. Its log is
-`tmp/polarity-clause-and-gadget-origins-full-build.log`. It includes all six
-new modules for source-indexed canonical clause positions, the single affine
-polarity clause compiler, exact decoder lookup and complete horizontal
-agreement, padding and macrocell geometry, and the shared native compiler
-for both actual gadget-origin columns.
+10,446 jobs, and an elapsed time of 239.409 seconds. Its log is
+`tmp/clause-triple-and-grouped-origin-full-build.log`. It includes all nine
+new modules for first-clause selection, fixed signed translation tables,
+actual indexed clause origins and clause-triple coordinates, and variable
+origins in canonical occurrence-entry order.
 
-All six new Lean modules built without diagnostics. The prior variable,
-clause-origin, identity, incidence, direction and route-request compilers remain
-included. The completed full-build log and all cached project trace files were
-checked for errors and compiler panics; none were found.
+All nine new Lean modules built without diagnostics. The prior coordinate,
+identity, incidence, direction and route-request compilers remain included.
+The completed full-build log and all cached project trace files were checked
+for errors and compiler panics; none were found.
