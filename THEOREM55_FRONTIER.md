@@ -257,3 +257,30 @@ application, replacing its duplicated structural proof. Both targets build
 retains two native arithmetic dependencies from the existing
 `scaledFieldSpace_le` helper. This supplies the reusable driver step, not
 the missing variable-tile transition certificate.
+
+## Uniform transition and connectivity checks
+
+`PolyominoStripRawKeys` erases dependent finite indices to natural-number
+records and proves that the exact binary bit order is unchanged.
+`PolyominoStripWindow.Raw.check_correct` verifies a transition checker whose
+quantifiers range over explicit lists of rows, placements, and input cells.
+It checks containment, unique coverage, and overlap; repeated input cells
+do not create extra placements. It never enumerates the window-state type.
+
+`PolyominoConnectivitySearch.disconnectedPacked_correct` replaces the
+powerset search with a countdown through binary masks. Each candidate
+contains at most the input cell list, and each mask has at most one bit per
+input cell. It does not allocate the list of all masks or subsets.
+
+`Theorem55StripDecider.decideStripRaw_correct` combines these checks with
+the indexed DFS driver to decide the exact strip predicate. The placement
+record count is bounded by `statePolynomial` in the actual input length;
+`cut_mask_bits_le` gives the corresponding linear cut-mask bound.
+The target builds successfully (1732 jobs). `tmp/StripRawAudit.lean` checks
+the equivalences and bounds; all use only the three standard axioms.
+
+The remaining upper-bound obligation is to compile these uniform checks
+and unary input handling into the machine model, with evaluator-space
+certificates. The finite-loop definitions and data bounds do not by themselves
+certify the machine's total workspace. Polynomial-time compilation of the
+concrete hard sources also remains open.
