@@ -35,6 +35,11 @@ thickness-three extrusion, respectively.
 | An aligned background seed forces its entire canonical quadrant | [KeyedPolycubeSlabPropagation](LeanTrominoes/KeyedPolycubeSlabPropagation.lean) |
 | A mixed tiling must use Q whenever P cannot tile alone | [PolycubePair](LeanTrominoes/PolycubePair.lean) |
 | Exhaustive covering candidates and inverse-coordinate membership | [PolycubeCovering](LeanTrominoes/PolycubeCovering.lean) |
+| Every full-space tiling admits a complete horizontal background grid | [KeyedPolycubeSpaceNormalization](LeanTrominoes/KeyedPolycubeSpaceNormalization.lean) |
+| Arbitrary full-space tilings recover planar P/Q tilings | [KeyedPolycubeSpaceRecovery](LeanTrominoes/KeyedPolycubeSpaceRecovery.lean) |
+| Periodic solid-cap bands construct full-space tilings | [KeyedPolycubeSpaceForward](LeanTrominoes/KeyedPolycubeSpaceForward.lean) |
+| Primitive-recursive full-space tile compiler | [TwoConnectedPolycubesSpaceCompiler](LeanTrominoes/TwoConnectedPolycubesSpaceCompiler.lean) |
+| Full-space co-r.e. completeness | [TwoConnectedPolycubesSpaceProof](LeanTrominoes/TwoConnectedPolycubesSpaceProof.lean) |
 
 The capped Q proof includes the keys protruding outside the square cap.
 It does not assume that the disconnected planar Q is contained in the cap.
@@ -170,6 +175,11 @@ directions, the equivalence, compiler computability, the upper bound, and the
 final theorem. All new geometric and compiler results use only the three
 standard axioms. The final theorem inherits exactly the same 4406 native
 certificates as slab completeness, with no new native axiom and no `sorryAx`.
+`lake env lean LeanTrominoes.lean` also completed successfully, checking the
+public import. The broader repository rebuild was interrupted while rebuilding
+existing strip machinery; it is not claimed as a successful whole-repository
+build. All eight artifacts affected by that interruption were restored by
+successful direct Lean compilations before the public import check.
 
 The remaining polycube obligation is slab completeness for each fixed height
 greater than two.
