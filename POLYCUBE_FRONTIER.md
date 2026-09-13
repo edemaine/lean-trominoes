@@ -27,6 +27,8 @@ thickness-three extrusion, respectively.
 | An I-tromino source tiling produces a height-2 slab tiling | [KeyedPolycubeForward](LeanTrominoes/KeyedPolycubeForward.lean) |
 | Every admissible keyed Q becomes connected under its square cap | [KeyedPolycubeConnected](LeanTrominoes/KeyedPolycubeConnected.lean) |
 | A capped Q fitting the height-2 slab is horizontal, with offset determined by its vertical reflection | [KeyedPolycubeSlabOrientation](LeanTrominoes/KeyedPolycubeSlabOrientation.lean) |
+| Both locks force background neighbors with the same vertical orientation | [KeyedPolycubeSlabLocks](LeanTrominoes/KeyedPolycubeSlabLocks.lean) |
+| An aligned background seed forces its entire canonical quadrant | [KeyedPolycubeSlabPropagation](LeanTrominoes/KeyedPolycubeSlabPropagation.lean) |
 | A mixed tiling must use Q whenever P cannot tile alone | [PolycubePair](LeanTrominoes/PolycubePair.lean) |
 | Exhaustive covering candidates and inverse-coordinate membership | [PolycubeCovering](LeanTrominoes/PolycubeCovering.lean) |
 
@@ -46,14 +48,22 @@ plane theorem retains its statement. `tmp/PolycubeForwardAudit.lean`
 checks the forward theorem and layer assembly, with output in
 `tmp/polycube-forward-audit.log`. Both use only the three standard axioms.
 
+The slab lock proof excludes a downward-facing cap using the two occupied
+horizontal neighbors of each lock. It then applies the exposed planar
+`vertical_candidate` and `right_candidate` lemmas to the exact zero-layer
+footprint. The original planar neighbor theorems retain their statements.
+`tmp/PolycubeSlabLocksAudit.lean` audits both slab neighbors and quadrant
+propagation; all use only the three standard axioms. Its output is
+`tmp/polycube-slab-locks-audit.log`.
+
 ## Next proof obligations
 
 1. Finish the finite pocket certificates proving that the 45-cube tile
    cannot tile full space by itself. An arithmetic inverse-coordinate
    checker replaces the memory-intensive placed-finset computation.
-2. Prove the height-2 slab lock-forcing lemmas, including exclusion of a
-   vertically reflected cap covering a simulation-layer lock. Propagate
-   the forced background placements and recover a planar tiling.
+2. Normalize an arbitrary slab tiling to an aligned background seed, use
+   compactness to complete its forced background grid, and recover a
+   planar tiling.
 3. Certify the finite output compiler and the 3D finite-search/compactness
    upper bound, then close height-2 slab co-r.e. completeness.
 4. Give explicit vertical keys and locks for full 3D, verify all allowed

@@ -71,21 +71,13 @@ theorem reference_cells (n : Nat) (holes : Polyomino) :
     referencePlacement.cells (pairTiles PlusRefinement.bumpy (tile n holes)) = tile n holes := by
   simp [referencePlacement, Placement.cells, pairTiles, SquareSymmetry.act, Cell.add]
 
-/-- In an arbitrary mixed tiling containing the canonical reference Q, the
-vertical lock forces another Q exactly one period above it. -/
-theorem vertical_neighbor {n : Nat} (hn : 96 ≤ n) (period : (n : Int) % 3 = 0)
-    (holes : Polyomino) (admissible : AdmissibleHoles n holes)
-    (placements : Set (Placement Bool))
-    (tiling : IsTiling (pairTiles PlusRefinement.bumpy (tile n holes)) Set.univ placements)
-    (reference_mem : referencePlacement ∈ placements) :
-    (⟨true, .identity, (0, -(n : Int))⟩ : Placement Bool) ∈ placements := by
-  obtain ⟨a, ha, covers⟩ := tiling.exists_cover (Set.mem_univ (2, 3))
-  have distinct : referencePlacement ≠ a := by
-    rintro rfl
-    rw [reference_cells] at covers
-    exact vertical_lock_outside hn (tile_upper hn holes covers)
-  have disjoint := tiling.disjoint_cells reference_mem ha distinct
-  rw [reference_cells] at disjoint
+/-- Local lock forcing, independent of a complete plane tiling. -/
+theorem vertical_candidate {n : Nat} (hn : 96 ≤ n) (period : (n : Int) % 3 = 0)
+    (holes : Polyomino) (admissible : AdmissibleHoles n holes) (a : Placement Bool)
+    (covers : (2, 3) ∈ a.cells (pairTiles PlusRefinement.bumpy (tile n holes)))
+    (disjoint : Disjoint (tile n holes)
+      (a.cells (pairTiles PlusRefinement.bumpy (tile n holes)))) :
+    a = (⟨true, .identity, (0, -(n : Int))⟩ : Placement Bool) := by
   cases hk : a.kind with
   | false =>
     have eq : a.cells (pairTiles PlusRefinement.bumpy (tile n holes)) =
@@ -113,7 +105,24 @@ theorem vertical_neighbor {n : Nat} (hn : 96 ≤ n) (period : (n : Int) % 3 = 0)
           lower_tile hn holes admissible source_lower
       exact (Finset.disjoint_left.mp disjoint) in_reference in_candidate
     obtain ⟨hs, ho⟩ := KeyCornerArithmetic.vertical_match n (by omega) period a.symmetry a.offset upper avoids
-    have eq : a = (⟨true, .identity, (0, -(n : Int))⟩ : Placement Bool) := Placement.ext hk hs ho
-    rwa [← eq]
+    exact Placement.ext hk hs ho
+
+/-- In an arbitrary mixed tiling containing the canonical reference Q, the
+vertical lock forces another Q exactly one period above it. -/
+theorem vertical_neighbor {n : Nat} (hn : 96 ≤ n) (period : (n : Int) % 3 = 0)
+    (holes : Polyomino) (admissible : AdmissibleHoles n holes)
+    (placements : Set (Placement Bool))
+    (tiling : IsTiling (pairTiles PlusRefinement.bumpy (tile n holes)) Set.univ placements)
+    (reference_mem : referencePlacement ∈ placements) :
+    (⟨true, .identity, (0, -(n : Int))⟩ : Placement Bool) ∈ placements := by
+  obtain ⟨a, ha, covers⟩ := tiling.exists_cover (Set.mem_univ (2, 3))
+  have distinct : referencePlacement ≠ a := by
+    rintro rfl
+    rw [reference_cells] at covers
+    exact vertical_lock_outside hn (tile_upper hn holes covers)
+  have disjoint := tiling.disjoint_cells reference_mem ha distinct
+  rw [reference_cells] at disjoint
+  have eq := vertical_candidate hn period holes admissible a covers disjoint
+  rwa [← eq]
 
 end LeanTrominoes.KeyedPeriodicComplement

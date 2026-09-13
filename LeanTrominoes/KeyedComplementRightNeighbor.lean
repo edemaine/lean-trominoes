@@ -40,21 +40,13 @@ private theorem right_lock_outside {n : Nat} (hn : 96 ≤ n) :
     KeyCornerArithmetic.inKey]
   omega
 
-/-- In an arbitrary mixed tiling containing the canonical reference Q, the
-right lock forces another Q exactly one period to its right. -/
-theorem right_neighbor {n : Nat} (hn : 96 ≤ n) (period : (n : Int) % 3 = 0)
-    (holes : Polyomino) (admissible : AdmissibleHoles n holes)
-    (placements : Set (Placement Bool))
-    (tiling : IsTiling (pairTiles PlusRefinement.bumpy (tile n holes)) Set.univ placements)
-    (reference_mem : referencePlacement ∈ placements) :
-    (⟨true, .identity, ((n : Int), 0)⟩ : Placement Bool) ∈ placements := by
-  obtain ⟨a, ha, covers⟩ := tiling.exists_cover (Set.mem_univ ((n : Int) - 4, 2))
-  have distinct : referencePlacement ≠ a := by
-    rintro rfl
-    rw [reference_cells] at covers
-    exact right_lock_outside hn (tile_upper hn holes covers)
-  have disjoint := tiling.disjoint_cells reference_mem ha distinct
-  rw [reference_cells] at disjoint
+/-- Local lock forcing, independent of a complete plane tiling. -/
+theorem right_candidate {n : Nat} (hn : 96 ≤ n) (period : (n : Int) % 3 = 0)
+    (holes : Polyomino) (admissible : AdmissibleHoles n holes) (a : Placement Bool)
+    (covers : ((n : Int) - 4, 2) ∈ a.cells (pairTiles PlusRefinement.bumpy (tile n holes)))
+    (disjoint : Disjoint (tile n holes)
+      (a.cells (pairTiles PlusRefinement.bumpy (tile n holes)))) :
+    a = (⟨true, .identity, ((n : Int), 0)⟩ : Placement Bool) := by
   cases hk : a.kind with
   | false =>
     have eq : a.cells (pairTiles PlusRefinement.bumpy (tile n holes)) =
@@ -82,7 +74,24 @@ theorem right_neighbor {n : Nat} (hn : 96 ≤ n) (period : (n : Int) % 3 = 0)
           lower_tile hn holes admissible source_lower
       exact (Finset.disjoint_left.mp disjoint) in_reference in_candidate
     obtain ⟨hs, ho⟩ := KeyCornerArithmetic.right_match n (by omega) period a.symmetry a.offset upper avoids
-    have eq : a = (⟨true, .identity, ((n : Int), 0)⟩ : Placement Bool) := Placement.ext hk hs ho
-    rwa [← eq]
+    exact Placement.ext hk hs ho
+
+/-- In an arbitrary mixed tiling containing the canonical reference Q, the
+right lock forces another Q exactly one period to its right. -/
+theorem right_neighbor {n : Nat} (hn : 96 ≤ n) (period : (n : Int) % 3 = 0)
+    (holes : Polyomino) (admissible : AdmissibleHoles n holes)
+    (placements : Set (Placement Bool))
+    (tiling : IsTiling (pairTiles PlusRefinement.bumpy (tile n holes)) Set.univ placements)
+    (reference_mem : referencePlacement ∈ placements) :
+    (⟨true, .identity, ((n : Int), 0)⟩ : Placement Bool) ∈ placements := by
+  obtain ⟨a, ha, covers⟩ := tiling.exists_cover (Set.mem_univ ((n : Int) - 4, 2))
+  have distinct : referencePlacement ≠ a := by
+    rintro rfl
+    rw [reference_cells] at covers
+    exact right_lock_outside hn (tile_upper hn holes covers)
+  have disjoint := tiling.disjoint_cells reference_mem ha distinct
+  rw [reference_cells] at disjoint
+  have eq := right_candidate hn period holes admissible a covers disjoint
+  rwa [← eq]
 
 end LeanTrominoes.KeyedPeriodicComplement
