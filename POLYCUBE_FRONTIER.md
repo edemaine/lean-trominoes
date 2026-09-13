@@ -1,7 +1,7 @@
 # Two connected polycubes
 
 The next targets are co-r.e. completeness of tiling the height-2 slab and
-full three-dimensional space with two connected polycubes. Neither
+full three-dimensional space with two connected polycubes. Height-2 slab co-r.e. hardness is proved; neither
 completeness theorem is proved yet. Their exact propositions are
 `TwoConnectedPolycubes.slabTwoStatement` and
 `TwoConnectedPolycubes.spaceStatement` in
@@ -68,15 +68,27 @@ modules built successfully (about 983 seconds each); the completed
 `tmp/polycube-space-obstruction-audit.log`, confirms only the three standard
 axioms, with no native-evaluation axiom.
 
+The slab recovery proof now normalizes any background placement by horizontal
+translation, planar symmetry, and, when needed, reflection of the slab.
+Compactness completes the forced quadrant to a full grid. Its square caps
+occupy the upper layer, so the lower layer recovers a planar P/Q tiling.
+`TwoConnectedPolycubesSlabGeometry` proves the resulting equivalence with
+the source I-tromino problem. `TwoConnectedPolycubesSlabCompiler` certifies
+the explicit voxel-list compiler as primitive recursive, and
+`TwoConnectedPolycubesSlabHardness.slabTwo_coREHard` closes co-r.e. hardness.
+The hardness target builds successfully. The audit in
+`tmp/PolycubeSlabHardnessAudit.lean` checks recovery, geometric equivalence,
+compiler computability, and hardness. Recovery, geometry, and compiler proofs
+use only the three standard axioms. The final hardness theorem also inherits
+the existing native-decision certificates in the planar source reduction
+and LeanWang; this milestone adds none.
+
 ## Next proof obligations
 
-1. Normalize an arbitrary slab tiling to an aligned background seed, use
-   compactness to complete its forced background grid, and recover a
-   planar tiling.
-2. Certify the finite output compiler and the 3D finite-search/compactness
-   upper bound, then close height-2 slab co-r.e. completeness.
-3. Give explicit vertical keys and locks for full 3D, verify all allowed
+1. Certify the voxel finite-search/compactness upper bound, then close
+   height-2 slab co-r.e. completeness.
+2. Give explicit vertical keys and locks for full 3D, verify all allowed
    orientations, and prove stacked-grid forcing and simulation recovery.
-4. Extend the slab argument to each fixed height greater than two.
+3. Extend the slab argument to each fixed height greater than two.
 
 The 3D space construction and the taller-slab assertions remain open.

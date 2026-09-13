@@ -18,6 +18,25 @@ def slabFamily (n : Nat) (holes : Polyomino) : Bool → Polycube :=
 def planarFamily (n : Nat) (holes : Polyomino) : Bool → Polyomino :=
   pairTiles PlusRefinement.bumpy (tile n holes)
 
+theorem slabFamily_eq_capped (n : Nat) (holes : Polyomino) :
+    slabFamily n holes = fun i => Polycube.capped
+      (planarFamily n holes i) (pairTiles ∅ (square n) i) {0} 1 := by
+  funext i
+  cases i <;> simp [slabFamily, planarFamily, pairTiles, Polycube.pairTiles,
+    Polycube.capped, Polycube.bumpyOne, slabTile, Polycube.extrude]
+
+theorem origin_mem_slabFamily {n : Nat} (hn : 96 ≤ n) (holes : Polyomino)
+    (admissible : AdmissibleHoles n holes) (i : Bool) :
+    ((0, 0), 0) ∈ slabFamily n holes i := by
+  cases i
+  · change ((0, 0), 0) ∈ Polycube.bumpyOne
+    decide
+  · have hq : (0, 0) ∈ tile n holes := lower_tile hn holes admissible (by
+      simp [KeyCornerArithmetic.lower, KeyCornerArithmetic.inBox,
+        KeyCornerArithmetic.inVerticalLock, KeyCornerArithmetic.inHorizontalLock]
+      omega)
+    simp [slabFamily, Polycube.pairTiles, slabTile, hq]
+
 theorem mixed_slab_horizontal {n : Nat} (hn : 96 ≤ n) (holes : Polyomino)
     (p : VoxelPlacement Bool)
     (inside : ∀ c ∈ p.cells (slabFamily n holes), c ∈ voxelSlab 2) :
