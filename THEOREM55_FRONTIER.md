@@ -284,3 +284,21 @@ and unary input handling into the machine model, with evaluator-space
 certificates. The finite-loop definitions and data bounds do not by themselves
 certify the machine's total workspace. Polynomial-time compilation of the
 concrete hard sources also remains open.
+
+## Bounded arithmetic machine compiler
+
+`PartrecBoundedAll` compiles bounded universal quantification to a tail loop.
+`boundedAll_uniform` bounds its evaluator workspace linearly in retained
+fields, counter bits, and leaf workspace, independently of iteration count.
+`BoundedArithmetic.Expr.code_eval` proves total evaluator compilation for
+field lookup, arithmetic, conditionals, local bindings, and nested bounded
+quantifiers. `Expr.code_fits` supplies a linear workspace allowance assuming
+explicit bounds on intermediate binary lengths (`Expr.Safe`). These are
+actual evaluator certificates, with a constant depending on the fixed formula.
+The combined target builds (1483 jobs); `tmp/BoundedArithmeticAudit.lean`
+confirms that the compiler and space results use only standard axioms.
+
+`PolyominoStripWindow.Raw.idxOf_keys_eq_address` replaces placement-list
+search by the exact mixed-radix arithmetic bit address. Instantiating the
+formula compiler for the strip checks and assembling the complete unary-input
+machine remain necessary before claiming PSPACE membership.
