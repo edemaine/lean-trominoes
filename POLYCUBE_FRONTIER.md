@@ -142,13 +142,21 @@ horizontal background grid. No seed or orientation hypothesis remains.
 The neighbor target built successfully (944 jobs), grid propagation (1137 jobs),
 and normalization (1146 jobs). `tmp/SpaceLockAudit.lean` confirms that both exact
 candidate and neighbor rules use only the three standard axioms. Recovery from
-the two solid cap planes is the next obligation.
+the two solid cap planes is now proved. `planar_tileable_of_space` recovers the
+planar P/Q tiling from any full-space tiling. Connected placements cannot cross
+the cap planes; any nongrid background tile is too tall, and any upright small
+tile fitting between the planes contains a forbidden middle-layer 2-by-2 square.
+The recovery target built successfully (1193 jobs), and
+`tmp/SpaceRecoveryAudit.lean` confirms only the three standard axioms.
+
+`space_tileable_of_holes` supplies the converse by repeating the compatible
+three-body-layer/two-cap-layer tiling every five voxels vertically.
+`space_tileable_iff_tromino` and `spaceProblem_iff_of_mask` establish the exact
+geometric reduction. The geometry target built successfully (1212 jobs).
 
 ## Next proof obligations
 
-1. Recover the planar source tiling between the complete grid’s solid caps.
-3. Construct full-space tilings by periodically stacking the forward simulation,
-   certify its output compiler, and combine hardness with `space_coRE`.
-4. Extend slab hardness to each fixed height greater than two.
+1. Certify the full-space output compiler and combine hardness with `space_coRE`.
+2. Extend slab hardness to each fixed height greater than two.
 
 The 3D space construction and the taller-slab completeness assertions remain open.
