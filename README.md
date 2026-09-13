@@ -16,9 +16,10 @@ The plane assertion of Theorem 5.5 is also proved: tiling by a fixed connected
 arbitrary rotations and reflections. The strip assertion remains open.
 [THEOREM55_FRONTIER.md](THEOREM55_FRONTIER.md) records the construction and validation.
 
-The next construction targets two connected polycubes in a height-2 slab
-and in full 3D. Connectivity and slab orientation/non-tiling lemmas are
-proved; completeness remains open. [POLYCUBE_FRONTIER.md](POLYCUBE_FRONTIER.md)
+Tiling the height-2 slab with a fixed connected 15-voxel polycube and an
+input connected polycube is also proved co-r.e.-complete, allowing all cube
+rotations and reflections. Full 3D has a co-r.e. upper bound and a fixed-tile
+non-tiling obstruction; its hardness construction remains open. [POLYCUBE_FRONTIER.md](POLYCUBE_FRONTIER.md)
 records the established results and remaining obligations.
 
 ## Main statements and proofs
@@ -43,6 +44,7 @@ otherwise.
 | Theorem 5.2, strip PSPACE completeness | `Theorem52.stripProved` | [Theorem52Proof](LeanTrominoes/Theorem52Proof.lean) |
 | Theorem 5.2, complete plane result | `PeriodicWangPlanarThreeDMReduction.theorem52_planeStatement` | [PeriodicWangPlanarThreeDMReduction](LeanTrominoes/PeriodicWangPlanarThreeDMReduction.lean) |
 | Theorem 5.5, plane co-r.e. completeness | `Theorem55.planeProved` | [Theorem55Proof](LeanTrominoes/Theorem55Proof.lean) |
+| Two connected polycubes, height-2 slab co-r.e. completeness | `TwoConnectedPolycubes.slabTwoProved` | [TwoConnectedPolycubesSlabProof](LeanTrominoes/TwoConnectedPolycubesSlabProof.lean) |
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE hardness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEHard` | [PeriodicCNFPolySpaceHardness](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean) |
@@ -96,6 +98,7 @@ a paper theorem.
 | Theorem 3.2 | Local 1D CNF SAT hardness proved; full theorem open |
 | Theorem 5.2 | Fully proved |
 | Theorem 5.5 | Plane co-r.e. completeness proved; strip assertion open |
+| Two connected polycubes | Height-2 slab proved; full 3D and taller slabs open |
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 | Open |
 

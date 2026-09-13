@@ -1,10 +1,10 @@
 # Two connected polycubes
 
-The next targets are co-r.e. completeness of tiling the height-2 slab and
-full three-dimensional space with two connected polycubes. Height-2 slab co-r.e. hardness is proved; neither
-completeness theorem is proved yet. Their exact propositions are
-`TwoConnectedPolycubes.slabTwoStatement` and
-`TwoConnectedPolycubes.spaceStatement` in
+Tiling the height-2 slab with two connected polycubes is proved co-r.e.
+complete by `TwoConnectedPolycubes.slabTwoProved` in
+[TwoConnectedPolycubesSlabProof.lean](LeanTrominoes/TwoConnectedPolycubesSlabProof.lean).
+Full three-dimensional space has a co-r.e. upper bound, but its hardness
+construction remains open. The target propositions are defined in
 [TwoConnectedPolycubes.lean](LeanTrominoes/TwoConnectedPolycubes.lean).
 
 Inputs explicitly list the variable tile's voxels. The predicates reject
@@ -83,12 +83,29 @@ use only the three standard axioms. The final hardness theorem also inherits
 the existing native-decision certificates in the planar source reduction
 and LeanWang; this milestone adds none.
 
+The upper bound uses finite subsets of all placements meeting a finite voxel
+box. Inside-region voxels must have exactly one covering placement; outside
+voxels must have none. Compactness converts successful searches for all
+boxes into an exact tiling of the prescribed region. The finite search and
+the face-connectivity cut test are certified primitive recursive. This proves
+`problem_coRE` for every primitive-recursive voxel region, `slab_coRE` for
+every fixed slab height, and `space_coRE` for full space.
+
+## Validation of slab completeness
+
+`lake build +LeanTrominoes.TwoConnectedPolycubesSlabProof:olean` completed
+successfully (4638 jobs). `tmp/PolycubeSlabCompletenessAudit.lean` audits the
+finite-search equivalence, search computability, connectivity computability,
+both upper bounds, and the final completeness theorem. The search,
+connectivity, and upper-bound proofs use only the three standard axioms.
+The final theorem has exactly the same inherited native-decision certificates
+as the hardness theorem, and no `sorryAx`. The public root module now imports
+the slab result.
+
 ## Next proof obligations
 
-1. Certify the voxel finite-search/compactness upper bound, then close
-   height-2 slab co-r.e. completeness.
-2. Give explicit vertical keys and locks for full 3D, verify all allowed
+1. Give explicit vertical keys and locks for full 3D, verify all allowed
    orientations, and prove stacked-grid forcing and simulation recovery.
-3. Extend the slab argument to each fixed height greater than two.
+2. Extend slab hardness to each fixed height greater than two.
 
-The 3D space construction and the taller-slab assertions remain open.
+The 3D space construction and the taller-slab completeness assertions remain open.

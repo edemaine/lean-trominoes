@@ -8,7 +8,8 @@ import LeanWang.CoRE
 
 /-! # Targets for tiling with two connected polycubes
 
-These are definitions of propositions, not completeness proofs. The fixed
+These are target definitions. `TwoConnectedPolycubesSlabProof` supplies the
+height-two slab proof; full-space hardness remains open. The fixed
 space tile has 45 voxels; the first slab target uses the fixed 15-voxel tile.
 Inputs give the second tile explicitly, and disconnected or empty inputs
 are rejected by the face-connectivity requirement.
