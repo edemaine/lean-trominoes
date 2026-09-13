@@ -113,10 +113,37 @@ took 236 seconds. `tmp/PolycubeSpaceSymmetryAudit.lean` audits composition,
 inversion, and normalization; all three use only the standard axioms, with
 no native-evaluation axiom.
 
+## Full-space solid-cap construction
+
+`KeyedPolycubeSpaceGeometry.spaceTile` places Q in layers 0, 1, and 2,
+with solid square caps at -1 and 3. `spaceTile_connected` proves this actual
+tile connected, including its protruding planar keys. The slab and space
+proofs now share the key-attachment paths in `KeyedPolycubeKeyAttachment`;
+the original slab connectivity theorem still builds.
+
+`PolycubeSpaceKeyCertificates` checks that either five-cell protruding key,
+extruded through three layers, overlaps a fixed occupied witness when it
+tries to fill a side lock upright. `PolycubeSpaceSmallCertificates` checks
+that the fixed 45-cube tile cannot fill either side lock in any orientation.
+These are kernel-checked finite statements, not experimental searches.
+The certificate target built successfully (860 jobs), and the connectivity
+regression build succeeded (923 jobs). The audit in
+`tmp/SpaceConstructionAudit.lean` confirms only the three standard axioms.
+
+The intended recovery uses a complete horizontal background grid. Its two
+solid cap layers would isolate three simulation layers, potentially avoiding
+vertical keys and stacked-grid forcing entirely. This recovery is not yet
+proved. Exploratory searches at period 96 support both side-neighbor rules;
+they are not used as trusted proof certificates.
+
 ## Next proof obligations
 
-1. Give explicit vertical keys and locks for full 3D, verify all allowed
-   orientations, and prove stacked-grid forcing and simulation recovery.
-2. Extend slab hardness to each fixed height greater than two.
+1. Lift the cap and finite key obstructions to arbitrary periods and actual
+   placements, forcing horizontal background neighbors.
+2. Complete the horizontal grid by compactness and recover the planar source
+   tiling between its solid caps.
+3. Construct full-space tilings by periodically stacking the forward simulation,
+   certify its output compiler, and combine hardness with `space_coRE`.
+4. Extend slab hardness to each fixed height greater than two.
 
 The 3D space construction and the taller-slab completeness assertions remain open.
