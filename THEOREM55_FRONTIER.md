@@ -312,3 +312,19 @@ workspace in its flat input size, including nested bounded quantifiers.
 The target builds (1486 jobs); `tmp/AutomaticArithmeticAudit.lean` reports
 only standard axioms for bit lookup and automatic space certification.
 The transition formula is the next instantiation.
+
+## Compiled variable-tile transition
+
+`PolyominoStripWindow.Formula.transition_truth` proves the complete bounded
+arithmetic formula equivalent to `Raw.Transition`. Its field readers preserve
+the signed coordinate encoding and placement-bit order. Containment and
+coverage handle all eight orientations; candidate quantifiers enforce unique
+coverage and matching overlap. Duplicate input cells remain harmless.
+
+`transition_code_eval` proves the actual evaluator returns the transition
+checker result. `transition_code_fits` certifies linear workspace in the binary
+flat input fields, with a fixed constant independent of the tiles and strip.
+The target builds (1517 jobs), and `tmp/StripFormulaAudit.lean` reports only
+standard axioms for semantic correctness, evaluation, and space certification.
+Disconnectedness compilation, the complete search/input machine, and the
+polynomial-time hardness compiler remain necessary for PSPACE completeness.
