@@ -397,3 +397,18 @@ build. `tmp/StripEvaluatorAudit.lean` reports standard axioms for evaluation
 and preprocessing; the space theorem inherits the same 12 existing native
 checks. Sequential machine composition with a space bound is still needed
 to package membership. The polynomial-time hardness compiler remains open.
+
+## PSPACE membership proved
+
+`Theorem55.strip_inPSPACE` in `Theorem55StripMembership.lean` proves
+membership for the exact unary encoding and target predicate.
+`PartrecPreparedEvaluatorSpace` composes polynomial-time preprocessing with
+a finite evaluator while retaining the original input-length space parameter.
+`TM2SequentialSpace` bounds every prefix of the two component runs and the
+intermediate tape transfer. All internal stack alphabets are finite.
+
+The membership target builds (1992 jobs). `tmp/StripMembershipAudit.lean`
+retains only standard axioms and the same 12 inherited native checks.
+The remaining completeness obligation is polynomial-time hardness. The
+existing direct tromino reduction already emits unary strip fields before
+its final binary encoder; this stream can feed the complement construction.
