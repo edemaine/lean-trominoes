@@ -343,3 +343,24 @@ The mask limit is an explicit supplied field whose binary length is linear
 in the number of cells. The target builds (1542 jobs); the audit in
 `tmp/ConnectivityFormulaAudit.lean` uses only standard axioms. Constructing
 that limit and assembling the search/input driver remain separate obligations.
+
+## Complete variable-tile reachability evaluator
+
+`PolyominoStripWindow.Savitch.reach_eval` and `reach_fits` certify a complete
+reachability request on the `2^bits`-state graph. The program constructs its
+exact fuel, initializes the saved stack and tile suffix, evaluates the strip
+leaf at every base query, and returns the normalized answer. Its explicit
+budget is polynomial in `bits` and linear in the retained suffix footprint.
+
+The shared `flatIterate_uniform` theorem needs one-step certificates only
+along the orbit; iteration count enters the budget only through its binary
+length. `GenericSavitchReach.iterate_fits` applies it to arbitrary retained
+contexts and leaf relations. `fuelCost_linear` bounds fuel construction in
+the binary lengths of its inputs and output.
+
+The reachability target builds (1663 jobs). `tmp/StripReachAudit.lean` reports
+standard axioms for evaluation and the new iteration wrapper. The complete
+space certificate inherits 12 existing native arithmetic checks from context
+recovery and driver field bounds, with no newly introduced native checks.
+The outer cycle search, unary input machine, and polynomial-time hardness
+compiler remain open.
