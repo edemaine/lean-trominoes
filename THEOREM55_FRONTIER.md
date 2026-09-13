@@ -180,6 +180,14 @@ successfully (805 jobs).
 `plane_tileable_of_strip` repeats any positive-height strip tiling through
 the plane. Consequently `PlusRefinement.bumpy_not_tileable_strip` excludes
 a tiling by the fixed 15-omino alone, at every positive strip height.
-The strip PSPACE-completeness assertion is still open: lock forcing,
-source preparation, polynomial-time compilation, and the upper bound
-remain to be completed.
+`KeyedStripComplement.right_match` proves horizontal lock matching with
+three occupied witnesses. Region normalization, forced row propagation,
+and compactness give a tiling containing the complete canonical Q row.
+`pair_tileable_iff` proves exact equivalence with the source I-tromino
+tiling under the mask promises (1124 jobs). The isolated 2-by-2 component
+also certifies Q disconnected (926 jobs). `tmp/StripGeometryAudit.lean`
+checks this equivalence, disconnectedness, and the small-tile obstruction;
+all use only the three standard axioms.
+
+The strip PSPACE-completeness assertion is still open: source preparation,
+polynomial-time compilation, and the upper bound remain to be completed.
