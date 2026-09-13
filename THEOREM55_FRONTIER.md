@@ -189,5 +189,35 @@ also certifies Q disconnected (926 jobs). `tmp/StripGeometryAudit.lean`
 checks this equivalence, disconnectedness, and the small-tile obstruction;
 all use only the three standard axioms.
 
-The strip PSPACE-completeness assertion is still open: source preparation,
-polynomial-time compilation, and the upper bound remain to be completed.
+`Theorem55StripSource` now prepares every periodic-strip source: it shifts
+the source ten rows upward, adds separated 2-by-3 padding rectangles, and
+uses horizontal period `(width + 72) * period`. The mask is admissible,
+its carrier is exactly the refined prepared source, and the preparation
+preserves I-tromino tileability. No hard-source geometry promise is assumed.
+
+`Theorem55StripCompiler.compile_correct` proves the exact reduction from
+`PeriodicStripTrominoTiling .I` to `Theorem55.stripProblem`, including malformed
+inputs. The compiler emits the actual cell list; `compile_primrec` proves
+primitive recursiveness. `Theorem55StripEncoding.finEncoding` uses unary
+height and signed-coordinate fields, with a proved decoding round trip.
+`Theorem55.stripStatement` states PSPACE completeness under this encoding.
+
+`compile_encoding_length_le` bounds the output length by
+`(2 + 2*n²) * (n² + 2*n + 9)`, where
+`n = 3 * (source.width + 72) * source.period`. The target builds successfully
+(1703 jobs). `tmp/StripCompilerAudit.lean` checks compiler correctness,
+primitive recursiveness, the size bound, and the unary parser round trip;
+all use only the three standard axioms.
+
+The PSPACE-completeness assertion remains open. The next obligations are:
+
+- Certify a polynomial-time machine for the compiler on the concrete hard
+  sources. The enlarged period is polynomial in their geometric dimensions;
+  these dimensions are already polynomially bounded in the original source
+  size. Primitive recursiveness and polynomial output size alone do not
+  supply this runtime certificate. An arbitrary binary-encoded periodic
+  strip can have exponentially large dimensions.
+- Generalize the existing tromino-only strip decider to variable polyomino
+  footprints, and certify polynomial workspace under the unary geometric
+  encoding. The current upper bound cannot be applied directly to Q.
+- Compose the hardness reduction and upper bound to prove `stripStatement`.

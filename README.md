@@ -13,7 +13,10 @@ in the plane and PSPACE-complete in a strip.
 
 The plane assertion of Theorem 5.5 is also proved: tiling by a fixed connected
 15-omino and an input disconnected polyomino is co-r.e.-complete, allowing
-arbitrary rotations and reflections. The strip assertion remains open.
+arbitrary rotations and reflections. For the strip assertion, the exact
+two-tile reduction, explicit compiler, and output-size bound are proved;
+the polynomial-time and PSPACE certificates remain open. See
+[THEOREM55_FRONTIER.md](THEOREM55_FRONTIER.md).
 [THEOREM55_FRONTIER.md](THEOREM55_FRONTIER.md) records the construction and validation.
 
 Tiling full 3D space with a fixed connected 45-voxel polycube and an input
