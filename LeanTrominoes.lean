@@ -2,6 +2,7 @@ import LeanTrominoes.Theorem52Proof
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
 import LeanTrominoes.Theorem55Proof
 import LeanTrominoes.TwoConnectedPolycubesSlabProof
+import LeanTrominoes.TwoConnectedPolycubesSpaceProof
 
 /-!
 # Main theorem interface
@@ -19,8 +20,10 @@ for the construction and validation.
 
 `TwoConnectedPolycubes.slabTwoProved` proves co-r.e. completeness of tiling
 the height-two slab with a fixed connected 15-voxel polycube and an input
-connected polycube, allowing all cube rotations and reflections. Full-space
-hardness remains open; see POLYCUBE_FRONTIER.md.
+connected polycube. `TwoConnectedPolycubes.spaceProved` proves full-space
+co-r.e. completeness with a fixed connected 45-voxel polycube and an input
+connected polycube. Both allow all cube rotations and reflections. See
+POLYCUBE_FRONTIER.md.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.

@@ -3,8 +3,10 @@
 Tiling the height-2 slab with two connected polycubes is proved co-r.e.
 complete by `TwoConnectedPolycubes.slabTwoProved` in
 [TwoConnectedPolycubesSlabProof.lean](LeanTrominoes/TwoConnectedPolycubesSlabProof.lean).
-Full three-dimensional space has a co-r.e. upper bound, but its hardness
-construction remains open. The target propositions are defined in
+Full three-dimensional space is proved co-r.e. complete by
+`TwoConnectedPolycubes.spaceProved` in
+[TwoConnectedPolycubesSpaceProof.lean](LeanTrominoes/TwoConnectedPolycubesSpaceProof.lean).
+The target propositions are defined in
 [TwoConnectedPolycubes.lean](LeanTrominoes/TwoConnectedPolycubes.lean).
 
 Inputs explicitly list the variable tile's voxels. The predicates reject
@@ -154,9 +156,20 @@ three-body-layer/two-cap-layer tiling every five voxels vertically.
 `space_tileable_iff_tromino` and `spaceProblem_iff_of_mask` establish the exact
 geometric reduction. The geometry target built successfully (1212 jobs).
 
-## Next proof obligations
+## Full-space completeness
 
-1. Certify the full-space output compiler and combine hardness with `space_coRE`.
-2. Extend slab hardness to each fixed height greater than two.
+`SpaceCompiler.compile` emits three copies of planar Q and its two square
+caps as an explicit voxel list. Its primitive-recursiveness proof and exact
+source-encoding theorem give `space_coREHard`. Combining this with the
+existing finite-search upper bound gives `spaceProved`, now imported by
+the public root module.
 
-The 3D space construction and the taller-slab completeness assertions remain open.
+`lake build +LeanTrominoes.TwoConnectedPolycubesSpaceProof:olean` succeeded
+(4666 jobs). `tmp/PolycubeSpaceCompletenessAudit.lean` checks both geometric
+directions, the equivalence, compiler computability, the upper bound, and the
+final theorem. All new geometric and compiler results use only the three
+standard axioms. The final theorem inherits exactly the same 4406 native
+certificates as slab completeness, with no new native axiom and no `sorryAx`.
+
+The remaining polycube obligation is slab completeness for each fixed height
+greater than two.
