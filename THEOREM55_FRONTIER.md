@@ -217,7 +217,32 @@ The PSPACE-completeness assertion remains open. The next obligations are:
   size. Primitive recursiveness and polynomial output size alone do not
   supply this runtime certificate. An arbitrary binary-encoded periodic
   strip can have exponentially large dimensions.
-- Generalize the existing tromino-only strip decider to variable polyomino
-  footprints, and certify polynomial workspace under the unary geometric
-  encoding. The current upper bound cannot be applied directly to Q.
+- Certify the variable-tile transition evaluator, connectivity check, and
+  complete machine under the unary geometric encoding. The semantic
+  decider, packed search, and polynomial DFS-stack bound are now proved
+  below; these do not yet bound the transition evaluator's workspace.
 - Compose the hardness reduction and upper bound to prove `stripStatement`.
+
+## Variable-tile strip decider
+
+`PolyominoStripWindow.tileable_iff_cycle` proves that any finite family of
+bounded polyominoes tiles a full strip exactly when its finite window graph
+has a cycle. The construction handles all eight square symmetries, empty
+shapes, and arbitrary disconnected footprints. `LocalWindow.satisfiable_iff_cycle`
+is the generic finite-alphabet overlap lemma used in the proof.
+
+`Theorem55StripDecider.decideStrip_correct` proves a total Boolean decider
+for the precise strip target, including positivity, nonemptiness, and the
+finite disconnectedness test. A window has exactly `2^stateBits` states.
+Under the unary input encoding, `stateBits` and the Savitch depth are bounded
+by `16*(2*L+15)*(3*L+15)` and this polynomial plus one, respectively.
+
+`PolyominoStripPacked` represents each window by a binary natural number
+and proves exact decoding. `decideStripIndexed_correct` uses the existing
+arithmetic DFS search, so it never constructs the list of all graph states.
+`dfs_encoded_space_le` bounds every serialized DFS stack, at every search
+step, by a quartic polynomial in input length. It treats transition evaluation
+as a separate operation whose machine certificate remains to be supplied.
+The indexed-search target builds successfully (1728 jobs).
+`tmp/StripWindowAudit.lean` and `tmp/StripIndexedAudit.lean` check the new
+semantic, encoding, and stack-bound results; all use only standard axioms.
