@@ -165,3 +165,21 @@ standard axioms; the completed theorem adds no axioms to that source proof.
 The strip PSPACE assertion and the translation-only corollary are later
 targets. No unproved compiler, drawing, grid-forcing, or complexity witness
 is being treated as a completed theorem.
+
+## Strip construction in progress
+
+The plane tile has vertical keys as well as horizontal keys. The strip
+construction instead uses `KeyedStripComplement.tile`: it moves only the
+horizontal lock cells, leaving both bounded edges flat.
+`KeyedStripComplement.grid_tiling` proves that its horizontal translates
+tile exactly the complement of the horizontally repeated holes within the
+full strip. `placement_orientation` excludes all quarter-turns and fixes
+the vertical offset of every remaining orientation. These results build
+successfully (805 jobs).
+
+`plane_tileable_of_strip` repeats any positive-height strip tiling through
+the plane. Consequently `PlusRefinement.bumpy_not_tileable_strip` excludes
+a tiling by the fixed 15-omino alone, at every positive strip height.
+The strip PSPACE-completeness assertion is still open: lock forcing,
+source preparation, polynomial-time compilation, and the upper bound
+remain to be completed.
