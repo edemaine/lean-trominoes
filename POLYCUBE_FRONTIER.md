@@ -17,6 +17,7 @@ thickness-three extrusion, respectively.
 | Result | Module |
 | --- | --- |
 | Integer voxels, all 48 cube symmetries, inverse actions, finite placements | [PolycubeBasic](LeanTrominoes/PolycubeBasic.lean) |
+| Cube-symmetry composition and inverses; arbitrary full-space seed normalization | [PolycubeSpaceSymmetry](LeanTrominoes/PolycubeSpaceSymmetry.lean) |
 | Exact tilings, disjointness, finite-height slabs | [PolycubeTiling](LeanTrominoes/PolycubeTiling.lean) |
 | Extrusions, capped tiles, fixed-tile cardinalities | [PolycubeExtrusion](LeanTrominoes/PolycubeExtrusion.lean) |
 | Face connectivity, spanning-tree certificates, cap attachment criterion | [PolycubeConnectivity](LeanTrominoes/PolycubeConnectivity.lean) |
@@ -101,6 +102,16 @@ connectivity, and upper-bound proofs use only the three standard axioms.
 The final theorem has exactly the same inherited native-decision certificates
 as the hardness theorem, and no `sorryAx`. The public root module now imports
 the slab result.
+
+Full-space placement normalization is also available as
+`IsVoxelTiling.normalize_space`: any selected tile can be moved to the origin
+with identity orientation. Composition, inversion, and faithfulness of all
+48 cube symmetries are certified on coordinate basis vectors with
+`decide +kernel`; proved linearity extends the certificate to every voxel.
+The three modules built successfully (727 jobs), and the finite certificates
+took 236 seconds. `tmp/PolycubeSpaceSymmetryAudit.lean` audits composition,
+inversion, and normalization; all three use only the standard axioms, with
+no native-evaluation axiom.
 
 ## Next proof obligations
 
