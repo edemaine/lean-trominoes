@@ -1,4 +1,4 @@
-# Theorem 5.5: plane tiling by a connected and a disconnected polyomino
+# Theorem 5.5: plane and strip tiling by two polyominoes
 
 The plane target is `LeanTrominoes.Theorem55.planeStatement`, defined in
 [Theorem55.lean](LeanTrominoes/Theorem55.lean). It fixes the connected
@@ -6,6 +6,15 @@ The plane target is `LeanTrominoes.Theorem55.planeStatement`, defined in
 Q inputs are rejected. **The plane co-r.e.-completeness theorem is proved** by
 `LeanTrominoes.Theorem55.planeProved` in
 [Theorem55Proof.lean](LeanTrominoes/Theorem55Proof.lean).
+
+**The strip PSPACE-completeness theorem is also proved** by
+`LeanTrominoes.Theorem55.stripProved` in
+[Theorem55StripProof.lean](LeanTrominoes/Theorem55StripProof.lean).
+It proves the unchanged `Theorem55.stripStatement`: a fixed connected
+15-omino P, an input disconnected Q, arbitrary rotations and reflections,
+and the original unary encoding of the height and cell list.
+The sections below preserve the development history; references to open
+strip obligations describe earlier milestones.
 
 ## Established geometric reduction
 
@@ -429,6 +438,28 @@ sums and affine maps, key membership, filtering, and serialization. The audit
 in `tmp/StripUnaryCompilerAudit.lean` reports only standard axioms for the
 complete emitter and the new product/arithmetic compilers.
 
-The geometric identification of this emitted list with the established
-keyed complement is in progress. After that, composing with the existing
-unary hard-source emitter will discharge hardness.
+## Strip PSPACE completeness
+
+`Theorem55StripUnary.compiled_tile` identifies the emitted list exactly with
+the keyed complement. The proof handles signed coordinates, the extra
+periodic copy needed at the square boundary, injectivity of coordinate keys,
+and movement of the five lock cells. `compiledInput_correct` gives equivalence
+with the well-formed source tromino problem, including Q's disconnectedness.
+Both geometric results use only the three standard axioms.
+
+`Theorem55StripHardSource.compiler` obtains unary fields from the existing
+PSPACE hard-source machine before its final binary encoder. Composing it with
+the complement emitter gives the polynomial-time many-one reduction in
+`Theorem55.strip_PSPACEHard`. Together with `strip_inPSPACE`, this proves
+`Theorem55.stripProved` under the exact target encoding.
+
+
+Validation: `lake build +LeanTrominoes.Theorem55StripProof:olean` completed
+successfully (9854 jobs), and `lake env lean LeanTrominoes.lean` checked the
+public import. `tmp/StripCompletenessAudit.lean` reports no `sorryAx`.
+The complete theorem retains 5327 existing native-check dependencies:
+5315 in hardness, plus the 12 arithmetic checks in membership. The new
+geometric identification uses only `propext`, `Classical.choice`, and
+`Quot.sound`; this milestone introduces no axioms or `native_decide` calls.
+`tmp/StripInheritedAudit.lean` confirms that the reported native dependencies
+are contained in those of the existing Theorem 5.2 strip proof and membership.

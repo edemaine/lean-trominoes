@@ -1,6 +1,6 @@
 # Theorem 5.2 proof status
 
-The completed plane proof of Theorem 5.5 has its own
+The completed plane and strip proofs of Theorem 5.5 have their own
 [construction record](THEOREM55_FRONTIER.md). The record below concerns the
 completed Theorem 5.2 construction.
 
