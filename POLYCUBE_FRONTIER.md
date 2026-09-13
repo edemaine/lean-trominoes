@@ -130,18 +130,23 @@ The certificate target built successfully (860 jobs), and the connectivity
 regression build succeeded (923 jobs). The audit in
 `tmp/SpaceConstructionAudit.lean` confirms only the three standard axioms.
 
-The intended recovery uses a complete horizontal background grid. Its two
-solid cap layers would isolate three simulation layers, potentially avoiding
-vertical keys and stacked-grid forcing entirely. This recovery is not yet
-proved. Exploratory searches at period 96 support both side-neighbor rules;
-they are not used as trusted proof certificates.
+The side-neighbor rules are now proved for every admissible period. A uniform
+cap-overlap lemma excludes upright copies sourced inside the square, and the
+finite key certificates handle the protrusions. Exact slices force the planar
+offset and align all three simulation layers. Vertical reflections of horizontal
+background copies are canonicalized without changing their occupied cells.
+`space_tileable_has_grid` normalizes an arbitrary full-space tiling, propagates
+its background quadrant, and applies compactness to obtain the complete
+horizontal background grid. No seed or orientation hypothesis remains.
+
+The neighbor target built successfully (944 jobs), grid propagation (1137 jobs),
+and normalization (1146 jobs). `tmp/SpaceLockAudit.lean` confirms that both exact
+candidate and neighbor rules use only the three standard axioms. Recovery from
+the two solid cap planes is the next obligation.
 
 ## Next proof obligations
 
-1. Lift the cap and finite key obstructions to arbitrary periods and actual
-   placements, forcing horizontal background neighbors.
-2. Complete the horizontal grid by compactness and recover the planar source
-   tiling between its solid caps.
+1. Recover the planar source tiling between the complete grid’s solid caps.
 3. Construct full-space tilings by periodically stacking the forward simulation,
    certify its output compiler, and combine hardness with `space_coRE`.
 4. Extend slab hardness to each fixed height greater than two.
