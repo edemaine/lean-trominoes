@@ -21,6 +21,7 @@ thickness-three extrusion, respectively.
 | Extrusions, capped tiles, fixed-tile cardinalities | [PolycubeExtrusion](LeanTrominoes/PolycubeExtrusion.lean) |
 | Face connectivity, spanning-tree certificates, cap attachment criterion | [PolycubeConnectivity](LeanTrominoes/PolycubeConnectivity.lean) |
 | Both fixed tiles are connected | [BumpyPolycubeConnected](LeanTrominoes/BumpyPolycubeConnected.lean) |
+| The fixed 45-cube tile cannot tile full 3D space alone | [BumpyPolycubeObstruction](LeanTrominoes/BumpyPolycubeObstruction.lean) |
 | The fixed 15-cube tile cannot tile the height-2 slab alone | [BumpyPolycubeSlab](LeanTrominoes/BumpyPolycubeSlab.lean) |
 | Horizontal slab tilings yield planar slice tilings | [PolycubeHorizontalSlice](LeanTrominoes/PolycubeHorizontalSlice.lean) |
 | Compatible planar layer tilings assemble into a slab tiling | [PolycubeLayerAssembly](LeanTrominoes/PolycubeLayerAssembly.lean) |
@@ -56,18 +57,26 @@ footprint. The original planar neighbor theorems retain their statements.
 propagation; all use only the three standard axioms. Its output is
 `tmp/polycube-slab-locks-audit.log`.
 
+The full-space obstruction uses the two pocket voxels in the middle layer
+of the thickness-three extrusion. The finite certificates check every
+reference orientation and every orientation/source-voxel candidate with
+`decide +kernel`. An arithmetic membership predicate is proved equivalent
+to actual voxel membership before it is used by the checker. Both certificate
+modules built successfully (about 983 seconds each); the completed
+`bumpyThree_not_tileable_space` theorem passed the audit in
+`tmp/PolycubeSpaceObstructionAudit.lean`. Its log,
+`tmp/polycube-space-obstruction-audit.log`, confirms only the three standard
+axioms, with no native-evaluation axiom.
+
 ## Next proof obligations
 
-1. Finish the finite pocket certificates proving that the 45-cube tile
-   cannot tile full space by itself. An arithmetic inverse-coordinate
-   checker replaces the memory-intensive placed-finset computation.
-2. Normalize an arbitrary slab tiling to an aligned background seed, use
+1. Normalize an arbitrary slab tiling to an aligned background seed, use
    compactness to complete its forced background grid, and recover a
    planar tiling.
-3. Certify the finite output compiler and the 3D finite-search/compactness
+2. Certify the finite output compiler and the 3D finite-search/compactness
    upper bound, then close height-2 slab co-r.e. completeness.
-4. Give explicit vertical keys and locks for full 3D, verify all allowed
+3. Give explicit vertical keys and locks for full 3D, verify all allowed
    orientations, and prove stacked-grid forcing and simulation recovery.
-5. Extend the slab argument to each fixed height greater than two.
+4. Extend the slab argument to each fixed height greater than two.
 
 The 3D space construction and the taller-slab assertions remain open.
