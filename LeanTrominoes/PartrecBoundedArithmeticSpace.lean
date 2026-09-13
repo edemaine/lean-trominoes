@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LeanTrominoes.PartrecBoundedArithmeticCombinatorsSpace
+import LeanTrominoes.PartrecBitTestSpace
 
 /-! # A polynomial-space compiler for bounded arithmetic formulas
 
@@ -18,7 +19,7 @@ open Turing Turing.PartrecToTM2 Turing.PartrecToTM2.EvaluatorCodeFits
 def Expr.weight : Expr → Nat
   | .literal n => arithmeticScale * (addConstCost n [0]+1)
   | .load i => arithmeticScale * (i.weight+1)
-  | .binary _ a b => arithmeticScale * (a.weight+b.weight+2)
+  | .binary _ a b | .testBit a b => arithmeticScale * (a.weight+b.weight+2)
   | .powerTwo a => arithmeticScale * (a.weight+1)
   | .ite t y n => arithmeticScale * (t.weight+y.weight+n.weight+1)
   | .letE a b => arithmeticScale * (a.weight+b.weight+1)
@@ -57,6 +58,16 @@ theorem Expr.code_fits (expr : Expr) (values : List Nat) (bits : Nat) (positive 
     have prep := prepend_singleton_bound values (a.eval values) (b.eval values) bits
       (a.weight*(encodedListSpace values+bits+1)) (b.weight*(encodedListSpace values+bits+1)) ha hb
     simp only [Expr.weight,arithmeticBudget,arithmeticScale]
+    nlinarith
+  | testBit a b ia ib =>
+    have ha := safe.1.value_bits
+    have hb := safe.2.1.value_bits
+    have arguments := prepend (ia values safe.1) (ib values safe.2.1)
+    have fit := comp (bitTest (a.eval values) (b.eval values) bits ha hb) arguments
+    apply fit.mono
+    have prep := prepend_singleton_bound values (a.eval values) (b.eval values) bits
+      (a.weight*(encodedListSpace values+bits+1)) (b.weight*(encodedListSpace values+bits+1)) ha hb
+    simp only [Expr.weight,bitTestBudget,arithmeticScale]
     nlinarith
   | powerTwo a ih =>
     have fit := comp (powerTwo_fits (a.eval values) bits safe.1.value_bits safe.2) (ih values safe.1)

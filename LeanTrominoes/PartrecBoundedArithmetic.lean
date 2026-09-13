@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LeanTrominoes.PartrecBoundedAll
+import LeanTrominoes.PartrecBitTest
 import LeanTrominoes.PartrecNatEquality
 import LeanTrominoes.PartrecNatCompare
 import LeanTrominoes.PartrecAdd
@@ -46,6 +47,7 @@ inductive Expr
   | literal : Nat → Expr
   | load : Expr → Expr
   | binary : Op → Expr → Expr → Expr
+  | testBit : Expr → Expr → Expr
   | powerTwo : Expr → Expr
   | ite : Expr → Expr → Expr → Expr
   | letE : Expr → Expr → Expr
@@ -55,6 +57,7 @@ def Expr.eval : Expr → List Nat → Nat
   | .literal n,_ => n
   | .load i,values => values[i.eval values]?.getD 0
   | .binary op a b,values => op.eval (a.eval values) (b.eval values)
+  | .testBit a b,values => ((a.eval values).testBit (b.eval values)).toNat
   | .powerTwo a,values => 2^(a.eval values)
   | .ite test yes no,values => if test.eval values = 0 then no.eval values else yes.eval values
   | .letE a body,values => body.eval (a.eval values :: values)
@@ -65,6 +68,7 @@ def Expr.code : Expr → Code
   | .literal n => Code.numeral n
   | .load i => (Code.head.comp Code.dynamicDropCode).comp (Code.prepend i.code Code.id)
   | .binary op a b => op.code.comp (Code.prepend a.code b.code)
+  | .testBit a b => Code.bitTestCode.comp (Code.prepend a.code b.code)
   | .powerTwo a => Code.powerTwoCode.comp a.code
   | .ite test yes no => Code.branchZero test.code no.code yes.code
   | .letE a body => body.code.comp (Code.prepend a.code Code.id)
@@ -85,6 +89,7 @@ theorem Expr.code_eval (expr : Expr) (values : List Nat) : expr.code.eval values
   | literal n => simp [Expr.code,Expr.eval]
   | load i ih => simp [Expr.code,Expr.eval,ih,Part.bind_eq_bind,drop_headI_eq_getD]
   | binary op a b ia ib => simp [Expr.code,Expr.eval,ia,ib,Op.code_eval,Part.bind_eq_bind]
+  | testBit a b ia ib => simp [Expr.code,Expr.eval,ia,ib,Code.bitTestCode_eval,Part.bind_eq_bind]
   | powerTwo a ih => simp [Expr.code,Expr.eval,ih,Part.bind_eq_bind]
   | ite test yes no it iy ino =>
     by_cases h : test.eval values = 0
@@ -109,6 +114,7 @@ def Expr.Safe (bits : Nat) : Expr → List Nat → Prop
   | .load i,values => i.Safe bits values ∧ (Computability.encodeNat ((.load i : Expr).eval values)).length ≤ bits
   | .binary op a b,values => a.Safe bits values ∧ b.Safe bits values ∧
       (Computability.encodeNat (op.eval (a.eval values) (b.eval values))).length ≤ bits
+  | .testBit a b,values => a.Safe bits values ∧ b.Safe bits values ∧ 1 ≤ bits
   | .powerTwo a,values => a.Safe bits values ∧ (Computability.encodeNat (2^a.eval values)).length ≤ bits
   | .ite test yes no,values => test.Safe bits values ∧ yes.Safe bits values ∧ no.Safe bits values
   | .letE a body,values => a.Safe bits values ∧ body.Safe bits (a.eval values :: values)
@@ -121,6 +127,12 @@ theorem Expr.Safe.value_bits {expr : Expr} {bits : Nat} {values : List Nat}
   | literal n => exact safe
   | load i ih => exact safe.2
   | binary op a b ia ib => exact safe.2.2
+  | testBit a b ia ib =>
+    have h := safe.2.2
+    change (Computability.encodeNat (Bool.toNat _)).length ≤ bits
+    cases (a.eval values).testBit (b.eval values)
+    · change 0 ≤ bits; omega
+    · change 1 ≤ bits; exact h
   | powerTwo a ih => exact safe.2
   | ite test yes no it iy ino =>
     simp only [Expr.eval]

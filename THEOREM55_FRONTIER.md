@@ -302,3 +302,13 @@ confirms that the compiler and space results use only standard axioms.
 search by the exact mixed-radix arithmetic bit address. Instantiating the
 formula compiler for the strip checks and assembling the complete unary-input
 machine remain necessary before claiming PSPACE membership.
+
+`PartrecBitTestSpace.bitTest` now supplies binary-space bit lookup by
+repeated halving, without constructing `2^index`. The arithmetic language
+includes this primitive. `Expr.code_fits_automatic` proves that every fixed
+formula without the explicit power-of-two constructor uses linear evaluator
+workspace in its flat input size, including nested bounded quantifiers.
+`Expr.safe_automatic` derives all intermediate bounds from the formula.
+The target builds (1486 jobs); `tmp/AutomaticArithmeticAudit.lean` reports
+only standard axioms for bit lookup and automatic space certification.
+The transition formula is the next instantiation.
