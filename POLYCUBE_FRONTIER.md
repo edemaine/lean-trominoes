@@ -183,3 +183,21 @@ successful direct Lean compilations before the public import check.
 
 The remaining polycube obligation is slab completeness for each fixed height
 greater than two.
+
+
+## All fixed slab heights: construction in progress
+
+The taller-slab construction keeps the 45-voxel small tile for every height
+at least four and thickens only Q's solid cap. Height three uses a 30-voxel
+two-layer extrusion. `TwoConnectedPolycubes.slabSmall_not_tileable` proves
+that the selected small tile cannot tile its slab for any height greater
+than one. For the exceptional height three, finite kernel certificates show
+that every boundary voxel forces the inward voxel, excluding upright copies.
+The remaining horizontal tiling would contradict the planar obstruction.
+For greater heights, repeating a slab tiling would contradict the existing
+full-space obstruction. `tmp/TallSlabObstructionAudit.lean` confirms only the
+three standard axioms for all these results.
+
+The variable-cap geometry and both small-tile side-lock exclusions build
+successfully (1043 jobs). Uniform background alignment, grid recovery,
+forward assembly, and the height-dependent compiler remain to be completed.
