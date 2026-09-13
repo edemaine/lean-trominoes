@@ -412,3 +412,23 @@ retains only standard axioms and the same 12 inherited native checks.
 The remaining completeness obligation is polynomial-time hardness. The
 existing direct tromino reduction already emits unary strip fields before
 its final binary encoder; this stream can feed the complement construction.
+
+## Polynomial-time complement emitter
+
+`Theorem55StripUnary.compiler` is an actual polynomial-time machine from
+unary periodic-strip fields to the exact target encoding. It enumerates the
+square, generates repeated cross-refined motif and padding coordinates,
+filters hole and right-lock keys, then appends the five moved left-lock cells.
+Coordinate tables use biased natural coordinates; the emitted cell list uses
+the original signed encoding. The output fields and final encoding agree
+exactly with `compiledInput`.
+
+Reusable verified compilers cover two-list Cartesian products, unary sums and
+bounded ranges, multiplication by a computed unary scalar, coordinate-table
+sums and affine maps, key membership, filtering, and serialization. The audit
+in `tmp/StripUnaryCompilerAudit.lean` reports only standard axioms for the
+complete emitter and the new product/arithmetic compilers.
+
+The geometric identification of this emitted list with the established
+keyed complement is in progress. After that, composing with the existing
+unary hard-source emitter will discharge hardness.
