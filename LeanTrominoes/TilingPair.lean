@@ -33,16 +33,19 @@ theorem tag_cells (p q : Polyomino) (kind : Bool) (a : Placement Unit) :
 
 end Placement
 
-/-- Tiling a region and its complement separately gives a two-tile plane tiling. -/
-theorem tileable_pair_of_complement (p q : Polyomino) (region : Set Cell)
-    (hp : TileableBy p region) (hq : TileableBy q regionᶜ) :
-    Tileable (pairTiles p q) Set.univ := by
+/-- Tag the two collections without changing their geometric placements. -/
+def pairPlacements (ps qs : Set (Placement Unit)) : Set (Placement Bool) :=
+  {a | if a.kind then a.untag ∈ qs else a.untag ∈ ps}
+
+/-- The explicit union of tilings of a region and its complement. -/
+theorem isTiling_pair_of_complement (p q : Polyomino) (region : Set Cell)
+    (ps qs : Set (Placement Unit)) (pt : IsTiling (fun _ => p) region ps)
+    (qt : IsTiling (fun _ => q) regionᶜ qs) :
+    IsTiling (pairTiles p q) Set.univ (pairPlacements ps qs) := by
   classical
-  obtain ⟨ps, pt⟩ := hp
-  obtain ⟨qs, qt⟩ := hq
-  let placements : Set (Placement Bool) :=
-    {a | if a.kind then a.untag ∈ qs else a.untag ∈ ps}
-  refine ⟨placements, fun _ _ _ _ => Set.mem_univ _, ?_⟩
+  let placements := pairPlacements ps qs
+  change IsTiling (pairTiles p q) Set.univ placements
+  refine ⟨fun _ _ _ _ => Set.mem_univ _, ?_⟩
   intro c _
   by_cases hc : c ∈ region
   · obtain ⟨a, ⟨ha, hca⟩, unique⟩ := pt.uniqueCover c hc
@@ -52,7 +55,7 @@ theorem tileable_pair_of_complement (p q : Polyomino) (region : Set Cell)
     · rintro other ⟨ho, hco⟩
       cases hk : other.kind with
       | false =>
-        have hom : other.untag ∈ ps := by simpa [placements, hk] using ho
+        have hom : other.untag ∈ ps := by simpa [placements, pairPlacements, hk] using ho
         have hcm : c ∈ other.untag.cells (fun _ => p) := by
           simpa [Placement.cells, Placement.untag, pairTiles, hk] using hco
         have eq := unique other.untag ⟨hom, hcm⟩
@@ -60,7 +63,7 @@ theorem tileable_pair_of_complement (p q : Polyomino) (region : Set Cell)
         · simpa only [Placement.untag, Placement.tag] using congrArg Placement.symmetry eq
         · simpa only [Placement.untag, Placement.tag] using congrArg Placement.offset eq
       | true =>
-        have hom : other.untag ∈ qs := by simpa [placements, hk] using ho
+        have hom : other.untag ∈ qs := by simpa [placements, pairPlacements, hk] using ho
         have hcm : c ∈ other.untag.cells (fun _ => q) := by
           simpa [Placement.cells, Placement.untag, pairTiles, hk] using hco
         exact False.elim (qt.tilesInside other.untag hom c hcm hc)
@@ -71,18 +74,26 @@ theorem tileable_pair_of_complement (p q : Polyomino) (region : Set Cell)
     · rintro other ⟨ho, hco⟩
       cases hk : other.kind with
       | false =>
-        have hom : other.untag ∈ ps := by simpa [placements, hk] using ho
+        have hom : other.untag ∈ ps := by simpa [placements, pairPlacements, hk] using ho
         have hcm : c ∈ other.untag.cells (fun _ => p) := by
           simpa [Placement.cells, Placement.untag, pairTiles, hk] using hco
         exact False.elim (hc (pt.tilesInside other.untag hom c hcm))
       | true =>
-        have hom : other.untag ∈ qs := by simpa [placements, hk] using ho
+        have hom : other.untag ∈ qs := by simpa [placements, pairPlacements, hk] using ho
         have hcm : c ∈ other.untag.cells (fun _ => q) := by
           simpa [Placement.cells, Placement.untag, pairTiles, hk] using hco
         have eq := unique other.untag ⟨hom, hcm⟩
         apply Placement.ext hk
         · simpa only [Placement.untag, Placement.tag] using congrArg Placement.symmetry eq
         · simpa only [Placement.untag, Placement.tag] using congrArg Placement.offset eq
+
+/-- Tiling a region and its complement separately gives a two-tile plane tiling. -/
+theorem tileable_pair_of_complement (p q : Polyomino) (region : Set Cell)
+    (hp : TileableBy p region) (hq : TileableBy q regionᶜ) :
+    Tileable (pairTiles p q) Set.univ := by
+  obtain ⟨ps, pt⟩ := hp
+  obtain ⟨qs, qt⟩ := hq
+  exact ⟨pairPlacements ps qs, isTiling_pair_of_complement p q region ps qs pt qt⟩
 
 /-- Removing a Q-background known to tile the complement recovers a P-tiling
 of the remaining region. The background uses exactly the Q placements of

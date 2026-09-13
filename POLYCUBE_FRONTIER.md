@@ -24,6 +24,7 @@ thickness-three extrusion, respectively.
 | The fixed 15-cube tile cannot tile the height-2 slab alone | [BumpyPolycubeSlab](LeanTrominoes/BumpyPolycubeSlab.lean) |
 | Horizontal slab tilings yield planar slice tilings | [PolycubeHorizontalSlice](LeanTrominoes/PolycubeHorizontalSlice.lean) |
 | Compatible planar layer tilings assemble into a slab tiling | [PolycubeLayerAssembly](LeanTrominoes/PolycubeLayerAssembly.lean) |
+| An I-tromino source tiling produces a height-2 slab tiling | [KeyedPolycubeForward](LeanTrominoes/KeyedPolycubeForward.lean) |
 | Every admissible keyed Q becomes connected under its square cap | [KeyedPolycubeConnected](LeanTrominoes/KeyedPolycubeConnected.lean) |
 | A capped Q fitting the height-2 slab is horizontal, with offset determined by its vertical reflection | [KeyedPolycubeSlabOrientation](LeanTrominoes/KeyedPolycubeSlabOrientation.lean) |
 | A mixed tiling must use Q whenever P cannot tile alone | [PolycubePair](LeanTrominoes/PolycubePair.lean) |
@@ -38,20 +39,25 @@ connectivity, slab non-tiling, and orientation theorems use only `propext`,
 `Classical.choice`, and `Quot.sound`. The layer-assembly module also passed
 a direct Lean check. No completeness claim follows from these lemmas alone.
 
+The forward construction uses `square_grid_tiling` to cover the cap layer
+at exactly the same canonical offsets as Q. The explicit placement union
+is exposed by `isTiling_pair_of_complement`; the existing existential
+plane theorem retains its statement. `tmp/PolycubeForwardAudit.lean`
+checks the forward theorem and layer assembly, with output in
+`tmp/polycube-forward-audit.log`. Both use only the three standard axioms.
+
 ## Next proof obligations
 
 1. Finish the finite pocket certificates proving that the 45-cube tile
    cannot tile full space by itself. An arithmetic inverse-coordinate
    checker replaces the memory-intensive placed-finset computation.
-2. Instantiate the layer-assembly theorem for the canonical planar P/Q
-   construction and Q's square caps.
-3. Prove the height-2 slab lock-forcing lemmas, including exclusion of a
+2. Prove the height-2 slab lock-forcing lemmas, including exclusion of a
    vertically reflected cap covering a simulation-layer lock. Propagate
    the forced background placements and recover a planar tiling.
-4. Certify the finite output compiler and the 3D finite-search/compactness
+3. Certify the finite output compiler and the 3D finite-search/compactness
    upper bound, then close height-2 slab co-r.e. completeness.
-5. Give explicit vertical keys and locks for full 3D, verify all allowed
+4. Give explicit vertical keys and locks for full 3D, verify all allowed
    orientations, and prove stacked-grid forcing and simulation recovery.
-6. Extend the slab argument to each fixed height greater than two.
+5. Extend the slab argument to each fixed height greater than two.
 
 The 3D space construction and the taller-slab assertions remain open.
