@@ -246,3 +246,14 @@ as a separate operation whose machine certificate remains to be supplied.
 The indexed-search target builds successfully (1728 jobs).
 `tmp/StripWindowAudit.lean` and `tmp/StripIndexedAudit.lean` check the new
 semantic, encoding, and stack-bound results; all use only standard axioms.
+
+## Shared Savitch evaluator certificate
+
+`FiniteState.GenericSavitchStep.exactStep` now proves the evaluator-space
+bound for an arbitrary transition leaf and retained input suffix, assuming
+the leaf's own certificate. The old tromino step theorem is a direct
+application, replacing its duplicated structural proof. Both targets build
+(1620 jobs). The generic theorem introduces no native checks; its axiom audit
+retains two native arithmetic dependencies from the existing
+`scaledFieldSpace_le` helper. This supplies the reusable driver step, not
+the missing variable-tile transition certificate.
