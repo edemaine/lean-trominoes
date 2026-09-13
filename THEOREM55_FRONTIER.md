@@ -364,3 +364,20 @@ space certificate inherits 12 existing native arithmetic checks from context
 recovery and driver field bounds, with no newly introduced native checks.
 The outer cycle search, unary input machine, and polynomial-time hardness
 compiler remain open.
+
+## Complete cycle-search evaluator
+
+`PolyominoStripWindow.Savitch.cycle_eval` and `cycle_fits` now certify the
+outer search through pairs of window states as well as each return-path
+query. The two existential counters are streamed through `boundedAnyCode`;
+`boundedAny_uniform` gives a workspace bound independent of iteration count.
+Guards cover the one-past-the-end states needed by the countdown invariant.
+The resulting `cycleBudget` is polynomial in the window bit count and linear
+in retained tile-data space.
+
+The target builds (1669 jobs). `tmp/StripCycleAudit.lean` reports only standard
+axioms for bounded existential iteration and cycle evaluation. The space
+certificate retains the same 12 inherited native checks as reachability.
+Preparing the fixed tile and numeric bounds, combining the guards and cut
+test, and packaging unary input remain before the upper bound is complete.
+Polynomial-time compilation of the hard sources remains a separate obligation.
