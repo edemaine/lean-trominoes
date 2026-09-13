@@ -17,6 +17,11 @@ PSPACE-complete in a strip, allowing arbitrary rotations and reflections.
 The strip theorem uses the original unary encoding of the height and tile.
 [THEOREM55_FRONTIER.md](THEOREM55_FRONTIER.md) records the construction and validation.
 
+Corollary 5.6 is proved too: with translations only, two fixed connected
+15-ominoes and an input disconnected Q give co-r.e.-complete plane tiling
+and PSPACE-complete strip tiling. See
+[TRANSLATION_FRONTIER.md](TRANSLATION_FRONTIER.md).
+
 Tiling full 3D space with a fixed connected 45-voxel polycube and an input
 connected polycube is proved co-r.e.-complete, allowing all cube rotations
 and reflections. The same completeness result is proved for every fixed
@@ -46,6 +51,7 @@ otherwise.
 | Theorem 5.2, complete plane result | `PeriodicWangPlanarThreeDMReduction.theorem52_planeStatement` | [PeriodicWangPlanarThreeDMReduction](LeanTrominoes/PeriodicWangPlanarThreeDMReduction.lean) |
 | Theorem 5.5, plane co-r.e. completeness | `Theorem55.planeProved` | [Theorem55Proof](LeanTrominoes/Theorem55Proof.lean) |
 | Theorem 5.5, strip PSPACE completeness | `Theorem55.stripProved` | [Theorem55StripProof](LeanTrominoes/Theorem55StripProof.lean) |
+| Corollary 5.6, translations only, plane and strip | `ThreeTranslationPolyominoes.proved` | [ThreeTranslationProof](LeanTrominoes/ThreeTranslationProof.lean) |
 | Two connected polycubes, full-space co-r.e. completeness | `TwoConnectedPolycubes.spaceProved` | [TwoConnectedPolycubesSpaceProof](LeanTrominoes/TwoConnectedPolycubesSpaceProof.lean) |
 | Two connected polycubes, every fixed slab height > 1 | `TwoConnectedPolycubes.slabsProved` | [TwoConnectedPolycubesSlabsProof](LeanTrominoes/TwoConnectedPolycubesSlabsProof.lean) |
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
@@ -101,9 +107,10 @@ a paper theorem.
 | Theorem 3.2 | Local 1D CNF SAT hardness proved; full theorem open |
 | Theorem 5.2 | Fully proved |
 | Theorem 5.5 | Plane co-r.e. completeness and strip PSPACE completeness proved |
+| Corollary 5.6 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Two connected polycubes | Full 3D and every fixed slab height > 1 proved |
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
-| Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 | Open |
+| Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 except those listed above | Open |
 
 The [historical progress archive](PROGRESS_ARCHIVE.md) preserves the detailed
 construction checklist and development history.
