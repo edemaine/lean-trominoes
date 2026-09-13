@@ -200,4 +200,13 @@ three standard axioms for all these results.
 
 The variable-cap geometry and both small-tile side-lock exclusions build
 successfully (1043 jobs). Uniform background alignment, grid recovery,
-forward assembly, and the height-dependent compiler remain to be completed.
+connectivity, and forward assembly are now proved. The exact equivalence
+`tall_slab_tileable_iff_tromino` builds for every height at least three,
+provided the square cap is wider than the slab (1230 jobs).
+
+`repeatMask_carrier` enlarges a period by repeating its holes without changing
+the infinite region, and `repeatMask_admissible` preserves the cross-grid and
+reserved-corner conditions. This supplies the larger periods needed for tall
+slabs. `tmp/TallSlabGeometryAudit.lean` checks the equivalence, connectivity,
+and both repetition lemmas; each uses only the three standard axioms.
+The height-dependent executable compiler and final hardness composition remain.
