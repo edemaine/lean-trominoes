@@ -1,8 +1,8 @@
 # Two connected polycubes
 
-Tiling the height-2 slab with two connected polycubes is proved co-r.e.
-complete by `TwoConnectedPolycubes.slabTwoProved` in
-[TwoConnectedPolycubesSlabProof.lean](LeanTrominoes/TwoConnectedPolycubesSlabProof.lean).
+Tiling every fixed slab height greater than one with two connected polycubes
+is proved co-r.e. complete by `TwoConnectedPolycubes.slabsProved` in
+[TwoConnectedPolycubesSlabsProof.lean](LeanTrominoes/TwoConnectedPolycubesSlabsProof.lean).
 Full three-dimensional space is proved co-r.e. complete by
 `TwoConnectedPolycubes.spaceProved` in
 [TwoConnectedPolycubesSpaceProof.lean](LeanTrominoes/TwoConnectedPolycubesSpaceProof.lean).
@@ -11,8 +11,8 @@ The target propositions are defined in
 
 Inputs explicitly list the variable tile's voxels. The predicates reject
 empty or face-disconnected tiles and allow all cube rotations and reflections.
-The fixed tiles are the 15-voxel single layer of P and its 45-voxel
-thickness-three extrusion, respectively.
+The fixed slab tile has 15 voxels at height two, 30 at height three, and
+45 at every greater height. Full space also uses the 45-voxel tile.
 
 ## Established foundation
 
@@ -181,11 +181,11 @@ existing strip machinery; it is not claimed as a successful whole-repository
 build. All eight artifacts affected by that interruption were restored by
 successful direct Lean compilations before the public import check.
 
-The remaining polycube obligation is slab completeness for each fixed height
-greater than two.
+The rotation-allowing full-space and fixed-height slab assertions are complete.
+The translation-only corollaries remain separate targets.
 
 
-## All fixed slab heights: construction in progress
+## All fixed slab heights
 
 The taller-slab construction keeps the 45-voxel small tile for every height
 at least four and thickens only Q's solid cap. Height three uses a 30-voxel
@@ -209,4 +209,21 @@ the infinite region, and `repeatMask_admissible` preserves the cross-grid and
 reserved-corner conditions. This supplies the larger periods needed for tall
 slabs. `tmp/TallSlabGeometryAudit.lean` checks the equivalence, connectivity,
 and both repetition lemmas; each uses only the three standard axioms.
-The height-dependent executable compiler and final hardness composition remain.
+`TallSlabCompiler.compile` explicitly enumerates the enlarged background's
+body and cap voxels. It is primitive recursive for every fixed height, and
+`compile_source_correct` proves exact equivalence with the original source.
+`tall_slab_coREHard` composes this with the existing Wang reduction.
+`slabsProved` combines the height-two theorem with this taller-slab hardness
+and the generic slab upper bound. `slabSmall_connected` and
+`slabSmall_card_le` certify that the fixed tile is connected and has at most
+45 voxels at every height. The completeness target built successfully
+(4699 jobs).
+
+`tmp/AllSlabsCompletenessAudit.lean` checks the fixed-tile obstruction, exact
+geometric equivalence, compiler primitive recursiveness and correctness,
+connectivity, size bound, and final theorem. All new geometric and compiler
+results use only the three standard axioms. The final theorem inherits
+exactly the same 4406 native certificates as the full-space and height-two
+results, with no new native axiom and no `sorryAx`.
+`lake env lean LeanTrominoes.lean` also completed successfully, checking the
+updated public import.
