@@ -328,3 +328,18 @@ The target builds (1517 jobs), and `tmp/StripFormulaAudit.lean` reports only
 standard axioms for semantic correctness, evaluation, and space certification.
 Disconnectedness compilation, the complete search/input machine, and the
 polynomial-time hardness compiler remain necessary for PSPACE completeness.
+
+## Compiled disconnectedness test
+
+`IndexedCut` labels cell-list indices by bits. Its closure condition includes
+equal cells, so conflicting labels on duplicate entries cannot create a false
+cut. Existence of a mask below `2^cellCount` is equivalent to disconnectedness
+for nonempty input. Signed adjacency is compiled directly on encoded integer
+coordinates, without an extra coordinate-bound hypothesis.
+
+`PolyominoConnectivitySearch.Formula.disconnected_code_fits` certifies the
+complete bounded-mask search in linear space in its binary input fields.
+The mask limit is an explicit supplied field whose binary length is linear
+in the number of cells. The target builds (1542 jobs); the audit in
+`tmp/ConnectivityFormulaAudit.lean` uses only standard axioms. Constructing
+that limit and assembling the search/input driver remain separate obligations.
