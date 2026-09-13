@@ -381,3 +381,19 @@ certificate retains the same 12 inherited native checks as reachability.
 Preparing the fixed tile and numeric bounds, combining the guards and cut
 test, and packaging unary input remain before the upper bound is complete.
 Polynomial-time compilation of the hard sources remains a separate obligation.
+
+## Complete evaluator and unary preprocessing
+
+`Theorem55StripDecider.Evaluator.decide_eval` composes the guards,
+duplicate-safe disconnectedness test, and complete window-cycle search.
+`decide_fits_polynomial` bounds this complete evaluator by an explicit
+polynomial in the original unary encoding length, including the computed
+geometric bound and the fixed tile coordinates.
+
+`nativePreparation_compiler` converts the exact original Bool encoding to
+the evaluator fields in polynomial time. It counts unary markers to prepend
+the geometric bound and uses the verified unary-field encoder. Both targets
+build. `tmp/StripEvaluatorAudit.lean` reports standard axioms for evaluation
+and preprocessing; the space theorem inherits the same 12 existing native
+checks. Sequential machine composition with a space bound is still needed
+to package membership. The polynomial-time hardness compiler remains open.
