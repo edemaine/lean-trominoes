@@ -80,6 +80,8 @@ compilers. No compiler witness remains assumed.
 | --- | --- |
 | Integer-grid cells, polyominoes, square-grid symmetries, I and L trominoes | [Basic](LeanTrominoes/Basic.lean) |
 | Placements and exact tilings | [Tiling](LeanTrominoes/Tiling.lean) |
+| Partial tromino tilings and completion | [TrominoCompletion](LeanTrominoes/TrominoCompletion.lean) |
+| Periodic plane and strip prefills | [PeriodicTrominoCompletion](LeanTrominoes/PeriodicTrominoCompletion.lean) |
 | Equivalent tilings by geometric three-cell footprints | [FootprintTiling](LeanTrominoes/FootprintTiling.lean) |
 | `PeriodicRegion`, `PeriodicStrip`, and their tilability predicates | [Periodic](LeanTrominoes/Periodic.lean) |
 | Target strip encoding and decoder | [PeriodicStripFlatEncoding](LeanTrominoes/PeriodicStripFlatEncoding.lean) |
@@ -114,8 +116,16 @@ Intermediate construction lemmas do not by themselves close a paper theorem.
 | Corollary 5.6 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Two connected polycubes | Full 3D and every fixed slab height > 1 proved |
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
+| Tromino completion | Prefill semantics and finite-obstruction characterization proved; co-r.e. and PSPACE completeness remain open |
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 except those listed above | Open |
+
+Current work is tromino completion. Extending a valid prefill is proved
+equivalent to tiling the uncovered region, with a
+[finite-obstruction characterization](LeanTrominoes/TrominoCompletionFiniteSearch.lean)
+for plane and strip inputs. The remaining obligations include computability
+and space bounds for the input checkers, a flat strip encoding, and verified
+completion gadgets with their periodic hardness compiler.
 
 ## Proof guides
 
