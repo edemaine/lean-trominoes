@@ -131,12 +131,14 @@ The [L-brick palette](LeanTrominoes/CompletionLBricks.lean) has a verified commo
 [region](LeanTrominoes/CompletionLBrickRegions.lean),
 [Boolean network](LeanTrominoes/CompletionLBrickLogic.lean), and
 [local barrier checks](LeanTrominoes/CompletionLAtomBarriers.lean). These yield
-a [global restriction theorem](LeanTrominoes/CompletionLLocalRestriction.lean):
-every plane completion induces a completion of each subbrick, with only
-connector cells assigned to neighbors. The proof handles new and preplaced
-L trominoes in arbitrary infinite brick layouts.
-Global geometric gluing and the periodic hardness compiler remain unfinished,
-as do the input-checker bounds and flat strip encoding needed for completeness.
+a [global assembly criterion](LeanTrominoes/CompletionLAssembly.lean): a plane
+completion exists exactly when realizable local gadget states partition the
+plane. Canonical states from a completion satisfy
+[connector consistency](LeanTrominoes/CompletionLConnectorConsistency.lean).
+The [minor-state lemmas](LeanTrominoes/CompletionLMinorStates.lean) force and
+propagate Boolean connectors. Equivalence with the brick Boolean network and
+the periodic hardness compiler remain unfinished, as do the input-checker
+bounds and flat strip encoding needed for completeness.
 
 ## Proof guides
 

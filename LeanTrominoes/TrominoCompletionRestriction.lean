@@ -25,9 +25,14 @@ theorem IsFootprintTiling.restrict {t : Tromino} {global : Set Cell}
     intro g hg
     exact (unique g ⟨hg.1.1,hg.2⟩).trans (unique f ⟨hf.1,hfc⟩).symm
 
+/-- Cells in a finite region covered only by tiles not contained in that region. -/
+noncomputable def outsideCells (completed : Set (Finset Cell)) (region : Finset Cell) : Finset Cell := by
+  classical
+  exact region.filter fun c => c ∉ occupied (containedTiles completed region)
+
 /-- If every tile meeting the interior stays within the local region, a
 full tiling induces a completion obtained by deleting only boundary cells. -/
-theorem IsFootprintTiling.local_completion {t : Tromino} {global : Set Cell}
+theorem IsFootprintTiling.local_completion_canonical {t : Tromino} {global : Set Cell}
     {completed : Set (Finset Cell)} (h : t.IsFootprintTiling global completed)
     (region boundary : Finset Cell) (prescribed : Set (Finset Cell))
     (regionInside : (region : Set Cell) ⊆ global)
@@ -35,8 +40,8 @@ theorem IsFootprintTiling.local_completion {t : Tromino} {global : Set Cell}
     (prescribedInside : ∀ f ∈ prescribed, f ⊆ region)
     (noCrossing : ∀ f ∈ completed, ∀ c ∈ f,
       c ∈ region \ boundary → f ⊆ region) :
-    ∃ outside : Finset Cell, outside ⊆ boundary ∧
-      t.Completable (region \ outside : Finset Cell) prescribed := by
+    outsideCells completed region ⊆ boundary ∧
+      t.Completable (region \ outsideCells completed region : Finset Cell) prescribed := by
   classical
   let selected := containedTiles completed region
   let outside := region.filter fun c => c ∉ occupied selected
@@ -50,7 +55,8 @@ theorem IsFootprintTiling.local_completion {t : Tromino} {global : Set Cell}
     · intro hc
       obtain ⟨f,hf,hfc⟩ := hc
       exact Finset.mem_sdiff.mpr ⟨hf.2 hfc,fun ho => (Finset.mem_filter.mp ho).2 ⟨f,hf,hfc⟩⟩
-  refine ⟨outside,?_,?_⟩
+  change outside ⊆ boundary ∧ t.Completable (region \ outside : Finset Cell) prescribed
+  refine ⟨?_,?_⟩
   · intro c hc
     obtain ⟨inside,absent⟩ := Finset.mem_filter.mp hc
     by_contra notBoundary
@@ -58,5 +64,20 @@ theorem IsFootprintTiling.local_completion {t : Tromino} {global : Set Cell}
     exact absent ⟨f,⟨hf,noCrossing f hf c hfc (Finset.mem_sdiff.mpr ⟨inside,notBoundary⟩)⟩,hfc⟩
   · rw [carrier]
     exact ⟨selected,h.restrict region,fun f hf => ⟨retained hf,prescribedInside f hf⟩⟩
+
+/-- If every tile meeting the interior stays within the local region, a
+full tiling induces a completion obtained by deleting only boundary cells. -/
+theorem IsFootprintTiling.local_completion {t : Tromino} {global : Set Cell}
+    {completed : Set (Finset Cell)} (h : t.IsFootprintTiling global completed)
+    (region boundary : Finset Cell) (prescribed : Set (Finset Cell))
+    (regionInside : (region : Set Cell) ⊆ global)
+    (retained : prescribed ⊆ completed)
+    (prescribedInside : ∀ f ∈ prescribed, f ⊆ region)
+    (noCrossing : ∀ f ∈ completed, ∀ c ∈ f,
+      c ∈ region \ boundary → f ⊆ region) :
+    ∃ outside : Finset Cell, outside ⊆ boundary ∧
+      t.Completable (region \ outside : Finset Cell) prescribed := by
+  exact ⟨outsideCells completed region,
+    h.local_completion_canonical region boundary prescribed regionInside retained prescribedInside noCrossing⟩
 
 end LeanTrominoes.Tromino
