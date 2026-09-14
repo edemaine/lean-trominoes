@@ -138,9 +138,11 @@ plane. Canonical states from a completion satisfy
 The [minor-state lemmas](LeanTrominoes/CompletionLMinorStates.lean) force and
 propagate Boolean connectors. The full [brick-network equivalence](LeanTrominoes/CompletionLBrickEquivalence.lean)
 and [finite periodic prefill compiler](LeanTrominoes/CompletionLPeriodicCompiler.lean)
-are proved. Connecting the existing hard orientation source to this Boolean
-brick network remains unfinished, as do compiler computability, input-checker
-bounds, and flat strip encoding needed for completeness.
+are proved. Nine [orientation-cell circuits](LeanTrominoes/CompletionCircuitTruthTables.lean)
+have checked truth tables and wiring; their [infinite-grid composition](LeanTrominoes/CompletionCircuitReduction.lean)
+is proved. The source-orientation interface and finite compiler computability
+remain unfinished, as do input-checker bounds and flat strip encoding needed
+for completeness.
 
 ## Proof guides
 
