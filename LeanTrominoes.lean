@@ -1,6 +1,5 @@
-import LeanTrominoes.CompletionLHardness
+import LeanTrominoes.CompletionCompleteness
 import LeanTrominoes.CompletionLCompilerValidity
-import LeanTrominoes.CompletionIHardness
 import LeanTrominoes.CompletionICompilerValidity
 import LeanTrominoes.Theorem52Proof
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
@@ -15,10 +14,10 @@ import LeanTrominoes.TwoConnectedPolycubesSlabsProof
 /-!
 # Main theorem interface
 
-`CompletionPattern.LBricks.lCompletion_coREHard` and
-`CompletionPattern.IBricks.iCompletion_coREHard` prove co-r.e. hardness of
-periodic L- and I-tromino completion in the plane. `compileDrawing_valid` in
-each namespace proves that every reduction output is a valid partial tiling.
+`PeriodicTrominoPrefill.planeProblem_coREComplete` proves co-r.e. completeness
+of periodic L- and I-tromino completion in the plane. `compileDrawing_valid`
+in `CompletionPattern.LBricks` and `CompletionPattern.IBricks` proves that
+every hardness reduction output is a valid partial tiling.
 
 `Theorem52.proved` proves the complete plane and strip result, and
 `Theorem52.stripProved` exposes strip PSPACE completeness. Import

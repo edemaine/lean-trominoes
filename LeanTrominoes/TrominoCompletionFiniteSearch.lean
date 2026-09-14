@@ -7,8 +7,9 @@ import LeanTrominoes.FiniteSearch
 
 /-! # Finite obstructions to completing a valid prefill
 
-This supplies the semantic finite-search characterization. A computability
-certificate for the complete periodic-input checker is a separate obligation.
+This supplies the semantic finite-search characterization. `CompletionCoRE`
+certifies a computable periodic-input checker, including prefill validity,
+and proves plane co-r.e. membership for both trominoes.
 -/
 
 namespace LeanTrominoes

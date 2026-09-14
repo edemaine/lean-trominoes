@@ -33,7 +33,7 @@ two fixed with at most 45 voxels each, give co-r.e.-complete tiling of full
 3D space and every fixed slab height greater than one. See
 [the Corollary 5.9 guide](docs/corollary-5.9.md).
 
-Periodic L- and I-tromino completion are proved co-r.e.-hard in the plane.
+Periodic L- and I-tromino completion are proved co-r.e.-complete in the plane.
 Both reductions always produce valid, nonoverlapping periodic prefills.
 
 ## Main statements and proofs
@@ -65,6 +65,7 @@ otherwise.
 | Two connected polycubes, every fixed slab height > 1 | `TwoConnectedPolycubes.slabsProved` | [TwoConnectedPolycubesSlabsProof](LeanTrominoes/TwoConnectedPolycubesSlabsProof.lean) |
 | Periodic L-tromino completion, plane co-r.e. hardness | `CompletionPattern.LBricks.lCompletion_coREHard` | [CompletionLHardness](LeanTrominoes/CompletionLHardness.lean) |
 | Periodic I-tromino completion, plane co-r.e. hardness | `CompletionPattern.IBricks.iCompletion_coREHard` | [CompletionIHardness](LeanTrominoes/CompletionIHardness.lean) |
+| Periodic L- and I-tromino completion, plane co-r.e. completeness | `PeriodicTrominoPrefill.planeProblem_coREComplete` | [CompletionCompleteness](LeanTrominoes/CompletionCompleteness.lean) |
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE hardness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEHard` | [PeriodicCNFPolySpaceHardness](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean) |
@@ -121,7 +122,7 @@ Intermediate construction lemmas do not by themselves close a paper theorem.
 | Corollary 5.6 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Two connected polycubes | Full 3D and every fixed slab height > 1 proved |
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
-| Tromino completion | L- and I-tromino plane co-r.e. hardness proved; plane membership and strip PSPACE completeness remain open |
+| Tromino completion | L- and I-tromino plane co-r.e. completeness proved; strip PSPACE completeness remains open |
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 except those listed above | Open |
 
@@ -157,10 +158,15 @@ and [no-crossing lemmas](LeanTrominoes/CompletionINoCrossing.lean) give an exact
 Reusing the orientation circuits yields
 [plane co-r.e. hardness](LeanTrominoes/CompletionIHardness.lean), with
 [valid prefills and independent periods](LeanTrominoes/CompletionICompilerValidity.lean).
-Plane co-r.e. membership and strip PSPACE completeness remain open.
-Both completion reductions use only standard Lean axioms. The final hardness
-theorems inherit the source proof’s native-evaluation certificates; their audits
-contain no `sorryAx` and add no axioms beyond that source theorem.
+[Co-r.e. membership](LeanTrominoes/CompletionCoRE.lean) is proved for both
+trominoes by searching for dependent periods, overlapping prescribed tiles,
+or an unsatisfiable finite box of uncovered cells. This gives
+[plane co-r.e. completeness](LeanTrominoes/CompletionCompleteness.lean).
+Strip PSPACE completeness remains open.
+The membership proof and both completion reductions use only standard Lean
+axioms. The final completeness theorem inherits the source hardness proof’s
+native-evaluation certificates; its audit contains no `sorryAx` and adds no
+axioms beyond that source theorem.
 
 ## Proof guides
 
