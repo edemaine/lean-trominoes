@@ -130,7 +130,9 @@ for plane and strip inputs. The paper's ASCII layouts in
 The [L-brick palette](LeanTrominoes/CompletionLBricks.lean) has a verified common
 [region](LeanTrominoes/CompletionLBrickRegions.lean),
 [Boolean network](LeanTrominoes/CompletionLBrickLogic.lean), and
-[local barrier checks](LeanTrominoes/CompletionLAtomBarriers.lean).
+[local barrier checks](LeanTrominoes/CompletionLAtomBarriers.lean). These yield
+a [global no-crossing theorem](LeanTrominoes/CompletionLNoCrossing.lean) for new
+L trominoes in arbitrary infinite brick layouts.
 Global geometric gluing and the periodic hardness compiler remain unfinished,
 as do the input-checker bounds and flat strip encoding needed for completeness.
 
