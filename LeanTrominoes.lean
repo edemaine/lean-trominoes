@@ -3,6 +3,7 @@ import LeanTrominoes.PeriodicCNFPolySpaceHardness
 import LeanTrominoes.Theorem55Proof
 import LeanTrominoes.Theorem55StripProof
 import LeanTrominoes.ThreeTranslationProof
+import LeanTrominoes.ThreeTranslationPolycubesProof
 import LeanTrominoes.TwoConnectedPolycubesSlabProof
 import LeanTrominoes.TwoConnectedPolycubesSpaceProof
 import LeanTrominoes.TwoConnectedPolycubesSlabsProof
@@ -36,6 +37,11 @@ POLYCUBE_FRONTIER.md.
 `TwoConnectedPolycubes.slabsProved` proves co-r.e. completeness for every
 fixed slab height greater than one. The fixed connected tile has at most
 45 voxels, independently of the height.
+
+`ThreeTranslationPolycubes.proved` proves Corollary 5.9: tiling full 3D space
+or any fixed slab height greater than one by translations of three connected
+polycubes is co-r.e. complete. Two tiles are fixed, each with at most 45 voxels.
+See TRANSLATION_POLYCUBE_FRONTIER.md.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.

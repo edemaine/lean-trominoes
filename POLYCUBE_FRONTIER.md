@@ -227,3 +227,7 @@ exactly the same 4406 native certificates as the full-space and height-two
 results, with no new native axiom and no `sorryAx`.
 `lake env lean LeanTrominoes.lean` also completed successfully, checking the
 updated public import.
+
+Corollary 5.9, with three connected polycubes and translations only, is proved
+in full 3D and every fixed slab height greater than one. See
+[TRANSLATION_POLYCUBE_FRONTIER.md](TRANSLATION_POLYCUBE_FRONTIER.md).

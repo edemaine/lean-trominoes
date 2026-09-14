@@ -28,6 +28,11 @@ and reflections. The same completeness result is proved for every fixed
 slab height greater than one, with a fixed connected tile of at most 45 voxels.
 [POLYCUBE_FRONTIER.md](POLYCUBE_FRONTIER.md) records the constructions and validation.
 
+Corollary 5.9 is proved with translations only: three connected polycubes,
+two fixed with at most 45 voxels each, give co-r.e.-complete tiling of full
+3D space and every fixed slab height greater than one. See
+[TRANSLATION_POLYCUBE_FRONTIER.md](TRANSLATION_POLYCUBE_FRONTIER.md).
+
 ## Main statements and proofs
 
 Start with [Theorem52.lean](LeanTrominoes/Theorem52.lean) to read the complete
@@ -52,6 +57,7 @@ otherwise.
 | Theorem 5.5, plane co-r.e. completeness | `Theorem55.planeProved` | [Theorem55Proof](LeanTrominoes/Theorem55Proof.lean) |
 | Theorem 5.5, strip PSPACE completeness | `Theorem55.stripProved` | [Theorem55StripProof](LeanTrominoes/Theorem55StripProof.lean) |
 | Corollary 5.6, translations only, plane and strip | `ThreeTranslationPolyominoes.proved` | [ThreeTranslationProof](LeanTrominoes/ThreeTranslationProof.lean) |
+| Corollary 5.9, translations only, full 3D and every fixed slab height > 1 | `ThreeTranslationPolycubes.proved` | [ThreeTranslationPolycubesProof](LeanTrominoes/ThreeTranslationPolycubesProof.lean) |
 | Two connected polycubes, full-space co-r.e. completeness | `TwoConnectedPolycubes.spaceProved` | [TwoConnectedPolycubesSpaceProof](LeanTrominoes/TwoConnectedPolycubesSpaceProof.lean) |
 | Two connected polycubes, every fixed slab height > 1 | `TwoConnectedPolycubes.slabsProved` | [TwoConnectedPolycubesSlabsProof](LeanTrominoes/TwoConnectedPolycubesSlabsProof.lean) |
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
@@ -109,6 +115,7 @@ a paper theorem.
 | Theorem 5.5 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Corollary 5.6 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Two connected polycubes | Full 3D and every fixed slab height > 1 proved |
+| Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 except those listed above | Open |
 

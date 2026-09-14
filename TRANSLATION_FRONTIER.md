@@ -52,3 +52,7 @@ transition certificate use only standard axioms. Strip membership retains
 the same 12 existing arithmetic native checks. The combined completeness
 proof reports 5388 inherited native-check dependencies; no new axiom or
 `native_decide` call was introduced.
+
+Corollary 5.9, with three connected polycubes and translations only, is proved
+in full 3D and every fixed slab height greater than one. See
+[TRANSLATION_POLYCUBE_FRONTIER.md](TRANSLATION_POLYCUBE_FRONTIER.md).
