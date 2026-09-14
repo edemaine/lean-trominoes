@@ -127,8 +127,10 @@ for plane and strip inputs. The paper's equal/not ASCII layouts are preserved
 in [data/completion](data/completion), with a
 [coordinate generator](scripts/completion_minor_data.py) and
 [Lean certificates](LeanTrominoes/CompletionMinorWitnesses.lean) for all eight
-intended I/L states, retaining every preplaced tile. These are existence
-certificates; exclusion of unintended states and gadget composition remain.
+intended I/L states, retaining every preplaced tile. The [equal/not relation theorem](LeanTrominoes/CompletionMinorSoundness.lean)
+also excludes every incorrect Boolean state, assuming one cell of each
+connector pair belongs to the neighboring brick. Full boundary profiles and
+gadget composition remain separate obligations.
 The remaining obligations also include computability
 and space bounds for the input checkers, a flat strip encoding, and verified
 completion gadgets with their periodic hardness compiler.
