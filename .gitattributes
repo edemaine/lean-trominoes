@@ -1,0 +1,2 @@
+# Preserve the paper ASCII figures verbatim, including blank edge padding.
+data/completion/*/*.asc whitespace=-blank-at-eol

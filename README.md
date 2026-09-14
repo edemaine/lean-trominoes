@@ -123,7 +123,13 @@ Intermediate construction lemmas do not by themselves close a paper theorem.
 Current work is tromino completion. Extending a valid prefill is proved
 equivalent to tiling the uncovered region, with a
 [finite-obstruction characterization](LeanTrominoes/TrominoCompletionFiniteSearch.lean)
-for plane and strip inputs. The remaining obligations include computability
+for plane and strip inputs. The paper's equal/not ASCII layouts are preserved
+in [data/completion](data/completion), with a
+[coordinate generator](scripts/completion_minor_data.py) and
+[Lean certificates](LeanTrominoes/CompletionMinorWitnesses.lean) for all eight
+intended I/L states, retaining every preplaced tile. These are existence
+certificates; exclusion of unintended states and gadget composition remain.
+The remaining obligations also include computability
 and space bounds for the input checkers, a flat strip encoding, and verified
 completion gadgets with their periodic hardness compiler.
 
