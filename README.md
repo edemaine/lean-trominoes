@@ -129,8 +129,13 @@ in [data/completion](data/completion), with a
 [Lean certificates](LeanTrominoes/CompletionMinorWitnesses.lean) for all eight
 intended I/L states, retaining every preplaced tile. The [equal/not relation theorem](LeanTrominoes/CompletionMinorSoundness.lean)
 also excludes every incorrect Boolean state, assuming one cell of each
-connector pair belongs to the neighboring brick. Full boundary profiles and
-gadget composition remain separate obligations.
+connector pair belongs to the neighboring brick. The [I-clause certificate](LeanTrominoes/CompletionITftsat.lean)
+checks all sixteen Boolean boundary states using the actual prefill.
+[Assembly](LeanTrominoes/TrominoCompletionAssembly.lean),
+[restriction](LeanTrominoes/TrominoCompletionRestriction.lean), and
+[barrier checking](LeanTrominoes/CompletionBarrier.lean) provide the generic
+local-to-global lemmas. Full boundary profiles and the periodic geometric
+compiler remain separate obligations.
 The remaining obligations also include computability
 and space bounds for the input checkers, a flat strip encoding, and verified
 completion gadgets with their periodic hardness compiler.
