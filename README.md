@@ -15,23 +15,23 @@ Theorem 5.5 is also proved: tiling by a fixed connected 15-omino and an
 input disconnected polyomino is co-r.e.-complete in the plane and
 PSPACE-complete in a strip, allowing arbitrary rotations and reflections.
 The strip theorem uses the original unary encoding of the height and tile.
-[THEOREM55_FRONTIER.md](THEOREM55_FRONTIER.md) records the construction and validation.
+[The proof guide](docs/theorem-5.5.md) records the construction and validation.
 
 Corollary 5.6 is proved too: with translations only, two fixed connected
 15-ominoes and an input disconnected Q give co-r.e.-complete plane tiling
 and PSPACE-complete strip tiling. See
-[TRANSLATION_FRONTIER.md](TRANSLATION_FRONTIER.md).
+[the Corollary 5.6 guide](docs/corollary-5.6.md).
 
 Tiling full 3D space with a fixed connected 45-voxel polycube and an input
 connected polycube is proved co-r.e.-complete, allowing all cube rotations
 and reflections. The same completeness result is proved for every fixed
 slab height greater than one, with a fixed connected tile of at most 45 voxels.
-[POLYCUBE_FRONTIER.md](POLYCUBE_FRONTIER.md) records the constructions and validation.
+[The proof guide](docs/two-connected-polycubes.md) records the constructions and validation.
 
 Corollary 5.9 is proved with translations only: three connected polycubes,
 two fixed with at most 45 voxels each, give co-r.e.-complete tiling of full
 3D space and every fixed slab height greater than one. See
-[TRANSLATION_POLYCUBE_FRONTIER.md](TRANSLATION_POLYCUBE_FRONTIER.md).
+[the Corollary 5.9 guide](docs/corollary-5.9.md).
 
 ## Main statements and proofs
 
@@ -100,12 +100,10 @@ strengthens Mathlib’s machine interface; a [verified alphabet restriction](Lea
 converts existing certificates without changing their encodings or running time.
 Finite control ensures that each program can write only finitely many symbols.
 
-## Current work and paper coverage
+## Paper coverage
 
-[PROOF_FRONTIER.md](PROOF_FRONTIER.md) records the exact outstanding witness
-types, the next semantic theorem, and the constructors that consume them.
-It is the current work list; intermediate lemmas do not by themselves close
-a paper theorem.
+This table is the authoritative summary of completed and open paper results.
+Intermediate construction lemmas do not by themselves close a paper theorem.
 
 | Paper results | Current coverage |
 | --- | --- |
@@ -119,8 +117,18 @@ a paper theorem.
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 except those listed above | Open |
 
-The [historical progress archive](PROGRESS_ARCHIVE.md) preserves the detailed
-construction checklist and development history.
+## Proof guides
+
+These guides explain the final constructions and point to their main modules.
+Development history is preserved in Git.
+
+| Result | Guide |
+| --- | --- |
+| Theorem 5.2 | [Periodic-subset tiling with one tromino](docs/theorem-5.2.md) |
+| Theorem 5.5 | [Tiling by two polyominoes](docs/theorem-5.5.md) |
+| Two connected polycubes | [Full space and fixed-height slabs](docs/two-connected-polycubes.md) |
+| Corollary 5.6 | [Three polyominoes by translation](docs/corollary-5.6.md) |
+| Corollary 5.9 | [Three connected polycubes by translation](docs/corollary-5.9.md) |
 
 ## Build
 

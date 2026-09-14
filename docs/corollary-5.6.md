@@ -1,12 +1,12 @@
-# Three polyominoes, translations only
+# Corollary 5.6: three polyominoes by translation
 
 **Corollary 5.6 is proved** by `ThreeTranslationPolyominoes.proved` in
-[ThreeTranslationProof.lean](LeanTrominoes/ThreeTranslationProof.lean): two fixed connected 15-ominoes (the horizontal
+[ThreeTranslationProof.lean](../LeanTrominoes/ThreeTranslationProof.lean): two fixed connected 15-ominoes (the horizontal
 and vertical versions of P), and an input disconnected Q. Every placement
 must be a translation. The plane problem is co-r.e.-complete; the strip
 problem is PSPACE-complete under the same unary encoding as Theorem 5.5.
 
-## Established reductions
+## Reductions
 
 - `TranslationTiling` defines restricted and translation-only exact tilings,
   and proves that replacing placements by identical footprints preserves tilings.
@@ -40,19 +40,25 @@ The final declarations are `planeProved`, `stripProved`, and `proved` in
 namespace `LeanTrominoes.ThreeTranslationPolyominoes`. `fixed_card`,
 `fixed_connected`, and `fixed_distinct` establish the two fixed tiles' properties.
 The target definitions are in
-[ThreeTranslationStatements.lean](LeanTrominoes/ThreeTranslationStatements.lean).
+[ThreeTranslationStatements.lean](../LeanTrominoes/ThreeTranslationStatements.lean).
 
-Validation: `lake build +LeanTrominoes.ThreeTranslationProof:olean` completed
+## Validation
+
+`lake build +LeanTrominoes.ThreeTranslationProof:olean` completed
 successfully (9880 jobs).
 
-The public import also passes `lake env lean LeanTrominoes.lean`.
-`tmp/ThreeTranslationAudit.lean` reports no `sorryAx`. The new plane upper
+The public import also passed `lake env lean LeanTrominoes.lean`.
+The completion axiom audit found no `sorryAx`. The new plane upper
 bound, fixed-tile connectivity, strip compiler correctness, and arithmetic
 transition certificate use only standard axioms. Strip membership retains
 the same 12 existing arithmetic native checks. The combined completeness
 proof reports 5388 inherited native-check dependencies; no new axiom or
-`native_decide` call was introduced.
+`native_decide` call was introduced. To inspect current dependencies, import
+the proof module and run
+`#print axioms LeanTrominoes.ThreeTranslationPolyominoes.proved`.
 
 Corollary 5.9, with three connected polycubes and translations only, is proved
 in full 3D and every fixed slab height greater than one. See
-[TRANSLATION_POLYCUBE_FRONTIER.md](TRANSLATION_POLYCUBE_FRONTIER.md).
+[Corollary 5.9](corollary-5.9.md).
+
+See [README](../README.md) for current paper coverage.

@@ -1,10 +1,10 @@
 # Corollary 5.9: three connected polycubes by translation
 
 The target definitions are in
-[ThreeTranslationPolycubes.lean](LeanTrominoes/ThreeTranslationPolycubes.lean).
+[ThreeTranslationPolycubes.lean](../LeanTrominoes/ThreeTranslationPolycubes.lean).
 The final proofs are `spaceProved`, `slabsProved`, and `proved` in namespace
 `LeanTrominoes.ThreeTranslationPolycubes`, exposed by
-[ThreeTranslationPolycubesProof.lean](LeanTrominoes/ThreeTranslationPolycubesProof.lean).
+[ThreeTranslationPolycubesProof.lean](../LeanTrominoes/ThreeTranslationPolycubesProof.lean).
 
 Inputs explicitly list the variable polycube Q's voxels. The predicates
 reject empty or face-disconnected Q and allow only identity-symmetry
@@ -48,14 +48,14 @@ connectivity checker to prove co-r.e. membership.
 
 `lake build +LeanTrominoes.ThreeTranslationPolycubesProof:olean` passed
 (4738 jobs). The public import passed `lake env lean LeanTrominoes.lean`.
-The axiom audit in `tmp/ThreeTranslationPolycubeAudit.lean`
-passed with no `sorryAx`. The upper bounds, orientation equivalence,
+The completion axiom audit passed with no `sorryAx`. The upper bounds, orientation equivalence,
 fixed-tile properties, and restricted forward constructions use only
 `propext`, `Classical.choice`, and `Quot.sound`.
 
 The combined completeness proof reports 4435 inherited native-check
 dependencies, exactly those already present in the two-connected-polycube
 space/slab completeness proofs. No new axiom or `native_decide` call was
-introduced. The comparison is recorded in
-`tmp/ThreeTranslationPolycubeInheritedAudit.lean` and the corresponding
-`tmp/three-translation-polycube-*-audit.log` files.
+introduced. To inspect current dependencies, import the proof module and run
+`#print axioms LeanTrominoes.ThreeTranslationPolycubes.proved`.
+
+See [README](../README.md) for current paper coverage.
