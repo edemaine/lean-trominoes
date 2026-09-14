@@ -136,11 +136,11 @@ completion exists exactly when realizable local gadget states partition the
 plane. Canonical states from a completion satisfy
 [connector consistency](LeanTrominoes/CompletionLConnectorConsistency.lean).
 The [minor-state lemmas](LeanTrominoes/CompletionLMinorStates.lean) force and
-propagate Boolean connectors. A [satisfying infinite brick network produces a
-completion](LeanTrominoes/CompletionLBrickCompleteness.lean), with geometric
-gluing proved for arbitrary Boolean assignments. The reverse Boolean
-extraction and periodic hardness compiler remain unfinished, as do the
-input-checker bounds and flat strip encoding needed for completeness.
+propagate Boolean connectors. The full [brick-network equivalence](LeanTrominoes/CompletionLBrickEquivalence.lean)
+and [finite periodic prefill compiler](LeanTrominoes/CompletionLPeriodicCompiler.lean)
+are proved. Connecting the existing hard orientation source to this Boolean
+brick network remains unfinished, as do compiler computability, input-checker
+bounds, and flat strip encoding needed for completeness.
 
 ## Proof guides
 
