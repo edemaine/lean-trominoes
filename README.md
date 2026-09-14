@@ -123,22 +123,16 @@ Intermediate construction lemmas do not by themselves close a paper theorem.
 Current work is tromino completion. Extending a valid prefill is proved
 equivalent to tiling the uncovered region, with a
 [finite-obstruction characterization](LeanTrominoes/TrominoCompletionFiniteSearch.lean)
-for plane and strip inputs. The paper's equal/not ASCII layouts are preserved
-in [data/completion](data/completion), with a
-[coordinate generator](scripts/completion_minor_data.py) and
-[Lean certificates](LeanTrominoes/CompletionMinorWitnesses.lean) for all eight
-intended I/L states, retaining every preplaced tile. The [equal/not relation theorem](LeanTrominoes/CompletionMinorSoundness.lean)
-also excludes every incorrect Boolean state, assuming one cell of each
-connector pair belongs to the neighboring brick. The [I-clause certificate](LeanTrominoes/CompletionITftsat.lean)
-checks all sixteen Boolean boundary states using the actual prefill.
-[Assembly](LeanTrominoes/TrominoCompletionAssembly.lean),
-[restriction](LeanTrominoes/TrominoCompletionRestriction.lean), and
-[barrier checking](LeanTrominoes/CompletionBarrier.lean) provide the generic
-local-to-global lemmas. Full boundary profiles and the periodic geometric
-compiler remain separate obligations.
-The remaining obligations also include computability
-and space bounds for the input checkers, a flat strip encoding, and verified
-completion gadgets with their periodic hardness compiler.
+for plane and strip inputs. The paper's ASCII layouts in
+[data/completion](data/completion) now have kernel-checked
+[major gadget relations](LeanTrominoes/CompletionMajorRelations.lean) and
+[complete minor boundary profiles](LeanTrominoes/CompletionMinorBoundaryRelations.lean).
+The [L-brick palette](LeanTrominoes/CompletionLBricks.lean) has a verified common
+[region](LeanTrominoes/CompletionLBrickRegions.lean),
+[Boolean network](LeanTrominoes/CompletionLBrickLogic.lean), and
+[local barrier checks](LeanTrominoes/CompletionLAtomBarriers.lean).
+Global geometric gluing and the periodic hardness compiler remain unfinished,
+as do the input-checker bounds and flat strip encoding needed for completeness.
 
 ## Proof guides
 
