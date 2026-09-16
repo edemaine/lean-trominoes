@@ -66,6 +66,7 @@ otherwise.
 | Periodic L-tromino completion, plane co-r.e. hardness | `CompletionPattern.LBricks.lCompletion_coREHard` | [CompletionLHardness](LeanTrominoes/CompletionLHardness.lean) |
 | Periodic I-tromino completion, plane co-r.e. hardness | `CompletionPattern.IBricks.iCompletion_coREHard` | [CompletionIHardness](LeanTrominoes/CompletionIHardness.lean) |
 | Periodic L- and I-tromino completion, plane co-r.e. completeness | `PeriodicTrominoPrefill.planeProblem_coREComplete` | [CompletionCompleteness](LeanTrominoes/CompletionCompleteness.lean) |
+| Strip completion: decidability and polynomial-space uncovered-cell compiler | `problemDecidable`, `Raw.Compiler.compile_fits`, `Raw.Compiler.compileBudget_polynomial` | [CompletionStripReduction](LeanTrominoes/CompletionStripReduction.lean), [CompletionStripCompilerSpace](LeanTrominoes/CompletionStripCompilerSpace.lean) |
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE hardness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEHard` | [PeriodicCNFPolySpaceHardness](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean) |
