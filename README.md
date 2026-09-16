@@ -67,7 +67,7 @@ otherwise.
 | Periodic L-tromino completion, plane co-r.e. hardness | `CompletionPattern.LBricks.lCompletion_coREHard` | [CompletionLHardness](LeanTrominoes/CompletionLHardness.lean) |
 | Periodic I-tromino completion, plane co-r.e. hardness | `CompletionPattern.IBricks.iCompletion_coREHard` | [CompletionIHardness](LeanTrominoes/CompletionIHardness.lean) |
 | Periodic L- and I-tromino completion, plane co-r.e. completeness | `PeriodicTrominoPrefill.planeProblem_coREComplete` | [CompletionCompleteness](LeanTrominoes/CompletionCompleteness.lean) |
-| Periodic L- and I-tromino completion, strip PSPACE membership (unary encoding) | `PeriodicStripTrominoPrefill.problem_inPSPACE` | [CompletionStripMembership](LeanTrominoes/CompletionStripMembership.lean) |
+| Periodic L- and I-tromino completion, strip PSPACE completeness (unary encoding) | `PeriodicStripTrominoPrefill.problem_PSPACEComplete` | [CompletionStripHardness](LeanTrominoes/CompletionStripHardness.lean) |
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE hardness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEHard` | [PeriodicCNFPolySpaceHardness](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean) |
@@ -124,7 +124,7 @@ Intermediate construction lemmas do not by themselves close a paper theorem.
 | Corollary 5.6 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Two connected polycubes | Full 3D and every fixed slab height > 1 proved |
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
-| Tromino completion | L- and I-tromino plane co-r.e. completeness and unary strip PSPACE membership proved; strip hardness remains open |
+| Tromino completion | L- and I-tromino plane co-r.e. completeness and strip PSPACE completeness (unary encoding) proved |
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 except those listed above | Open |
 
@@ -164,29 +164,28 @@ Reusing the orientation circuits yields
 trominoes by searching for dependent periods, overlapping prescribed tiles,
 or an unsatisfiable finite box of uncovered cells. This gives
 [plane co-r.e. completeness](LeanTrominoes/CompletionCompleteness.lean).
-[Strip PSPACE membership](LeanTrominoes/CompletionStripMembership.lean) uses an explicit unary encoding
-and a [polynomial-space compiler](LeanTrominoes/CompletionStripCompilerSpace.lean)
-from valid prefills to uncovered periodic strips. The compiler uses only standard Lean axioms; membership inherits the existing
-strip decider’s native-evaluation certificates. Strip PSPACE hardness remains open.
-The [diagonal routing refinement](LeanTrominoes/CompletionDiagonalPeriod.lean)
-preserves satisfiability, horizontal periods, and bounded height for both
-completion palettes. [Kernel-checked cap bands](LeanTrominoes/CompletionStripCapBands.lean)
-match the [L-brick](LeanTrominoes/CompletionLStripCore.lean) and
-[I-brick](LeanTrominoes/CompletionIStripCore.lean) boundary geometry.
-The capped-strip equivalence is proved for [L](LeanTrominoes/CompletionLStripCapped.lean)
-and [I](LeanTrominoes/CompletionIStripCapped.lean). Finite periodic strip compilers
-for [L](LeanTrominoes/CompletionLStripCompiler.lean) and
-[I](LeanTrominoes/CompletionIStripCompiler.lean) realize this equivalence with
-explicit motifs, periods, and heights. The [orientation compiler](LeanTrominoes/CompletionOrientationStripCompiler.lean)
-and [PSPACE source construction](LeanTrominoes/CompletionStripSourceReduction.lean)
-preserve satisfiability. [Palette evaluation](LeanTrominoes/CompletionCircuitPaletteCompiler.lean)
-and [bounded variable-modulus arithmetic](LeanTrominoes/UnaryColumnModuloCompiler.lean)
-have polynomial-time machines. Connecting the source records and serializing
-the complete prefill remain unfinished.
-The membership proof and both completion reductions use only standard Lean
-axioms. The final completeness theorem inherits the source hardness proof’s
-native-evaluation certificates; its audit contains no `sorryAx` and adds no
-axioms beyond that source theorem.
+[Strip PSPACE completeness](LeanTrominoes/CompletionStripHardness.lean) is proved
+for both trominoes under an explicit unary encoding of height, period, and motif.
+[Membership](LeanTrominoes/CompletionStripMembership.lean) compiles valid prefills
+to uncovered strips in polynomial space. Hardness uses
+[diagonal routing](LeanTrominoes/CompletionDiagonalPeriod.lean) to preserve
+satisfiability, horizontal periods, and bounded height, followed by
+[kernel-checked cap bands](LeanTrominoes/CompletionStripCapBands.lean).
+The finite compilers for [L](LeanTrominoes/CompletionLStripCompiler.lean) and
+[I](LeanTrominoes/CompletionIStripCompiler.lean) produce explicit motifs,
+periods, and heights. The [source reduction](LeanTrominoes/CompletionStripSourceReduction.lean)
+preserves satisfiability, and its
+[polynomial-time machine](LeanTrominoes/CompletionStripHardnessCompiler.lean)
+queries the actual source records, evaluates the brick palette, and serializes
+the entire prefill in unary. Every output is a
+[valid partial tiling](LeanTrominoes/CompletionStripPrefillValidity.lean),
+including outputs for unsatisfiable inputs. Completing tilings need not be periodic.
+
+The completion geometry and generic serialization proofs use only standard
+Lean axioms. The final completeness theorems inherit existing native-evaluation
+certificates from the source reductions and strip decider. Their audits contain
+no `sorryAx`; the strip theorem adds no axioms beyond its verified source
+semantics, source runtime, and membership proofs.
 
 ## Proof guides
 
