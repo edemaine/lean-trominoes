@@ -168,6 +168,10 @@ or an unsatisfiable finite box of uncovered cells. This gives
 and a [polynomial-space compiler](LeanTrominoes/CompletionStripCompilerSpace.lean)
 from valid prefills to uncovered periodic strips. The compiler uses only standard Lean axioms; membership inherits the existing
 strip decider’s native-evaluation certificates. Strip PSPACE hardness remains open.
+The [diagonal routing refinement](LeanTrominoes/CompletionDiagonalPeriod.lean)
+preserves satisfiability, horizontal periods, and bounded height for both
+completion palettes; the strip boundary and polynomial-time reduction still
+need to be connected.
 The membership proof and both completion reductions use only standard Lean
 axioms. The final completeness theorem inherits the source hardness proof’s
 native-evaluation certificates; its audit contains no `sorryAx` and adds no
