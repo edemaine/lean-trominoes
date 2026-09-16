@@ -177,7 +177,9 @@ The capped-strip equivalence is proved for [L](LeanTrominoes/CompletionLStripCap
 and [I](LeanTrominoes/CompletionIStripCapped.lean). Finite periodic strip compilers
 for [L](LeanTrominoes/CompletionLStripCompiler.lean) and
 [I](LeanTrominoes/CompletionIStripCompiler.lean) realize this equivalence with
-explicit motifs, periods, and heights. The polynomial-time source reduction remains unfinished.
+explicit motifs, periods, and heights. The [orientation compiler](LeanTrominoes/CompletionOrientationStripCompiler.lean)
+and [PSPACE source construction](LeanTrominoes/CompletionStripSourceReduction.lean)
+preserve satisfiability. Certifying the latter construction polynomial-time remains unfinished.
 The membership proof and both completion reductions use only standard Lean
 axioms. The final completeness theorem inherits the source hardness proof’s
 native-evaluation certificates; its audit contains no `sorryAx` and adds no
