@@ -174,8 +174,10 @@ completion palettes. [Kernel-checked cap bands](LeanTrominoes/CompletionStripCap
 match the [L-brick](LeanTrominoes/CompletionLStripCore.lean) and
 [I-brick](LeanTrominoes/CompletionIStripCore.lean) boundary geometry.
 The capped-strip equivalence is proved for [L](LeanTrominoes/CompletionLStripCapped.lean)
-and [I](LeanTrominoes/CompletionIStripCapped.lean). The finite periodic compiler
-and its polynomial-time source reduction are still unfinished.
+and [I](LeanTrominoes/CompletionIStripCapped.lean). Finite periodic strip compilers
+for [L](LeanTrominoes/CompletionLStripCompiler.lean) and
+[I](LeanTrominoes/CompletionIStripCompiler.lean) realize this equivalence with
+explicit motifs, periods, and heights. The polynomial-time source reduction remains unfinished.
 The membership proof and both completion reductions use only standard Lean
 axioms. The final completeness theorem inherits the source hardness proof’s
 native-evaluation certificates; its audit contains no `sorryAx` and adds no
