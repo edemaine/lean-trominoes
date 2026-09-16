@@ -173,7 +173,9 @@ preserves satisfiability, horizontal periods, and bounded height for both
 completion palettes. [Kernel-checked cap bands](LeanTrominoes/CompletionStripCapBands.lean)
 match the [L-brick](LeanTrominoes/CompletionLStripCore.lean) and
 [I-brick](LeanTrominoes/CompletionIStripCore.lean) boundary geometry.
-The full capped reduction and its polynomial-time compiler are still unfinished.
+The capped-strip equivalence is proved for [L](LeanTrominoes/CompletionLStripCapped.lean)
+and [I](LeanTrominoes/CompletionIStripCapped.lean). The finite periodic compiler
+and its polynomial-time source reduction are still unfinished.
 The membership proof and both completion reductions use only standard Lean
 axioms. The final completeness theorem inherits the source hardness proof’s
 native-evaluation certificates; its audit contains no `sorryAx` and adds no
