@@ -35,7 +35,9 @@ two fixed with at most 45 voxels each, give co-r.e.-complete tiling of full
 
 Periodic L- and I-tromino completion are proved co-r.e.-complete in the plane.
 Both reductions always produce valid, nonoverlapping periodic prefills.
-Strip completion is in PSPACE under the explicit unary encoding.
+Strip completion is PSPACE-complete under the explicit unary encoding.
+For each tromino, there is also a completable periodic prefill with no
+doubly periodic completion.
 
 ## Main statements and proofs
 
@@ -68,6 +70,7 @@ otherwise.
 | Periodic I-tromino completion, plane co-r.e. hardness | `CompletionPattern.IBricks.iCompletion_coREHard` | [CompletionIHardness](LeanTrominoes/CompletionIHardness.lean) |
 | Periodic L- and I-tromino completion, plane co-r.e. completeness | `PeriodicTrominoPrefill.planeProblem_coREComplete` | [CompletionCompleteness](LeanTrominoes/CompletionCompleteness.lean) |
 | Periodic L- and I-tromino completion, strip PSPACE completeness (unary encoding) | `PeriodicStripTrominoPrefill.problem_PSPACEComplete` | [CompletionStripHardness](LeanTrominoes/CompletionStripHardness.lean) |
+| Periodic L- and I-tromino prefills admitting completions but no doubly periodic completion | `PeriodicTrominoPrefill.exists_no_doubly_periodic_completion` | [CompletionAperiodic](LeanTrominoes/CompletionAperiodic.lean) |
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE hardness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEHard` | [PeriodicCNFPolySpaceHardness](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean) |
@@ -186,6 +189,18 @@ Lean axioms. The final completeness theorems inherit existing native-evaluation
 certificates from the source reductions and strip decider. Their audits contain
 no `sorryAx`; the strip theorem adds no axioms beyond its verified source
 semantics, source runtime, and membership proofs.
+
+[Periodic prefills without doubly periodic completions](LeanTrominoes/CompletionAperiodic.lean)
+are proved to exist for both trominoes. A
+[finite tile table](LeanTrominoes/CompletionPeriodicCertificate.lean) certifies a
+periodic completion, and the [checks are primitive recursive](LeanTrominoes/CompletionPeriodicComputability.lean).
+Every completion with two independent integer translation periods
+[yields such a certificate](LeanTrominoes/CompletionPeriodicExtraction.lean).
+If every completable prefill had one, plane completion would be r.e.,
+contradicting its co-r.e. hardness. The result excludes full-rank period
+lattices; absence of even a single nonzero translation period remains a
+stronger statement. The certificate proofs use only standard Lean axioms;
+the existence theorem adds no axioms beyond plane hardness.
 
 ## Proof guides
 
