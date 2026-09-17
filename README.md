@@ -36,8 +36,8 @@ two fixed with at most 45 voxels each, give co-r.e.-complete tiling of full
 Periodic L- and I-tromino completion are proved co-r.e.-complete in the plane.
 Both reductions always produce valid, nonoverlapping periodic prefills.
 Strip completion is PSPACE-complete under the explicit unary encoding.
-For each tromino, there is also a completable periodic prefill with no
-doubly periodic completion.
+For each tromino, there is also a completable periodic prefill whose every
+completion is aperiodic: no nonzero translation preserves the completed tiling.
 
 ## Main statements and proofs
 
@@ -70,7 +70,7 @@ otherwise.
 | Periodic I-tromino completion, plane co-r.e. hardness | `CompletionPattern.IBricks.iCompletion_coREHard` | [CompletionIHardness](LeanTrominoes/CompletionIHardness.lean) |
 | Periodic L- and I-tromino completion, plane co-r.e. completeness | `PeriodicTrominoPrefill.planeProblem_coREComplete` | [CompletionCompleteness](LeanTrominoes/CompletionCompleteness.lean) |
 | Periodic L- and I-tromino completion, strip PSPACE completeness (unary encoding) | `PeriodicStripTrominoPrefill.problem_PSPACEComplete` | [CompletionStripHardness](LeanTrominoes/CompletionStripHardness.lean) |
-| Periodic L- and I-tromino prefills admitting completions but no doubly periodic completion | `PeriodicTrominoPrefill.exists_no_doubly_periodic_completion` | [CompletionAperiodic](LeanTrominoes/CompletionAperiodic.lean) |
+| Periodic L- and I-tromino prefills admitting only aperiodic completions | `PeriodicTrominoPrefill.exists_aperiodic_completion` | [CompletionAperiodic](LeanTrominoes/CompletionAperiodic.lean) |
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE hardness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEHard` | [PeriodicCNFPolySpaceHardness](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean) |
@@ -127,7 +127,7 @@ Intermediate construction lemmas do not by themselves close a paper theorem.
 | Corollary 5.6 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Two connected polycubes | Full 3D and every fixed slab height > 1 proved |
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
-| Tromino completion | L- and I-tromino plane co-r.e. completeness and strip PSPACE completeness (unary encoding) proved |
+| Tromino completion | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |
 | Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 except those listed above | Open |
 
@@ -190,17 +190,20 @@ certificates from the source reductions and strip decider. Their audits contain
 no `sorryAx`; the strip theorem adds no axioms beyond its verified source
 semantics, source runtime, and membership proofs.
 
-[Periodic prefills without doubly periodic completions](LeanTrominoes/CompletionAperiodic.lean)
+[Periodic prefills admitting only aperiodic completions](LeanTrominoes/CompletionAperiodic.lean)
 are proved to exist for both trominoes. A
 [finite tile table](LeanTrominoes/CompletionPeriodicCertificate.lean) certifies a
-periodic completion, and the [checks are primitive recursive](LeanTrominoes/CompletionPeriodicComputability.lean).
+doubly periodic completion, and the [checks are primitive recursive](LeanTrominoes/CompletionPeriodicComputability.lean).
 Every completion with two independent integer translation periods
 [yields such a certificate](LeanTrominoes/CompletionPeriodicExtraction.lean).
 If every completable prefill had one, plane completion would be r.e.,
-contradicting its co-r.e. hardness. The result excludes full-rank period
-lattices; absence of even a single nonzero translation period remains a
-stronger statement. The certificate proofs use only standard Lean axioms;
-the existence theorem adds no axioms beyond plane hardness.
+contradicting its co-r.e. hardness.
+[Cylinder pumping](LeanTrominoes/CompletionCylinderPumping.lean) strengthens this:
+a completion with any nonzero translation period would yield a doubly periodic
+completion of the same prefill. The proof handles arbitrary period directions
+and preserves the prefill's phase. Hence every completion of these examples
+has no nonzero translation period. The certificate and pumping proofs use only
+standard Lean axioms; the existence theorem adds no axioms beyond plane hardness.
 
 ## Proof guides
 

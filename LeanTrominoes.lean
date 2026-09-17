@@ -21,9 +21,9 @@ import LeanTrominoes.TwoConnectedPolycubesSlabsProof
 of periodic L- and I-tromino completion in the plane. `compileDrawing_valid`
 in `CompletionPattern.LBricks` and `CompletionPattern.IBricks` proves that
 every hardness reduction output is a valid partial tiling.
-`PeriodicTrominoPrefill.exists_no_doubly_periodic_completion` proves that each
-tromino admits a valid periodic prefill whose completions exist but have no
-pair of independent translation periods.
+`PeriodicTrominoPrefill.exists_aperiodic_completion` proves that each tromino
+admits a valid periodic prefill whose completions exist but have no nonzero
+translation period.
 `PeriodicStripTrominoPrefill.problem_PSPACEComplete` proves strip completion
 PSPACE completeness under the explicit unary encoding for both trominoes.
 `CompletionPattern.StripOrientation.compile_valid` proves validity of every

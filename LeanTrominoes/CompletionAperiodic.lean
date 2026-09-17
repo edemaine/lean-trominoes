@@ -3,16 +3,17 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LeanTrominoes.CompletionCompleteness
+import LeanTrominoes.CompletionCylinderPumping
 import LeanTrominoes.CompletionPeriodicComputability
 import LeanTrominoes.CompletionPeriodicExtraction
 import Mathlib.Computability.Halting
 
-/-! # Periodic tromino prefills with no doubly periodic completion
+/-! # Periodic tromino prefills admitting only aperiodic completions
 
 For each tromino there is a valid, doubly periodic prefill admitting a plane
-tiling, but no completion has two independent translation periods. The proof
-uses finite certificates for doubly periodic completions and co-r.e. hardness.
-It does not assert that each completion has no single nonzero period.
+tiling, but every completion has no nonzero translation period. Finite
+certificates and co-r.e. hardness first exclude doubly periodic completions;
+cylinder pumping then excludes every singly periodic completion as well.
 -/
 namespace LeanTrominoes.PeriodicTrominoPrefill
 open CompletionPeriodic
@@ -54,4 +55,21 @@ theorem exists_no_doubly_periodic_completion (t : Tromino) :
   intro completed tiling retained periodic
   obtain ⟨n,hn,square⟩ := squarePeriod_of_independent periodic
   exact uncertified ⟨rank,certificate_of_periodic t input ⟨completed,tiling,retained,n,hn,square⟩⟩
+/-- A periodic prefill can admit plane completions while every completion
+has no nonzero translation period. This holds for both L and I trominoes. -/
+theorem exists_aperiodic_completion (t : Tromino) :
+    ∃ input : PeriodicTrominoPrefill,
+      (input.occupiedRegion t).IsFullRank ∧
+      t.IsPartialTiling Set.univ (input.prescribed t) ∧
+      t.Completable Set.univ (input.prescribed t) ∧
+      ∀ completed, t.IsFootprintTiling Set.univ completed →
+        input.prescribed t ⊆ completed →
+        ∀ v, HasTranslationPeriod completed v → v = (0,0) := by
+  obtain ⟨input,rank,valid,completable,aperiodic⟩ := exists_no_doubly_periodic_completion t
+  refine ⟨input,rank,valid,completable,?_⟩
+  intro completed tiling retained v periodic
+  by_contra nonzero
+  obtain ⟨completed',tiling',retained',periodic'⟩ :=
+    completion_with_two_periods_of_one t input rank tiling retained v nonzero periodic
+  exact aperiodic completed' tiling' retained' periodic'
 end LeanTrominoes.PeriodicTrominoPrefill
