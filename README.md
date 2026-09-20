@@ -81,6 +81,7 @@ otherwise.
 | Theorem 3.4, local 2D periodic 3SAT-3 co-r.e. completeness | `PeriodicThreeSATThree.localThreeSATThreeCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
 | Local 2D periodic 1-in-3SAT-3 co-r.e. completeness (without a planarity restriction) | `PeriodicOneInThree.localOneInThreeSATThreeCoREComplete` | [PeriodicOneInThreeCompleteness](LeanTrominoes/PeriodicOneInThreeCompleteness.lean) |
 | Plane periodic 3SAT with checked continuous planar drawings, co-r.e. completeness | `PeriodicPlanarSAT.WangReduction.coREComplete` | [PeriodicPlanarSATCompleteness](LeanTrominoes/PeriodicPlanarSATCompleteness.lean) |
+| Plane periodic 3SAT-3 with supplied continuous planar drawings, co-r.e. completeness | `PeriodicPlanarSAT.ThreeOccurrenceGeometry.WangReduction.coREComplete` | [PeriodicPlanarThreeOccurrenceCompleteness](LeanTrominoes/PeriodicPlanarThreeOccurrenceCompleteness.lean) |
 | Plane periodic 1-in-3SAT and 1-in-3SAT-3 with supplied continuous planar drawings, co-r.e. completeness | `PeriodicPlanarSAT.ExactOneEndpoint.WangReduction.coREComplete`, `threeOccurrenceCoREComplete` | [PeriodicPlanarExactOneCompleteness](LeanTrominoes/PeriodicPlanarExactOneCompleteness.lean) |
 | Plane periodic 3DM with checked drawings and degree 2 or 3, co-r.e. completeness | `PeriodicThreeDM.planeProblem_coREComplete` | [PeriodicThreeDMPlaneCompleteness](LeanTrominoes/PeriodicThreeDMPlaneCompleteness.lean) |
 | Normalized plane trichromatic orientation, co-r.e. completeness | `Gadget.NormalizedOrientation.coREComplete` | [NormalizedOrientationCompleteness](LeanTrominoes/NormalizedOrientationCompleteness.lean) |
@@ -142,7 +143,7 @@ paper theorem being complete; the entries below distinguish these cases.
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
 | Tromino completion | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |
 | Theorems 2.1–2.2, Lemma 2.3 | Concrete drawing constructions used by the hardness proofs exist; full general drawing statements and bounds remain open |
-| Theorems 3.5–3.8 | Plane planar 3SAT, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Full local planar classifications, drawing-size restrictions, and remaining dimensional clauses still need packaging/proofs |
+| Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Full local planar classifications, drawing-size restrictions, and remaining dimensional clauses still need packaging/proofs |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
 
 The 1D CNF upper-bound work now has a verified
@@ -153,9 +154,12 @@ A state needs at most three bits per symbol of the flat input encoding,
 even with large atom identifiers or common clause offsets. This does **not**
 yet prove PSPACE membership: the checker still needs an encoded TM space
 certificate. The 1D 3SAT and 3SAT-3 reductions also need encoded polynomial-time
-bounds. Ordinary planar 3SAT-3 still needs its source drawing's compatibility
-certificate assembled; the exact-one three-occurrence endpoint is complete
-with supplied drawings, without claiming the paper's locality/grid-size clauses.
+bounds. The ordinary and exact-one planar three-occurrence endpoints are
+complete with supplied drawings, without claiming the paper's locality or
+polynomial grid-size clauses. The ordinary endpoint uses a
+[finite certificate for vertex orbits](LeanTrominoes/PeriodicGraphOrbitCertificate.lean):
+canonical representatives may lie outside the fundamental square, but distinct
+vertices cannot coincide under any whole-period translation.
 
 For the plane parts of Theorems 3.2–3.4, the existing Wang reductions already
 proved hardness. The shared [finite-obstruction proof](LeanTrominoes/PeriodicCNFFiniteSearch.lean)
