@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicPlanarLocalExactOneCompleteness
 import LeanTrominoes.PeriodicPlanarLocalThreeOccurrenceCompleteness
 import LeanTrominoes.PeriodicThreeSATThreePolySpaceCompleteness
 import LeanTrominoes.PeriodicCNFFlatFieldCountSpace

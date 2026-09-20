@@ -145,7 +145,7 @@ paper theorem being complete; the entries below distinguish these cases.
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
 | Tromino completion | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |
 | Theorems 2.1–2.2, Lemma 2.3 | Concrete drawing constructions used by the hardness proofs exist; full general drawing statements and bounds remain open |
-| Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Local plane planar 3SAT and 3SAT-3 are co-r.e. complete, with linear construction grid bounds; local planar exact-one endpoints and remaining dimensional clauses still need packaging/proofs |
+| Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Local plane planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are co-r.e. complete, with linear construction grid bounds; remaining dimensional clauses still need packaging/proofs |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
 
 The local 1D CNF endpoint is now **PSPACE-complete** under the native flat
@@ -163,8 +163,9 @@ combines occurrence-split atom numbers with literal profiles and emits the nativ
 [Local planar 3SAT and 3SAT-3 are co-r.e. complete](LeanTrominoes/PeriodicPlanarLocalThreeOccurrenceCompleteness.lean)
 with supplied drawings. The construction has
 [a linear fundamental-grid side bound](LeanTrominoes/PeriodicPlanarThreeOccurrenceGridSize.lean)
-in the source clause-plus-literal count. The exact-one planar three-occurrence endpoint
-is complete with supplied drawings; its locality extension is being finished.
+in the source clause-plus-literal count.
+[Local planar 1-in-3SAT and 1-in-3SAT-3 are also co-r.e. complete](LeanTrominoes/PeriodicPlanarLocalExactOneCompleteness.lean),
+with [the corresponding linear grid bound](LeanTrominoes/PeriodicPlanarExactOneGridSize.lean).
 The ordinary endpoint uses a
 [finite certificate for vertex orbits](LeanTrominoes/PeriodicGraphOrbitCertificate.lean):
 canonical representatives may lie outside the fundamental square, but distinct
