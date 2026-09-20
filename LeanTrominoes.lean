@@ -1,4 +1,4 @@
-import LeanTrominoes.PeriodicThreeSATThreePolySpaceMembership
+import LeanTrominoes.PeriodicThreeSATThreePolySpaceCompleteness
 import LeanTrominoes.PeriodicCNFFlatFieldCountSpace
 import LeanTrominoes.PeriodicPlanarThreeOccurrenceCompleteness
 import LeanTrominoes.PeriodicCNFLinePacked

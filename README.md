@@ -76,7 +76,7 @@ otherwise.
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEComplete` | [PeriodicCNFPolySpaceMembership](LeanTrominoes/PeriodicCNFPolySpaceMembership.lean) |
 | Theorem 3.3, local 1D periodic 3SAT PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeCNF1DSAT_PSPACEComplete` | [PeriodicCNFFieldWidth](LeanTrominoes/PeriodicCNFFieldWidth.lean) |
-| Local 1D periodic 3SAT-3 PSPACE membership | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeSATThree1DSAT_inPSPACE` | [PeriodicThreeSATThreePolySpaceMembership](LeanTrominoes/PeriodicThreeSATThreePolySpaceMembership.lean) |
+| Theorem 3.4, local 1D periodic 3SAT-3 PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeSATThree1DSAT_PSPACEComplete` | [PeriodicThreeSATThreePolySpaceCompleteness](LeanTrominoes/PeriodicThreeSATThreePolySpaceCompleteness.lean) |
 | Local 1D periodic CNF, executable decision procedure and linear state-bit bound | `PeriodicCNF.LineWindow.check_localPeriodicCNF1DSAT`, `state_bits_le_encoding` | [PeriodicCNFLineSearch](LeanTrominoes/PeriodicCNFLineSearch.lean) |
 | Theorem 3.2, 2D periodic CNF SAT co-r.e. completeness | `WangPeriodicCNF.coREComplete`, `WangPeriodicCNF.localCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
 | Theorem 3.3, local 2D periodic 3SAT co-r.e. completeness | `PeriodicThreeCNF.localThreeCNFCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
@@ -136,7 +136,7 @@ paper theorem being complete; the entries below distinguish these cases.
 | --- | --- |
 | Theorem 3.1 | Imported Wang tiling theorem |
 | Theorem 3.2 | 2D CNF SAT co-r.e. completeness, including the local restriction, proved; local 1D PSPACE completeness proved; remaining dimensional clauses open |
-| Theorems 3.3–3.4 | Local 1D 3SAT PSPACE-completeness and 3SAT-3 PSPACE membership proved; local 2D 3SAT and 3SAT-3 co-r.e. completeness proved; remaining clauses open |
+| Theorems 3.3–3.4 | Local 1D 3SAT and 3SAT-3 PSPACE-completeness proved; local 2D 3SAT and 3SAT-3 co-r.e. completeness proved; remaining clauses open |
 | Theorem 5.2 | Fully proved |
 | Corollary 5.3 | Translation-only plane co-r.e. completeness and strip PSPACE completeness proved |
 | Theorem 5.5 | Plane co-r.e. completeness and strip PSPACE completeness proved |
@@ -157,8 +157,9 @@ The [field-indexed window model](LeanTrominoes/PeriodicCNFFieldWindow.lean)
 uses three bits per flat field and supports arbitrarily large atom names and
 common clause offsets. [Local 1D 3SAT is also PSPACE-complete](LeanTrominoes/PeriodicCNFFieldWidth.lean):
 the hardness compiler already emits width-three clauses.
-[Local 1D 3SAT-3 belongs to PSPACE](LeanTrominoes/PeriodicThreeSATThreePolySpaceMembership.lean);
-its polynomial-time hardness compiler still needs the flat formula output bridge. The ordinary and exact-one planar three-occurrence endpoints are
+[Local 1D 3SAT-3 is PSPACE-complete](LeanTrominoes/PeriodicThreeSATThreePolySpaceCompleteness.lean).
+Its [polynomial-time compiler](LeanTrominoes/PeriodicThreeSATThreePolyTimeCompiler.lean)
+combines occurrence-split atom numbers with literal profiles and emits the native flat formula encoding. The ordinary and exact-one planar three-occurrence endpoints are
 complete with supplied drawings, without claiming the paper's locality or
 polynomial grid-size clauses. The ordinary endpoint uses a
 [finite certificate for vertex orbits](LeanTrominoes/PeriodicGraphOrbitCertificate.lean):
