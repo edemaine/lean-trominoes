@@ -5,6 +5,7 @@ import LeanTrominoes.CompletionCompleteness
 import LeanTrominoes.CompletionLCompilerValidity
 import LeanTrominoes.CompletionICompilerValidity
 import LeanTrominoes.Theorem52Proof
+import LeanTrominoes.TwoTranslationTrominoes
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
 import LeanTrominoes.Theorem55Proof
 import LeanTrominoes.Theorem55StripProof
@@ -34,6 +35,10 @@ strip reduction output, including those for unsatisfiable inputs.
 `LeanTrominoes.Theorem52` separately to read only the target statements.
 See README.md for the main declarations and docs/theorem-5.2.md for the
 completed construction and validation.
+
+`TwoTranslationTrominoes.proved` proves Corollary 5.3: tiling periodic
+plane regions by translations of the horizontal and vertical I trominoes is
+co-r.e. complete, and the strip problem is PSPACE complete.
 
 `Theorem55.planeProved` proves co-r.e. completeness of plane tiling by a fixed
 connected 15-omino and an input disconnected polyomino, allowing rotations

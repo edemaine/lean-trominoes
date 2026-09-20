@@ -60,6 +60,7 @@ otherwise.
 | Theorem 5.2, complete result | `Theorem52.proved` | [Theorem52Proof](LeanTrominoes/Theorem52Proof.lean) |
 | Theorem 5.2, strip PSPACE completeness | `Theorem52.stripProved` | [Theorem52Proof](LeanTrominoes/Theorem52Proof.lean) |
 | Theorem 5.2, complete plane result | `PeriodicWangPlanarThreeDMReduction.theorem52_planeStatement` | [PeriodicWangPlanarThreeDMReduction](LeanTrominoes/PeriodicWangPlanarThreeDMReduction.lean) |
+| Corollary 5.3, two translation-only I trominoes, plane and strip | `TwoTranslationTrominoes.proved` | [TwoTranslationTrominoes](LeanTrominoes/TwoTranslationTrominoes.lean) |
 | Theorem 5.5, plane co-r.e. completeness | `Theorem55.planeProved` | [Theorem55Proof](LeanTrominoes/Theorem55Proof.lean) |
 | Theorem 5.5, strip PSPACE completeness | `Theorem55.stripProved` | [Theorem55StripProof](LeanTrominoes/Theorem55StripProof.lean) |
 | Corollary 5.6, translations only, plane and strip | `ThreeTranslationPolyominoes.proved` | [ThreeTranslationProof](LeanTrominoes/ThreeTranslationProof.lean) |
@@ -123,6 +124,7 @@ Intermediate construction lemmas do not by themselves close a paper theorem.
 | Theorem 3.1 | Imported Wang tiling theorem |
 | Theorem 3.2 | Local 1D CNF SAT hardness proved; full theorem open |
 | Theorem 5.2 | Fully proved |
+| Corollary 5.3 | Translation-only plane co-r.e. completeness and strip PSPACE completeness proved |
 | Theorem 5.5 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Corollary 5.6 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Two connected polycubes | Full 3D and every fixed slab height > 1 proved |
