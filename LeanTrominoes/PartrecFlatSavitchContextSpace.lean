@@ -188,7 +188,7 @@ private theorem flatContextFrameProductArgumentsCost_le_linear
       flatContextStackLengthSpace_le_unit context stateCount state suffix
   have unitLarge : 10 ≤ unit := by
     simpa [unit] using flatContextSpaceUnit_large context stateCount state suffix
-  have numeralAdd : addConstCost 6 [0] ≤ 1000000 := by native_decide
+  have numeralAdd : addConstCost 6 [0] ≤ 1000000 := by decide
   have zeroRaw := listCodeZeroCost_le_linear values
   have numeralBound : numeralCost 6 values ≤ 1000000 * unit := by
     simp only [numeralCost]
@@ -198,13 +198,13 @@ private theorem flatContextFrameProductArgumentsCost_le_linear
     exact getRaw.trans (by omega)
   have outputSpace : encodedListSpace [6, state.stack.length] ≤
       3 * unit := by
-    have sixBits : (Computability.encodeNat 6).length = 3 := by native_decide
+    have sixBits : (Computability.encodeNat 6).length = 3 := by decide
     simp only [encodedListSpace_cons, encodedListSpace_nil] at stackSpace ⊢
     omega
   have estimate := listCodePrependCost_le_of values [6]
     [state.stack.length] (numeralCost 6 values) (getCost 2 values)
     (3 * unit) (by omega) (by
-      have sixBits : (Computability.encodeNat 6).length = 3 := by native_decide
+      have sixBits : (Computability.encodeNat 6).length = 3 := by decide
       simp only [encodedListSpace_cons, encodedListSpace_nil]
       omega) (by simpa only [List.headI_cons] using outputSpace)
   change prependCost values [6] [state.stack.length]
@@ -238,10 +238,10 @@ private theorem flatContextFrameProductCost_le_linear
     (6 + stackLength + 6 * stackLength + 10)
   have final := encodeNat_add_length_le_sum
     (16 * (6 + stackLength + 6 * stackLength + 10)) 100
-  have sixBits : (Computability.encodeNat 6).length = 3 := by native_decide
-  have tenBits : (Computability.encodeNat 10).length = 4 := by native_decide
-  have sixteenBits : (Computability.encodeNat 16).length = 5 := by native_decide
-  have hundredBits : (Computability.encodeNat 100).length = 7 := by native_decide
+  have sixBits : (Computability.encodeNat 6).length = 3 := by decide
+  have tenBits : (Computability.encodeNat 10).length = 4 := by decide
+  have sixteenBits : (Computability.encodeNat 16).length = 5 := by decide
+  have hundredBits : (Computability.encodeNat 100).length = 7 := by decide
   have unitLarge : 10 ≤ unit := by
     simpa [unit] using flatContextSpaceUnit_large context stateCount state suffix
   have multiplyRaw := natMultiplyCost_le_linear 6 stackLength
@@ -278,8 +278,8 @@ private theorem flatContextOffsetSpace_le_unit
     simpa [stackLength] using stackBits
   have product := encodeNat_mul_length_le_sum 6 stackLength
   have final := encodeNat_add_length_le_sum 7 (6 * stackLength)
-  have sixBits : (Computability.encodeNat 6).length = 3 := by native_decide
-  have sevenBits : (Computability.encodeNat 7).length = 3 := by native_decide
+  have sixBits : (Computability.encodeNat 6).length = 3 := by decide
+  have sevenBits : (Computability.encodeNat 7).length = 3 := by decide
   have unitLarge : 10 ≤ unit := by
     simpa [unit] using flatContextSpaceUnit_large context stateCount state suffix
   simp only [encodedListSpace_cons, encodedListSpace_nil]
@@ -298,7 +298,7 @@ private theorem flatContextOffsetCost_le_linear
   have stackSpace := flatContextStackLengthSpace_le_unit
     context stateCount state suffix
   have productBits := encodeNat_mul_length_le_sum 6 state.stack.length
-  have sixBits : (Computability.encodeNat 6).length = 3 := by native_decide
+  have sixBits : (Computability.encodeNat 6).length = 3 := by decide
   have addRaw := addConstCost_le 7 [6 * state.stack.length]
   have unitLarge : 10 ≤ unit := by
     simpa [unit] using flatContextSpaceUnit_large context stateCount state suffix

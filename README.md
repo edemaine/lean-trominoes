@@ -74,7 +74,9 @@ otherwise.
 | Periodic L- and I-tromino prefills admitting only aperiodic completions | `PeriodicTrominoPrefill.exists_aperiodic_completion` | [CompletionAperiodic](LeanTrominoes/CompletionAperiodic.lean) |
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
-| Theorem 3.2, local 1D periodic CNF SAT PSPACE hardness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEHard` | [PeriodicCNFPolySpaceHardness](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean) |
+| Theorem 3.2, local 1D periodic CNF SAT PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEComplete` | [PeriodicCNFPolySpaceMembership](LeanTrominoes/PeriodicCNFPolySpaceMembership.lean) |
+| Theorem 3.3, local 1D periodic 3SAT PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeCNF1DSAT_PSPACEComplete` | [PeriodicCNFFieldWidth](LeanTrominoes/PeriodicCNFFieldWidth.lean) |
+| Local 1D periodic 3SAT-3 PSPACE membership | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeSATThree1DSAT_inPSPACE` | [PeriodicThreeSATThreePolySpaceMembership](LeanTrominoes/PeriodicThreeSATThreePolySpaceMembership.lean) |
 | Local 1D periodic CNF, executable decision procedure and linear state-bit bound | `PeriodicCNF.LineWindow.check_localPeriodicCNF1DSAT`, `state_bits_le_encoding` | [PeriodicCNFLineSearch](LeanTrominoes/PeriodicCNFLineSearch.lean) |
 | Theorem 3.2, 2D periodic CNF SAT co-r.e. completeness | `WangPeriodicCNF.coREComplete`, `WangPeriodicCNF.localCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
 | Theorem 3.3, local 2D periodic 3SAT co-r.e. completeness | `PeriodicThreeCNF.localThreeCNFCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
@@ -133,8 +135,8 @@ paper theorem being complete; the entries below distinguish these cases.
 | Paper results | Current coverage |
 | --- | --- |
 | Theorem 3.1 | Imported Wang tiling theorem |
-| Theorem 3.2 | 2D CNF SAT co-r.e. completeness, including the local restriction, proved; local 1D PSPACE hardness proved; remaining dimensional/upper-bound clauses open |
-| Theorems 3.3–3.4 | Local 2D 3SAT and 3SAT-3 co-r.e. completeness proved; remaining dimensional clauses open |
+| Theorem 3.2 | 2D CNF SAT co-r.e. completeness, including the local restriction, proved; local 1D PSPACE completeness proved; remaining dimensional clauses open |
+| Theorems 3.3–3.4 | Local 1D 3SAT PSPACE-completeness and 3SAT-3 PSPACE membership proved; local 2D 3SAT and 3SAT-3 co-r.e. completeness proved; remaining clauses open |
 | Theorem 5.2 | Fully proved |
 | Corollary 5.3 | Translation-only plane co-r.e. completeness and strip PSPACE completeness proved |
 | Theorem 5.5 | Plane co-r.e. completeness and strip PSPACE completeness proved |
@@ -146,20 +148,17 @@ paper theorem being complete; the entries below distinguish these cases.
 | Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Full local planar classifications, drawing-size restrictions, and remaining dimensional clauses still need packaging/proofs |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
 
-The 1D CNF upper-bound work now has a verified
-[three-column window model](LeanTrominoes/PeriodicCNFLineWindow.lean),
-[executable cycle checker](LeanTrominoes/PeriodicCNFLineSearch.lean), and
-[binary state packing](LeanTrominoes/PeriodicCNFLinePacked.lean).
-A state needs at most three bits per symbol of the flat input encoding,
-even with large atom identifiers or common clause offsets. This does **not**
-yet prove PSPACE membership: the checker still needs an encoded TM space
-certificate. The [flat-input scanner](LeanTrominoes/PeriodicCNFFlatScanner.lean)
-now has exact mask semantics, a linear stored-state bound, and a
-[linear evaluator-space certificate](LeanTrominoes/PeriodicCNFFlatFieldCountSpace.lean)
-for the complete preprocessor, including computing its iteration count from
-the source encoding. Compiling the transition predicate and assembling
-the bounded-space search remain. The 1D 3SAT and 3SAT-3 reductions also need encoded polynomial-time
-bounds. The ordinary and exact-one planar three-occurrence endpoints are
+The local 1D CNF endpoint is now **PSPACE-complete** under the native flat
+encoding. The [machine certificate](LeanTrominoes/PeriodicCNFPolySpaceMembership.lean)
+combines the [linear-space preprocessor](LeanTrominoes/PeriodicCNFFlatFieldCountSpace.lean),
+[compiled transition predicate](LeanTrominoes/PeriodicCNFFieldTransition.lean), and
+[polynomial-space cycle search](LeanTrominoes/PeriodicCNFFieldEvaluator.lean).
+The [field-indexed window model](LeanTrominoes/PeriodicCNFFieldWindow.lean)
+uses three bits per flat field and supports arbitrarily large atom names and
+common clause offsets. [Local 1D 3SAT is also PSPACE-complete](LeanTrominoes/PeriodicCNFFieldWidth.lean):
+the hardness compiler already emits width-three clauses.
+[Local 1D 3SAT-3 belongs to PSPACE](LeanTrominoes/PeriodicThreeSATThreePolySpaceMembership.lean);
+its polynomial-time hardness compiler still needs the flat formula output bridge. The ordinary and exact-one planar three-occurrence endpoints are
 complete with supplied drawings, without claiming the paper's locality or
 polynomial grid-size clauses. The ordinary endpoint uses a
 [finite certificate for vertex orbits](LeanTrominoes/PeriodicGraphOrbitCertificate.lean):

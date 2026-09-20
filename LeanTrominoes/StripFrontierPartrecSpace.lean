@@ -2111,8 +2111,8 @@ theorem scaledFieldSpace_le
       10 * (encodedListSpace [value] + 1) := by
   have product := encodeNat_mul_length_le_sum 2 value
   have sum := encodeNat_add_length_le_sum (2 * value) 4
-  have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
-  have fourBits : (Computability.encodeNat 4).length = 3 := by native_decide
+  have twoBits : (Computability.encodeNat 2).length = 2 := by decide
+  have fourBits : (Computability.encodeNat 4).length = 3 := by decide
   simp only [encodedListSpace_cons, encodedListSpace_nil]
   rw [twoBits] at product
   rw [fourBits] at sum
