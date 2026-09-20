@@ -155,8 +155,9 @@ even with large atom identifiers or common clause offsets. This does **not**
 yet prove PSPACE membership: the checker still needs an encoded TM space
 certificate. The [flat-input scanner](LeanTrominoes/PeriodicCNFFlatScanner.lean)
 now has exact mask semantics, a linear stored-state bound, and a
-[linear evaluator-space certificate](LeanTrominoes/PeriodicCNFFlatScannerCodeSpace.lean)
-for its countdown program. Compiling the transition predicate and assembling
+[linear evaluator-space certificate](LeanTrominoes/PeriodicCNFFlatFieldCountSpace.lean)
+for the complete preprocessor, including computing its iteration count from
+the source encoding. Compiling the transition predicate and assembling
 the bounded-space search remain. The 1D 3SAT and 3SAT-3 reductions also need encoded polynomial-time
 bounds. The ordinary and exact-one planar three-occurrence endpoints are
 complete with supplied drawings, without claiming the paper's locality or
