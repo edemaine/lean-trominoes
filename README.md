@@ -153,7 +153,11 @@ The 1D CNF upper-bound work now has a verified
 A state needs at most three bits per symbol of the flat input encoding,
 even with large atom identifiers or common clause offsets. This does **not**
 yet prove PSPACE membership: the checker still needs an encoded TM space
-certificate. The 1D 3SAT and 3SAT-3 reductions also need encoded polynomial-time
+certificate. The [flat-input scanner](LeanTrominoes/PeriodicCNFFlatScanner.lean)
+now has exact mask semantics, a linear stored-state bound, and a
+[linear evaluator-space certificate](LeanTrominoes/PeriodicCNFFlatScannerCodeSpace.lean)
+for its countdown program. Compiling the transition predicate and assembling
+the bounded-space search remain. The 1D 3SAT and 3SAT-3 reductions also need encoded polynomial-time
 bounds. The ordinary and exact-one planar three-occurrence endpoints are
 complete with supplied drawings, without claiming the paper's locality or
 polynomial grid-size clauses. The ordinary endpoint uses a
