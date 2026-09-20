@@ -75,6 +75,7 @@ otherwise.
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE hardness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEHard` | [PeriodicCNFPolySpaceHardness](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean) |
+| Local 1D periodic CNF, executable decision procedure and linear state-bit bound | `PeriodicCNF.LineWindow.check_localPeriodicCNF1DSAT`, `state_bits_le_encoding` | [PeriodicCNFLineSearch](LeanTrominoes/PeriodicCNFLineSearch.lean) |
 | Theorem 3.2, 2D periodic CNF SAT co-r.e. completeness | `WangPeriodicCNF.coREComplete`, `WangPeriodicCNF.localCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
 | Theorem 3.3, local 2D periodic 3SAT co-r.e. completeness | `PeriodicThreeCNF.localThreeCNFCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
 | Theorem 3.4, local 2D periodic 3SAT-3 co-r.e. completeness | `PeriodicThreeSATThree.localThreeSATThreeCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
@@ -143,6 +144,18 @@ paper theorem being complete; the entries below distinguish these cases.
 | Theorems 2.1–2.2, Lemma 2.3 | Concrete drawing constructions used by the hardness proofs exist; full general drawing statements and bounds remain open |
 | Theorems 3.5–3.8 | Plane planar 3SAT, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Full local planar classifications, drawing-size restrictions, and remaining dimensional clauses still need packaging/proofs |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
+
+The 1D CNF upper-bound work now has a verified
+[three-column window model](LeanTrominoes/PeriodicCNFLineWindow.lean),
+[executable cycle checker](LeanTrominoes/PeriodicCNFLineSearch.lean), and
+[binary state packing](LeanTrominoes/PeriodicCNFLinePacked.lean).
+A state needs at most three bits per symbol of the flat input encoding,
+even with large atom identifiers or common clause offsets. This does **not**
+yet prove PSPACE membership: the checker still needs an encoded TM space
+certificate. The 1D 3SAT and 3SAT-3 reductions also need encoded polynomial-time
+bounds. Ordinary planar 3SAT-3 still needs its source drawing's compatibility
+certificate assembled; the exact-one three-occurrence endpoint is complete
+with supplied drawings, without claiming the paper's locality/grid-size clauses.
 
 For the plane parts of Theorems 3.2–3.4, the existing Wang reductions already
 proved hardness. The shared [finite-obstruction proof](LeanTrominoes/PeriodicCNFFiniteSearch.lean)

@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicCNFLinePacked
 import LeanTrominoes.PeriodicPlanarSATCompleteness
 import LeanTrominoes.PeriodicPlanarExactOneCompleteness
 import LeanTrominoes.CompletionAperiodic
