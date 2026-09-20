@@ -75,6 +75,9 @@ otherwise.
 | Plane co-r.e. membership | `periodicTrominoTiling_coRE` | [ComputableSearch](LeanTrominoes/ComputableSearch.lean) |
 | Theorem 5.2, strip PSPACE membership | `PeriodicStrip.RawWindowState.FlatStripDeciderPartrec.flatPeriodicStripTrominoTiling_inPSPACE` | [PartrecFlatStripDeciderSpace](LeanTrominoes/PartrecFlatStripDeciderSpace.lean) |
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE hardness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEHard` | [PeriodicCNFPolySpaceHardness](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean) |
+| Theorem 3.2, 2D periodic CNF SAT co-r.e. completeness | `WangPeriodicCNF.coREComplete`, `WangPeriodicCNF.localCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
+| Theorem 3.3, local 2D periodic 3SAT co-r.e. completeness | `PeriodicThreeCNF.localThreeCNFCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
+| Theorem 3.4, local 2D periodic 3SAT-3 co-r.e. completeness | `PeriodicThreeSATThree.localThreeSATThreeCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
 | Theorem 3.1, Wang tiling co-r.e.-completeness | `LeanWang.domino_problem_coRE_complete` | Dependency module `LeanWang.Final` |
 
 `import LeanTrominoes` exposes these main results. Import
@@ -117,12 +120,14 @@ Finite control ensures that each program can write only finitely many symbols.
 ## Paper coverage
 
 This table is the authoritative summary of completed and open paper results.
-Intermediate construction lemmas do not by themselves close a paper theorem.
+A result can have proved hardness reductions without all clauses of its numbered
+paper theorem being complete; the entries below distinguish these cases.
 
 | Paper results | Current coverage |
 | --- | --- |
 | Theorem 3.1 | Imported Wang tiling theorem |
-| Theorem 3.2 | Local 1D CNF SAT hardness proved; full theorem open |
+| Theorem 3.2 | 2D CNF SAT co-r.e. completeness, including the local restriction, proved; local 1D PSPACE hardness proved; remaining dimensional/upper-bound clauses open |
+| Theorems 3.3–3.4 | Local 2D 3SAT and 3SAT-3 co-r.e. completeness proved; remaining dimensional clauses open |
 | Theorem 5.2 | Fully proved |
 | Corollary 5.3 | Translation-only plane co-r.e. completeness and strip PSPACE completeness proved |
 | Theorem 5.5 | Plane co-r.e. completeness and strip PSPACE completeness proved |
@@ -130,8 +135,18 @@ Intermediate construction lemmas do not by themselves close a paper theorem.
 | Two connected polycubes | Full 3D and every fixed slab height > 1 proved |
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
 | Tromino completion | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |
-| Theorems 2.1–2.2, Lemma 2.3, Theorems 3.3–3.8 | Construction infrastructure exists; full paper statements remain open |
-| Section 4, Lemma 5.1 in its full generality, and other results 5.3–5.15 except those listed above | Open |
+| Theorems 2.1–2.2, Lemma 2.3 | Concrete drawing constructions used by the hardness proofs exist; full general drawing statements and bounds remain open |
+| Theorems 3.5–3.8 | The plane hardness chain through planar SAT, 3DM, and normalized orientation is proved; full standalone classifications remain open |
+| Section 4, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
+
+For the plane parts of Theorems 3.2–3.4, the existing Wang reductions already
+proved hardness. The shared [finite-obstruction proof](LeanTrominoes/PeriodicCNFFiniteSearch.lean)
+and [effective finite search](LeanTrominoes/PeriodicCNFCoRE.lean) now supply
+co-r.e. membership for arbitrary periodic CNF presentations.
+[Locality, width, and occurrence checks](LeanTrominoes/PeriodicCNFSyntaxComputability.lean)
+allow invalid restricted presentations to be rejected. These upper bounds
+use only Lean's standard axioms; completeness retains the assumptions of the
+existing Wang hardness theorem.
 
 For tromino completion, extending a valid prefill is proved
 equivalent to tiling the uncovered region, with a

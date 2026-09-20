@@ -7,6 +7,7 @@ import LeanTrominoes.CompletionICompilerValidity
 import LeanTrominoes.Theorem52Proof
 import LeanTrominoes.TwoTranslationTrominoes
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
+import LeanTrominoes.PeriodicSATPlaneCompleteness
 import LeanTrominoes.Theorem55Proof
 import LeanTrominoes.Theorem55StripProof
 import LeanTrominoes.ThreeTranslationProof
@@ -65,6 +66,13 @@ fixed slab height greater than one. The fixed connected tile has at most
 or any fixed slab height greater than one by translations of three connected
 polycubes is co-r.e. complete. Two tiles are fixed, each with at most 45 voxels.
 See docs/corollary-5.9.md.
+
+`WangPeriodicCNF.coREComplete` and `WangPeriodicCNF.localCoREComplete`
+prove two-dimensional periodic CNF SAT co-r.e. completeness.
+`PeriodicThreeCNF.localThreeCNFCoREComplete` and
+`PeriodicThreeSATThree.localThreeSATThreeCoREComplete` prove the corresponding
+local 3SAT and 3SAT-3 results. These package the plane parts of Theorems 3.2–3.4;
+the separate one-dimensional classifications are not asserted here.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.
