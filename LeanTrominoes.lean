@@ -8,6 +8,8 @@ import LeanTrominoes.Theorem52Proof
 import LeanTrominoes.TwoTranslationTrominoes
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
 import LeanTrominoes.PeriodicSATPlaneCompleteness
+import LeanTrominoes.PeriodicOneInThreeCompleteness
+import LeanTrominoes.PeriodicThreeDMPlaneCompleteness
 import LeanTrominoes.Theorem55Proof
 import LeanTrominoes.Theorem55StripProof
 import LeanTrominoes.ThreeTranslationProof
