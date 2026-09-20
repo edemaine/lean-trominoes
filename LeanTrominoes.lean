@@ -1,3 +1,5 @@
+import LeanTrominoes.PeriodicPlanarSATCompleteness
+import LeanTrominoes.PeriodicPlanarExactOneCompleteness
 import LeanTrominoes.CompletionAperiodic
 import LeanTrominoes.CompletionStripHardness
 import LeanTrominoes.CompletionStripPrefillValidity
