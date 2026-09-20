@@ -145,7 +145,7 @@ paper theorem being complete; the entries below distinguish these cases.
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
 | Tromino completion | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |
 | Theorems 2.1–2.2, Lemma 2.3 | Concrete drawing constructions used by the hardness proofs exist; full general drawing statements and bounds remain open |
-| Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Full local planar classifications, drawing-size restrictions, and remaining dimensional clauses still need packaging/proofs |
+| Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Local plane planar 3SAT and 3SAT-3 are co-r.e. complete, with linear construction grid bounds; local planar exact-one endpoints and remaining dimensional clauses still need packaging/proofs |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
 
 The local 1D CNF endpoint is now **PSPACE-complete** under the native flat
@@ -159,9 +159,13 @@ common clause offsets. [Local 1D 3SAT is also PSPACE-complete](LeanTrominoes/Per
 the hardness compiler already emits width-three clauses.
 [Local 1D 3SAT-3 is PSPACE-complete](LeanTrominoes/PeriodicThreeSATThreePolySpaceCompleteness.lean).
 Its [polynomial-time compiler](LeanTrominoes/PeriodicThreeSATThreePolyTimeCompiler.lean)
-combines occurrence-split atom numbers with literal profiles and emits the native flat formula encoding. The ordinary and exact-one planar three-occurrence endpoints are
-complete with supplied drawings, without claiming the paper's locality or
-polynomial grid-size clauses. The ordinary endpoint uses a
+combines occurrence-split atom numbers with literal profiles and emits the native flat formula encoding.
+[Local planar 3SAT and 3SAT-3 are co-r.e. complete](LeanTrominoes/PeriodicPlanarLocalThreeOccurrenceCompleteness.lean)
+with supplied drawings. The construction has
+[a linear fundamental-grid side bound](LeanTrominoes/PeriodicPlanarThreeOccurrenceGridSize.lean)
+in the source clause-plus-literal count. The exact-one planar three-occurrence endpoint
+is complete with supplied drawings; its locality extension is being finished.
+The ordinary endpoint uses a
 [finite certificate for vertex orbits](LeanTrominoes/PeriodicGraphOrbitCertificate.lean):
 canonical representatives may lie outside the fundamental square, but distinct
 vertices cannot coincide under any whole-period translation.
