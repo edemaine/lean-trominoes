@@ -178,8 +178,12 @@ the actual vertices and segment endpoints, without a bounding-box promise.
 [Drawing planarity itself is in PSPACE](LeanTrominoes/PeriodicDrawingPolySpaceVerification.lean)
 under a lossless flat binary encoding with cached segment records. The compiled
 checker uses bounded counters and has a linear evaluator-space certificate.
-Combining it with formula compatibility and SAT, and compiling the planar
-reductions' complete output encodings, remain open.
+[Combined formula, planarity, and grid-bound verifiers](LeanTrominoes/PeriodicPlanarSATBoundedComponentVerification.lean)
+now have native polynomial-space certificates for all four variants, using a
+[lossless formula-and-drawing encoding](LeanTrominoes/PeriodicPlanarSATFlatEncoding.lean).
+The component equivalences isolate the remaining membership obligation:
+checking that the drawing matches the formula's incidence graph. Compiling the
+planar reductions' complete output encodings also remains open.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
 under the native flat encoding. The upper bounds use a direct exact-one window
