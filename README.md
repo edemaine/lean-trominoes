@@ -187,7 +187,13 @@ also have native space certificates. Distinct variables are counted from their
 last literal occurrences, matching `List.dedup`; vertex checks handle arbitrary
 signed coordinates and repeated residues. The
 [remaining membership obligation](LeanTrominoes/PeriodicPlanarSATRouteObligation.lean)
-is matching route endpoints to incidence edges. Compiling the planar reductions'
+is matching route endpoints to incidence edges. The
+[compiled endpoint query](LeanTrominoes/PeriodicPlanarSATRouteMachine.lean)
+has an execution theorem and a linear evaluator-space certificate; its
+identification with `RoutesMatch` is still pending. It uses
+[incidence address ranks](LeanTrominoes/PeriodicCNFIncidenceFieldRanks.lean) and
+[a lossless route cursor](LeanTrominoes/PeriodicDrawingRouteCursorSemantics.lean),
+including empty and singleton routes. Compiling the planar reductions'
 complete output encodings also remains open.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
