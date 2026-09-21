@@ -154,7 +154,8 @@ def clauseIncidenceEdges {Variable : Type*}
     List (PeriodicEdge (CNFVertex Variable)) :=
   clause.map (incidenceEdge clauseIndex (clauseAnchor clause))
 
-/-- Variable protovertices that actually occur, in first-occurrence order. -/
+/-- Variable protovertices that actually occur, in last-occurrence order
+(`List.dedup` keeps the last copy). -/
 def incidenceVariableVertices {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) : List (CNFVertex Variable) :=
   formula.variableOccurrences.dedup.map CNFVertex.variable

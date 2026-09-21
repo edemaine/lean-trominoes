@@ -181,9 +181,14 @@ checker uses bounded counters and has a linear evaluator-space certificate.
 [Combined formula, planarity, and grid-bound verifiers](LeanTrominoes/PeriodicPlanarSATBoundedComponentVerification.lean)
 now have native polynomial-space certificates for all four variants, using a
 [lossless formula-and-drawing encoding](LeanTrominoes/PeriodicPlanarSATFlatEncoding.lean).
-The component equivalences isolate the remaining membership obligation:
-checking that the drawing matches the formula's incidence graph. Compiling the
-planar reductions' complete output encodings also remains open.
+[Incidence counts](LeanTrominoes/PeriodicPlanarSATIncidenceCountVerification.lean)
+and [vertex compatibility](LeanTrominoes/PeriodicPlanarSATVertexVerification.lean)
+also have native space certificates. Distinct variables are counted from their
+last literal occurrences, matching `List.dedup`; vertex checks handle arbitrary
+signed coordinates and repeated residues. The
+[remaining membership obligation](LeanTrominoes/PeriodicPlanarSATRouteObligation.lean)
+is matching route endpoints to incidence edges. Compiling the planar reductions'
+complete output encodings also remains open.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
 under the native flat encoding. The upper bounds use a direct exact-one window

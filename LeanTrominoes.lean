@@ -35,6 +35,7 @@ import LeanTrominoes.PeriodicPlanarSATLineReduction
 import LeanTrominoes.PeriodicPlanarSATLineDecision
 import LeanTrominoes.PeriodicDrawingPolySpaceVerification
 import LeanTrominoes.PeriodicPlanarSATBoundedComponentVerification
+import LeanTrominoes.PeriodicPlanarSATRouteObligation
 import LeanTrominoes.PeriodicExactOneCNFFlatSize
 import LeanTrominoes.PeriodicExactOneLineReduction
 
