@@ -78,6 +78,7 @@ otherwise.
 | Theorem 3.3, local 1D periodic 3SAT PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeCNF1DSAT_PSPACEComplete` | [PeriodicCNFFieldWidth](LeanTrominoes/PeriodicCNFFieldWidth.lean) |
 | Theorem 3.4, local 1D periodic 3SAT-3 PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeSATThree1DSAT_PSPACEComplete` | [PeriodicThreeSATThreePolySpaceCompleteness](LeanTrominoes/PeriodicThreeSATThreePolySpaceCompleteness.lean) |
 | Local 1D planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3, total semantic reductions with linear grid bounds (complexity bounds pending) | `PeriodicPlanarSAT.LineReduction.ordinary_correct`, `ordinaryThreeOccurrence_correct`, `exactOne_correct`, `exactOneThreeOccurrence_correct` | [PeriodicPlanarSATLineReduction](LeanTrominoes/PeriodicPlanarSATLineReduction.lean) |
+| Supplied periodic drawing planarity, flat binary PSPACE membership | `PeriodicGridDrawing.Arithmetic.isContinuouslyPlanar_inPSPACE` | [PeriodicDrawingPolySpaceVerification](LeanTrominoes/PeriodicDrawingPolySpaceVerification.lean) |
 | Local 1D planar SAT, all four variants, executable supplied-drawing decisions | `PeriodicPlanarSAT.LineDecision.ordinaryCheck_correct`, `ordinaryThreeCheck_correct`, `exactOneCheck_correct`, `exactOneThreeCheck_correct` | [PeriodicPlanarSATLineDecision](LeanTrominoes/PeriodicPlanarSATLineDecision.lean) |
 | Local 1D 1-in-3SAT and 1-in-3SAT-3, native flat-encoded PSPACE completeness | `PeriodicExactOneCNF.localOneDimensionalThreeSAT_PSPACEComplete`, `localOneDimensionalThreeSATThree_PSPACEComplete` | [PeriodicExactOnePolySpaceCompleteness](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean) |
 | Local 1D exact-one SAT, executable decisions for unrestricted, width-three, and occurrence-three variants; linear state and encoding-size bounds | `PeriodicExactOneCNF.check_correct`, `checkThree_correct`, `checkThreeThree_correct`, `state_bits_le_encoding`, `flatEncoding_length_le` | [PeriodicExactOneCNFLocality](LeanTrominoes/PeriodicExactOneCNFLocality.lean), [PeriodicExactOneCNFFlatSize](LeanTrominoes/PeriodicExactOneCNFFlatSize.lean) |
@@ -174,6 +175,11 @@ pending. [Executable decisions for all four planar variants](LeanTrominoes/Perio
 are proved, using an [exact finite planarity check](LeanTrominoes/PeriodicDrawingFiniteCheck.lean)
 that supports arbitrary stored coordinates. Its translation bound comes from
 the actual vertices and segment endpoints, without a bounding-box promise.
+[Drawing planarity itself is in PSPACE](LeanTrominoes/PeriodicDrawingPolySpaceVerification.lean)
+under a lossless flat binary encoding with cached segment records. The compiled
+checker uses bounded counters and has a linear evaluator-space certificate.
+Combining it with formula compatibility and SAT, and compiling the planar
+reductions' complete output encodings, remain open.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
 under the native flat encoding. The upper bounds use a direct exact-one window

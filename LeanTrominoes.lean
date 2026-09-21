@@ -33,6 +33,7 @@ import LeanTrominoes.TwoConnectedPolycubesSlabsProof
 
 import LeanTrominoes.PeriodicPlanarSATLineReduction
 import LeanTrominoes.PeriodicPlanarSATLineDecision
+import LeanTrominoes.PeriodicDrawingPolySpaceVerification
 import LeanTrominoes.PeriodicExactOneCNFFlatSize
 import LeanTrominoes.PeriodicExactOneLineReduction
 
