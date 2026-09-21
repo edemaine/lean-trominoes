@@ -169,32 +169,22 @@ now preserve one-dimensionality, locality, occurrence bounds, and the intrinsic
 linear drawing-grid bounds, including on malformed source inputs.
 [Forgetting the drawings](LeanTrominoes/PeriodicExactOneLineReduction.lean) also
 gives total reductions to nonplanar exact-one SAT and its occurrence-three variant.
-These reductions are proved primitive recursive; their native encoded
-polynomial-time certificates and the supplied-drawing PSPACE deciders are still
-pending. [Executable decisions for all four planar variants](LeanTrominoes/PeriodicPlanarSATLineDecision.lean)
-are proved, using an [exact finite planarity check](LeanTrominoes/PeriodicDrawingFiniteCheck.lean)
-that supports arbitrary stored coordinates. Its translation bound comes from
-the actual vertices and segment endpoints, without a bounding-box promise.
-[Drawing planarity itself is in PSPACE](LeanTrominoes/PeriodicDrawingPolySpaceVerification.lean)
-under a lossless flat binary encoding with cached segment records. The compiled
-checker uses bounded counters and has a linear evaluator-space certificate.
-[Combined formula, planarity, and grid-bound verifiers](LeanTrominoes/PeriodicPlanarSATBoundedComponentVerification.lean)
-now have native polynomial-space certificates for all four variants, using a
-[lossless formula-and-drawing encoding](LeanTrominoes/PeriodicPlanarSATFlatEncoding.lean).
-[Incidence counts](LeanTrominoes/PeriodicPlanarSATIncidenceCountVerification.lean)
-and [vertex compatibility](LeanTrominoes/PeriodicPlanarSATVertexVerification.lean)
-also have native space certificates. Distinct variables are counted from their
-last literal occurrences, matching `List.dedup`; vertex checks handle arbitrary
-signed coordinates and repeated residues. The
-[remaining membership obligation](LeanTrominoes/PeriodicPlanarSATRouteObligation.lean)
-is matching route endpoints to incidence edges. The
-[compiled endpoint query](LeanTrominoes/PeriodicPlanarSATRouteMachine.lean)
-has an execution theorem and a linear evaluator-space certificate; its
-identification with `RoutesMatch` is still pending. It uses
-[incidence address ranks](LeanTrominoes/PeriodicCNFIncidenceFieldRanks.lean) and
-[a lossless route cursor](LeanTrominoes/PeriodicDrawingRouteCursorSemantics.lean),
-including empty and singleton routes. Compiling the planar reductions'
-complete output encodings also remains open.
+The planar reductions are proved primitive recursive; their native encoded
+polynomial-time certificates remain open.
+
+[All four planar 1D SAT variants are in PSPACE](LeanTrominoes/PeriodicPlanarSATLinePolySpaceMembership.lean)
+under the [lossless formula-and-drawing encoding](LeanTrominoes/PeriodicPlanarSATFlatEncoding.lean).
+The [complete verifier](LeanTrominoes/PeriodicPlanarSATFullVerification.lean)
+checks satisfiability, locality, clause width, the applicable occurrence bound,
+the grid bound, planarity, incidence counts, vertex compatibility, and route endpoints.
+The [finite planarity check](LeanTrominoes/PeriodicDrawingFiniteCheck.lean)
+supports arbitrary stored coordinates, without a bounding-box promise.
+The [route query's correctness proof](LeanTrominoes/PeriodicPlanarSATRouteSemantics.lean)
+connects its [linear-space machine](LeanTrominoes/PeriodicPlanarSATRouteMachine.lean)
+to the actual incidence graph, including repeated literals and empty or singleton routes.
+Distinct-variable indices follow `List.dedup`'s last-occurrence order.
+The remaining completeness work is compiling the planar reductions' full
+formula-and-drawing output encodings in polynomial time.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
 under the native flat encoding. The upper bounds use a direct exact-one window

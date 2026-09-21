@@ -5,11 +5,12 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LeanTrominoes.PeriodicPlanarSATVertexVerification
 import LeanTrominoes.PeriodicPlanarSATBoundedComponentVerification
 
-/-! # The remaining route-endpoint obligation for planar 1D SAT
+/-! # Separating planar 1D SAT prechecks from route verification
 
 All other supplied-input conditions now have a single compiled verifier with
-a polynomial space bound. These equivalences identify the missing condition
+a polynomial space bound. These equivalences isolate route matching
 without assuming that an unrelated planar drawing represents the formula.
+`PeriodicPlanarSATRouteSemantics` proves the compiled route check correct.
 -/
 namespace LeanTrominoes.PeriodicPlanarSAT.ComponentVerification.FormulaVerifier
 open FlatEncoding Turing Turing.ToPartrec Turing.PartrecToTM2
