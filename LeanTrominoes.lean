@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicExactOneThreePolySpaceMembership
 import LeanTrominoes.PeriodicPlanarBoundedLocalCompleteness
 import LeanTrominoes.PeriodicPlanarLocalExactOneCompleteness
 import LeanTrominoes.PeriodicPlanarLocalThreeOccurrenceCompleteness

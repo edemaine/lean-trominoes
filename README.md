@@ -78,6 +78,7 @@ otherwise.
 | Theorem 3.3, local 1D periodic 3SAT PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeCNF1DSAT_PSPACEComplete` | [PeriodicCNFFieldWidth](LeanTrominoes/PeriodicCNFFieldWidth.lean) |
 | Theorem 3.4, local 1D periodic 3SAT-3 PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeSATThree1DSAT_PSPACEComplete` | [PeriodicThreeSATThreePolySpaceCompleteness](LeanTrominoes/PeriodicThreeSATThreePolySpaceCompleteness.lean) |
 | Local 1D planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3, total semantic reductions with linear grid bounds (complexity bounds pending) | `PeriodicPlanarSAT.LineReduction.ordinary_correct`, `ordinaryThreeOccurrence_correct`, `exactOne_correct`, `exactOneThreeOccurrence_correct` | [PeriodicPlanarSATLineReduction](LeanTrominoes/PeriodicPlanarSATLineReduction.lean) |
+| Local 1D 1-in-3SAT and 1-in-3SAT-3, native flat-encoded PSPACE membership | `PeriodicExactOneCNF.localOneDimensionalThreeSAT_inPSPACE`, `localOneDimensionalThreeSATThree_inPSPACE` | [PeriodicExactOnePolySpaceMembership](LeanTrominoes/PeriodicExactOnePolySpaceMembership.lean), [PeriodicExactOneThreePolySpaceMembership](LeanTrominoes/PeriodicExactOneThreePolySpaceMembership.lean) |
 | Local 1D exact-one SAT, executable decisions for unrestricted, width-three, and occurrence-three variants; linear state and encoding-size bounds | `PeriodicExactOneCNF.check_correct`, `checkThree_correct`, `checkThreeThree_correct`, `state_bits_le_encoding`, `flatEncoding_length_le` | [PeriodicExactOneCNFLocality](LeanTrominoes/PeriodicExactOneCNFLocality.lean), [PeriodicExactOneCNFFlatSize](LeanTrominoes/PeriodicExactOneCNFFlatSize.lean) |
 | Local 1D periodic CNF, executable decision procedure and linear state-bit bound | `PeriodicCNF.LineWindow.check_localPeriodicCNF1DSAT`, `state_bits_le_encoding` | [PeriodicCNFLineSearch](LeanTrominoes/PeriodicCNFLineSearch.lean) |
 | Theorem 3.2, 2D periodic CNF SAT co-r.e. completeness | `WangPeriodicCNF.coREComplete`, `WangPeriodicCNF.localCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
@@ -170,7 +171,9 @@ These reductions are proved primitive recursive; their native encoded
 polynomial-time certificates and the supplied-drawing PSPACE deciders are still
 pending. The [exact-one decision procedures](LeanTrominoes/PeriodicExactOneCNFLocality.lean)
 and [linear binary encoding-size bound](LeanTrominoes/PeriodicExactOneCNFFlatSize.lean)
-are proved, but do not yet constitute an encoded PSPACE membership theorem.
+are proved. [Native flat-encoded PSPACE membership](LeanTrominoes/PeriodicExactOneThreePolySpaceMembership.lean)
+is also proved for 1-in-3SAT and 1-in-3SAT-3, using a direct exact-one window
+predicate and the compiled Savitch search. Encoded hardness remains pending.
 
 Its [polynomial-time compiler](LeanTrominoes/PeriodicThreeSATThreePolyTimeCompiler.lean)
 combines occurrence-split atom numbers with literal profiles and emits the native flat formula encoding.
