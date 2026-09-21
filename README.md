@@ -189,7 +189,9 @@ intermediate has [compiled numeric atom names](LeanTrominoes/PeriodicCNFStripNat
 with a proved injective renaming that
 [preserves the planar languages and drawings](LeanTrominoes/PeriodicPlanarSATInjectiveRenaming.lean), and
 [compiled signed variable-position fields](LeanTrominoes/PeriodicCNFStripNativeVariableFields.lean)
-in incidence order. The [binary input assembler](LeanTrominoes/PeriodicPlanarSATEncodingCompiler.lean)
+in incidence order. Its [complete route-word compiler](LeanTrominoes/PeriodicCNFStripNativeRouteWords.lean)
+outputs the actual clause-to-variable direction words with incidence boundaries
+and compiles their signed horizontal and vertical displacements. The [binary input assembler](LeanTrominoes/PeriodicPlanarSATEncodingCompiler.lean)
 is also proved; complete clause and drawing field compilers still need to be connected.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
