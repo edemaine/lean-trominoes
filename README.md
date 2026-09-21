@@ -136,7 +136,7 @@ paper theorem being complete; the entries below distinguish these cases.
 | --- | --- |
 | Theorem 3.1 | Imported Wang tiling theorem |
 | Theorem 3.2 | 2D CNF SAT co-r.e. completeness, including the local restriction, proved; local 1D PSPACE completeness proved; remaining dimensional clauses open |
-| Theorems 3.3–3.4 | Local 1D 3SAT and 3SAT-3 PSPACE-completeness proved; local 2D 3SAT and 3SAT-3 co-r.e. completeness proved; remaining clauses open |
+| Theorems 3.3–3.4 | Local 1D 3SAT and 3SAT-3 PSPACE-completeness proved; local 2D 3SAT and 3SAT-3 co-r.e. completeness proved |
 | Theorem 5.2 | Fully proved |
 | Corollary 5.3 | Translation-only plane co-r.e. completeness and strip PSPACE completeness proved |
 | Theorem 5.5 | Plane co-r.e. completeness and strip PSPACE completeness proved |
