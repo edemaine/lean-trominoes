@@ -9,7 +9,7 @@ import LeanTrominoes.PeriodicExactOneCNFLocality
 /-! # Numeric exact-one reduction semantics for every PSPACE source
 
 This connects the compact numeric formula to the original language. The
-polynomial-time atom column is still required for encoded hardness.
+polynomial-time compiler and completeness endpoints build on this equivalence.
 -/
 noncomputable section
 namespace LeanTrominoes.PeriodicOneInThree.PolyTime
