@@ -28,6 +28,10 @@ import LeanTrominoes.TwoConnectedPolycubesSlabProof
 import LeanTrominoes.TwoConnectedPolycubesSpaceProof
 import LeanTrominoes.TwoConnectedPolycubesSlabsProof
 
+import LeanTrominoes.PeriodicPlanarSATLineReduction
+import LeanTrominoes.PeriodicExactOneCNFFlatSize
+import LeanTrominoes.PeriodicExactOneLineReduction
+
 /-!
 # Main theorem interface
 
@@ -83,10 +87,9 @@ See docs/corollary-5.9.md.
 prove two-dimensional periodic CNF SAT co-r.e. completeness.
 `PeriodicThreeCNF.localThreeCNFCoREComplete` and
 `PeriodicThreeSATThree.localThreeSATThreeCoREComplete` prove the corresponding
-local 3SAT and 3SAT-3 results. These package the plane parts of Theorems 3.2–3.4;
-the separate one-dimensional classifications are not asserted here.
+local 3SAT and 3SAT-3 results. Together with the native flat-encoded one-dimensional PSPACE endpoints,
+these complete Theorems 3.3–3.4.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.
 -/
-import LeanTrominoes.PeriodicPlanarSATLineReduction
