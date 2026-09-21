@@ -89,3 +89,4 @@ the separate one-dimensional classifications are not asserted here.
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.
 -/
+import LeanTrominoes.PeriodicPlanarSATLineReduction
