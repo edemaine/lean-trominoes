@@ -174,6 +174,11 @@ and [linear binary encoding-size bound](LeanTrominoes/PeriodicExactOneCNFFlatSiz
 are proved. [Native flat-encoded PSPACE membership](LeanTrominoes/PeriodicExactOneThreePolySpaceMembership.lean)
 is also proved for 1-in-3SAT and 1-in-3SAT-3, using a direct exact-one window
 predicate and the compiled Savitch search. Encoded hardness remains pending.
+The [compact numeric reduction](LeanTrominoes/PeriodicOneInThreePolyTimeSemantics.lean)
+is semantically correct for every PSPACE source, and its
+[finite metadata stream](LeanTrominoes/PeriodicOneInThreePolyTimeProfiles.lean)
+is compiled in polynomial time. Compiling the numeric atom stream remains the
+missing part of this nonplanar exact-one hardness reduction.
 
 Its [polynomial-time compiler](LeanTrominoes/PeriodicThreeSATThreePolyTimeCompiler.lean)
 combines occurrence-split atom numbers with literal profiles and emits the native flat formula encoding.
