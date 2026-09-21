@@ -184,7 +184,13 @@ connects its [linear-space machine](LeanTrominoes/PeriodicPlanarSATRouteMachine.
 to the actual incidence graph, including repeated literals and empty or singleton routes.
 Distinct-variable indices follow `List.dedup`'s last-occurrence order.
 The remaining completeness work is compiling the planar reductions' full
-formula-and-drawing output encodings in polynomial time.
+formula-and-drawing output encodings in polynomial time. The routed exact-one
+intermediate has [compiled numeric atom names](LeanTrominoes/PeriodicCNFStripNativeAtomRenaming.lean)
+with a proved injective renaming that
+[preserves the planar languages and drawings](LeanTrominoes/PeriodicPlanarSATInjectiveRenaming.lean), and
+[compiled signed variable-position fields](LeanTrominoes/PeriodicCNFStripNativeVariableFields.lean)
+in incidence order. The [binary input assembler](LeanTrominoes/PeriodicPlanarSATEncodingCompiler.lean)
+is also proved; complete clause and drawing field compilers still need to be connected.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
 under the native flat encoding. The upper bounds use a direct exact-one window

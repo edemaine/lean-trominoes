@@ -15,7 +15,7 @@ namespace LeanTrominoes.UnaryFieldStableDedup
 
 open Computability Turing
 
-/-- Keep the first presentation of every unary natural, preserving source
+/-- Keep the last presentation of every unary natural, preserving source
 order.  Length-coded binary words let the generic representative selector
 compare arbitrary unary values. -/
 def values (source : List Nat) : List Nat :=
