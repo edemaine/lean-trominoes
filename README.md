@@ -195,9 +195,13 @@ and compiles their signed horizontal and vertical displacements. The [binary inp
 is also proved. [Canonical clause-origin fields](LeanTrominoes/PeriodicCNFStripNativeIncidenceClauseFields.lean)
 are compiled in incidence order. The [offset recovery compiler](LeanTrominoes/CanonicalLiteralOffsetCompiler.lean)
 turns signed incidence-coordinate columns and a positive drawing period into
-native anchored literal-offset fields; its geometric premises still need to be
-connected to the concrete routed source. Complete clause and drawing field
-compilers remain unfinished.
+native anchored literal-offset fields. The [concrete literal-offset compiler](LeanTrominoes/PeriodicCNFStripNativeLiteralOffsets.lean)
+now discharges those geometric premises for the routed source. Its
+[drawing period](LeanTrominoes/PeriodicCNFStripNativePeriodCompiler.lean),
+[clause lengths](LeanTrominoes/PeriodicCNFStripNativeClauseArities.lean), and
+[literal signs](LeanTrominoes/PeriodicCNFStripNativeLiteralValues.lean) also have
+native polynomial-time compilers. Complete formula and drawing field assembly
+remains unfinished.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
 under the native flat encoding. The upper bounds use a direct exact-one window
