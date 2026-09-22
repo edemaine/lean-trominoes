@@ -192,7 +192,12 @@ with a proved injective renaming that
 in incidence order. Its [complete route-word compiler](LeanTrominoes/PeriodicCNFStripNativeRouteWords.lean)
 outputs the actual clause-to-variable direction words with incidence boundaries
 and compiles their signed horizontal and vertical displacements. The [binary input assembler](LeanTrominoes/PeriodicPlanarSATEncodingCompiler.lean)
-is also proved; complete clause and drawing field compilers still need to be connected.
+is also proved. [Canonical clause-origin fields](LeanTrominoes/PeriodicCNFStripNativeIncidenceClauseFields.lean)
+are compiled in incidence order. The [offset recovery compiler](LeanTrominoes/CanonicalLiteralOffsetCompiler.lean)
+turns signed incidence-coordinate columns and a positive drawing period into
+native anchored literal-offset fields; its geometric premises still need to be
+connected to the concrete routed source. Complete clause and drawing field
+compilers remain unfinished.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
 under the native flat encoding. The upper bounds use a direct exact-one window
