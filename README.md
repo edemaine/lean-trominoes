@@ -200,8 +200,10 @@ now discharges those geometric premises for the routed source. Its
 [drawing period](LeanTrominoes/PeriodicCNFStripNativePeriodCompiler.lean),
 [clause lengths](LeanTrominoes/PeriodicCNFStripNativeClauseArities.lean), and
 [literal signs](LeanTrominoes/PeriodicCNFStripNativeLiteralValues.lean) also have
-native polynomial-time compilers. Complete formula and drawing field assembly
-remains unfinished.
+native polynomial-time compilers. The [complete native formula compiler](LeanTrominoes/PeriodicCNFStripNativeFormulaCompiler.lean)
+now assembles every field and its binary encoding for the anchor-normalized,
+numerically renamed routed formula, preserving exact-one satisfiability.
+Complete drawing field assembly and the four planar hardness endpoints remain unfinished.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
 under the native flat encoding. The upper bounds use a direct exact-one window
