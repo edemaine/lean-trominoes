@@ -203,7 +203,12 @@ now discharges those geometric premises for the routed source. Its
 native polynomial-time compilers. The [complete native formula compiler](LeanTrominoes/PeriodicCNFStripNativeFormulaCompiler.lean)
 now assembles every field and its binary encoding for the anchor-normalized,
 numerically renamed routed formula, preserving exact-one satisfiability.
-Complete drawing field assembly and the four planar hardness endpoints remain unfinished.
+The [complete ordered vertex table](LeanTrominoes/PeriodicCNFStripNativeDrawingVertices.lean)
+and [complete route table](LeanTrominoes/PeriodicCNFStripNativeDrawingRoutes.lean)
+also have polynomial-time field compilers, including route counts, point counts,
+and every stored route coordinate. [Unit-route reconstruction](LeanTrominoes/DelimitedDirectionVertexGeometry.lean)
+proves exact agreement with the stored point lists. The indexed segment table,
+drawing-header fields, and four planar hardness endpoints remain unfinished.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
 under the native flat encoding. The upper bounds use a direct exact-one window
