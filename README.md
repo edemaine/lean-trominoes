@@ -138,8 +138,9 @@ Finite control ensures that each program can write only finitely many symbols.
 The [local 1D 3DM checker](LeanTrominoes/PeriodicThreeDMLineDecision.lean)
 handles graph-local incidence offsets, including elements whose neighbors span
 two cells. Its [native binary encoding](LeanTrominoes/PeriodicThreeDMFlatEncoding.lean)
-also stores complete supplied drawings. These are prerequisites; native planar
-3DM PSPACE membership and hardness certificates remain open.
+also stores complete supplied drawings. The [3DM instance compiler](LeanTrominoes/PeriodicCNFStripNativeThreeDMFields.lean)
+emits all counts, dense element indices, and periodic reference offsets in polynomial time.
+These are prerequisites; native planar 3DM PSPACE membership and hardness certificates remain open.
 [Normalized 1D trichromatic orientation is PSPACE-hard](LeanTrominoes/NormalizedOrientationLineHardness.lean)
 under a [lossless binary encoding](LeanTrominoes/NormalizedOrientationFlatEncoding.lean)
 of the full colored cell table and periods. The endpoint requires separated
