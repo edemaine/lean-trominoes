@@ -93,7 +93,7 @@ otherwise.
 | Plane periodic 3SAT-3 with supplied continuous planar drawings, co-r.e. completeness | `PeriodicPlanarSAT.ThreeOccurrenceGeometry.WangReduction.coREComplete` | [PeriodicPlanarThreeOccurrenceCompleteness](LeanTrominoes/PeriodicPlanarThreeOccurrenceCompleteness.lean) |
 | Plane periodic 1-in-3SAT and 1-in-3SAT-3 with supplied continuous planar drawings, co-r.e. completeness | `PeriodicPlanarSAT.ExactOneEndpoint.WangReduction.coREComplete`, `threeOccurrenceCoREComplete` | [PeriodicPlanarExactOneCompleteness](LeanTrominoes/PeriodicPlanarExactOneCompleteness.lean) |
 | Plane periodic 3DM with checked drawings and degree 2 or 3, co-r.e. completeness | `PeriodicThreeDM.planeProblem_coREComplete` | [PeriodicThreeDMPlaneCompleteness](LeanTrominoes/PeriodicThreeDMPlaneCompleteness.lean) |
-| Local 1D periodic 3DM, executable decision with colored degree 2 or 3 | `PeriodicThreeDM.lineCheck_correct` | [PeriodicThreeDMLineDecision](LeanTrominoes/PeriodicThreeDMLineDecision.lean) |
+| Local 1D periodic 3DM with colored degree 2 or 3, native PSPACE completeness | `PeriodicThreeDM.localLineProblem_PSPACEComplete` | [PeriodicThreeDMLineCompleteness](LeanTrominoes/PeriodicThreeDMLineCompleteness.lean) |
 | Normalized plane trichromatic orientation, co-r.e. completeness | `Gadget.NormalizedOrientation.coREComplete` | [NormalizedOrientationCompleteness](LeanTrominoes/NormalizedOrientationCompleteness.lean) |
 | Normalized 1D trichromatic orientation, native binary PSPACE completeness | `Gadget.NormalizedOrientation.lineProblem_PSPACEComplete` | [NormalizedOrientationLineMembership](LeanTrominoes/NormalizedOrientationLineMembership.lean) |
 | Theorem 3.1, Wang tiling co-r.e.-completeness | `LeanWang.domino_problem_coRE_complete` | Dependency module `LeanWang.Final` |
@@ -140,7 +140,9 @@ under the [complete native binary encoding](LeanTrominoes/PeriodicThreeDMFlatEnc
 of the instance and supplied drawing. The reduction emits every count, reference,
 vertex, segment, and route field; its output passes the finite continuous-planarity
 verifier. The [total checker](LeanTrominoes/PeriodicThreeDMPlanarLineDecision.lean)
-also has proved decision semantics, but its native PSPACE upper bound remains open.
+also has proved decision semantics. [The instance-only matching problem is PSPACE-complete](LeanTrominoes/PeriodicThreeDMLineCompleteness.lean)
+under its native binary encoding; integrating the supplied-drawing verifier into
+that upper bound remains open.
 [Normalized 1D trichromatic orientation is PSPACE-complete](LeanTrominoes/NormalizedOrientationLineMembership.lean)
 under a [lossless binary encoding](LeanTrominoes/NormalizedOrientationFlatEncoding.lean)
 of the full colored cell table and periods. The endpoint requires separated
