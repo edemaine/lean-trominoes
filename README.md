@@ -183,8 +183,8 @@ The [route query's correctness proof](LeanTrominoes/PeriodicPlanarSATRouteSemant
 connects its [linear-space machine](LeanTrominoes/PeriodicPlanarSATRouteMachine.lean)
 to the actual incidence graph, including repeated literals and empty or singleton routes.
 Distinct-variable indices follow `List.dedup`'s last-occurrence order.
-The remaining completeness work is compiling the planar reductions' full
-formula-and-drawing output encodings in polynomial time. The routed exact-one
+The remaining completeness work is connecting native encoded reductions to
+the four target languages, including their fixed grid and locality promises. The routed exact-one
 intermediate has [compiled numeric atom names](LeanTrominoes/PeriodicCNFStripNativeAtomRenaming.lean)
 with a proved injective renaming that
 [preserves the planar languages and drawings](LeanTrominoes/PeriodicPlanarSATInjectiveRenaming.lean), and
@@ -207,8 +207,14 @@ The [complete ordered vertex table](LeanTrominoes/PeriodicCNFStripNativeDrawingV
 and [complete route table](LeanTrominoes/PeriodicCNFStripNativeDrawingRoutes.lean)
 also have polynomial-time field compilers, including route counts, point counts,
 and every stored route coordinate. [Unit-route reconstruction](LeanTrominoes/DelimitedDirectionVertexGeometry.lean)
-proves exact agreement with the stored point lists. The indexed segment table,
-drawing-header fields, and four planar hardness endpoints remain unfinished.
+proves exact agreement with the stored point lists. The
+[indexed segment table](LeanTrominoes/PeriodicCNFStripNativeDrawingSegments.lean)
+and [drawing-header fields](LeanTrominoes/PeriodicDrawingHeaderCompiler.lean)
+are also compiled, including the exact finite-check radius. The
+[complete native binary encoder](LeanTrominoes/PeriodicCNFStripNativePlanarEncoding.lean)
+now emits the entire routed exact-one candidate and its supplied drawing.
+The four planar hardness endpoints remain unfinished; this routed candidate
+is distinct from the earlier primitive-recursive endpoints.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
 under the native flat encoding. The upper bounds use a direct exact-one window
