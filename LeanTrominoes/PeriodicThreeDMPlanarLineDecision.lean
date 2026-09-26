@@ -8,7 +8,8 @@ import LeanTrominoes.PeriodicThreeDMFiniteDrawingCertificate
 
 /-! # Total decision semantics for supplied-drawing local 1D 3DM
 
-The polynomial-space bound for this native input is a separate obligation.
+The native polynomial-space bound is established in
+`PeriodicThreeDMPlanarLineMembership`.
 -/
 namespace LeanTrominoes.PeriodicThreeDM
 

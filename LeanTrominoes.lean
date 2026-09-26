@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicThreeDMPlanarLineCompleteness
 import LeanTrominoes.PeriodicThreeDMLineCompleteness
 import LeanTrominoes.NormalizedOrientationLineMembership
 import LeanTrominoes.PeriodicThreeDMLineDecision
@@ -116,6 +117,10 @@ the original fixed linear grid bounds.
 `Gadget.NormalizedOrientation.lineProblem_PSPACEComplete` proves normalized
 one-dimensional trichromatic orientation PSPACE-complete under the native binary
 cell-table encoding, with separated vertices and a blank vertical boundary.
+
+`PeriodicThreeDM.localPlanarLineProblem_PSPACEComplete` proves local planar
+one-dimensional 3DM with colored degree 2 or 3 PSPACE-complete under the native
+binary encoding, including verification of the complete supplied drawing.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.

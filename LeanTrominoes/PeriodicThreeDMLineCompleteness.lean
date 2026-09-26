@@ -7,8 +7,8 @@ import LeanTrominoes.PeriodicThreeDMLineHardness
 
 /-! # Native PSPACE completeness for local horizontal degree-two-or-three 3DM
 
-This endpoint omits the supplied drawing. The planar supplied-drawing upper
-bound additionally needs the native finite drawing verifier.
+This endpoint omits the supplied drawing. The supplied-drawing version is
+proved separately in `PeriodicThreeDMPlanarLineCompleteness`.
 -/
 noncomputable section
 namespace LeanTrominoes.PeriodicThreeDM

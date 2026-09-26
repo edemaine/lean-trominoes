@@ -94,6 +94,7 @@ otherwise.
 | Plane periodic 1-in-3SAT and 1-in-3SAT-3 with supplied continuous planar drawings, co-r.e. completeness | `PeriodicPlanarSAT.ExactOneEndpoint.WangReduction.coREComplete`, `threeOccurrenceCoREComplete` | [PeriodicPlanarExactOneCompleteness](LeanTrominoes/PeriodicPlanarExactOneCompleteness.lean) |
 | Plane periodic 3DM with checked drawings and degree 2 or 3, co-r.e. completeness | `PeriodicThreeDM.planeProblem_coREComplete` | [PeriodicThreeDMPlaneCompleteness](LeanTrominoes/PeriodicThreeDMPlaneCompleteness.lean) |
 | Local 1D periodic 3DM with colored degree 2 or 3, native PSPACE completeness | `PeriodicThreeDM.localLineProblem_PSPACEComplete` | [PeriodicThreeDMLineCompleteness](LeanTrominoes/PeriodicThreeDMLineCompleteness.lean) |
+| Local planar 1D periodic 3DM with colored degree 2 or 3 and supplied drawing, native PSPACE completeness | `PeriodicThreeDM.localPlanarLineProblem_PSPACEComplete` | [PeriodicThreeDMPlanarLineCompleteness](LeanTrominoes/PeriodicThreeDMPlanarLineCompleteness.lean) |
 | Normalized plane trichromatic orientation, co-r.e. completeness | `Gadget.NormalizedOrientation.coREComplete` | [NormalizedOrientationCompleteness](LeanTrominoes/NormalizedOrientationCompleteness.lean) |
 | Normalized 1D trichromatic orientation, native binary PSPACE completeness | `Gadget.NormalizedOrientation.lineProblem_PSPACEComplete` | [NormalizedOrientationLineMembership](LeanTrominoes/NormalizedOrientationLineMembership.lean) |
 | Theorem 3.1, Wang tiling co-r.e.-completeness | `LeanWang.domino_problem_coRE_complete` | Dependency module `LeanWang.Final` |
@@ -135,14 +136,13 @@ strengthens Mathlib’s machine interface; a [verified alphabet restriction](Lea
 converts existing certificates without changing their encodings or running time.
 Finite control ensures that each program can write only finitely many symbols.
 
-[Local planar 1D 3DM with degree 2 or 3 is PSPACE-hard](LeanTrominoes/PeriodicThreeDMLineHardness.lean)
+[Local planar 1D 3DM with colored degree 2 or 3 is PSPACE-complete](LeanTrominoes/PeriodicThreeDMPlanarLineCompleteness.lean)
 under the [complete native binary encoding](LeanTrominoes/PeriodicThreeDMFlatEncoding.lean)
 of the instance and supplied drawing. The reduction emits every count, reference,
-vertex, segment, and route field; its output passes the finite continuous-planarity
-verifier. The [total checker](LeanTrominoes/PeriodicThreeDMPlanarLineDecision.lean)
-also has proved decision semantics. [The instance-only matching problem is PSPACE-complete](LeanTrominoes/PeriodicThreeDMLineCompleteness.lean)
-under its native binary encoding; integrating the supplied-drawing verifier into
-that upper bound remains open.
+vertex, segment, and route point. The upper bound combines the matching solver
+with a [linear-space drawing verifier](LeanTrominoes/PeriodicThreeDMDrawingVerifier.lean)
+that checks incidence endpoints, continuous planarity, halo bounds, and endpoint-only
+route-point contacts. [The instance-only matching problem is also PSPACE-complete](LeanTrominoes/PeriodicThreeDMLineCompleteness.lean).
 [Normalized 1D trichromatic orientation is PSPACE-complete](LeanTrominoes/NormalizedOrientationLineMembership.lean)
 under a [lossless binary encoding](LeanTrominoes/NormalizedOrientationFlatEncoding.lean)
 of the full colored cell table and periods. The endpoint requires separated
@@ -172,7 +172,7 @@ paper theorem being complete; the entries below distinguish these cases.
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
 | Tromino completion | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |
 | Theorems 2.1–2.2, Lemma 2.3 | Concrete drawing constructions used by the hardness proofs exist; full general drawing statements and bounds remain open |
-| Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Local plane planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are co-r.e. complete even with a linear grid-size restriction in the output formula size. Local 1D planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are PSPACE-complete under the native formula-and-drawing encoding; remaining dimensional clauses are open |
+| Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Local plane planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are co-r.e. complete even with a linear grid-size restriction in the output formula size. Local 1D planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are PSPACE-complete under the native formula-and-drawing encoding. Normalized 1D trichromatic orientation and local planar 1D 3DM with colored degree 2 or 3 and a supplied drawing are also PSPACE-complete under their native binary encodings; remaining dimensional clauses are open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
 
 The local 1D CNF endpoint is now **PSPACE-complete** under the native flat
