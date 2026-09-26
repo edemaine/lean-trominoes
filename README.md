@@ -93,6 +93,7 @@ otherwise.
 | Plane periodic 3SAT-3 with supplied continuous planar drawings, co-r.e. completeness | `PeriodicPlanarSAT.ThreeOccurrenceGeometry.WangReduction.coREComplete` | [PeriodicPlanarThreeOccurrenceCompleteness](LeanTrominoes/PeriodicPlanarThreeOccurrenceCompleteness.lean) |
 | Plane periodic 1-in-3SAT and 1-in-3SAT-3 with supplied continuous planar drawings, co-r.e. completeness | `PeriodicPlanarSAT.ExactOneEndpoint.WangReduction.coREComplete`, `threeOccurrenceCoREComplete` | [PeriodicPlanarExactOneCompleteness](LeanTrominoes/PeriodicPlanarExactOneCompleteness.lean) |
 | Plane periodic 3DM with checked drawings and degree 2 or 3, co-r.e. completeness | `PeriodicThreeDM.planeProblem_coREComplete` | [PeriodicThreeDMPlaneCompleteness](LeanTrominoes/PeriodicThreeDMPlaneCompleteness.lean) |
+| Local 1D periodic 3DM, executable decision with colored degree 2 or 3 | `PeriodicThreeDM.lineCheck_correct` | [PeriodicThreeDMLineDecision](LeanTrominoes/PeriodicThreeDMLineDecision.lean) |
 | Normalized plane trichromatic orientation, co-r.e. completeness | `Gadget.NormalizedOrientation.coREComplete` | [NormalizedOrientationCompleteness](LeanTrominoes/NormalizedOrientationCompleteness.lean) |
 | Theorem 3.1, Wang tiling co-r.e.-completeness | `LeanWang.domino_problem_coRE_complete` | Dependency module `LeanWang.Final` |
 
@@ -132,6 +133,12 @@ alphabets on every stack. The [finite-alphabet certificate](LeanTrominoes/Finite
 strengthens Mathlib’s machine interface; a [verified alphabet restriction](LeanTrominoes/TM2FiniteAlphabetRestriction.lean)
 converts existing certificates without changing their encodings or running time.
 Finite control ensures that each program can write only finitely many symbols.
+
+The [local 1D 3DM checker](LeanTrominoes/PeriodicThreeDMLineDecision.lean)
+handles graph-local incidence offsets, including elements whose neighbors span
+two cells. Its [native binary encoding](LeanTrominoes/PeriodicThreeDMFlatEncoding.lean)
+also stores complete supplied drawings. These are prerequisites; native planar
+3DM PSPACE membership and hardness certificates remain open.
 
 ## Paper coverage
 
