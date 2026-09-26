@@ -77,7 +77,8 @@ otherwise.
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEComplete` | [PeriodicCNFPolySpaceMembership](LeanTrominoes/PeriodicCNFPolySpaceMembership.lean) |
 | Theorem 3.3, local 1D periodic 3SAT PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeCNF1DSAT_PSPACEComplete` | [PeriodicCNFFieldWidth](LeanTrominoes/PeriodicCNFFieldWidth.lean) |
 | Theorem 3.4, local 1D periodic 3SAT-3 PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeSATThree1DSAT_PSPACEComplete` | [PeriodicThreeSATThreePolySpaceCompleteness](LeanTrominoes/PeriodicThreeSATThreePolySpaceCompleteness.lean) |
-| Local 1D planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3, total semantic reductions with linear grid bounds (complexity bounds pending) | `PeriodicPlanarSAT.LineReduction.ordinary_correct`, `ordinaryThreeOccurrence_correct`, `exactOne_correct`, `exactOneThreeOccurrence_correct` | [PeriodicPlanarSATLineReduction](LeanTrominoes/PeriodicPlanarSATLineReduction.lean) |
+| Local 1D planar SAT, all four variants, total semantic reductions with linear grid bounds | `PeriodicPlanarSAT.LineReduction.ordinary_correct`, `ordinaryThreeOccurrence_correct`, `exactOne_correct`, `exactOneThreeOccurrence_correct` | [PeriodicPlanarSATLineReduction](LeanTrominoes/PeriodicPlanarSATLineReduction.lean) |
+| Local 1D planar 1-in-3SAT and 1-in-3SAT-3, native flat-encoded PSPACE completeness | `PeriodicPlanarSAT.exactOne_PSPACEComplete`, `exactOneThree_PSPACEComplete` | [PeriodicPlanarExactOneLinePolySpaceCompleteness](LeanTrominoes/PeriodicPlanarExactOneLinePolySpaceCompleteness.lean) |
 | Supplied periodic drawing planarity, flat binary PSPACE membership | `PeriodicGridDrawing.Arithmetic.isContinuouslyPlanar_inPSPACE` | [PeriodicDrawingPolySpaceVerification](LeanTrominoes/PeriodicDrawingPolySpaceVerification.lean) |
 | Local 1D planar SAT, all four variants, executable supplied-drawing decisions | `PeriodicPlanarSAT.LineDecision.ordinaryCheck_correct`, `ordinaryThreeCheck_correct`, `exactOneCheck_correct`, `exactOneThreeCheck_correct` | [PeriodicPlanarSATLineDecision](LeanTrominoes/PeriodicPlanarSATLineDecision.lean) |
 | Local 1D 1-in-3SAT and 1-in-3SAT-3, native flat-encoded PSPACE completeness | `PeriodicExactOneCNF.localOneDimensionalThreeSAT_PSPACEComplete`, `localOneDimensionalThreeSATThree_PSPACEComplete` | [PeriodicExactOnePolySpaceCompleteness](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean) |
@@ -150,7 +151,7 @@ paper theorem being complete; the entries below distinguish these cases.
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
 | Tromino completion | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |
 | Theorems 2.1–2.2, Lemma 2.3 | Concrete drawing constructions used by the hardness proofs exist; full general drawing statements and bounds remain open |
-| Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Local plane planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are co-r.e. complete even with a linear grid-size restriction in the output formula size; remaining dimensional clauses still need packaging/proofs |
+| Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Local plane planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are co-r.e. complete even with a linear grid-size restriction in the output formula size. Local 1D planar 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete under the native formula-and-drawing encoding; ordinary planar 1D hardness and remaining dimensional clauses are open |
 | Section 4, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
 
 The local 1D CNF endpoint is now **PSPACE-complete** under the native flat
@@ -169,8 +170,9 @@ now preserve one-dimensionality, locality, occurrence bounds, and the intrinsic
 linear drawing-grid bounds, including on malformed source inputs.
 [Forgetting the drawings](LeanTrominoes/PeriodicExactOneLineReduction.lean) also
 gives total reductions to nonplanar exact-one SAT and its occurrence-three variant.
-The planar reductions are proved primitive recursive; their native encoded
-polynomial-time certificates remain open.
+The original planar reductions are primitive recursive. A separate native
+polynomial-time reduction now proves the two planar exact-one endpoints;
+the ordinary planar 3SAT and 3SAT-3 hardness certificates remain open.
 
 [All four planar 1D SAT variants are in PSPACE](LeanTrominoes/PeriodicPlanarSATLinePolySpaceMembership.lean)
 under the [lossless formula-and-drawing encoding](LeanTrominoes/PeriodicPlanarSATFlatEncoding.lean).
@@ -183,38 +185,20 @@ The [route query's correctness proof](LeanTrominoes/PeriodicPlanarSATRouteSemant
 connects its [linear-space machine](LeanTrominoes/PeriodicPlanarSATRouteMachine.lean)
 to the actual incidence graph, including repeated literals and empty or singleton routes.
 Distinct-variable indices follow `List.dedup`'s last-occurrence order.
-The remaining completeness work is connecting native encoded reductions to
-the four target languages, including their fixed grid and locality promises. The routed exact-one
-intermediate has [compiled numeric atom names](LeanTrominoes/PeriodicCNFStripNativeAtomRenaming.lean)
-with a proved injective renaming that
-[preserves the planar languages and drawings](LeanTrominoes/PeriodicPlanarSATInjectiveRenaming.lean), and
-[compiled signed variable-position fields](LeanTrominoes/PeriodicCNFStripNativeVariableFields.lean)
-in incidence order. Its [complete route-word compiler](LeanTrominoes/PeriodicCNFStripNativeRouteWords.lean)
-outputs the actual clause-to-variable direction words with incidence boundaries
-and compiles their signed horizontal and vertical displacements. The [binary input assembler](LeanTrominoes/PeriodicPlanarSATEncodingCompiler.lean)
-is also proved. [Canonical clause-origin fields](LeanTrominoes/PeriodicCNFStripNativeIncidenceClauseFields.lean)
-are compiled in incidence order. The [offset recovery compiler](LeanTrominoes/CanonicalLiteralOffsetCompiler.lean)
-turns signed incidence-coordinate columns and a positive drawing period into
-native anchored literal-offset fields. The [concrete literal-offset compiler](LeanTrominoes/PeriodicCNFStripNativeLiteralOffsets.lean)
-now discharges those geometric premises for the routed source. Its
-[drawing period](LeanTrominoes/PeriodicCNFStripNativePeriodCompiler.lean),
-[clause lengths](LeanTrominoes/PeriodicCNFStripNativeClauseArities.lean), and
-[literal signs](LeanTrominoes/PeriodicCNFStripNativeLiteralValues.lean) also have
-native polynomial-time compilers. The [complete native formula compiler](LeanTrominoes/PeriodicCNFStripNativeFormulaCompiler.lean)
-now assembles every field and its binary encoding for the anchor-normalized,
-numerically renamed routed formula, preserving exact-one satisfiability.
-The [complete ordered vertex table](LeanTrominoes/PeriodicCNFStripNativeDrawingVertices.lean)
-and [complete route table](LeanTrominoes/PeriodicCNFStripNativeDrawingRoutes.lean)
-also have polynomial-time field compilers, including route counts, point counts,
-and every stored route coordinate. [Unit-route reconstruction](LeanTrominoes/DelimitedDirectionVertexGeometry.lean)
-proves exact agreement with the stored point lists. The
-[indexed segment table](LeanTrominoes/PeriodicCNFStripNativeDrawingSegments.lean)
-and [drawing-header fields](LeanTrominoes/PeriodicDrawingHeaderCompiler.lean)
-are also compiled, including the exact finite-check radius. The
-[complete native binary encoder](LeanTrominoes/PeriodicCNFStripNativePlanarEncoding.lean)
-now emits the entire routed exact-one candidate and its supplied drawing.
-The four planar hardness endpoints remain unfinished; this routed candidate
-is distinct from the earlier primitive-recursive endpoints.
+[Local 1D planar 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicPlanarExactOneLinePolySpaceCompleteness.lean)
+under that encoding. The [native binary encoder](LeanTrominoes/PeriodicCNFStripNativePlanarEncoding.lean)
+compiles the entire routed formula and supplied drawing: numeric atom names,
+signed offsets, vertices, routes, indexed segments, and finite-check radius.
+[Semantic correctness and planarity](LeanTrominoes/PeriodicCNFStripNativePlanarSemantics.lean),
+[locality and the occurrence-three bound](LeanTrominoes/PeriodicCNFStripNativePlanarLocality.lean),
+and the [original fixed grid bound](LeanTrominoes/PeriodicCNFStripNativePlanarGridBound.lean)
+connect this encoder to both target languages. The reduction uses the
+anchor-normalized, numerically renamed routed exact-one construction,
+which differs from the earlier primitive-recursive endpoint.
+
+The two ordinary planar hardness endpoints remain open: their semantic
+reductions and PSPACE upper bounds are proved, but their native encoded
+polynomial-time reduction certificates are still needed.
 
 [Local 1D 1-in-3SAT and 1-in-3SAT-3 are PSPACE-complete](LeanTrominoes/PeriodicExactOnePolySpaceCompleteness.lean)
 under the native flat encoding. The upper bounds use a direct exact-one window

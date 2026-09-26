@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicPlanarExactOneLinePolySpaceCompleteness
 import LeanTrominoes.PeriodicPlanarSATInjectiveRenaming
 import LeanTrominoes.PeriodicCNFStripNativeVariableFields
 import LeanTrominoes.PeriodicPlanarSATEncodingCompiler
@@ -100,6 +101,11 @@ prove two-dimensional periodic CNF SAT co-r.e. completeness.
 `PeriodicThreeSATThree.localThreeSATThreeCoREComplete` prove the corresponding
 local 3SAT and 3SAT-3 results. Together with the native flat-encoded one-dimensional PSPACE endpoints,
 these complete Theorems 3.3–3.4.
+
+`PeriodicPlanarSAT.exactOne_PSPACEComplete` and
+`PeriodicPlanarSAT.exactOneThree_PSPACEComplete` prove local one-dimensional
+planar exact-one SAT PSPACE completeness, with supplied drawings under the
+native flat encoding and the fixed linear grid bound.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.
