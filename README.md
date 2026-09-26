@@ -135,16 +135,19 @@ strengthens Mathlib’s machine interface; a [verified alphabet restriction](Lea
 converts existing certificates without changing their encodings or running time.
 Finite control ensures that each program can write only finitely many symbols.
 
-The [local 1D 3DM checker](LeanTrominoes/PeriodicThreeDMLineDecision.lean)
-handles graph-local incidence offsets, including elements whose neighbors span
-two cells. Its [native binary encoding](LeanTrominoes/PeriodicThreeDMFlatEncoding.lean)
-also stores complete supplied drawings. The [3DM instance compiler](LeanTrominoes/PeriodicCNFStripNativeThreeDMFields.lean)
-emits all counts, dense element indices, and periodic reference offsets in polynomial time.
-These are prerequisites; native planar 3DM PSPACE membership and hardness certificates remain open.
+[Local planar 1D 3DM with degree 2 or 3 is PSPACE-hard](LeanTrominoes/PeriodicThreeDMLineHardness.lean)
+under the [complete native binary encoding](LeanTrominoes/PeriodicThreeDMFlatEncoding.lean)
+of the instance and supplied drawing. The reduction emits every count, reference,
+vertex, segment, and route field; its output passes the finite continuous-planarity
+verifier. The [total checker](LeanTrominoes/PeriodicThreeDMPlanarLineDecision.lean)
+also has proved decision semantics, but its native PSPACE upper bound remains open.
 [Normalized 1D trichromatic orientation is PSPACE-hard](LeanTrominoes/NormalizedOrientationLineHardness.lean)
 under a [lossless binary encoding](LeanTrominoes/NormalizedOrientationFlatEncoding.lean)
 of the full colored cell table and periods. The endpoint requires separated
 vertices and a blank vertical boundary; its encoded PSPACE upper bound remains open.
+[Bounded binary preparation](LeanTrominoes/NormalizedOrientationBoundedPreparation.lean)
+recovers valid orientation fields in polynomial time without expanding oversized
+malformed dimensions. [Valid local 3DM fields also have polynomial numeric bounds](LeanTrominoes/PeriodicThreeDMNativeFieldBounds.lean).
 
 ## Paper coverage
 

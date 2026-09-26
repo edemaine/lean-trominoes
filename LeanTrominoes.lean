@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicThreeDMLineHardness
 import LeanTrominoes.NormalizedOrientationLineHardness
 import LeanTrominoes.PeriodicThreeDMLineDecision
 import LeanTrominoes.PeriodicThreeDMFlatEncoding
