@@ -1,5 +1,5 @@
 import LeanTrominoes.PeriodicThreeDMLineHardness
-import LeanTrominoes.NormalizedOrientationLineHardness
+import LeanTrominoes.NormalizedOrientationLineMembership
 import LeanTrominoes.PeriodicThreeDMLineDecision
 import LeanTrominoes.PeriodicThreeDMFlatEncoding
 import LeanTrominoes.PeriodicPlanarOrdinaryLinePolySpaceCompleteness
@@ -112,6 +112,10 @@ these complete Theorems 3.3–3.4.
 one-dimensional planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 PSPACE
 completeness, with supplied drawings under the native flat encoding and
 the original fixed linear grid bounds.
+
+`Gadget.NormalizedOrientation.lineProblem_PSPACEComplete` proves normalized
+one-dimensional trichromatic orientation PSPACE-complete under the native binary
+cell-table encoding, with separated vertices and a blank vertical boundary.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.
