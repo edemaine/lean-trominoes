@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicHornDecision
 import LeanTrominoes.PeriodicThreeDMPlanarLineCompleteness
 import LeanTrominoes.PeriodicThreeDMLineCompleteness
 import LeanTrominoes.NormalizedOrientationLineMembership
@@ -121,6 +122,11 @@ cell-table encoding, with separated vertices and a blank vertical boundary.
 `PeriodicThreeDM.localPlanarLineProblem_PSPACEComplete` proves local planar
 one-dimensional 3DM with colored degree 2 or 3 PSPACE-complete under the native
 binary encoding, including verification of the complete supplied drawing.
+
+`Horn.exists_period_one` and `Horn.dual_exists_period_one` give constant models
+for satisfiable periodic Horn and dual Horn formulas in every dimension.
+`PeriodicCNF.hornCheck_correct` and `dualHornCheck_correct` certify executable
+solvers on the existing periodic-CNF representation. No linear-time bound is claimed.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.

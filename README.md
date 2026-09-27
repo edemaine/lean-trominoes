@@ -97,6 +97,8 @@ otherwise.
 | Local planar 1D periodic 3DM with colored degree 2 or 3 and supplied drawing, native PSPACE completeness | `PeriodicThreeDM.localPlanarLineProblem_PSPACEComplete` | [PeriodicThreeDMPlanarLineCompleteness](LeanTrominoes/PeriodicThreeDMPlanarLineCompleteness.lean) |
 | Normalized plane trichromatic orientation, co-r.e. completeness | `Gadget.NormalizedOrientation.coREComplete` | [NormalizedOrientationCompleteness](LeanTrominoes/NormalizedOrientationCompleteness.lean) |
 | Normalized 1D trichromatic orientation, native binary PSPACE completeness | `Gadget.NormalizedOrientation.lineProblem_PSPACEComplete` | [NormalizedOrientationLineMembership](LeanTrominoes/NormalizedOrientationLineMembership.lean) |
+| Periodic Horn and dual Horn SAT, period-one models in every dimension | `Horn.exists_period_one`, `Horn.dual_exists_period_one` | [PeriodicHornCore](LeanTrominoes/PeriodicHornCore.lean), [PeriodicHornSolver](LeanTrominoes/PeriodicHornSolver.lean) |
+| Periodic Horn and dual Horn SAT, executable solvers and period-one model construction | `Horn.periodicCheck_correct`, `periodicDualCheck_correct`; `PeriodicCNF.hornCheck_correct`, `dualHornCheck_correct`, `hornModel_correct`, `dualHornModel_correct` | [PeriodicHornSolver](LeanTrominoes/PeriodicHornSolver.lean), [PeriodicHornDecision](LeanTrominoes/PeriodicHornDecision.lean) |
 | Theorem 3.1, Wang tiling co-r.e.-completeness | `LeanWang.domino_problem_coRE_complete` | Dependency module `LeanWang.Final` |
 
 `import LeanTrominoes` exposes these main results. Import
@@ -153,6 +155,16 @@ recovers valid orientation fields in polynomial time without expanding oversized
 malformed dimensions. [The complete compiler](LeanTrominoes/NormalizedOrientationCompletionCompiler.lean)
 preserves every well-formed drawing. [Valid local 3DM fields also have polynomial numeric bounds](LeanTrominoes/PeriodicThreeDMNativeFieldBounds.lean).
 
+Periodic Horn and dual Horn SAT reduce to finite Horn SAT by identifying all
+translates of each variable. The [period-one theorem](LeanTrominoes/PeriodicHornCore.lean)
+works over any additive group of offsets, including integer lattices in every
+dimension, without a locality bound. The [solver](LeanTrominoes/HornSolver.lean)
+performs at most one forward-chaining round per distinct conclusion variable,
+then checks negative clauses. It constructs the least Horn model; complementing
+it gives a dual Horn model. The [existing CNF API](LeanTrominoes/PeriodicHornDecision.lean)
+also checks the Horn restriction. This solver rescans the rules each round;
+a linear-time implementation and runtime certificate remain separate work.
+
 ## Paper coverage
 
 This table is the authoritative summary of completed and open paper results.
@@ -173,7 +185,8 @@ paper theorem being complete; the entries below distinguish these cases.
 | Tromino completion | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |
 | Theorems 2.1–2.2, Lemma 2.3 | Concrete drawing constructions used by the hardness proofs exist; full general drawing statements and bounds remain open |
 | Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Local plane planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are co-r.e. complete even with a linear grid-size restriction in the output formula size. Local 1D planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are PSPACE-complete under the native formula-and-drawing encoding. Normalized 1D trichromatic orientation and local planar 1D 3DM with colored degree 2 or 3 and a supplied drawing are also PSPACE-complete under their native binary encodings; remaining dimensional clauses are open |
-| Section 4, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
+| Section 4, Horn and dual Horn SAT | Period-one models in every dimension, finite-quotient equivalence, and executable forward-chaining solvers proved; the paper’s linear-time bound remains open |
+| Remaining Section 4 results, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
 
 The local 1D CNF endpoint is now **PSPACE-complete** under the native flat
 encoding. The [machine certificate](LeanTrominoes/PeriodicCNFPolySpaceMembership.lean)
