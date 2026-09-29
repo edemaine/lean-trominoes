@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicHornLinearTime
 import LeanTrominoes.PeriodicHornDecision
 import LeanTrominoes.PeriodicThreeDMPlanarLineCompleteness
 import LeanTrominoes.PeriodicThreeDMLineCompleteness
@@ -126,7 +127,10 @@ binary encoding, including verification of the complete supplied drawing.
 `Horn.exists_period_one` and `Horn.dual_exists_period_one` give constant models
 for satisfiable periodic Horn and dual Horn formulas in every dimension.
 `PeriodicCNF.hornCheck_correct` and `dualHornCheck_correct` certify executable
-solvers on the existing periodic-CNF representation. No linear-time bound is claimed.
+solvers on the existing periodic-CNF representation.
+`Horn.PeriodicIndexed.certified` adds a linear operation bound for explicitly
+indexed inputs in the unit-cost RAM model, including input preparation.
+This does not assert a bit-Turing or Lean VM runtime bound.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.
