@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicMatchingPeriodOne
 import LeanTrominoes.PeriodicHornLinearTime
 import LeanTrominoes.PeriodicHornDecision
 import LeanTrominoes.PeriodicThreeDMPlanarLineCompleteness
@@ -123,6 +124,10 @@ cell-table encoding, with separated vertices and a blank vertical boundary.
 `PeriodicThreeDM.localPlanarLineProblem_PSPACEComplete` proves local planar
 one-dimensional 3DM with colored degree 2 or 3 PSPACE-complete under the native
 binary encoding, including verification of the complete supplied drawing.
+
+`PeriodicBipartite.exists_period_one` proves Theorem 4.6 in every dimension.
+`PeriodicBipartite.perfect_iff_quotient` characterizes perfect matchings by the
+finite bipartite quotient, without a locality restriction.
 
 `Horn.exists_period_one` and `Horn.dual_exists_period_one` give constant models
 for satisfiable periodic Horn and dual Horn formulas in every dimension.
