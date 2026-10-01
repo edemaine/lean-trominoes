@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicMatchingSolver
 import LeanTrominoes.PeriodicMatchingPeriodOne
 import LeanTrominoes.PeriodicHornLinearTime
 import LeanTrominoes.PeriodicHornDecision
@@ -128,6 +129,11 @@ binary encoding, including verification of the complete supplied drawing.
 `PeriodicBipartite.exists_period_one` proves Theorem 4.6 in every dimension.
 `PeriodicBipartite.perfect_iff_quotient` characterizes perfect matchings by the
 finite bipartite quotient, without a locality restriction.
+`PeriodicBipartite.matchingSolver_certified` proves Theorem 4.7: an executable
+indexed solver decides perfect matching and constructs a finite protoedge table
+for a period-one matching, in every dimension. The complete unit-cost RAM
+bound is `1000(E+1)(sqrt(V)+1)`; `matchingSolver_edge_sqrt_bound` gives
+`4000E*sqrt(V)` for nonempty edge tables, including preparation and construction.
 
 `Horn.exists_period_one` and `Horn.dual_exists_period_one` give constant models
 for satisfiable periodic Horn and dual Horn formulas in every dimension.

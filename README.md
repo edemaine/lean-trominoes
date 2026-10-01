@@ -101,6 +101,7 @@ otherwise.
 | Periodic Horn and dual Horn SAT, executable solvers and period-one model construction | `Horn.periodicCheck_correct`, `periodicDualCheck_correct`; `PeriodicCNF.hornCheck_correct`, `dualHornCheck_correct`, `hornModel_correct`, `dualHornModel_correct` | [PeriodicHornSolver](LeanTrominoes/PeriodicHornSolver.lean), [PeriodicHornDecision](LeanTrominoes/PeriodicHornDecision.lean) |
 | Periodic Horn and dual Horn SAT, linear indexed-RAM bound | `Horn.Indexed.certified`, `Horn.PeriodicIndexed.certified` | [HornIndexedTime](LeanTrominoes/HornIndexedTime.lean), [PeriodicHornLinearTime](LeanTrominoes/PeriodicHornLinearTime.lean) |
 | Theorem 4.6, period-one bipartite perfect matching in every dimension | `PeriodicBipartite.exists_period_one`, `perfect_iff_quotient` | [PeriodicMatchingPeriodOne](LeanTrominoes/PeriodicMatchingPeriodOne.lean) |
+| Theorem 4.7, bipartite perfect matching decision and construction in `O(E√V)` indexed-RAM operations | `PeriodicBipartite.matchingSolver_certified`, `matchingSolver_edge_sqrt_bound` | [PeriodicMatchingSolver](LeanTrominoes/PeriodicMatchingSolver.lean) |
 | Theorem 3.1, Wang tiling co-r.e.-completeness | `LeanWang.domino_problem_coRE_complete` | Dependency module `LeanWang.Final` |
 
 `import LeanTrominoes` exposes these main results. Import
@@ -200,7 +201,17 @@ paper theorem being complete; the entries below distinguish these cases.
 | Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Local plane planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are co-r.e. complete even with a linear grid-size restriction in the output formula size. Local 1D planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are PSPACE-complete under the native formula-and-drawing encoding. Normalized 1D trichromatic orientation and local planar 1D 3DM with colored degree 2 or 3 and a supplied drawing are also PSPACE-complete under their native binary encodings; remaining dimensional clauses are open |
 | Section 4, Horn and dual Horn SAT | Period-one models in every dimension, finite-quotient equivalence, and executable solvers proved; linear operation bound proved for explicitly indexed inputs in the unit-cost RAM model |
 | Theorem 4.6 | Every perfect matching in a bipartite periodic graph implies a period-one perfect matching; equivalence with finite quotient matching proved in every dimension, without a locality restriction |
+| Theorem 4.7 | Executable decision and period-one matching construction in every dimension, with a verified `O(E√V)` bound for indexed inputs in the unit-cost RAM model |
 | Remaining Section 4 results, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
+
+The [bipartite matching solver](LeanTrominoes/PeriodicMatchingSolver.lean)
+uses breadth-first layers and disjoint blocking paths. Its bound includes
+quotient indexing, vertex-array initialization, and selection of a finite
+protoedge table describing the period-one matching. Here `E` counts edge
+records and `V` counts vertex slots. The uniform bound is
+`1000(E+1)(⌊√V⌋+1)`, with `4000E⌊√V⌋` for nonempty edge tables.
+Indices and scalar operations have unit cost; coordinate vectors remain in
+the input store. This is not a bit-Turing or Lean VM runtime bound.
 
 The local 1D CNF endpoint is now **PSPACE-complete** under the native flat
 encoding. The [machine certificate](LeanTrominoes/PeriodicCNFPolySpaceMembership.lean)
