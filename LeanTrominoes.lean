@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicSubspaceCompletion
 import LeanTrominoes.PeriodicGeneralAugmentingPath
 import LeanTrominoes.PeriodicTwoSATLocalTime
 import LeanTrominoes.PeriodicBipartitionDoubling
