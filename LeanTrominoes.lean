@@ -1,3 +1,5 @@
+import LeanTrominoes.PeriodicBipartitionDoubling
+import LeanTrominoes.PeriodicShortAugmentingProperties
 import LeanTrominoes.PeriodicMatchingSolver
 import LeanTrominoes.PeriodicMatchingPeriodOne
 import LeanTrominoes.PeriodicHornLinearTime
@@ -125,6 +127,14 @@ cell-table encoding, with separated vertices and a blank vertical boundary.
 `PeriodicThreeDM.localPlanarLineProblem_PSPACEComplete` proves local planar
 one-dimensional 3DM with colored degree 2 or 3 PSPACE-complete under the native
 binary encoding, including verification of the complete supplied drawing.
+
+`PeriodicLatticeGraph.bipartition_two_periodic` proves Lemma 4.4 in every
+dimension: a connected bipartite periodic graph's coloring is invariant under
+twice any lattice translation.
+`PeriodicBipartite.perfect_or_short_augmenting` proves Lemma 4.5 for arbitrary
+period-one partial matchings of the infinite graph. The augmenting path has
+free endpoints, unmatched forward edges, no repeated protovertex, and fewer
+edges than the quotient has vertices.
 
 `PeriodicBipartite.exists_period_one` proves Theorem 4.6 in every dimension.
 `PeriodicBipartite.perfect_iff_quotient` characterizes perfect matchings by the
