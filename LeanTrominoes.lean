@@ -1,4 +1,4 @@
-import LeanTrominoes.PeriodicSubspaceCompletion
+import LeanTrominoes.Lemma51
 import LeanTrominoes.PeriodicGeneralAugmentingPath
 import LeanTrominoes.PeriodicTwoSATLocalTime
 import LeanTrominoes.PeriodicBipartitionDoubling
@@ -169,4 +169,12 @@ This does not assert a bit-Turing or Lean VM runtime bound.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.
+-/
+
+/-!
+`PeriodicSubspaceTiling.lemma51` packages Lemma 5.1: arbitrary finite-footprint
+periodic subspace tiling and completion are co-r.e. in every dimension, and
+both strip problems are in PSPACE for each fixed polynomial bounding box.
+The strip inputs use native binary fields; the window-to-Savitch evaluator
+has a run-level finite-alphabet Turing-machine space certificate.
 -/

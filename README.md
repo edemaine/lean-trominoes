@@ -101,7 +101,7 @@ otherwise.
 | Periodic Horn and dual Horn SAT, executable solvers and period-one model construction | `Horn.periodicCheck_correct`, `periodicDualCheck_correct`; `PeriodicCNF.hornCheck_correct`, `dualHornCheck_correct`, `hornModel_correct`, `dualHornModel_correct` | [PeriodicHornSolver](LeanTrominoes/PeriodicHornSolver.lean), [PeriodicHornDecision](LeanTrominoes/PeriodicHornDecision.lean) |
 | Periodic Horn and dual Horn SAT, linear indexed-RAM bound | `Horn.Indexed.certified`, `Horn.PeriodicIndexed.certified` | [HornIndexedTime](LeanTrominoes/HornIndexedTime.lean), [PeriodicHornLinearTime](LeanTrominoes/PeriodicHornLinearTime.lean) |
 | Theorem 4.1, local periodic 2SAT in every fixed dimension | `PeriodicTwoSAT.local_certified`, `solveLocal_correct`, `solveLocal_polynomial` | [PeriodicTwoSATLocalTime](LeanTrominoes/PeriodicTwoSATLocalTime.lean), [PeriodicTwoSATPolynomialTime](LeanTrominoes/PeriodicTwoSATPolynomialTime.lean) |
-| Lemma 5.1, general periodic subspace tiling and completion co-r.e. membership | `PeriodicSubspaceTiling.lattice_tileable_coRE`, `lattice_completable_coRE` | [PeriodicSubspaceTilingCoRE](LeanTrominoes/PeriodicSubspaceTilingCoRE.lean), [PeriodicSubspaceCompletion](LeanTrominoes/PeriodicSubspaceCompletion.lean) |
+| Lemma 5.1, arbitrary periodic subspace tiling and completion membership | `PeriodicSubspaceTiling.lemma51`, `lattice_tileable_coRE`, `lattice_completable_coRE`, `Strip.tiling_inPSPACE`, `Strip.completion_inPSPACE` | [Lemma51](LeanTrominoes/Lemma51.lean) |
 | Lemma 4.3, bounded-diameter augmenting paths in general periodic graphs | `PeriodicLatticeGraph.bounded_augmenting_path`, `perfect_or_bounded_augmenting` | [PeriodicGeneralAugmentingPath](LeanTrominoes/PeriodicGeneralAugmentingPath.lean) |
 | Lemma 4.4, 2-periodic bipartition of a connected bipartite periodic graph | `PeriodicLatticeGraph.bipartition_two_periodic` | [PeriodicBipartitionDoubling](LeanTrominoes/PeriodicBipartitionDoubling.lean) |
 | Lemma 4.5, a protovertex-simple augmenting path shorter than the quotient vertex count | `PeriodicBipartite.perfect_or_short_augmenting` | [PeriodicShortAugmentingProperties](LeanTrominoes/PeriodicShortAugmentingProperties.lean) |
@@ -211,8 +211,26 @@ paper theorem being complete; the entries below distinguish these cases.
 | Lemma 4.5 | Any imperfect period-one partial matching of a bipartite periodic graph with a perfect matching has an augmenting path with no repeated protovertex and edge length strictly less than the quotient vertex count |
 | Theorem 4.6 | Every perfect matching in a bipartite periodic graph implies a period-one perfect matching; equivalence with finite quotient matching proved in every dimension, without a locality restriction |
 | Theorem 4.7 | Executable decision and period-one matching construction in every dimension, with a verified `O(E√V)` bound for indexed inputs in the unit-cost RAM model |
-| Lemma 5.1 | General finite-footprint periodic subspace tiling and completion are co-r.e. in every dimension; the arbitrary-footprint strip PSPACE proof is in progress |
+| Lemma 5.1 | Arbitrary finite-footprint periodic subspace tiling and completion are co-r.e. in every dimension. Both strip problems are in PSPACE for each fixed polynomial bounding box under native binary encoding; the palette, target, and prefill are all input |
 | Other results 5.4–5.15 except those listed above | Open |
+
+The [general subspace membership proof](LeanTrominoes/Lemma51.lean) uses
+finite footprint records in fundamental-domain coordinates. Records include
+all allowed prototile orientations and representative anchors. The
+[geometry bridge](LeanTrominoes/PeriodicSubspaceGeometry.lean) proves their
+containment and exact-cover semantics, including transport to physical cells
+through a fundamental-domain chart. Completion prescribes whole placement
+orbits; the completing tiling itself may be nonperiodic.
+
+The [strip decider](LeanTrominoes/PeriodicSubspaceStripMembership.lean) stores
+one bit per record per column in a window of `2*B+1` columns and runs the
+verified Savitch cycle search. Its binary encoding includes the target,
+records, bound, and prescribed orbit list. For any fixed polynomial `p`,
+the input promise is `B ≤ p(input length)`; every reachable machine
+configuration has polynomial space. No fixed palette or connectedness
+assumption is used. The [regressions](LeanTrominoes/PeriodicSubspaceExamples.lean)
+cover empty instances, duplicates, sparse labels, signed offsets, overlap,
+and invalid prefills.
 
 The [periodic 2SAT solver](LeanTrominoes/PeriodicTwoSATLocalTime.lean)
 accepts empty clauses and duplicated literals for units. Locality bounds
