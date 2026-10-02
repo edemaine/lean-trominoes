@@ -107,6 +107,8 @@ otherwise.
 | Lemma 4.5, a protovertex-simple augmenting path shorter than the quotient vertex count | `PeriodicBipartite.perfect_or_short_augmenting` | [PeriodicShortAugmentingProperties](LeanTrominoes/PeriodicShortAugmentingProperties.lean) |
 | Theorem 4.6, period-one bipartite perfect matching in every dimension | `PeriodicBipartite.exists_period_one`, `perfect_iff_quotient` | [PeriodicMatchingPeriodOne](LeanTrominoes/PeriodicMatchingPeriodOne.lean) |
 | Theorem 4.7, bipartite perfect matching decision and construction in `O(E√V)` indexed-RAM operations | `PeriodicBipartite.matchingSolver_certified`, `matchingSolver_edge_sqrt_bound` | [PeriodicMatchingSolver](LeanTrominoes/PeriodicMatchingSolver.lean) |
+| Theorem 5.13 and Corollary 5.14, doubled-period domino tilings and completions | `Domino.theorem513`, `corollary514` | [DominoTheorems](LeanTrominoes/DominoTheorems.lean) |
+| Corollary 5.15, executable periodic domino decision with a fixed-dimensional polynomial RAM bound | `Domino.corollary515` | [PeriodicDominoSolverCost](LeanTrominoes/PeriodicDominoSolverCost.lean) |
 | Theorem 3.1, Wang tiling co-r.e.-completeness | `LeanWang.domino_problem_coRE_complete` | Dependency module `LeanWang.Final` |
 
 `import LeanTrominoes` exposes these main results. Import
@@ -212,7 +214,21 @@ paper theorem being complete; the entries below distinguish these cases.
 | Theorem 4.6 | Every perfect matching in a bipartite periodic graph implies a period-one perfect matching; equivalence with finite quotient matching proved in every dimension, without a locality restriction |
 | Theorem 4.7 | Executable decision and period-one matching construction in every dimension, with a verified `O(E√V)` bound for indexed inputs in the unit-cost RAM model |
 | Lemma 5.1 | Arbitrary finite-footprint periodic subspace tiling and completion are co-r.e. in every dimension. Both strip problems are in PSPACE for each fixed polynomial bounding box under native binary encoding; the palette, target, and prefill are all input |
-| Other results 5.4–5.15 except those listed above | Open |
+| Theorem 5.13 | Every tileable periodic domino region has a tiling invariant under twice each original generator, in every ambient dimension and periodic rank |
+| Corollary 5.14 | Every completable periodic domino prefill has a completion with those doubled periods |
+| Corollary 5.15 | Executable decision from cell representatives and arbitrary nonsingular integer period matrices; quadratic operation budget in the number of representatives for each fixed dimension, in the unit-cost arithmetic RAM model |
+| Other results 5.4–5.12 except those listed above | Open |
+
+The [domino results](LeanTrominoes/DominoTheorems.lean) use exact covers by
+face-adjacent two-cell footprints. The proofs allow disconnected regions and
+arbitrary initial tilings. Completion keeps every prefilled domino fixed.
+The decision procedure derives adjacency using an integer-matrix coordinate
+decoder, doubles the period lattice to preserve checkerboard colors, and runs
+the finite matching solver. Its budget includes coordinate searches and cover
+construction. Dimension-dependent constants include `2^d` and determinant
+preparation; this is a fixed-dimension arithmetic-RAM bound, not a bit-Turing
+or Lean VM runtime claim. [Kernel-evaluated examples](LeanTrominoes/PeriodicDominoExamples.lean)
+cover holes, skew periods, and empty and zero-dimensional regions.
 
 The [general subspace membership proof](LeanTrominoes/Lemma51.lean) uses
 finite footprint records in fundamental-domain coordinates. Records include
