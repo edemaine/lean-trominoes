@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicGeneralAugmentingPath
 import LeanTrominoes.PeriodicTwoSATLocalTime
 import LeanTrominoes.PeriodicBipartitionDoubling
 import LeanTrominoes.PeriodicShortAugmentingProperties
@@ -135,6 +136,10 @@ degree `3(d*d+d+1)` in the explicit indexed input size. It includes clause
 anchoring, an explicitly indexed finite lattice cover, and verified Horn
 worklist reachability queries. Locality concerns offset differences, allowing
 arbitrary common offsets. The cost model is the unit-cost indexed RAM.
+
+`PeriodicLatticeGraph.bounded_augmenting_path` proves Lemma 4.3 in every
+dimension, including general nonbipartite graphs. From each free vertex,
+it gives a simple augmenting path of diameter at most `2*d*|E|`.
 
 `PeriodicLatticeGraph.bipartition_two_periodic` proves Lemma 4.4 in every
 dimension: a connected bipartite periodic graph's coloring is invariant under
