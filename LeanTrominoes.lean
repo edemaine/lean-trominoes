@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicTwoSATLocalTime
 import LeanTrominoes.PeriodicBipartitionDoubling
 import LeanTrominoes.PeriodicShortAugmentingProperties
 import LeanTrominoes.PeriodicMatchingSolver
@@ -127,6 +128,13 @@ cell-table encoding, with separated vertices and a blank vertical boundary.
 `PeriodicThreeDM.localPlanarLineProblem_PSPACEComplete` proves local planar
 one-dimensional 3DM with colored degree 2 or 3 PSPACE-complete under the native
 binary encoding, including verification of the complete supplied drawing.
+
+`PeriodicTwoSAT.local_certified` proves Theorem 4.1 in every fixed dimension:
+an executable local periodic 2SAT solver, with a complete polynomial bound of
+degree `3(d*d+d+1)` in the explicit indexed input size. It includes clause
+anchoring, an explicitly indexed finite lattice cover, and verified Horn
+worklist reachability queries. Locality concerns offset differences, allowing
+arbitrary common offsets. The cost model is the unit-cost indexed RAM.
 
 `PeriodicLatticeGraph.bipartition_two_periodic` proves Lemma 4.4 in every
 dimension: a connected bipartite periodic graph's coloring is invariant under

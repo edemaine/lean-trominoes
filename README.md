@@ -100,6 +100,7 @@ otherwise.
 | Periodic Horn and dual Horn SAT, period-one models in every dimension | `Horn.exists_period_one`, `Horn.dual_exists_period_one` | [PeriodicHornCore](LeanTrominoes/PeriodicHornCore.lean), [PeriodicHornSolver](LeanTrominoes/PeriodicHornSolver.lean) |
 | Periodic Horn and dual Horn SAT, executable solvers and period-one model construction | `Horn.periodicCheck_correct`, `periodicDualCheck_correct`; `PeriodicCNF.hornCheck_correct`, `dualHornCheck_correct`, `hornModel_correct`, `dualHornModel_correct` | [PeriodicHornSolver](LeanTrominoes/PeriodicHornSolver.lean), [PeriodicHornDecision](LeanTrominoes/PeriodicHornDecision.lean) |
 | Periodic Horn and dual Horn SAT, linear indexed-RAM bound | `Horn.Indexed.certified`, `Horn.PeriodicIndexed.certified` | [HornIndexedTime](LeanTrominoes/HornIndexedTime.lean), [PeriodicHornLinearTime](LeanTrominoes/PeriodicHornLinearTime.lean) |
+| Theorem 4.1, local periodic 2SAT in every fixed dimension | `PeriodicTwoSAT.local_certified`, `solveLocal_correct`, `solveLocal_polynomial` | [PeriodicTwoSATLocalTime](LeanTrominoes/PeriodicTwoSATLocalTime.lean), [PeriodicTwoSATPolynomialTime](LeanTrominoes/PeriodicTwoSATPolynomialTime.lean) |
 | Lemma 4.4, 2-periodic bipartition of a connected bipartite periodic graph | `PeriodicLatticeGraph.bipartition_two_periodic` | [PeriodicBipartitionDoubling](LeanTrominoes/PeriodicBipartitionDoubling.lean) |
 | Lemma 4.5, a protovertex-simple augmenting path shorter than the quotient vertex count | `PeriodicBipartite.perfect_or_short_augmenting` | [PeriodicShortAugmentingProperties](LeanTrominoes/PeriodicShortAugmentingProperties.lean) |
 | Theorem 4.6, period-one bipartite perfect matching in every dimension | `PeriodicBipartite.exists_period_one`, `perfect_iff_quotient` | [PeriodicMatchingPeriodOne](LeanTrominoes/PeriodicMatchingPeriodOne.lean) |
@@ -202,11 +203,28 @@ paper theorem being complete; the entries below distinguish these cases.
 | Theorems 2.1–2.2, Lemma 2.3 | Concrete drawing constructions used by the hardness proofs exist; full general drawing statements and bounds remain open |
 | Theorems 3.5–3.8 | Plane planar 3SAT and 3SAT-3, planar 1-in-3SAT and 1-in-3SAT-3 with supplied drawings, normalized orientation, and checked-drawing 3DM with degree 2 or 3 have completeness endpoints. Local 1-in-3SAT-3 completeness without planarity is also proved. Local plane planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are co-r.e. complete even with a linear grid-size restriction in the output formula size. Local 1D planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 are PSPACE-complete under the native formula-and-drawing encoding. Normalized 1D trichromatic orientation and local planar 1D 3DM with colored degree 2 or 3 and a supplied drawing are also PSPACE-complete under their native binary encodings; remaining dimensional clauses are open |
 | Section 4, Horn and dual Horn SAT | Period-one models in every dimension, finite-quotient equivalence, and executable solvers proved; linear operation bound proved for explicitly indexed inputs in the unit-cost RAM model |
+| Theorem 4.1 | Executable local periodic 2SAT decision in every fixed dimension, with a verified polynomial indexed-RAM operation bound including clause normalization and finite-cover construction |
 | Lemma 4.4 | Every proper bipartition of a connected periodic graph is invariant under twice every lattice translation, in every dimension |
 | Lemma 4.5 | Any imperfect period-one partial matching of a bipartite periodic graph with a perfect matching has an augmenting path with no repeated protovertex and edge length strictly less than the quotient vertex count |
 | Theorem 4.6 | Every perfect matching in a bipartite periodic graph implies a period-one perfect matching; equivalence with finite quotient matching proved in every dimension, without a locality restriction |
 | Theorem 4.7 | Executable decision and period-one matching construction in every dimension, with a verified `O(E√V)` bound for indexed inputs in the unit-cost RAM model |
-| Remaining Section 4 results, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
+| Lemma 4.3, Lemma 5.1 in its full generality, and other results 5.4–5.15 except those listed above | Open |
+
+The [periodic 2SAT solver](LeanTrominoes/PeriodicTwoSATLocalTime.lean)
+accepts empty clauses and duplicated literals for units. Locality bounds
+coordinatewise offset differences, which includes the paper's Manhattan
+locality. Each clause is first anchored at its first literal, preserving all
+assignments even when the common offset is large. The solver uses an explicit
+finite cover with base-`M` coordinate indices and the verified Horn worklist
+solver for opposite-literal reachability tests. The
+[cover theorem](LeanTrominoes/PeriodicPowerTwoCover.lean) proves that a uniformly
+chosen power-of-two period preserves contradictions. For every fixed `d`, the
+complete operation bound has degree `3(d²+d+1)` in `n + clauses + 1`, where `n`
+is the number of explicit variable slots. It uses the same unit-cost indexed
+RAM model as the matching and Horn solvers. The
+[regressions](LeanTrominoes/PeriodicTwoSATExamples.lean) include kernel-evaluated
+units, inconsistent units, empty inputs, and dimension zero, as well as a
+satisfiable alternation formula with no period-one assignment.
 
 The [bipartite matching solver](LeanTrominoes/PeriodicMatchingSolver.lean)
 uses breadth-first layers and disjoint blocking paths. Its bound includes
