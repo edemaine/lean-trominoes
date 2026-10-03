@@ -972,11 +972,11 @@ theorem step_readWireSlice_next (data : TapeData) (tail : List Γ')
 def constantTagTime (value : Bool) : Nat :=
   if value then 3 else 2
 
-@[simp] theorem trNat_one : trNat 1 = [Γ'.bit1] := by native_decide
-@[simp] theorem trNat_two : trNat 2 = [Γ'.bit0, Γ'.bit1] := by native_decide
-@[simp] theorem trNat_three : trNat 3 = [Γ'.bit1, Γ'.bit1] := by native_decide
+@[simp] theorem trNat_one : trNat 1 = [Γ'.bit1] := by decide
+@[simp] theorem trNat_two : trNat 2 = [Γ'.bit0, Γ'.bit1] := by decide
+@[simp] theorem trNat_three : trNat 3 = [Γ'.bit1, Γ'.bit1] := by decide
 @[simp] theorem trNat_four : trNat 4 = [Γ'.bit0, Γ'.bit0, Γ'.bit1] := by
-  native_decide
+  decide
 
 /-- The generated constant-instruction tag and Boolean payload select the
 matching constant-gate routine. -/
