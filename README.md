@@ -108,6 +108,7 @@ otherwise.
 | Theorem 4.6, period-one bipartite perfect matching in every dimension | `PeriodicBipartite.exists_period_one`, `perfect_iff_quotient` | [PeriodicMatchingPeriodOne](LeanTrominoes/PeriodicMatchingPeriodOne.lean) |
 | Theorem 4.7, bipartite perfect matching decision and construction in `O(E√V)` indexed-RAM operations | `PeriodicBipartite.matchingSolver_certified`, `matchingSolver_edge_sqrt_bound` | [PeriodicMatchingSolver](LeanTrominoes/PeriodicMatchingSolver.lean) |
 | Finite 3CNF tableaux for bounded-time TM2 acceptance, with symbolic initial configurations and polynomial formula-size bounds | `FiniteMachineTrace.paddedFormula_iff_evals`, `symbolicFormula_iff_evals`, `symbolicFormula_length_le`, `symbolicFormula_width` | [FiniteMachineAcceptanceCNF](LeanTrominoes/FiniteMachineAcceptanceCNF.lean), [FiniteSymbolicMachineCNF](LeanTrominoes/FiniteSymbolicMachineCNF.lean) |
+| Cook–Levin: every verifier-defined NP language reduces by an actual polynomial-time machine to ordinary finite 3CNF SAT | `FiniteCNF.threeSatisfiable_npHard`, `satisfiable_npHard`; `Complexity.VerifierInPolyTime.finiteCNFReduction`; `FiniteNPRequestEmitter.computableInPolyTime` | [FiniteSATNPHard](LeanTrominoes/FiniteSATNPHard.lean), [FiniteNPRequestEmitter](LeanTrominoes/FiniteNPRequestEmitter.lean), [FiniteNPSeparatedRequest](LeanTrominoes/FiniteNPSeparatedRequest.lean) |
 | Complete polynomial-time verifier initialization and accepting self-loop emission, matching the existing finite tableau programs | `FiniteNPInitializationEmitter.computableInPolyTime`, `initialProgram_encode`; `FiniteNPCertificateStackEmitter.stackProgram_eq`; `FiniteNPPaddedProgramEmitter.computableInPolyTime`, `program_eq` | [FiniteNPInitializationEmitter](LeanTrominoes/FiniteNPInitializationEmitter.lean), [FiniteNPCertificateStackEmitterCorrectness](LeanTrominoes/FiniteNPCertificateStackEmitterCorrectness.lean), [FiniteNPPaddedProgramEmitter](LeanTrominoes/FiniteNPPaddedProgramEmitter.lean) |
 | Native finite-verifier machine programs and absolute-time serialization, with polynomial-time squares, products, pairing, and request-header generation | `FiniteNPMachineProgramEmitter.wellFormedComputableInPolyTime`, `stepComputableInPolyTime`, `acceptingComputableInPolyTime`; `FiniteCNF.ProgramColumns.repeated`; `FiniteNPVariableNameCompiler.sourceComputableInPolyTime`, `freshComputableInPolyTime` | [FiniteNPMachineProgramEmitter](LeanTrominoes/FiniteNPMachineProgramEmitter.lean), [FiniteProgramColumns](LeanTrominoes/FiniteProgramColumns.lean), [FiniteNPVariableNameCompiler](LeanTrominoes/FiniteNPVariableNameCompiler.lean) |
 | Native finite-CNF compiler backend, with quadratic machine time and correct bounded requests for every NP verifier | `FiniteCNFCompiler.finiteAlphabetComputableInPolyTime`, `Request.correct`, `compiler_time`; `Complexity.VerifierInPolyTime.nativeRequest_correct`, `nativeRequest_encode_length_le`, `nativeRequest_backend_time_le` | [FiniteCNFCompiler](LeanTrominoes/FiniteCNFCompiler.lean), [FiniteNPCompilerRequest](LeanTrominoes/FiniteNPCompilerRequest.lean) |
@@ -230,25 +231,17 @@ paper theorem being complete; the entries below distinguish these cases.
 | Corollary 5.4 | Finite-region tromino NP-completeness remains open |
 | Other results 5.7–5.11 except those listed above | Open |
 
-The finite NP-completeness work has a checked [verifier-based NP definition](LeanTrominoes/NP.lean)
-and [finite 3CNF machine tableaux](LeanTrominoes/FiniteSymbolicMachineCNF.lean).
-These characterize acceptance within a deadline and have explicit polynomial size
-bounds. The [certificate initialization](LeanTrominoes/FiniteCertificateCNF.lean)
-encodes a fixed input followed by an unknown bounded binary certificate, with
-linear-size initialization constraints. This does not yet prove Cook–Levin:
-the [NP-verifier bridge](LeanTrominoes/FiniteNPTableau.lean) and
-[binary output-size bound](LeanTrominoes/FiniteNPTableauEncoding.lean) are proved.
-The [native finite-CNF backend](LeanTrominoes/FiniteCNFCompiler.lean) is a checked
-quadratic-time machine, and [source/counter preparation](LeanTrominoes/FiniteNPCompilerPreparation.lean)
-is polynomial-time. Native emitters now generate well-formedness, machine steps,
-and accepting tests, while the [absolute-time serializer](LeanTrominoes/FiniteProgramColumns.lean)
-implements variable renaming and repeated programs with polynomial-time machines.
-The [complete initialization emitter](LeanTrominoes/FiniteNPInitializationEmitter.lean)
-now handles the bounded unknown certificate and matches the existing tableau
-program exactly, and accepting self-loop emission is also polynomial-time.
-Complete source-to-request assembly remains unfinished, so the
-complete polynomial-time reduction is still open. Finite tromino hardness
-reductions and polynomial-time verification endpoints are also outstanding.
+[Cook–Levin](LeanTrominoes/FiniteSATNPHard.lean) is proved for the
+[verifier-based NP definition](LeanTrominoes/NP.lean): every NP language reduces
+to ordinary finite 3CNF SAT under the native binary formula encoding. The
+[complete request emitter](LeanTrominoes/FiniteNPRequestEmitter.lean) generates
+initialization with a bounded unknown certificate, acceptance, well-formedness,
+and padded transitions, with absolute variable names and exact clause counts.
+It composes with the checked quadratic-time
+[finite-CNF backend](LeanTrominoes/FiniteCNFCompiler.lean). The reduction uses
+actual finite-alphabet polynomial-time Turing machines throughout.
+Finite tromino hardness reductions and their polynomial-time verification
+endpoints remain outstanding; the tromino NP-completeness clauses are still open.
 
 The [domino results](LeanTrominoes/DominoTheorems.lean) use exact covers by
 face-adjacent two-cell footprints. The proofs allow disconnected regions and

@@ -1,3 +1,4 @@
+import LeanTrominoes.FiniteSATNPHard
 import LeanTrominoes.FiniteNPInitializationEmitter
 import LeanTrominoes.FiniteNPPaddedProgramEmitter
 import LeanTrominoes.FiniteNPMachineProgramEmitter

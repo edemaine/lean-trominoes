@@ -65,7 +65,7 @@ private theorem map_all (slice : TransitionSlice) (programs : List TransitionPro
   induction programs <;> simp_all [TransitionProgram.all,TransitionProgram.constant,
     TransitionProgram.conjoin,retime]
 
-private theorem map_configuration (slice : TransitionSlice) (space : Nat) (target : verifier.computer.tm.Cfg) :
+theorem map_configuration (slice : TransitionSlice) (space : Nat) (target : verifier.computer.tm.Cfg) :
     (BoundedMachineProgram.currentConfigIs (tm := verifier.computer.tm) (space := space) target).map (retime slice)=
       BoundedMachineFixedConfigurationEmitter.configurationIs (tm := verifier.computer.tm) slice target space := by
   cases slice <;> simp [BoundedMachineFixedConfigurationEmitter.configurationIs,
