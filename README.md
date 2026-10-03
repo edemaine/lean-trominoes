@@ -108,6 +108,7 @@ otherwise.
 | Theorem 4.6, period-one bipartite perfect matching in every dimension | `PeriodicBipartite.exists_period_one`, `perfect_iff_quotient` | [PeriodicMatchingPeriodOne](LeanTrominoes/PeriodicMatchingPeriodOne.lean) |
 | Theorem 4.7, bipartite perfect matching decision and construction in `O(E√V)` indexed-RAM operations | `PeriodicBipartite.matchingSolver_certified`, `matchingSolver_edge_sqrt_bound` | [PeriodicMatchingSolver](LeanTrominoes/PeriodicMatchingSolver.lean) |
 | Finite 3CNF tableaux for bounded-time TM2 acceptance, with symbolic initial configurations and polynomial formula-size bounds | `FiniteMachineTrace.paddedFormula_iff_evals`, `symbolicFormula_iff_evals`, `symbolicFormula_length_le`, `symbolicFormula_width` | [FiniteMachineAcceptanceCNF](LeanTrominoes/FiniteMachineAcceptanceCNF.lean), [FiniteSymbolicMachineCNF](LeanTrominoes/FiniteSymbolicMachineCNF.lean) |
+| Complete polynomial-time verifier initialization and accepting self-loop emission, matching the existing finite tableau programs | `FiniteNPInitializationEmitter.computableInPolyTime`, `initialProgram_encode`; `FiniteNPCertificateStackEmitter.stackProgram_eq`; `FiniteNPPaddedProgramEmitter.computableInPolyTime`, `program_eq` | [FiniteNPInitializationEmitter](LeanTrominoes/FiniteNPInitializationEmitter.lean), [FiniteNPCertificateStackEmitterCorrectness](LeanTrominoes/FiniteNPCertificateStackEmitterCorrectness.lean), [FiniteNPPaddedProgramEmitter](LeanTrominoes/FiniteNPPaddedProgramEmitter.lean) |
 | Native finite-verifier machine programs and absolute-time serialization, with polynomial-time squares, products, pairing, and request-header generation | `FiniteNPMachineProgramEmitter.wellFormedComputableInPolyTime`, `stepComputableInPolyTime`, `acceptingComputableInPolyTime`; `FiniteCNF.ProgramColumns.repeated`; `FiniteNPVariableNameCompiler.sourceComputableInPolyTime`, `freshComputableInPolyTime` | [FiniteNPMachineProgramEmitter](LeanTrominoes/FiniteNPMachineProgramEmitter.lean), [FiniteProgramColumns](LeanTrominoes/FiniteProgramColumns.lean), [FiniteNPVariableNameCompiler](LeanTrominoes/FiniteNPVariableNameCompiler.lean) |
 | Native finite-CNF compiler backend, with quadratic machine time and correct bounded requests for every NP verifier | `FiniteCNFCompiler.finiteAlphabetComputableInPolyTime`, `Request.correct`, `compiler_time`; `Complexity.VerifierInPolyTime.nativeRequest_correct`, `nativeRequest_encode_length_le`, `nativeRequest_backend_time_le` | [FiniteCNFCompiler](LeanTrominoes/FiniteCNFCompiler.lean), [FiniteNPCompilerRequest](LeanTrominoes/FiniteNPCompilerRequest.lean) |
 | Polynomial-time preparation of finite-compiler source words, with exact certificate, time, space, and variable counters | `FiniteNPCompilerPreparation.computableInPolyTime`, `prepared_eq`, `counterCount_prepared`, `sourceSymbols_prepared` | [FiniteNPCompilerPreparation](LeanTrominoes/FiniteNPCompilerPreparation.lean) |
@@ -242,8 +243,10 @@ quadratic-time machine, and [source/counter preparation](LeanTrominoes/FiniteNPC
 is polynomial-time. Native emitters now generate well-formedness, machine steps,
 and accepting tests, while the [absolute-time serializer](LeanTrominoes/FiniteProgramColumns.lean)
 implements variable renaming and repeated programs with polynomial-time machines.
-The unknown-certificate initialization emitter and complete request assembly
-remain unfinished, so the
+The [complete initialization emitter](LeanTrominoes/FiniteNPInitializationEmitter.lean)
+now handles the bounded unknown certificate and matches the existing tableau
+program exactly, and accepting self-loop emission is also polynomial-time.
+Complete source-to-request assembly remains unfinished, so the
 complete polynomial-time reduction is still open. Finite tromino hardness
 reductions and polynomial-time verification endpoints are also outstanding.
 

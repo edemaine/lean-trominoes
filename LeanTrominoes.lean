@@ -1,3 +1,5 @@
+import LeanTrominoes.FiniteNPInitializationEmitter
+import LeanTrominoes.FiniteNPPaddedProgramEmitter
 import LeanTrominoes.FiniteNPMachineProgramEmitter
 import LeanTrominoes.FiniteProgramColumns
 import LeanTrominoes.FiniteNPVariableNameCompiler
