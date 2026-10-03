@@ -107,6 +107,8 @@ otherwise.
 | Lemma 4.5, a protovertex-simple augmenting path shorter than the quotient vertex count | `PeriodicBipartite.perfect_or_short_augmenting` | [PeriodicShortAugmentingProperties](LeanTrominoes/PeriodicShortAugmentingProperties.lean) |
 | Theorem 4.6, period-one bipartite perfect matching in every dimension | `PeriodicBipartite.exists_period_one`, `perfect_iff_quotient` | [PeriodicMatchingPeriodOne](LeanTrominoes/PeriodicMatchingPeriodOne.lean) |
 | Theorem 4.7, bipartite perfect matching decision and construction in `O(E√V)` indexed-RAM operations | `PeriodicBipartite.matchingSolver_certified`, `matchingSolver_edge_sqrt_bound` | [PeriodicMatchingSolver](LeanTrominoes/PeriodicMatchingSolver.lean) |
+| Finite 3CNF tableaux for bounded-time TM2 acceptance, with symbolic initial configurations and polynomial formula-size bounds | `FiniteMachineTrace.paddedFormula_iff_evals`, `symbolicFormula_iff_evals`, `symbolicFormula_length_le`, `symbolicFormula_width` | [FiniteMachineAcceptanceCNF](LeanTrominoes/FiniteMachineAcceptanceCNF.lean), [FiniteSymbolicMachineCNF](LeanTrominoes/FiniteSymbolicMachineCNF.lean) |
+| Finite 3CNF for existence of an accepted bounded binary certificate, with polynomial formula-size bounds | `FiniteCertificate.formula_correct`, `formula_length_le`, `formula_width` | [FiniteCertificateCNF](LeanTrominoes/FiniteCertificateCNF.lean) |
 | Theorem 5.12, finite-preplacement completion decidability for both trominoes | `Tromino.FiniteWitness.decideCompletion_correct`, `completion_iff_bounded_witness` | [FiniteCompletionDecision](LeanTrominoes/FiniteCompletionDecision.lean) |
 | Theorem 5.13 and Corollary 5.14, doubled-period domino tilings and completions | `Domino.theorem513`, `corollary514` | [DominoTheorems](LeanTrominoes/DominoTheorems.lean) |
 | Corollary 5.15, executable periodic domino decision with a fixed-dimensional polynomial RAM bound | `Domino.corollary515` | [PeriodicDominoSolverCost](LeanTrominoes/PeriodicDominoSolverCost.lean) |
@@ -219,7 +221,17 @@ paper theorem being complete; the entries below distinguish these cases.
 | Theorem 5.13 | Every tileable periodic domino region has a tiling invariant under twice each original generator, in every ambient dimension and periodic rank |
 | Corollary 5.14 | Every completable periodic domino prefill has a completion with those doubled periods |
 | Corollary 5.15 | Executable decision from cell representatives and arbitrary nonsingular integer period matrices; quadratic operation budget in the number of representatives for each fixed dimension, in the unit-cost arithmetic RAM model |
-| Other results 5.4–5.12 except those listed above | Open |
+| Corollary 5.4 | Finite-region tromino NP-completeness remains open |
+| Other results 5.7–5.11 except those listed above | Open |
+
+The finite NP-completeness work has a checked [verifier-based NP definition](LeanTrominoes/NP.lean)
+and [finite 3CNF machine tableaux](LeanTrominoes/FiniteSymbolicMachineCNF.lean).
+These characterize acceptance within a deadline and have explicit polynomial size
+bounds. The [certificate initialization](LeanTrominoes/FiniteCertificateCNF.lean)
+encodes a fixed input followed by an unknown bounded binary certificate, with
+linear-size initialization constraints. This does not yet prove Cook–Levin:
+the polynomial-time formula compiler remains unfinished. Finite tromino hardness
+reductions and polynomial-time verification endpoints are also outstanding.
 
 The [domino results](LeanTrominoes/DominoTheorems.lean) use exact covers by
 face-adjacent two-cell footprints. The proofs allow disconnected regions and

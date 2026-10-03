@@ -1,3 +1,5 @@
+import LeanTrominoes.NP
+import LeanTrominoes.FiniteCertificateCNF
 import LeanTrominoes.FiniteCompletionDecision
 import LeanTrominoes.DominoTheorems
 import LeanTrominoes.Lemma51
