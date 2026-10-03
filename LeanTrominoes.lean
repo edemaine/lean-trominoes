@@ -1,4 +1,4 @@
-import LeanTrominoes.NP
+import LeanTrominoes.FiniteNPTableau
 import LeanTrominoes.FiniteCertificateCNF
 import LeanTrominoes.FiniteCompletionDecision
 import LeanTrominoes.DominoTheorems

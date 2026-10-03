@@ -108,6 +108,7 @@ otherwise.
 | Theorem 4.6, period-one bipartite perfect matching in every dimension | `PeriodicBipartite.exists_period_one`, `perfect_iff_quotient` | [PeriodicMatchingPeriodOne](LeanTrominoes/PeriodicMatchingPeriodOne.lean) |
 | Theorem 4.7, bipartite perfect matching decision and construction in `O(E√V)` indexed-RAM operations | `PeriodicBipartite.matchingSolver_certified`, `matchingSolver_edge_sqrt_bound` | [PeriodicMatchingSolver](LeanTrominoes/PeriodicMatchingSolver.lean) |
 | Finite 3CNF tableaux for bounded-time TM2 acceptance, with symbolic initial configurations and polynomial formula-size bounds | `FiniteMachineTrace.paddedFormula_iff_evals`, `symbolicFormula_iff_evals`, `symbolicFormula_length_le`, `symbolicFormula_width` | [FiniteMachineAcceptanceCNF](LeanTrominoes/FiniteMachineAcceptanceCNF.lean), [FiniteSymbolicMachineCNF](LeanTrominoes/FiniteSymbolicMachineCNF.lean) |
+| Every verifier-defined NP language has an equivalent finite width-three tableau with a polynomial clause bound | `Complexity.VerifierInPolyTime.tableau_correct`, `tableau_width`, `tableau_length_le` | [FiniteNPTableau](LeanTrominoes/FiniteNPTableau.lean) |
 | Finite 3CNF for existence of an accepted bounded binary certificate, with polynomial formula-size bounds | `FiniteCertificate.formula_correct`, `formula_length_le`, `formula_width` | [FiniteCertificateCNF](LeanTrominoes/FiniteCertificateCNF.lean) |
 | Theorem 5.12, finite-preplacement completion decidability for both trominoes | `Tromino.FiniteWitness.decideCompletion_correct`, `completion_iff_bounded_witness` | [FiniteCompletionDecision](LeanTrominoes/FiniteCompletionDecision.lean) |
 | Theorem 5.13 and Corollary 5.14, doubled-period domino tilings and completions | `Domino.theorem513`, `corollary514` | [DominoTheorems](LeanTrominoes/DominoTheorems.lean) |
@@ -230,7 +231,8 @@ These characterize acceptance within a deadline and have explicit polynomial siz
 bounds. The [certificate initialization](LeanTrominoes/FiniteCertificateCNF.lean)
 encodes a fixed input followed by an unknown bounded binary certificate, with
 linear-size initialization constraints. This does not yet prove Cook–Levin:
-the polynomial-time formula compiler remains unfinished. Finite tromino hardness
+the [NP-verifier bridge](LeanTrominoes/FiniteNPTableau.lean) is proved, while the
+polynomial-time formula compiler remains unfinished. Finite tromino hardness
 reductions and polynomial-time verification endpoints are also outstanding.
 
 The [domino results](LeanTrominoes/DominoTheorems.lean) use exact covers by
