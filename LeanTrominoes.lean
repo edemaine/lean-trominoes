@@ -1,3 +1,6 @@
+import LeanTrominoes.FiniteNPMachineProgramEmitter
+import LeanTrominoes.FiniteProgramColumns
+import LeanTrominoes.FiniteNPVariableNameCompiler
 import LeanTrominoes.FiniteNPCompilerRequest
 import LeanTrominoes.FiniteNPCompilerPreparation
 import LeanTrominoes.FiniteCertificateCNF
