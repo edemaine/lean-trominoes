@@ -1,3 +1,4 @@
+import LeanTrominoes.FiniteNPCompilerRequest
 import LeanTrominoes.FiniteNPCompilerPreparation
 import LeanTrominoes.FiniteCertificateCNF
 import LeanTrominoes.FiniteCompletionDecision

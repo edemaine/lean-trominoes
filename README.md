@@ -108,6 +108,7 @@ otherwise.
 | Theorem 4.6, period-one bipartite perfect matching in every dimension | `PeriodicBipartite.exists_period_one`, `perfect_iff_quotient` | [PeriodicMatchingPeriodOne](LeanTrominoes/PeriodicMatchingPeriodOne.lean) |
 | Theorem 4.7, bipartite perfect matching decision and construction in `O(E√V)` indexed-RAM operations | `PeriodicBipartite.matchingSolver_certified`, `matchingSolver_edge_sqrt_bound` | [PeriodicMatchingSolver](LeanTrominoes/PeriodicMatchingSolver.lean) |
 | Finite 3CNF tableaux for bounded-time TM2 acceptance, with symbolic initial configurations and polynomial formula-size bounds | `FiniteMachineTrace.paddedFormula_iff_evals`, `symbolicFormula_iff_evals`, `symbolicFormula_length_le`, `symbolicFormula_width` | [FiniteMachineAcceptanceCNF](LeanTrominoes/FiniteMachineAcceptanceCNF.lean), [FiniteSymbolicMachineCNF](LeanTrominoes/FiniteSymbolicMachineCNF.lean) |
+| Native finite-CNF compiler backend, with quadratic machine time and correct bounded requests for every NP verifier | `FiniteCNFCompiler.finiteAlphabetComputableInPolyTime`, `Request.correct`, `compiler_time`; `Complexity.VerifierInPolyTime.nativeRequest_correct`, `nativeRequest_encode_length_le`, `nativeRequest_backend_time_le` | [FiniteCNFCompiler](LeanTrominoes/FiniteCNFCompiler.lean), [FiniteNPCompilerRequest](LeanTrominoes/FiniteNPCompilerRequest.lean) |
 | Polynomial-time preparation of finite-compiler source words, with exact certificate, time, space, and variable counters | `FiniteNPCompilerPreparation.computableInPolyTime`, `prepared_eq`, `counterCount_prepared`, `sourceSymbols_prepared` | [FiniteNPCompilerPreparation](LeanTrominoes/FiniteNPCompilerPreparation.lean) |
 | Flat finite-tableau encoding, with source and auxiliary variable ranges and a polynomial binary-output bound | `Complexity.VerifierInPolyTime.tableau_variable_bounds`, `tableau_encode_length_le` | [FiniteNPTableauEncoding](LeanTrominoes/FiniteNPTableauEncoding.lean), [FiniteCNFFlatEncoding](LeanTrominoes/FiniteCNFFlatEncoding.lean) |
 | Every verifier-defined NP language has an equivalent finite width-three tableau with a polynomial clause bound | `Complexity.VerifierInPolyTime.tableau_correct`, `tableau_width`, `tableau_length_le` | [FiniteNPTableau](LeanTrominoes/FiniteNPTableau.lean) |
@@ -235,7 +236,10 @@ encodes a fixed input followed by an unknown bounded binary certificate, with
 linear-size initialization constraints. This does not yet prove Cook–Levin:
 the [NP-verifier bridge](LeanTrominoes/FiniteNPTableau.lean) and
 [binary output-size bound](LeanTrominoes/FiniteNPTableauEncoding.lean) are proved.
-The polynomial-time formula compiler remains unfinished. Finite tromino hardness
+The [native finite-CNF backend](LeanTrominoes/FiniteCNFCompiler.lean) is a checked
+quadratic-time machine, and [source/counter preparation](LeanTrominoes/FiniteNPCompilerPreparation.lean)
+is polynomial-time. The source-to-request emitter remains unfinished, so the
+complete polynomial-time reduction is still open. Finite tromino hardness
 reductions and polynomial-time verification endpoints are also outstanding.
 
 The [domino results](LeanTrominoes/DominoTheorems.lean) use exact covers by
