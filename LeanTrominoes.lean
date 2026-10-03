@@ -1,3 +1,4 @@
+import LeanTrominoes.FiniteCompletionDecision
 import LeanTrominoes.DominoTheorems
 import LeanTrominoes.Lemma51
 import LeanTrominoes.PeriodicGeneralAugmentingPath
