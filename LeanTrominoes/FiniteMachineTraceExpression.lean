@@ -30,6 +30,29 @@ theorem atCurrent_atomsBelow {e : TransitionExpr} {bound : Nat} (h : e.AtomsBelo
 theorem atCurrent_gateCount (e : TransitionExpr) : e.atCurrent.gateCount=e.gateCount := by
   induction e <;> simp_all [atCurrent,gateCount]
 
+def atNext : TransitionExpr → TransitionExpr
+  | .constant b => .constant b
+  | .wire w => .wire ⟨.next,w.atom⟩
+  | .not e => .not e.atNext
+  | .and e f => .and e.atNext f.atNext
+  | .or e f => .or e.atNext f.atNext
+
+theorem atNext_eval (e : TransitionExpr) (current next : Nat → Bool) :
+    e.atNext.eval current next=e.eval next next := by
+  induction e with
+  | constant b => rfl
+  | wire w => cases w with | mk s atom => cases s <;> rfl
+  | not e ih => simp [atNext,eval,ih]
+  | and e f ih1 ih2 => simp [atNext,eval,ih1,ih2]
+  | or e f ih1 ih2 => simp [atNext,eval,ih1,ih2]
+
+theorem atNext_atomsBelow {e : TransitionExpr} {bound : Nat} (h : e.AtomsBelow bound) :
+    e.atNext.AtomsBelow bound := by
+  induction e <;> simp_all [atNext,AtomsBelow]
+
+theorem atNext_gateCount (e : TransitionExpr) : e.atNext.gateCount=e.gateCount := by
+  induction e <;> simp_all [atNext,gateCount]
+
 end LeanTrominoes.PeriodicCNF.TransitionExpr
 
 noncomputable section
