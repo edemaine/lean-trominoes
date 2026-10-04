@@ -117,6 +117,7 @@ otherwise.
 | Every verifier-defined NP language has an equivalent finite width-three tableau with a polynomial clause bound | `Complexity.VerifierInPolyTime.tableau_correct`, `tableau_width`, `tableau_length_le` | [FiniteNPTableau](LeanTrominoes/FiniteNPTableau.lean) |
 | Finite 3CNF for existence of an accepted bounded binary certificate, with polynomial formula-size bounds | `FiniteCertificate.formula_correct`, `formula_length_le`, `formula_width` | [FiniteCertificateCNF](LeanTrominoes/FiniteCertificateCNF.lean) |
 | Explicit binary certificates for both finite-region tiling and finite-preplacement completion: 24 bits per listed region cell or bounding-box cell | `Tromino.FiniteRegion.tileable_iff_bounded_certificate`; `Tromino.FiniteWitness.completion_iff_box_certificate`, `completion_iff_bounded_certificate` | [FiniteTrominoRegionCertificate](LeanTrominoes/FiniteTrominoRegionCertificate.lean), [FiniteTrominoCompletionCertificate](LeanTrominoes/FiniteTrominoCompletionCertificate.lean) |
+| Polynomial-time exact-cover verifier backend for both trominoes, with geometric certificate correctness and serialized candidate-table bounds | `FiniteExactCoverVerifier.finiteAlphabetComputableInPolyTime`; `Tromino.FiniteVerifier.check_correct`, `tileable_iff_certificate`, `completion_iff_certificate`, `nativeRequest_encode_length_le` | [FiniteExactCoverVerifier](LeanTrominoes/FiniteExactCoverVerifier.lean), [FiniteTrominoVerifierBackend](LeanTrominoes/FiniteTrominoVerifierBackend.lean), [FiniteTrominoVerifierSize](LeanTrominoes/FiniteTrominoVerifierSize.lean) |
 | Theorem 5.12, finite-preplacement completion decidability for both trominoes | `Tromino.FiniteWitness.decideCompletion_correct`, `completion_iff_bounded_witness` | [FiniteCompletionDecision](LeanTrominoes/FiniteCompletionDecision.lean) |
 | Theorem 5.13 and Corollary 5.14, doubled-period domino tilings and completions | `Domino.theorem513`, `corollary514` | [DominoTheorems](LeanTrominoes/DominoTheorems.lean) |
 | Corollary 5.15, executable periodic domino decision with a fixed-dimensional polynomial RAM bound | `Domino.corollary515` | [PeriodicDominoSolverCost](LeanTrominoes/PeriodicDominoSolverCost.lean) |
@@ -245,10 +246,14 @@ actual finite-alphabet polynomial-time Turing machines throughout.
 use 24 bits per listed cell. For
 [finite-preplacement completion](LeanTrominoes/FiniteTrominoCompletionCertificate.lean),
 24 bits per bounding-box cell suffice for either tromino, including tiles
-protruding outside the box. These have executable checkers and proved
-correctness, but polynomial-time verifier machines remain outstanding, as do
-the finite tromino hardness reductions. The tromino NP-completeness clauses
-are still open.
+protruding outside the box. The
+[exact-cover verifier backend](LeanTrominoes/FiniteExactCoverVerifier.lean) is
+an actual finite-alphabet polynomial-time machine. Its
+[geometric correctness](LeanTrominoes/FiniteTrominoVerifierBackend.lean) and
+[serialized candidate-table bound](LeanTrominoes/FiniteTrominoVerifierSize.lean)
+are proved. The backend's input includes the candidate table; a polynomial-time
+emitter from the original coordinate input remains outstanding, along with
+the finite tromino hardness reductions. Both NP-completeness clauses remain open.
 
 The [domino results](LeanTrominoes/DominoTheorems.lean) use exact covers by
 face-adjacent two-cell footprints. The proofs allow disconnected regions and
