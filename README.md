@@ -271,7 +271,7 @@ without assuming a periodic tiling. The
 [finite region emitter](LeanTrominoes/FiniteGadgetRegionCompiler.lean) expands
 compiled sparse drawing records into the original unary coordinate encoding
 with verified polynomial-time machines. The finite SAT source-to-drawing
-reduction still needs to be connected to this endpoint.
+correctness theorem is now connected to this endpoint.
 
 [Finite occurrence-three SAT](LeanTrominoes/FiniteThreeSATThreeNPHard.lean)
 is now NP-hard under the native binary formula encoding, with clauses of
@@ -286,8 +286,12 @@ now preserves ordinary finite SAT, including its canonical gauge and clause
 deduplication. [Zero offsets](LeanTrominoes/FiniteRetainedThreeDMOffsets.lean)
 persist through fixed-eight splitting, Figure 9, unit elimination, the final
 canonical gauge, routed polarity normalization, and planar 3DM assembly.
-The bounded normalized drawing and its polynomial-time source compiler remain
-to be connected to the finite tromino endpoint.
+[Finite normalization](LeanTrominoes/FiniteThreeDMNormalization.lean) pads the
+zero-offset drawing inside one square, preserves complete route separation
+and simplicity, and moves the blank seams to the final boundary. The
+[finite retained region](LeanTrominoes/FiniteRetainedTrominoRegion.lean) is
+tileable exactly when the finite source formula is satisfiable, for either
+tromino. Connecting the actual polynomial-time source compiler remains.
 
 The [domino results](LeanTrominoes/DominoTheorems.lean) use exact covers by
 face-adjacent two-cell footprints. The proofs allow disconnected regions and

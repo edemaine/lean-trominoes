@@ -1,3 +1,4 @@
+import LeanTrominoes.FiniteRetainedTrominoRegion
 import LeanTrominoes.FiniteThreeDMSemantics
 import LeanTrominoes.FiniteRetainedThreeDMOffsets
 import LeanTrominoes.FiniteThreeDMContractionOffsets
