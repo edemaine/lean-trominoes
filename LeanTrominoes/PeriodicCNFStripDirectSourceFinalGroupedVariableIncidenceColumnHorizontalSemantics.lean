@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceColumnBodySemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableFanHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedOccurrenceBodyHorizontalSemantics
@@ -51,10 +52,8 @@ theorem horizontalVariableIncidenceLocalColumn_eq_typedShape
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance columnHorizontalStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 /-- Both semantic projections of every local column belong to the same
 canonical source entry, without selecting either column independently. -/
@@ -63,14 +62,14 @@ theorem directSourceFinalGroupedVariableIncidenceLocalColumns_fields_horizontal
     List.Forall₂ (fun column entry =>
       column.pair =
         (horizontalOccurrenceVariableRibbonFanDataComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, entry.1),
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, entry.1),
           groupedVariableFanGenericSlot entry.2) ∧
       column.bodyBlock = incidenceColors.map (fun color => unitSubdivisionDirections
         (horizontalOccurrenceCoordinatedRouteComputed
-          (((PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, entry.1), entry.2), color))))
+          (((PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, entry.1), entry.2), color))))
       (directSourceFinalGroupedVariableIncidenceLocalColumns decider symbols)
       (occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase) := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase) := by
   have bodyLength := congrArg List.length
     (directSourceFinalGroupedOccurrenceDirectionBodyBlocks_eq_horizontal decider symbols)
   simp only [List.length_map] at bodyLength
@@ -89,18 +88,18 @@ theorem directSourceFinalGroupedVariableIncidenceLocalBodyBlocks_eq_horizontalTy
     (directSourceFinalGroupedVariableIncidenceLocalColumns decider symbols).map
         GroupedVariableIncidenceLocalColumn.localBodyBlock =
       (occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase).map fun entry =>
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase).map fun entry =>
         groupedVariableIncidenceTypedShapeBodies
           (horizontalSemanticNormalizedRibbonSource
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry.1 entry.2
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry.1 entry.2
           (horizontalOccurrenceVariableRibbonFanDataComputed
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, entry.1))
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, entry.1))
           (fun color => unitSubdivisionDirections (horizontalOccurrenceCoordinatedRouteComputed
-            (((PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, entry.1), entry.2), color))) := by
+            (((PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, entry.1), entry.2), color))) := by
   have aligned := (directSourceFinalGroupedVariableIncidenceLocalColumns_fields_horizontal decider symbols).imp_of_mem
     (fun column columnMember entry entryMember fields =>
       horizontalVariableIncidenceLocalColumn_eq_typedShape
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
         entry entryMember column fields.1 fields.2
         (directSourceFinalGroupedVariableIncidenceLocalColumns_valid decider symbols column columnMember).1)
   exact List.map_eq_map_of_forall₂ _ _ aligned
@@ -111,14 +110,14 @@ theorem directSourceFinalGroupedVariableIncidenceBodies_eq_horizontalTypedShape
     (symbols : List encoding.Γ) :
     directSourceFinalGroupedVariableIncidenceBodies decider symbols =
       (occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase).flatMap fun entry =>
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase).flatMap fun entry =>
         groupedVariableIncidenceTypedShapeBodies
           (horizontalSemanticNormalizedRibbonSource
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry.1 entry.2
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry.1 entry.2
           (horizontalOccurrenceVariableRibbonFanDataComputed
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, entry.1))
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, entry.1))
           (fun color => unitSubdivisionDirections (horizontalOccurrenceCoordinatedRouteComputed
-            (((PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, entry.1), entry.2), color))) := by
+            (((PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, entry.1), entry.2), color))) := by
   exact (directSourceFinalGroupedVariableIncidenceBodies_eq_localColumns decider symbols).trans
     ((congrArg List.flatten
       (directSourceFinalGroupedVariableIncidenceLocalBodyBlocks_eq_horizontalTypedShape decider symbols)).trans

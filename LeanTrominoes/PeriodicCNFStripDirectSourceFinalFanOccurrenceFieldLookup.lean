@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFanRankLookup
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceFieldsHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalOccurrenceFieldLookup
@@ -24,20 +25,18 @@ attribute [local instance]
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance fanFieldLookupStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 /-- The finite record selected by a genuine fan query contains the kind,
 polarity, and variable-end direction of that exact actual source occurrence. -/
 theorem directSourceFinalFanOccurrence_fields_of_occurrenceAt
     (symbols : List encoding.Γ) (index : Nat) (atom : RoutedVariable)
     (atomLookup : (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[index]? = some atom)
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences[index]? = some atom)
     (slot : OccurrenceSlot) (tagged : TaggedOccurrence RoutedVariable)
     (occurrenceLookup : occurrenceAt (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase atom slot = some tagged) :
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase atom slot = some tagged) :
     let record : HorizontalRoutedRouteHeader.OccurrenceData := FiniteAlphabetKeyedValueLookup.alignedDatum
       (directSourceFinalOccurrenceCandidateKeys decider symbols)
       (directSourceFinalVariableOccurrenceData decider symbols)
@@ -45,11 +44,11 @@ theorem directSourceFinalFanOccurrence_fields_of_occurrenceAt
     ((record.kind, record.polarity), record.direction) =
       taggedPresentedOccurrenceFields
         (horizontalSemanticNormalizedPlanarPresentation
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).routes tagged := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).routes tagged := by
   let positioned := horizontalSemanticNormalizedRibbonSource
-    (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
   let routes := (horizontalSemanticNormalizedPlanarPresentation
-    (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).routes
+    (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).routes
   let records := directSourceFinalVariableOccurrenceData decider symbols
   let field := fun record : HorizontalRoutedRouteHeader.OccurrenceData =>
     ((record.kind, record.polarity), record.direction)

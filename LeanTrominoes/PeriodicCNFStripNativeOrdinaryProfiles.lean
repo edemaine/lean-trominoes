@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeOrdinaryInput
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFirstParentRouteSemantics
 import LeanTrominoes.FiniteUnaryFieldBlockMapCompiler
@@ -20,11 +21,11 @@ local instance ordinaryProfileVariableDecidableEq : DecidableEq Variable := dire
 set_option maxHeartbeats 800000
 
 def nativeOrdinaryProfiles (s : List encoding.Γ) : List DirectedClauseProfile :=
-  (directSourceFinalParentRouteBlocks decider s).map Prod.fst
+  (directSourceFinalParentRouteBlocks (PeriodicCNF.ProgramSource.ofDecider decider) s).map Prod.fst
 
 def nativeOrdinaryProfilesCompiler : TM2ComputableInPolyTime id id (nativeOrdinaryProfiles decider) := by
   let physical := TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
+    (directSourceFinalClauseDescriptorsComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
     (FiniteBlockTransducer.computableInPolyTime (fun token : Token =>
       match token with | .variable => [] | .clause profile => [profile]))
   apply TM2ComputableInPolyTime.of_eq physical
@@ -37,8 +38,8 @@ theorem nativeOrdinaryProfiles_literals (s : List encoding.Γ) :
     (nativeOrdinaryProfiles decider s).map (fun profile => profile.orderedProfile.literals) =
       (nativeOrdinaryBaseInput decider s).1.clauses.map literalProfiles := by
   change _ = ((PositionedPeriodicCNF.orderClausesByRouteDirection
-    (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula (directSourceFormula decider s))
-    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes (directSourceFormula decider s))).scale
+    (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s))
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s))).scale
       retainedFigureNineSourceClearanceFactor).erase.clauses.map literalProfiles
   rw [PositionedPeriodicCNF.erase_scale]
   simp only [nativeOrdinaryProfiles, directSourceFinalParentRouteBlocks, List.map_map, Function.comp_def,
@@ -47,10 +48,10 @@ theorem nativeOrdinaryProfiles_literals (s : List encoding.Γ) :
   intro tagged member
   apply DirectedClauseProfile.orderedProfile_ofClause_literals
   · exact retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_clausesNonempty
-      (directSourceFormula decider s) (sourceFormula_clausesNonempty _) tagged.1
+      (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) (sourceFormula_clausesNonempty _) tagged.1
       (List.fst_mem_of_mem_zipIdx member)
   · exact retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_widthAtMostThree
-      (directSourceFormula decider s) (sourceFormula_widthAtMostThree _) tagged.1.literals
+      (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) (sourceFormula_widthAtMostThree _) tagged.1.literals
       (PositionedPeriodicCNF.literals_mem_erase_of_mem_zipIdx member)
 
 def nativeOrdinaryClauseLengthsCompiler : TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields

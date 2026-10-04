@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.GadgetSparseAffineIndexedEmitterPipelineData
 import LeanTrominoes.PeriodicCNFPolySpaceRequestEmitter
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTableAppenderData
@@ -20,11 +21,8 @@ open GadgetSparseAffineIndexedEmitter
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directSparseAffineTablePhaseDataStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- All four finite-table blocks in canonical contracted-vertex order. -/
 def directSparseComputedAffineTableVertexRequestsOfSymbols
@@ -65,27 +63,27 @@ structure DirectSparseAffineTablePhaseFamilies where
   blue : RecordFamily PeriodicCNF.UnaryProgramTokens.Token
   variableTriples_correct : ∀ symbols,
     recordsEmitted variableTriples
-        (PeriodicCNF.PolySpaceRequestEmitter.sourceTokens decider symbols) =
+        (PeriodicCNF.ProgramSource.sourceTokens decider symbols) =
       directSparseComputedAffineTableVariableTripleRequestsOfSymbols
         decider symbols
   clauseTriples_correct : ∀ symbols,
     recordsEmitted clauseTriples
-        (PeriodicCNF.PolySpaceRequestEmitter.sourceTokens decider symbols) =
+        (PeriodicCNF.ProgramSource.sourceTokens decider symbols) =
       directSparseComputedAffineTableClauseTripleRequestsOfSymbols
         decider symbols
   red_correct : ∀ symbols,
     recordsEmitted red
-        (PeriodicCNF.PolySpaceRequestEmitter.sourceTokens decider symbols) =
+        (PeriodicCNF.ProgramSource.sourceTokens decider symbols) =
       directSparseComputedAffineTableElementRequestsOfSymbols
         decider .red symbols
   green_correct : ∀ symbols,
     recordsEmitted green
-        (PeriodicCNF.PolySpaceRequestEmitter.sourceTokens decider symbols) =
+        (PeriodicCNF.ProgramSource.sourceTokens decider symbols) =
       directSparseComputedAffineTableElementRequestsOfSymbols
         decider .green symbols
   blue_correct : ∀ symbols,
     recordsEmitted blue
-        (PeriodicCNF.PolySpaceRequestEmitter.sourceTokens decider symbols) =
+        (PeriodicCNF.ProgramSource.sourceTokens decider symbols) =
       directSparseComputedAffineTableElementRequestsOfSymbols
         decider .blue symbols
 
@@ -102,7 +100,7 @@ def output (phases : DirectSparseAffineTablePhaseFamilies decider)
     (symbols : List encoding.Γ) :
     List GadgetSparseAffineVertexTokens.Token :=
   emittedPhases phases.families
-    (PeriodicCNF.PolySpaceRequestEmitter.sourceTokens decider symbols)
+    (PeriodicCNF.ProgramSource.sourceTokens decider symbols)
 
 /-- The shared five-phase scan emits the complete combined table word. -/
 theorem emitted_eq_table

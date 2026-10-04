@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.FiniteAlphabetAlignedZipCompiler
 import LeanTrominoes.PeriodicCNFStripIncidenceHeaderAssembler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalSelectedIncidenceEndpointSummarySemantics
@@ -145,7 +146,7 @@ theorem headerOutput_horizontal (source : PeriodicCNF Nat) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 def directSourceFinalContractedRouteHeaders (symbols : List encoding.Γ) : List Header :=
   IncidenceHeaderAssembler.output
@@ -180,9 +181,9 @@ canonical contracted edge, without a remaining source-specific premise. -/
 theorem directSourceFinalContractedRouteHeaders_eq_horizontal (symbols : List encoding.Γ) :
     directSourceFinalContractedRouteHeaders decider symbols =
       (horizontalThreeDMProblemComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).contractedEdges.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).contractedEdges.map
         (horizontalAssembledRouteRequestHeader
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)) := by
   unfold directSourceFinalContractedRouteHeaders
   rw [directSourceFinalCanonicalElementDegrees_eq_horizontal,
     directSourceFinalSelectedIncidenceEndpointSummaries_eq_horizontal, headerOutput_horizontal]

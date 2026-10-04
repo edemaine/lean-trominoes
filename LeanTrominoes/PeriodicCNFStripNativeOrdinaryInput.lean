@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicPlanarSATAnchorNormalization
 import LeanTrominoes.PeriodicPlanarSATInjectiveRenaming
 import LeanTrominoes.OccurrenceIdentityRenaming
@@ -23,19 +24,19 @@ set_option maxHeartbeats 800000
 abbrev OrdinaryVariable := ThreeOccurrenceGeometry.Target Variable
 
 def nativeOrdinaryBaseInput (s : List encoding.Γ) : PeriodicPlanarSAT.Input OrdinaryVariable :=
-  ThreeOccurrenceGeometry.input (directSourceFormula decider s)
+  ThreeOccurrenceGeometry.input (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s)
 
 def nativeOrdinaryAtomCodes (s : List encoding.Γ) : List Nat :=
-  (nativeOrdinaryBaseInput decider s).1.variableOccurrences.map (directSourceFinalRingVariableCode decider s)
+  (nativeOrdinaryBaseInput decider s).1.variableOccurrences.map (directSourceFinalRingVariableCode (PeriodicCNF.ProgramSource.ofDecider decider) s)
 
 private theorem ordinary_atom_is_ringCopy (s : List encoding.Γ) (atom : OrdinaryVariable)
     (member : atom ∈ (nativeOrdinaryBaseInput decider s).1.variableOccurrences) :
     ∃ original vertex,
       original ∈ (PeriodicOrthocrossing.retainedFinalCoordinatedScaledSource
-        (directSourceFormula decider s)).erase.variableOccurrences ∧
+        (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s)).erase.variableOccurrences ∧
       atom = PeriodicEightOccurrenceSplit.ringCopy original vertex := by
   apply PeriodicCNF.FormulaShapeRetainedFigureNineDirection.finalPositionedFormula_atom_is_ringCopy
-    (directSourceFormula decider s) atom
+    (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) atom
   apply (PositionedPeriodicCNF.orderClausesByRouteDirection_variableOccurrences_perm _ _).mem_iff.mp
   simpa only [nativeOrdinaryBaseInput, ThreeOccurrenceGeometry.input, ThreeOccurrenceGeometry.formula,
     PeriodicOrthocrossing.retainedFigureNineClearancePositionedFormula, PositionedPeriodicCNF.erase_scale,
@@ -49,7 +50,7 @@ theorem nativeOrdinaryAtomCodes_coherent (s : List encoding.Γ) :
   obtain ⟨a, av, ha, ea⟩ := ordinary_atom_is_ringCopy decider s _ (List.getElem_mem hi)
   obtain ⟨b, bv, hb, eb⟩ := ordinary_atom_is_ringCopy decider s _ (List.getElem_mem hj)
   rw [ea, eb]
-  exact directSourceFinalRingVariableCode_eq_iff_ringCopy decider s a b ha hb av bv
+  exact directSourceFinalRingVariableCode_eq_iff_ringCopy (PeriodicCNF.ProgramSource.ofDecider decider) s a b ha hb av bv
 
 def nativeOrdinaryRenaming (s : List encoding.Γ) : OrdinaryVariable → Nat :=
   OccurrenceIdentity.rename (nativeOrdinaryBaseInput decider s).1.variableOccurrences (nativeOrdinaryAtomCodes decider s)
@@ -68,7 +69,7 @@ def nativeOrdinaryInput (s : List encoding.Γ) : PeriodicPlanarSAT.Input Nat :=
 private theorem ordinarySource_occurrences (s : List encoding.Γ) :
     @PeriodicCNF.OccurrencesAtMost Variable
       (@instBEqOfDecidableEq Variable ordinaryInputVariableDecidableEq) (by infer_instance) 3
-      (directSourceFormula decider s) :=
+      (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) :=
   PeriodicCNF.occurrencesAtMost_congr_beq _ _ (by infer_instance) (by infer_instance) 3 _
     (sourceFormula_occurrencesAtMostThree_canonicalBEq (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider s))
 
@@ -76,14 +77,14 @@ private theorem nativeOrdinaryBaseInput_sat (s : List encoding.Γ) :
     (nativeOrdinaryBaseInput decider s).1.Satisfiable ↔
       PeriodicCNF.LocalPeriodicCNF1DSAT (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider s) := by
   exact (PeriodicOrthocrossing.retainedFigureNineClearancePositionedFormula_satisfiable_iff
-    (directSourceFormula decider s) (sourceFormula_isLocal _) (sourceFormula_widthAtMostThree _)
+    (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) (sourceFormula_isLocal _) (sourceFormula_widthAtMostThree _)
     (ordinarySource_occurrences decider s)).trans (sourceFormula_correct _).symm
 
 private theorem nativeOrdinaryBaseInput_three (s : List encoding.Γ)
     (h : PeriodicCNF.LocalPeriodicCNF1DSAT (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider s)) :
     Orbit.LocalOneDimensionalThreeOccurrenceProblem (nativeOrdinaryBaseInput decider s) := by
   apply (ThreeOccurrenceGeometry.localOneDimensionalThreeOccurrence_correct
-    (directSourceFormula decider s) (sourceFormula_isLocal _) (sourceFormula_widthAtMostThree _)
+    (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) (sourceFormula_isLocal _) (sourceFormula_widthAtMostThree _)
     (ordinarySource_occurrences decider s) (sourceFormula_clausesNonempty _) (sourceFormula_isOneDimensional _)).2
   exact (sourceFormula_correct _).1 h
 

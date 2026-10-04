@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalRetainedElementCoordinateCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTableAppenderData
 import LeanTrominoes.PeriodicCNFStripDirectDrawingGridUnitEmitter
@@ -20,12 +21,12 @@ local instance retainedElementRecordCellTypeInhabited : Inhabited OrthogonalCell
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 private noncomputable def retainedCoordinateCompiler (color : WireColor) (horizontal : Bool) :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun symbols => (horizontalRetainedElementPositions
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) color).map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) color).map
           (fun point => (DelimitedDirectionDisplacement.component horizontal point).toNat)) :=
   TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
     (directSourceFinalRetainedElementCoordinatesComputableInPolyTime decider color horizontal true)
@@ -36,7 +37,7 @@ private noncomputable def retainedCoordinateCompiler (color : WireColor) (horizo
 private noncomputable def retainedCellTypeCompiler (color : WireColor) :
     TM2ComputableInPolyTime id id
       (fun symbols => (horizontalRetainedElementPositions
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) color).map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) color).map
           (fun _ => OrthogonalCellType.monochromaticVertex color)) := by
   let bits := TM2CompositionMachine.computableInPolyTime
     (retainedCoordinateCompiler decider color true)
@@ -58,7 +59,7 @@ noncomputable def directSourceFinalRetainedElementRecordsComputableInPolyTime (c
     letI : Inhabited encoding.Γ := ⟨Classical.choice nonemptyAlphabet⟩
     let compiler := GadgetSparseAffineVertexTokens.RecordColumns.computableInPolyTimeOf
       (fun symbols => horizontalRetainedElementPositions
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) color)
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) color)
       (directDrawingGridUnitsOfSymbols decider)
       (fun _ point => (DelimitedDirectionDisplacement.component true point).toNat)
       (fun _ point => (DelimitedDirectionDisplacement.component false point).toNat)

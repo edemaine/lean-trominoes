@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicOneInThreePolyTimeProfiles
 import LeanTrominoes.PeriodicThreeSATThreePolySpaceCompleteness
 import LeanTrominoes.PeriodicExactOneCNFLocality
@@ -39,10 +40,10 @@ theorem reduction_correct (input : Input) :
   let base := PolySpaceCompiler.formulaOfSymbols decider symbols
   have sourceForward : (source decider symbols).IsForwardLocal :=
     PeriodicThreeSATThree.Numeric.forward base
-      (PeriodicCNFStripReduction.formulaOfSymbols_isForwardLocal decider symbols)
+      (PeriodicCNFStripReduction.formulaOfSymbols_isForwardLocal (PeriodicCNF.ProgramSource.ofDecider decider) symbols)
   have sourceWidth : (source decider symbols).WidthAtMost 3 :=
     PeriodicThreeSATThree.Numeric.width_three base
-      (PeriodicCNFStripReduction.formulaOfSymbols_widthAtMostThree decider symbols)
+      (PeriodicCNFStripReduction.formulaOfSymbols_widthAtMostThree (PeriodicCNF.ProgramSource.ofDecider decider) symbols)
   have sourceOccurrences : (source decider symbols).OccurrencesAtMost 3 :=
     PeriodicThreeSATThree.Numeric.occurrences_three base
   have horizontal := isOneDimensional_of_isForwardLocal sourceForward

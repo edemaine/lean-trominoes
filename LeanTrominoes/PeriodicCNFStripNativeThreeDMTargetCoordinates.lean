@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeThreeDMGeometry
 import LeanTrominoes.PeriodicThreeDMIncidenceCoverage
 import LeanTrominoes.UnaryColumnSignedCoordinateSum
@@ -74,7 +75,7 @@ def nativeThreeDMElementCoordinateCompiler (horizontal : Bool) :
   apply keyedRelation (nativeThreeDMElementKeyCompiler decider)
     (nativeThreeDMIncidenceKeyCompiler decider) (nativeThreeDMTargetCoordinateCompiler decider horizontal)
   · intro s a ha b hb eq
-    have unique := directSourceFinalCanonicalElementCodes_nodup decider s
+    have unique := directSourceFinalCanonicalElementCodes_nodup (PeriodicCNF.ProgramSource.ofDecider decider) s
     rw [directSourceFinalCanonicalElementCodes_eq_horizontal] at unique
     have same : (nativeThreeDMProblem decider s).incidenceElement a =
         (nativeThreeDMProblem decider s).incidenceElement b := List.inj_on_of_nodup_map unique
@@ -85,9 +86,9 @@ def nativeThreeDMElementCoordinateCompiler (horizontal : Bool) :
     obtain ⟨tag,ht,equal⟩ := incidenceElement_surjective_of_degreeTwoOrThree
       (nativeThreeDMProblem decider s) (nativeThreeDMDegree decider s) e.1 e.2
       ((nativeThreeDMElement_mem decider s e).1 he)
-    exact ⟨tag,ht,congrArg (directSourceFinalHorizontalElementCode decider s) equal⟩
+    exact ⟨tag,ht,congrArg (directSourceFinalHorizontalElementCode (PeriodicCNF.ProgramSource.ofDecider decider) s) equal⟩
   · intro s e he tag ht eq
-    have same := (directSourceFinalHorizontalIncidenceCode_eq_iff decider s e
+    have same := (directSourceFinalHorizontalIncidenceCode_eq_iff (PeriodicCNF.ProgramSource.ofDecider decider) s e
       ((nativeThreeDMElement_mem decider s e).1 he) tag ht).1 eq
     exact targetCoordinate_eq (nativeThreeDMProblem decider s) (nativeThreeDMDrawing decider s) tag e same horizontal
 

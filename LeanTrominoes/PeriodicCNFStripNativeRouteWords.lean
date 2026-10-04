@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeRouteWordCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalPresentedDirectionWords
 
@@ -25,7 +26,7 @@ def nativeRouteWords (symbols : List encoding.Γ) : List (List AxisDirection) :=
     (horizontalRoutedRoutesComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
 
 theorem nativeRouteWords_compiled (symbols : List encoding.Γ) :
-    NativeRouteWord.output (directSourceFinalCompiledRoutedRequestBlockTokens decider symbols) =
+    NativeRouteWord.output (directSourceFinalCompiledRoutedRequestBlockTokens (PeriodicCNF.ProgramSource.ofDecider decider) symbols) =
       DelimitedDirectionDisplacement.words (nativeRouteWords decider symbols) := by
   rw [directSourceFinalCompiledRoutedRequestBlockTokens_eq,
     directFigureNinePolarityRoutedRequestBlockTokens,
@@ -41,9 +42,9 @@ noncomputable def nativeRouteWordsCompiler :
       (fun symbols => DelimitedDirectionDisplacement.words (nativeRouteWords decider symbols)) := by
   let physical : TM2ComputableInPolyTime id id
       (fun symbols => NativeRouteWord.output
-        (directSourceFinalCompiledRoutedRequestBlockTokens decider symbols)) :=
+        (directSourceFinalCompiledRoutedRequestBlockTokens (PeriodicCNF.ProgramSource.ofDecider decider) symbols)) :=
     TM2CompositionMachine.computableInPolyTime
-      (directSourceFinalCompiledRoutedRequestBlockTokensComputableInPolyTime decider)
+      (directSourceFinalCompiledRoutedRequestBlockTokensComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
       NativeRouteWord.compiler
   simpa only [nativeRouteWords_compiled] using physical
 

@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalContractedSourceCoordinateCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSparseRouteRasterRequestData
 import LeanTrominoes.UnaryFieldConstantTableCompiler
@@ -37,7 +38,7 @@ private theorem incidenceTags_colorCodes (problem : PeriodicThreeDM) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Emit the RGB code table once per actual triple. -/
 def directSourceFinalIncidenceColorCodes (symbols : List encoding.Γ) : List Nat :=
@@ -54,10 +55,10 @@ noncomputable def directSourceFinalIncidenceColorCodesComputableInPolyTime :
 
 private theorem incidenceColorCodes_eq (symbols : List encoding.Γ) :
     directSourceFinalIncidenceColorCodes decider symbols =
-      (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.map
+      (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.map
         (fun tag => rasterColorCode tag.color) := by
   have aligned : (directSourceFinalTripleCoordinates decider true true symbols).length =
-      (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).triples.length := by
+      (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).triples.length := by
     rw [directSourceFinalTripleCoordinates_length, ← horizontalThreeDMPositionProblemComputed_eq]
     exact horizontalThreeDMTriplePositionsComputed_length _
   rw [incidenceTags_colorCodes]
@@ -85,13 +86,13 @@ noncomputable def directSourceFinalContractedColorCodesComputableInPolyTime :
 
 private theorem contractedColorCodes_eq (symbols : List encoding.Γ) :
     directSourceFinalContractedColorCodes decider symbols =
-      (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).contractedEdges.map
+      (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).contractedEdges.map
         (fun edge => rasterColorCode edge.color) := by
   unfold directSourceFinalContractedColorCodes
   rw [incidenceColorCodes_eq, directSourceFinalSelectedIncidenceValues_map_eq_horizontal,
     directSourceFinalCanonicalElementDegrees_eq_horizontal,
     CountedContractedIncidence.selected_sources_eq_contracted
-      (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols))
+      (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols))
       (fun tag : IncidenceTag => rasterColorCode tag.color) (by
         rw [horizontalThreeDMProblemComputed_eq_problem]
         exact problem_degreeTwoOrThree _)]

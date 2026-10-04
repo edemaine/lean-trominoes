@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.DelimitedRouteJoinTime
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierFallbackPrefixCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCarrierNormalizedFallbackSuffixCompiler
@@ -20,11 +21,8 @@ open PeriodicThreeDM.NormalizationDirectionRequest.Batch
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directFinalCarrierNormalizedFallbackRouteStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- Complete carrier fallback words formed from each scaled source prefix
 and its aligned normalized retained-fan suffix. -/

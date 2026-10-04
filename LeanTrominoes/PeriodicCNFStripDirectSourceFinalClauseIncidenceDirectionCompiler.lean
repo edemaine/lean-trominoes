@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.FiniteBlockTransducer
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFanCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceDirectionCompiler
@@ -32,11 +33,8 @@ def finalClauseIncidenceQueryBlock
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directFinalClauseIncidenceDirectionStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- One finite direction query for every final clause-core triple and color,
 in clause-major, triple-major, RGB-minor order. -/

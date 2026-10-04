@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeThreeDMTargetCoordinates
 import LeanTrominoes.PeriodicGridDrawingVertexTable
 import LeanTrominoes.UnaryPointFieldsCompiler
@@ -96,14 +97,14 @@ def nativeThreeDMVertexCoordinateCompiler (horizontal positive : Bool) :
     Compiler (fun s => (nativeThreeDMDrawing decider s).vertexPositions) (fun _ point =>
       SignedUnaryCoordinateRefinement.field positive (component horizontal point)) := by
   let physical := UnaryFieldClosure.appendCompiler id _ _
-    (directSourceFinalTripleCoordinatesComputableInPolyTime decider horizontal positive)
+    (directSourceFinalTripleCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive)
     (nativeThreeDMElementSignedCoordinateCompiler decider horizontal positive)
   apply TM2ComputableInPolyTime.of_eq physical
   intro s
   dsimp only
   rw [nativeThreeDMVertexPositions,List.map_append,List.map_map]
-  have first := directSourceFinalTripleCoordinates_eq_horizontal decider horizontal positive s
-  have firstEq : directSourceFinalTripleCoordinates decider horizontal positive s = (nativeThreeDMTriplePositions decider s).map
+  have first := directSourceFinalTripleCoordinates_eq_horizontal (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive s
+  have firstEq : directSourceFinalTripleCoordinates (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive s = (nativeThreeDMTriplePositions decider s).map
       (fun point => SignedUnaryCoordinateRefinement.field positive (component horizontal point)) := by
     apply first.trans
     apply List.map_congr_left

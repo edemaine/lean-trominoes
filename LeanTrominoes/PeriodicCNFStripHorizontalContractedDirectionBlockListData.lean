@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceData
 
 /-! # Canonically ordered compact blocks from incidence blocks -/
@@ -255,7 +256,7 @@ theorem directSparseCompactContractedRouteEntries_mappedOutput_of_incidenceBlock
         (HorizontalContractedRouteRasterSource.tokens
           (directSparseCompactContractedRouteEntries
             (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
-            (directSparseAssembledRouteMetadata decider symbols)
+            (directSparseAssembledRouteMetadata (PeriodicCNF.ProgramSource.ofDecider decider) symbols)
             (horizontalContractedDirectionBlocks
               (horizontalThreeDMProblemComputed
                 (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
@@ -263,9 +264,9 @@ theorem directSparseCompactContractedRouteEntries_mappedOutput_of_incidenceBlock
               incidenceBlock))) =
       GadgetSparseRouteRasterRequestTokens.tokens
         (RouteRasterRequest.directSparseRouteRasterRequestsOfSymbols
-          decider symbols) := by
+          (PeriodicCNF.ProgramSource.ofDecider decider) symbols) := by
   apply directSparseCompactContractedRouteEntries_mappedOutput_of_blocks
-    decider symbols
+    (PeriodicCNF.ProgramSource.ofDecider decider) symbols
   · unfold directSparseComputedNormalizationInputOfSymbols
     rw [horizontalNormalizationInputComputed_problem]
     exact map_fst_horizontalContractedDirectionBlocks

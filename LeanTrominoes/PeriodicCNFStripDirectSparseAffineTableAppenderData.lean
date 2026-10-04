@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTripleTableScan
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineClauseElementTableScan
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineVertexIndexedAppenderData
@@ -20,17 +21,14 @@ open Gadget
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directSparseAffineTableAppenderDataStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- Table-driven variable-triple requests generated from raw source symbols. -/
 def directSparseComputedAffineTableVariableTripleRequestsOfSymbols
     (symbols : List encoding.Γ) :
     List GadgetSparseAffineVertexTokens.Token :=
-  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+  let source := PeriodicCNF.ProgramSource.formulaOfSymbols
     decider symbols
   directSparseComputedAffineTypedTableVariableTripleRequests source
 
@@ -38,7 +36,7 @@ def directSparseComputedAffineTableVariableTripleRequestsOfSymbols
 def directSparseComputedAffineTableClauseTripleRequestsOfSymbols
     (symbols : List encoding.Γ) :
     List GadgetSparseAffineVertexTokens.Token :=
-  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+  let source := PeriodicCNF.ProgramSource.formulaOfSymbols
     decider symbols
   directSparseComputedAffineTableClauseTripleRequests source
 
@@ -65,13 +63,13 @@ theorem directSparseComputedAffineIndexedTripleRequestsOfSymbols_eq_table
     directSparseComputedAffineTableVariableTripleRequestsOfSymbols
     directSparseComputedAffineTableClauseTripleRequestsOfSymbols
   exact directSparseComputedAffineIndexedTripleRequests_eq_cellTables
-    (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
 
 /-- Table-driven retained clause-element requests of one color. -/
 def directSparseComputedAffineTableElementRequestsOfSymbols
     (color : WireColor) (symbols : List encoding.Γ) :
     List GadgetSparseAffineVertexTokens.Token :=
-  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+  let source := PeriodicCNF.ProgramSource.formulaOfSymbols
     decider symbols
   directSparseComputedAffineTableClauseElementRequests
     source (horizontalNormalizationInputComputed source) color
@@ -84,7 +82,7 @@ theorem directSparseComputedAffineIndexedElementRequestsOfSymbols_eq_table
         decider color symbols =
       directSparseComputedAffineTableElementRequestsOfSymbols
         decider color symbols := by
-  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+  let source := PeriodicCNF.ProgramSource.formulaOfSymbols
     decider symbols
   have problemEq :
       (horizontalNormalizationInputComputed source).problem =

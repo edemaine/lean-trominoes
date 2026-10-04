@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFrameBlockLengths
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalEndpointDirections
 import LeanTrominoes.PeriodicCNFStripHorizontalPresentedOccurrenceFields
@@ -26,11 +27,8 @@ attribute [local instance]
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance occurrenceFieldsStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- The completed records retain exactly the kind and polarity of every
 actual horizontal literal, in the same clause-major presentation order. -/
@@ -39,7 +37,7 @@ theorem directSourceFinalVariableOccurrenceData_literalFields_eq_horizontal
     (directSourceFinalVariableOccurrenceData decider symbols).map
         (fun record => (record.kind, record.polarity)) =
       presentedLiteralFields (horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)) := by
   rw [presentedLiteralFields_eq_of_polarityNormalized _
     (horizontalRoutedFormulaComputed_polarityNormalized _)]
   have blockFields :
@@ -48,7 +46,7 @@ theorem directSourceFinalVariableOccurrenceData_literalFields_eq_horizontal
           (HorizontalRoutedRouteHeader.outputConnectorKind frame.header,
             HorizontalRoutedRouteHeader.outputPolarity frame.header)) =
       (horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.clauses.map
           (fun clause => (List.range clause.length).map fun index =>
             (connectorKindOfLiteralIndex index,
               PeriodicCNF.ClauseProfilePolarityNormalization.normalizedPolarity index)) := by
@@ -96,9 +94,9 @@ theorem directSourceFinalVariableOccurrenceData_fields_eq_horizontal
     (directSourceFinalVariableOccurrenceData decider symbols).map
         (fun record => ((record.kind, record.polarity), record.direction)) =
       presentedOccurrenceFields
-        (horizontalRoutedFormulaComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
-        (horizontalRoutedRoutesComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
-  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols
+        (horizontalRoutedFormulaComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
+        (horizontalRoutedRoutesComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)) := by
+  let source := PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols
   let positioned := horizontalRoutedFormulaComputed source
   let routes := horizontalRoutedRoutesComputed source
   let records := directSourceFinalVariableOccurrenceData decider symbols
@@ -120,9 +118,9 @@ theorem directSourceFinalVariableOccurrenceData_fields_eq_normalized
     (directSourceFinalVariableOccurrenceData decider symbols).map
         (fun record => ((record.kind, record.polarity), record.direction)) =
       presentedOccurrenceFields
-        (horizontalSemanticNormalizedRibbonSource (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+        (horizontalSemanticNormalizedRibbonSource (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
         (horizontalSemanticNormalizedPlanarPresentation
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).routes := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).routes := by
   rw [directSourceFinalVariableOccurrenceData_fields_eq_horizontal,
     horizontalRoutedFormulaComputed_eq_semanticData, horizontalRoutedRoutesComputed_eq_semanticData,
     horizontalSemanticNormalizedPlanarPresentation_routes]

@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.CompletionSparseDrawing
 import LeanTrominoes.PeriodicCNFStripDirectSparseAssignmentBounds
 import LeanTrominoes.PeriodicCNFStripDirectExecutableFields
@@ -39,16 +40,17 @@ variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
 local instance sourceModelStack (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 theorem source_sparseModel (symbols : List encoding.Γ) :
-    SparseModel (directCompiledStripDrawingOfSymbols decider symbols)
-      (directSparseAssignmentsOfSymbols decider symbols) := by
+    SparseModel (directCompiledStripDrawingOfSymbols (PeriodicCNF.ProgramSource.ofDecider decider) symbols)
+      (directSparseAssignmentsOfSymbols (PeriodicCNF.ProgramSource.ofDecider decider) symbols) := by
   let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols
   let continuous := presentation source
   let p := continuous.toPlanarPresentation
-  have drawingEq : directCompiledStripDrawingOfSymbols decider symbols = p.stripNormalizedOrthogonalDrawing := by
+  have drawingEq : directCompiledStripDrawingOfSymbols (PeriodicCNF.ProgramSource.ofDecider decider) symbols = p.stripNormalizedOrthogonalDrawing := by
     exact compiledStripDrawing_eq_stripDrawing source
-  have entriesEq : directSparseAssignmentsOfSymbols decider symbols = p.finalStripCellAssignments := by
+  have entriesEq : directSparseAssignmentsOfSymbols (PeriodicCNF.ProgramSource.ofDecider decider) symbols = p.finalStripCellAssignments := by
     unfold directSparseAssignmentsOfSymbols directSparseNormalizationInputOfSymbols normalizationInput
     rw [PeriodicThreeDM.NormalizationCompiler.finalStripCellAssignments_inputOfPresentation]
+    rfl
   rw [drawingEq,entriesEq]
   have bounds (a : DrawingEntry) (ha : a ∈ p.finalStripCellAssignments) :
       0 ≤ a.1.1 ∧ a.1.1 < p.stripNormalizedOrthogonalDrawing.horizontalPeriod ∧

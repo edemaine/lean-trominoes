@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalIncidenceDirectionBlockListSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseElementDegreeSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalTripleOrderedIncidenceBodySemantics
@@ -64,11 +65,11 @@ same number of clauses. -/
 theorem directSourceFinalClauseFans_length_eq_horizontalTypedClauses
     {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
     {language : Input → Prop}
-    (decider : Complexity.DeciderInPolySpace encoding language)
+    (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
     (directSourceFinalClauseFans decider symbols).length =
       (horizontalThreeDMTypedSourceComputed
-        (PolySpaceCompiler.formulaOfSymbols decider symbols)).clauses.length := by
+        (ProgramSource.formulaOfSymbols decider symbols)).clauses.length := by
   have mapped := congrArg List.length
     (directSourceFinalClauseFans_hasRight_eq_typedClauseTernary
       decider symbols)
@@ -79,7 +80,7 @@ clause fan. -/
 theorem directSourceFinalClauseIncidenceBodies_eq_fanBlocks
     {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
     {language : Input → Prop}
-    (decider : Complexity.DeciderInPolySpace encoding language)
+    (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
     directSourceFinalClauseIncidenceBodies decider symbols =
       (directSourceFinalClauseFans decider symbols).flatMap
@@ -132,11 +133,11 @@ typed horizontal triple-order route-body presentation. -/
 theorem directSourceFinalClauseIncidenceBodies_eq_horizontalTyped
     {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
     {language : Input → Prop}
-    (decider : Complexity.DeciderInPolySpace encoding language)
+    (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
     directSourceFinalClauseIncidenceBodies decider symbols =
       horizontalTypedClauseIncidenceBodiesInTripleOrder
-        (PolySpaceCompiler.formulaOfSymbols decider symbols) := by
+        (ProgramSource.formulaOfSymbols decider symbols) := by
   rw [directSourceFinalClauseIncidenceBodies_eq_fanBlocks,
     horizontalTypedClauseIncidenceBodies_eq_clauseBlocks]
   apply flatMap_const_eq_of_length

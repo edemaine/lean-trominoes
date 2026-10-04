@@ -16,12 +16,12 @@ theorem strip_PSPACEHard : Complexity.PSPACEHard Theorem55StripEncoding.finEncod
   intro Input encoding language membership
   obtain ⟨decider⟩ := membership
   let reduce := fun input => Theorem55StripUnary.compiledInput
-    (directSparseCompiledTrominoStrip decider .I input)
+    (directSparseCompiledTrominoStrip (PeriodicCNF.ProgramSource.ofDecider decider) .I input)
   let compiler := TM2CompositionMachine.computableInPolyTime
     (Theorem55StripHardSource.compiler decider) Theorem55StripUnary.compiler
   apply Complexity.PolyTimeManyOneReducible.of_computableInPolyTime reduce ⟨compiler⟩
   intro input
-  exact (directSparseCompiledTrominoStrip_correct decider .I Gadget.iOrientationBehaviorCorrect input).trans
+  exact (directSparseCompiledTrominoStrip_correct (PeriodicCNF.ProgramSource.ofDecider decider) .I Gadget.iOrientationBehaviorCorrect input).trans
     (Theorem55StripUnary.compiledInput_correct _ (Theorem55StripHardSource.wellFormed decider input)).symm
 
 /-- The fixed connected 15-omino P and an input disconnected Q yield PSPACE-complete

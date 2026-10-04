@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeOrdinaryValueColumns
 import LeanTrominoes.PeriodicCNFOrdinarySourceRouteProjection
 import LeanTrominoes.OrdinarySourceRouteRecordCompiler
@@ -19,27 +20,27 @@ local instance ordinaryParentRouteVariableDecidableEq : DecidableEq Variable := 
 set_option maxHeartbeats 800000
 
 def nativeOrdinaryParentRouteDirections (s : List encoding.Γ) : List (List AxisDirection) :=
-  (directSourceFinalParentRouteBlocks decider s).flatMap (fun block => (slots block.1).map (fun slot =>
+  (directSourceFinalParentRouteBlocks (PeriodicCNF.ProgramSource.ofDecider decider) s).flatMap (fun block => (slots block.1).map (fun slot =>
     OrdinarySourceRouteRecord.directions (selectedHeader block.1 slot,
       FormulaShapeFigureNinePolarityRouteTail.selectedTailDirections block.2 (selectedHeader block.1 slot))))
 
 def nativeOrdinaryParentRoutesCompiler [Inhabited encoding.Γ] : TM2ComputableInPolyTime id id
     (fun s => DelimitedDirectionDisplacement.words (nativeOrdinaryParentRouteDirections decider s)) := by
   have records : TM2ComputableInPolyTime id id
-      (fun s => HorizontalRoutedRouteHeaderTail.records (directFigureNinePolarityRoutePairs decider s)) :=
-    TM2ComputableInPolyTime.of_eq (directSourceFinalCompiledRouteTailRecordsComputableInPolyTime decider)
+      (fun s => HorizontalRoutedRouteHeaderTail.records (directFigureNinePolarityRoutePairs (PeriodicCNF.ProgramSource.ofDecider decider) s)) :=
+    TM2ComputableInPolyTime.of_eq (directSourceFinalCompiledRouteTailRecordsComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
       (fun s => by
         rw [directSourceFinalCompiledRouteTailRecords_eq, directFigureNinePolarityRouteTailRecords,
           FormulaShapeRetainedFigureNineSourceTail.records,
           FormulaShapeFigureNinePolarityRouteTail.sourceRecords_eq_records]
         rfl)
   have valid (s : List encoding.Γ) (i : Nat) (member : i ∈ nativeOrdinaryQueries decider s) :
-      i < (directFigureNinePolarityRoutePairs decider s).length := by
+      i < (directFigureNinePolarityRoutePairs (PeriodicCNF.ProgramSource.ofDecider decider) s).length := by
     rw [directSourceFinalParentRouteBlocks_pairs, sourcePairs_blocks]
     apply routeQueries_valid
     simpa only [nativeOrdinaryQueries, directSourceFinalParentRouteBlocks_profiles] using member
   let physical := OrdinarySourceRouteRecord.compiler id (nativeOrdinaryQueries decider)
-    (directFigureNinePolarityRoutePairs decider) (nativeOrdinaryQueriesCompiler decider) records valid
+    (directFigureNinePolarityRoutePairs (PeriodicCNF.ProgramSource.ofDecider decider)) (nativeOrdinaryQueriesCompiler decider) records valid
   apply TM2ComputableInPolyTime.of_eq physical
   intro s
   rw [nativeOrdinaryQueries, directSourceFinalParentRouteBlocks_pairs, sourcePairs_blocks,

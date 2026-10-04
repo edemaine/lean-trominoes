@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSparsePreparedTokenMachineBridge
 
 /-! # Sparse prepared-token compiler interface for Theorem 5.2 -/
@@ -19,7 +20,7 @@ def DirectSparseCompiledTrominoStripPreparedTokenEmitters : Prop :=
   ∀ {Input : Type}
       (encoding : _root_.Computability.FinEncoding Input)
       (language : Input → Prop)
-      (decider : Complexity.DeciderInPolySpace encoding language)
+      (decider : PeriodicCNF.ProgramSource encoding language)
       (tromino : Tromino),
     Nonempty
       (TM2ComputableInPolyTime id id

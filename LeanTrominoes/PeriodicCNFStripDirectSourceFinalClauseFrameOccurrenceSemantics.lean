@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripHorizontalIncidenceIndexFields
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFanHorizontalSemantics
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMOccurrenceEntryIndices
@@ -23,10 +24,8 @@ attribute [local instance]
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance clauseOccurrenceStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 /-- Clause fans and groups retain the actual normalized clause/literal
 presentation positions used by variable occurrence lookup. -/
@@ -35,10 +34,10 @@ theorem directSourceFinalClauseFrames_fan_groups_eq_normalized
     (directSourceFinalClauseFrames decider symbols).map
         (fun frame => (frame.clauseFan, frame.group)) =
       presentedIncidenceIndexFields (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
         (fun clauseIndex literalIndex =>
           (horizontalOccurrenceClauseRibbonFanDataComputed
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, clauseIndex),
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, clauseIndex),
           terminalGroupOfLiteralIndex literalIndex)) := by
   rw [presentedIncidenceIndexFields_horizontal_normalized,
     presentedIncidenceIndexFields_eq_clauseRanges]
@@ -50,15 +49,15 @@ theorem directSourceFinalClauseFrame_fields_of_occurrenceAt
     (symbols : List encoding.Γ) (atom : RoutedVariable) (slot : OccurrenceSlot)
     (tagged : TaggedOccurrence RoutedVariable)
     (lookup : occurrenceAt (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase atom slot = some tagged) :
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase atom slot = some tagged) :
     let frame := (directSourceFinalClauseFrames decider symbols).getD
       (occurrenceEntryIndex (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase (atom, slot)) default
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase (atom, slot)) default
     (frame.clauseFan, frame.group) =
       (horizontalOccurrenceClauseRibbonFanDataComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, tagged.2.1),
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, tagged.2.1),
       terminalGroupOfLiteralIndex tagged.2.2) := by
-  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols
+  let source := PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols
   let positioned := horizontalSemanticNormalizedRibbonSource source
   let field := fun tagged : TaggedOccurrence RoutedVariable =>
     (horizontalOccurrenceClauseRibbonFanDataComputed (source, tagged.2.1),

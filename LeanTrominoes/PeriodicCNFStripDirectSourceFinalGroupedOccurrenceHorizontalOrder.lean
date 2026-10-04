@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.FinalFanQueryRankKeyOrder
 import LeanTrominoes.KeyedAlignedDatumRange
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexSemantics
@@ -22,10 +23,8 @@ attribute [local instance]
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance groupedHorizontalOrderStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 /-- The key lookup recovers exact variable-major occurrence order for the
 compiled atom identity column. -/
@@ -59,13 +58,13 @@ theorem directSourceFinalGroupedOccurrenceIndices_eq_horizontal
     directSourceFinalGroupedOccurrenceIndices decider symbols =
       StableOccurrenceRanks.groupedIndices
         (horizontalSemanticNormalizedRibbonSource
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences := by
   rw [directSourceFinalGroupedOccurrenceIndices_eq_groupedIndices,
     horizontalSemanticNormalizedRibbonSource_variableOccurrences]
   have identified := StableOccurrenceRanks.groupedIndices_eq_of_partition
     (directSourceFinalAtomIdentityCodes decider symbols)
     (horizontalRoutedFormulaComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences
     (directSourceFinalAtomIdentityCodes_length_eq_horizontalAtoms decider symbols)
     (directSourceFinalAtomIdentityCodes_partition_horizontal decider symbols)
   simpa only [StableOccurrenceRanks.groupedIndices, List.idxsOf,

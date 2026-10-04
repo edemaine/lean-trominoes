@@ -226,11 +226,11 @@ paper theorem being complete; the entries below distinguish these cases.
 | Theorem 4.6 | Every perfect matching in a bipartite periodic graph implies a period-one perfect matching; equivalence with finite quotient matching proved in every dimension, without a locality restriction |
 | Theorem 4.7 | Executable decision and period-one matching construction in every dimension, with a verified `O(E√V)` bound for indexed inputs in the unit-cost RAM model |
 | Lemma 5.1 | Arbitrary finite-footprint periodic subspace tiling and completion are co-r.e. in every dimension. Both strip problems are in PSPACE for each fixed polynomial bounding box under native binary encoding; the palette, target, and prefill are all input |
-| Theorem 5.12 | Decidability proved for both L- and I-tromino finite preplacements, via executable finite search and proved exterior extensions. Certificates use at most the bounding-box area in tiles; the NP-completeness clause remains open |
+| Theorem 5.12 | Decidability and NP-completeness proved for both trominoes, with the canonical bounding box listed in the encoding: `Tromino.FiniteCoordinateColumns.completion_npComplete` |
 | Theorem 5.13 | Every tileable periodic domino region has a tiling invariant under twice each original generator, in every ambient dimension and periodic rank |
 | Corollary 5.14 | Every completable periodic domino prefill has a completion with those doubled periods |
 | Corollary 5.15 | Executable decision from cell representatives and arbitrary nonsingular integer period matrices; quadratic operation budget in the number of representatives for each fixed dimension, in the unit-cost arithmetic RAM model |
-| Corollary 5.4 | Finite-region tromino NP-completeness remains open |
+| Corollary 5.4 | Proved for both trominoes under the explicit unary coordinate encoding: `Tromino.FiniteCoordinateColumns.region_npComplete` |
 | Other results 5.7–5.11 except those listed above | Open |
 
 [Cook–Levin](LeanTrominoes/FiniteSATNPHard.lean) is proved for the
@@ -260,8 +260,10 @@ under the explicit unary coordinate encoding, and
 when the canonical bounding box is explicitly listed in that encoding.
 These statements charge for unary coordinate magnitudes and the listed box;
 they do not establish membership under an unpadded binary-coordinate encoding.
-The finite tromino hardness reductions remain open, so both NP-completeness
-clauses remain open.
+[Finite-region NP-completeness](LeanTrominoes/FiniteTrominoRegionNPComplete.lean)
+is proved for both trominoes under the original unary coordinate encoding.
+[Finite-preplacement plane completion is also NP-complete](LeanTrominoes/FiniteTrominoCompletionNPComplete.lean)
+for both trominoes when the canonical bounding box is listed in the encoding.
 
 The [finite substitution bridge](LeanTrominoes/FiniteGadgetSubstitution.lean)
 now proves orientation equivalent to finite-motif tileability for both trominoes,
@@ -291,7 +293,22 @@ zero-offset drawing inside one square, preserves complete route separation
 and simplicity, and moves the blank seams to the final boundary. The
 [finite retained region](LeanTrominoes/FiniteRetainedTrominoRegion.lean) is
 tileable exactly when the finite source formula is satisfiable, for either
-tromino. Connecting the actual polynomial-time source compiler remains.
+tromino. The [shared program-source interface](LeanTrominoes/PeriodicCNFProgramSource.lean)
+accepts both the existing PSPACE source and the finite NP verifier source. The
+[finite source compiler](LeanTrominoes/FiniteProgramTrominoRegionCompiler.lean)
+now emits the padded, seam-shifted sparse drawing and its finite gadget region
+in the original encoding, with no source-emitter hypothesis.
+
+The [finite completion construction](LeanTrominoes/FiniteDrawingCompletion.lean)
+uses a finite collar of preplaced brick motifs. Local barrier and portal
+ownership proofs extract the required circuit behavior from any plane
+completion. The [completion compiler](LeanTrominoes/FiniteProgramCompletionCompiler.lean)
+evaluates signed-coordinate palette queries, emits the prescribed placements,
+and computes their exact canonical radius before listing the bounding box.
+The final finite NP-completeness theorems have no source-emitter assumptions or
+`sorryAx`; they inherit the existing native-evaluation certificates of the
+source and runtime pipeline.
+
 
 The [domino results](LeanTrominoes/DominoTheorems.lean) use exact covers by
 face-adjacent two-cell footprints. The proofs allow disconnected regions and

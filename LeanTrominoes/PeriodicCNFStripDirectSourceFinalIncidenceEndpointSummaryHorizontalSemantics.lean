@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripIncidenceEndpointSummaryCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalIncidenceBodyHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSparseRouteIncidenceHeaderSemantics
@@ -99,7 +100,7 @@ theorem incidenceEndpointSummary_directionOutput_horizontal (source : PeriodicCN
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Explicit finite-state endpoint extraction from the verified source
 incidence-word compiler. -/
@@ -120,9 +121,9 @@ including the full RGB fan needed for header construction. -/
 theorem directSourceFinalIncidenceEndpointSummaries_eq_horizontal (symbols : List encoding.Γ) :
     directSourceFinalIncidenceEndpointSummaries decider symbols =
       (horizontalThreeDMProblemComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.map
         (horizontalIncidenceEndpointSummary
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)) := by
   unfold directSourceFinalIncidenceEndpointSummaries
   rw [directSourceFinalCanonicalIncidenceDirectionTokens_eq_horizontal,
     incidenceEndpointSummary_directionOutput_horizontal]

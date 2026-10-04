@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.FiniteRoleSlotUnaryDecoderCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFanQueryKeyCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalVariableOccurrenceData
@@ -62,11 +63,8 @@ def decodedFinalFanOccurrenceData (codes : List Nat) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directFinalFanOccurrenceDataStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- Unary candidate values aligned with all final occurrence keys. -/
 def directSourceFinalFanOccurrenceCandidateCodes

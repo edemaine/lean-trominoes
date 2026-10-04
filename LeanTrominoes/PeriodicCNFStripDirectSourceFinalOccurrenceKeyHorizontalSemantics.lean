@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedOccurrenceEntryOrder
 
 /-! # Unique compiled keys name the actual horizontal occurrence entries -/
@@ -31,7 +32,7 @@ private theorem activeOccurrence_rank_lt_count
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- The compiled key at an actual horizontal occurrence's presentation index.
 Only active entries are used by the element-code interpretation. -/
@@ -39,7 +40,7 @@ def directSourceFinalHorizontalOccurrenceKey
     (symbols : List encoding.Γ) (entry : RoutedVariable × OccurrenceSlot) : Nat :=
   (directSourceFinalOccurrenceCandidateKeys decider symbols).getD
     (occurrenceEntryIndex (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry) 0
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry) 0
 
 /-- Reading the candidate key at each recovered position inverts regrouping. -/
 theorem directSourceFinalGroupedOccurrenceIndices_map_candidateKey
@@ -65,7 +66,7 @@ theorem directSourceFinalUniqueFanQueryKeys_eq_horizontal
     (symbols : List encoding.Γ) :
     directSourceFinalUniqueFanQueryKeys decider symbols =
       (occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase).map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase).map
         (directSourceFinalHorizontalOccurrenceKey decider symbols) := by
   rw [← directSourceFinalGroupedOccurrenceIndices_map_candidateKey,
     directSourceFinalGroupedOccurrenceIndices_eq_occurrenceEntries, List.map_map]
@@ -77,9 +78,9 @@ theorem directSourceFinalHorizontalOccurrenceKey_injective_on_entries
     (symbols : List encoding.Γ)
     (first second : RoutedVariable × OccurrenceSlot)
     (firstMember : first ∈ occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase)
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase)
     (secondMember : second ∈ occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase)
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase)
     (equal : directSourceFinalHorizontalOccurrenceKey decider symbols first =
       directSourceFinalHorizontalOccurrenceKey decider symbols second) :
     first = second := by
@@ -94,17 +95,17 @@ naming the cyclic successor from the current occurrence's identity. -/
 theorem directSourceFinalHorizontalOccurrenceKey_eq_base_rank
     (symbols : List encoding.Γ) (index : Nat) (atom : RoutedVariable)
     (atomLookup : (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[index]? = some atom)
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences[index]? = some atom)
     (slot : OccurrenceSlot)
     (member : (atom, slot) ∈ occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase) :
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase) :
     directSourceFinalHorizontalOccurrenceKey decider symbols (atom, slot) =
       (directSourceFinalAtomIdentityCodes decider symbols).getD index 0 * 3 + slot.index := by
   have rankLt : slot.index < (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.count atom := by
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.count atom := by
     simpa only [List.count_eq_countP, Bool.beq_eq_decide_eq] using
       activeOccurrence_rank_lt_count (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase (atom, slot) member
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase (atom, slot) member
   have keyMember : (directSourceFinalAtomIdentityCodes decider symbols).getD index 0 * 3 + slot.index ∈
       directSourceFinalOccurrenceCandidateKeys decider symbols := by
     rw [directSourceFinalOccurrenceCandidateKeys_eq_candidateKeys]

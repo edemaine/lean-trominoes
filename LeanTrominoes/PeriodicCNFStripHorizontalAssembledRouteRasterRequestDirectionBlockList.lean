@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripHorizontalAssembledRouteRasterRequestDirectionBlock
 
 /-! # Compact direction blocks for complete assembled raster-request lists -/
@@ -86,9 +87,9 @@ theorem directSparseRouteRasterRequestTokens_directionBlocks
       entries.map Prod.fst = edges ∧
         GadgetSparseRouteRasterRequestTokens.tokens
             (RouteRasterRequest.directSparseRouteRasterRequestsOfSymbols
-              decider symbols) =
+              (PeriodicCNF.ProgramSource.ofDecider decider) symbols) =
           horizontalAssembledRouteRasterRequestDirectionBlockListTokens
-            source (directSparseAssembledRouteMetadata decider symbols)
+            source (directSparseAssembledRouteMetadata (PeriodicCNF.ProgramSource.ofDecider decider) symbols)
             entries := by
   dsimp only
   rw [directSparseRouteRasterRequestsOfSymbols_eq_assembled]
@@ -103,7 +104,7 @@ theorem directSparseRouteRasterRequestTokens_directionBlocks
       (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
         decider symbols)).contractedEdges
     (fun _ member => member)
-    (directSparseAssembledRouteMetadata decider symbols)
+    (directSparseAssembledRouteMetadata (PeriodicCNF.ProgramSource.ofDecider decider) symbols)
 
 end PeriodicCNFStripReduction
 end LeanTrominoes

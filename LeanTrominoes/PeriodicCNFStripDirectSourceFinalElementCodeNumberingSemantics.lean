@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripTypedElementCodeEncoding
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalElementCodeHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalIncidenceElementCodeHorizontalSemantics
@@ -25,14 +26,14 @@ attribute [local instance]
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Structural code at an actual numbered horizontal element. -/
 def directSourceFinalHorizontalElementCode (symbols : List encoding.Γ)
     (element : WireColor × Nat) : Nat :=
   TypedElementCode.encodedElement
     (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase
     (directSourceFinalHorizontalOccurrenceKey decider symbols) element
 
 /-- The complete compiled element column names the numbered elements in their
@@ -42,7 +43,7 @@ theorem directSourceFinalCanonicalElementCodes_eq_horizontal
     directSourceFinalCanonicalElementCodes decider symbols =
       (CountedContractedIncidence.horizontalElementPairs
         (horizontalThreeDMProblemComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))).map
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))).map
         (directSourceFinalHorizontalElementCode decider symbols) := by
   rw [directSourceFinalCanonicalElementCodes_eq_horizontalTyped,
     horizontalThreeDMProblemComputed_eq_semantic]
@@ -55,10 +56,10 @@ theorem directSourceFinalCanonicalIncidenceElementCodes_eq_horizontal
     (symbols : List encoding.Γ) :
     directSourceFinalCanonicalIncidenceElementCodes decider symbols =
       (horizontalThreeDMProblemComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.map
         (fun tag => directSourceFinalHorizontalElementCode decider symbols
           ((horizontalThreeDMProblemComputed
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceElement tag)) := by
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceElement tag)) := by
   rw [directSourceFinalCanonicalIncidenceElementCodes_eq_horizontalTyped,
     horizontalThreeDMProblemComputed_eq_semantic]
   unfold directSourceFinalHorizontalElementCode
@@ -69,16 +70,16 @@ colored horizontal element, including across distinct colors. -/
 theorem directSourceFinalHorizontalIncidenceCode_eq_iff
     (symbols : List encoding.Γ) (element : WireColor × Nat)
     (elementLt : element.2 < (horizontalThreeDMProblemComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).elementCount element.1)
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).elementCount element.1)
     (tag : IncidenceTag)
     (tagMember : tag ∈ (horizontalThreeDMProblemComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags) :
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceTags) :
     directSourceFinalHorizontalElementCode decider symbols
         ((horizontalThreeDMProblemComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceElement tag) =
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceElement tag) =
       directSourceFinalHorizontalElementCode decider symbols element ↔
         (horizontalThreeDMProblemComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceElement tag = element := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceElement tag = element := by
   have unique := directSourceFinalCanonicalElementCodes_nodup decider symbols
   rw [directSourceFinalCanonicalElementCodes_eq_horizontalTyped] at unique
   rw [horizontalThreeDMProblemComputed_eq_semantic] at elementLt tagMember ⊢

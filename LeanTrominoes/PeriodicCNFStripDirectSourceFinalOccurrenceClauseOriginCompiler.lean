@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripHorizontalSourceOccurrenceParentIndices
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseOriginCompiler
 import LeanTrominoes.UnaryIndexedValueLookupSemantics
@@ -18,10 +19,8 @@ open PeriodicCNF.FormulaShapeRetainedFigureNineSourceTail
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance occurrenceOriginStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 attribute [local instance] directSourceVariableDecidableEqInstance
 
 /-- Original pre-Figure 9 parent indices, including copied and cycle parents. -/
@@ -57,8 +56,8 @@ theorem directSourceFinalSourceParentIndices_lt (symbols : List encoding.Γ) (pa
   rw [directSourceFinalSourceParentIndices_eq_occurrences] at member
   obtain ⟨occurrence, occurrenceMember, rfl⟩ := List.mem_map.mp member
   obtain ⟨witness⟩ := occurrenceWitness (directSourceFormula decider symbols)
-    (sourceFormula_widthAtMostThree (PolySpaceCompiler.formulaOfSymbols decider symbols))
-    (sourceFormula_clausesNonempty (PolySpaceCompiler.formulaOfSymbols decider symbols)) occurrence occurrenceMember
+    (sourceFormula_widthAtMostThree (ProgramSource.formulaOfSymbols decider symbols))
+    (sourceFormula_clausesNonempty (ProgramSource.formulaOfSymbols decider symbols)) occurrence occurrenceMember
   exact (List.getElem?_eq_some_iff.mp witness.sourceLookup).1
 
 /-- Broadcast each stored parent origin to all of its final occurrence rows. -/

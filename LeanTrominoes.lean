@@ -15,6 +15,8 @@ import LeanTrominoes.FiniteThreeSATThree
 import LeanTrominoes.FiniteGadgetSubstitution
 import LeanTrominoes.FiniteGadgetRegionCompiler
 import LeanTrominoes.FiniteTrominoCompletionInNP
+import LeanTrominoes.FiniteTrominoRegionNPComplete
+import LeanTrominoes.FiniteTrominoCompletionNPComplete
 import LeanTrominoes.FiniteTrominoVerifierSize
 import LeanTrominoes.FiniteTrominoCompletionCertificate
 import LeanTrominoes.FiniteSATNPHard

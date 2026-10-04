@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeThreeDMElements
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalIncidenceBodyHorizontalSemantics
 import LeanTrominoes.DelimitedDirectionDisplacementCompiler
@@ -37,7 +38,7 @@ private theorem directionToken_blocks (routes : List (List AxisDirection)) :
 def nativeThreeDMDirectionsCompiler : TM2ComputableInPolyTime id id
     (fun s => words (nativeThreeDMDirections decider s)) := by
   let physical := TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalCanonicalIncidenceDirectionTokensComputableInPolyTime decider)
+    (directSourceFinalCanonicalIncidenceDirectionTokensComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
     (FiniteBlockTransducer.computableInPolyTime (fun token => [directionToken token]))
   apply TM2ComputableInPolyTime.of_eq physical
   intro s

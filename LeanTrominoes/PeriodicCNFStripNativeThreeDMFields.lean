@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeThreeDMGeometry
 import LeanTrominoes.PeriodicThreeDMFieldsCompiler
 import LeanTrominoes.UnaryColumnSignedCoordinateSum
@@ -32,10 +33,10 @@ def nativeThreeDMOffsetCompiler (horizontal : Bool) :
 
 def nativeThreeDMTripleCountCompiler : ScalarCompiler (fun s => (nativeThreeDMProblem decider s).triples.length) := by
   let physical := TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalTripleCoordinatesComputableInPolyTime decider true true) UnaryFieldAggregate.countCompiler
+    (directSourceFinalTripleCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) true true) UnaryFieldAggregate.countCompiler
   apply TM2ComputableInPolyTime.of_eq physical
   intro s
-  simp only [directSourceFinalTripleCoordinates_length,nativeThreeDMTriplePositions_length]
+  simp only [directSourceFinalTripleCoordinates_length,PeriodicCNF.ProgramSource.ofDecider,nativeThreeDMTriplePositions_length]
 
 def nativeThreeDMFieldsCompiler : TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
     (fun s => PeriodicThreeDM.FlatEncoding.fields (nativeThreeDMProblem decider s)) :=

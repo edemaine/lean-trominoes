@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineDirectionExact
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalElementDegreeCompiler
@@ -27,11 +28,8 @@ open PeriodicOrthocrossing
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directFinalClauseDegreePatternStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance directFinalClauseDegreePatternVariableDecidableEq :
     DecidableEq Variable :=
@@ -92,23 +90,23 @@ theorem directSourceFinalClauseDescriptors_eq_finiteClausePrefix
     PeriodicThreeSATThree.sourceVariables
       (FormulaShapeRetainedFigureNineDirection.sourceScaledForFigureSeven
         (sourceFormula
-          (PolySpaceCompiler.formulaOfSymbols decider symbols))).erase
+          (ProgramSource.formulaOfSymbols decider symbols))).erase
   change
     FormulaShapeRetainedFigureNineDirection.copiedClauseDescriptors
           (sourceFormula
-            (PolySpaceCompiler.formulaOfSymbols decider symbols)) ++
+            (ProgramSource.formulaOfSymbols decider symbols)) ++
         (List.replicate atoms.length .variable).flatMap
           directSourceFinalCycleClauseDescriptorBlock =
       FormulaShapeRetainedFigureNineDirection.copiedClauseDescriptors
           (sourceFormula
-            (PolySpaceCompiler.formulaOfSymbols decider symbols)) ++
+            (ProgramSource.formulaOfSymbols decider symbols)) ++
         atoms.flatMap fun _ =>
           FormulaShapeFixedEightDirection.cycleClauseDescriptors
   exact congrArg
     (fun tail =>
       FormulaShapeRetainedFigureNineDirection.copiedClauseDescriptors
           (sourceFormula
-            (PolySpaceCompiler.formulaOfSymbols decider symbols)) ++ tail)
+            (ProgramSource.formulaOfSymbols decider symbols)) ++ tail)
     (variableMarkers_cycleClauseBlocks atoms)
 
 /-- Direct clause fans retain exactly the binary/ternary pattern of the
@@ -142,11 +140,11 @@ theorem directSourceFinalClauseFans_hasRight_eq_finalShape
   have sourceLocal : source.IsLocal := by
     simpa only [source, directSourceFormula] using
       sourceFormula_isLocal
-        (PolySpaceCompiler.formulaOfSymbols decider symbols)
+        (ProgramSource.formulaOfSymbols decider symbols)
   have sourceWidth : source.WidthAtMost 3 := by
     simpa only [source, directSourceFormula] using
       sourceFormula_widthAtMostThree
-        (PolySpaceCompiler.formulaOfSymbols decider symbols)
+        (ProgramSource.formulaOfSymbols decider symbols)
   have sourceOccurrences :
       @PeriodicCNF.OccurrencesAtMost Variable instBEqOfDecidableEq
         (by infer_instance) 3 source := by
@@ -154,11 +152,11 @@ theorem directSourceFinalClauseFans_hasRight_eq_finalShape
     intro atom
     exact
       (sourceFormula_occurrencesAtMostThree_canonicalBEq
-        (PolySpaceCompiler.formulaOfSymbols decider symbols)) atom
+        (ProgramSource.formulaOfSymbols decider symbols)) atom
   have sourceClausesNonempty : ∀ clause ∈ source.clauses, clause ≠ [] := by
     simpa only [source, directSourceFormula] using
       sourceFormula_clausesNonempty
-        (PolySpaceCompiler.formulaOfSymbols decider symbols)
+        (ProgramSource.formulaOfSymbols decider symbols)
   calc
     (directSourceFinalClauseFans decider symbols).map
           ClauseRibbonFanData.hasRight =

@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeClauseArities
 import LeanTrominoes.PeriodicOneInThreePolarityNormalizationPresentationProperties
 
@@ -42,7 +43,7 @@ noncomputable def nativeLiteralValuesCompiler :
         (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses.flatMap
           (fun clause => clause.map (fun literal => literal.value.toNat))) := by
   let physical := TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
+    (directSourceFinalClauseDescriptorsComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
     (FiniteUnaryFieldBlockMap.computableInPolyTime (fun token =>
       (HorizontalRoutedRouteHeaderClauseFrame.tokenBlocks token).flatMap (fun block => signFields block.length)))
   apply TM2ComputableInPolyTime.of_eq physical

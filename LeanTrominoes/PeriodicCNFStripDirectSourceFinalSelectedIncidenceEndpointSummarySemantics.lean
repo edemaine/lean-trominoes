@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceValueCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalIncidenceEndpointSummaryHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalSelectedIncidenceBodyHorizontalSemantics
@@ -35,7 +36,7 @@ def horizontalIncidenceEndpointSummariesByElement (source : PeriodicCNF Nat) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Identity and finite endpoint columns name the same canonical incidence list. -/
 theorem directSourceFinalIncidenceEndpointSummaryColumns_length (symbols : List encoding.Γ) :
@@ -79,7 +80,7 @@ theorem directSourceFinalSelectedIncidenceEndpointSummaries_eq_horizontal
     (symbols : List encoding.Γ) :
     directSourceFinalSelectedIncidenceEndpointSummaries decider symbols =
       horizontalIncidenceEndpointSummariesByElement
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) := by
   unfold directSourceFinalSelectedIncidenceEndpointSummaries
   rw [CountedContractedIncidence.selectedValues_eq_grouped _ _ _ _
     (directSourceFinalCountedContraction_elementColumns_length decider symbols)

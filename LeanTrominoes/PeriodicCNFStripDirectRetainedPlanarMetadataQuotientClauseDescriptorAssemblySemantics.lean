@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataNormalizedRoutedVariableDescriptorQuotient
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataQuotientClauseDescriptorAssemblyData
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataQuotientFamilySemantics
@@ -21,11 +22,8 @@ open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directQuotientAssemblySemanticsStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance directQuotientAssemblySemanticsVariableDecidableEq :
     DecidableEq Variable :=
@@ -39,9 +37,9 @@ theorem directRetainedPlanarMetadataQuotientClauseDescriptorAssembly_eq_quotient
         decider symbols =
       PeriodicThreeSATThree.clauseDescriptorQuotient
         (PeriodicThreeCNF.formula
-          (PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
+          (ProgramSource.formulaOfSymbols decider symbols)) := by
   let source := PeriodicThreeCNF.formula
-    (PolySpaceCompiler.formulaOfSymbols decider symbols)
+    (ProgramSource.formulaOfSymbols decider symbols)
   have sourceEq : directSourceFormula decider symbols =
       PeriodicThreeSATThree.formula source := by
     simpa only [source] using

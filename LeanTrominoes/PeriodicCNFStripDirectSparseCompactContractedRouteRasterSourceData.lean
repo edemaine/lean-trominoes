@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSparseContractedRouteRasterSourceData
 import LeanTrominoes.PeriodicCNFStripHorizontalContractedRouteRasterSourceData
 
@@ -135,12 +136,8 @@ theorem directSparseCompactContractedRouteEntries_mappedOutput
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance
-    directSparseCompactContractedRouteSourceDataStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- Ordered block projection and pointwise direction correctness are the only
 semantic obligations needed for a complete direct compact source word. -/
@@ -153,21 +150,21 @@ theorem directSparseCompactContractedRouteEntries_mappedOutput_of_blocks
     (directions : ∀ tagged ∈ blocks,
       tagged.2.directions =
         horizontalAssembledContractedDirections
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+          (PeriodicCNF.ProgramSource.formulaOfSymbols
             decider symbols) tagged.1) :
     TM2EndDelimitedBlockMap.mappedOutput
         HorizontalContractedRouteRasterSource.isEnd
         HorizontalContractedRouteRasterSource.requestOutput
         (HorizontalContractedRouteRasterSource.tokens
           (directSparseCompactContractedRouteEntries
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
             (directSparseAssembledRouteMetadata decider symbols)
             blocks)) =
       GadgetSparseRouteRasterRequestTokens.tokens
         (RouteRasterRequest.directSparseRouteRasterRequestsOfSymbols
           decider symbols) := by
   rw [directSparseCompactContractedRouteEntries_mappedOutput
-    (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
     (directSparseAssembledRouteMetadata decider symbols)
     blocks directions]
   apply congrArg GadgetSparseRouteRasterRequestTokens.tokens

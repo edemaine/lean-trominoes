@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableOriginCompiler
 import LeanTrominoes.PeriodicCNFStripGroupedVariableTriplePositionTable
 import LeanTrominoes.SignedUnaryCoordinateIndexedTableExpansion
@@ -35,10 +36,8 @@ private theorem component_add (horizontal : Bool) (origin offset : Cell) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance variableTripleCoordinatesStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 /-- Expand each grouped variable origin using its finite fan-selected triple table. -/
 def directSourceFinalVariableTripleCoordinates (horizontal keepPositive : Bool)
@@ -66,7 +65,7 @@ theorem directSourceFinalVariableTripleCoordinates_eq_horizontal
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     directSourceFinalVariableTripleCoordinates decider horizontal keepPositive symbols =
       (horizontalThreeDMVariableTriplePositionsComputed
-        (PolySpaceCompiler.formulaOfSymbols decider symbols)).map
+        (ProgramSource.formulaOfSymbols decider symbols)).map
           (CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)) := by
   unfold directSourceFinalVariableTripleCoordinates
   simp only [directSourceFinalGroupedVariableFanSlots_eq_horizontal,
@@ -82,7 +81,7 @@ noncomputable def directSourceFinalHorizontalVariableTripleCoordinatesComputable
     (horizontal keepPositive : Bool) :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun symbols => (horizontalThreeDMVariableTriplePositionsComputed
-        (PolySpaceCompiler.formulaOfSymbols decider symbols)).map
+        (ProgramSource.formulaOfSymbols decider symbols)).map
           (CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive))) :=
   TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
     (directSourceFinalVariableTripleCoordinatesComputableInPolyTime decider horizontal keepPositive)

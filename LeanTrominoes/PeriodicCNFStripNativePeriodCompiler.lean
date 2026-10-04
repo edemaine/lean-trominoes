@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedPlacementBridge
 import LeanTrominoes.PeriodicCNFStripHorizontalPeriodSize
 import LeanTrominoes.PeriodicCNFStripDirectGridUnitEmitter
@@ -38,14 +39,14 @@ noncomputable def nativeRoutedPeriodCompiler :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun s => [(horizontalRoutedPlacementComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider s)).period]) := by
   let base : TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
-      (fun s => [(directGridUnitsOfSymbols decider s).length]) :=
+      (fun s => [(directGridUnitsOfSymbols (PeriodicCNF.ProgramSource.ofDecider decider) s).length]) :=
     TM2CompositionMachine.computableInPolyTime
-    (directGridUnitsOfSymbolsComputableInPolyTime decider)
+    (directGridUnitsOfSymbolsComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
     UnaryFieldUnitLengthBroadcast.singletonComputableInPolyTime
   let result := TM2CompositionMachine.computableInPolyTime base
     (UnaryFieldConstantScale.computableInPolyTime (3 * horizontalPlacementPeriodFactor))
   simpa only [UnaryFieldConstantScale.values, List.map_cons, List.map_nil,
-    directGridUnitsOfSymbols_length, nativeRoutedPeriod_eq, Nat.mul_comm] using result
+    directGridUnitsOfSymbols_length, nativeRoutedPeriod_eq, Nat.mul_comm, PeriodicCNF.ProgramSource.ofDecider] using result
 
 end LeanTrominoes.PeriodicCNFStripReduction
 end

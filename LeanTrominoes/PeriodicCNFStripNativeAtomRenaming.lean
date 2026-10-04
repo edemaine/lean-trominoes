@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.OccurrenceIdentityRenaming
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceStableRankHorizontalSemantics
 import LeanTrominoes.PeriodicExactOneInjectiveRenaming
@@ -28,16 +29,16 @@ def nativeRoutedFormulaSource (symbols : List encoding.Γ) :=
 
 theorem nativeAtomCodes_coherent (symbols : List encoding.Γ) :
     OccurrenceIdentity.Coherent (nativeRoutedFormulaSource decider symbols).variableOccurrences
-      (directSourceFinalAtomIdentityCodes decider symbols) := by
-  refine ⟨directSourceFinalAtomIdentityCodes_length_eq_horizontalAtoms decider symbols,?_⟩
+      (directSourceFinalAtomIdentityCodes (PeriodicCNF.ProgramSource.ofDecider decider) symbols) := by
+  refine ⟨directSourceFinalAtomIdentityCodes_length_eq_horizontalAtoms (PeriodicCNF.ProgramSource.ofDecider decider) symbols,?_⟩
   intro i hi j hj
-  exact directSourceFinalAtomIdentityCodes_partition_horizontal decider symbols i j
+  exact directSourceFinalAtomIdentityCodes_partition_horizontal (PeriodicCNF.ProgramSource.ofDecider decider) symbols i j
     (by rwa [directSourceFinalAtomIdentityCodes_length_eq_horizontalAtoms])
     (by rwa [directSourceFinalAtomIdentityCodes_length_eq_horizontalAtoms])
 
 def nativeAtomRenaming (symbols : List encoding.Γ) : RoutedVariable → Nat :=
   OccurrenceIdentity.rename (nativeRoutedFormulaSource decider symbols).variableOccurrences
-    (directSourceFinalAtomIdentityCodes decider symbols)
+    (directSourceFinalAtomIdentityCodes (PeriodicCNF.ProgramSource.ofDecider decider) symbols)
 
 theorem nativeAtomRenaming_injective (symbols : List encoding.Γ) : Function.Injective (nativeAtomRenaming decider symbols) :=
   OccurrenceIdentity.rename_injective _ _ (nativeAtomCodes_coherent decider symbols)
@@ -46,7 +47,7 @@ def nativeRoutedFormula (symbols : List encoding.Γ) : PeriodicCNF Nat :=
   (nativeRoutedFormulaSource decider symbols).rename (nativeAtomRenaming decider symbols)
 
 theorem nativeRoutedFormula_atoms (symbols : List encoding.Γ) :
-    (nativeRoutedFormula decider symbols).variableOccurrences = directSourceFinalAtomIdentityCodes decider symbols := by
+    (nativeRoutedFormula decider symbols).variableOccurrences = directSourceFinalAtomIdentityCodes (PeriodicCNF.ProgramSource.ofDecider decider) symbols := by
   rw [nativeRoutedFormula,PeriodicCNF.variableOccurrences_rename]
   exact OccurrenceIdentity.map_rename _ _ (nativeAtomCodes_coherent decider symbols)
 
@@ -58,7 +59,7 @@ theorem nativeRoutedFormula_exactOne (symbols : List encoding.Γ) :
 noncomputable def nativeRoutedFormulaAtomsComputableInPolyTime :
     Turing.TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun symbols => (nativeRoutedFormula decider symbols).variableOccurrences) := by
-  simpa only [nativeRoutedFormula_atoms] using directSourceFinalAtomIdentityCodesComputableInPolyTime decider
+  simpa only [nativeRoutedFormula_atoms] using directSourceFinalAtomIdentityCodesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider)
 
 end LeanTrominoes.PeriodicCNFStripReduction
 end

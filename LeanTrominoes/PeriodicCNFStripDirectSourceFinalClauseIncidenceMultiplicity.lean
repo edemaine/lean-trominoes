@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.ListZipWithFlattenAppendPerm
 import LeanTrominoes.ListZipWithProject
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalElementCodeSemantics
@@ -123,7 +124,7 @@ private theorem zipWith_flatten_perm_of_pointwise
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Canonical clause element identities repeated by their declared degrees,
 in clause-major RGB order. -/

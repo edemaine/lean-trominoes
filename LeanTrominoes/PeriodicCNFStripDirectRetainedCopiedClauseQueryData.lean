@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorData
 import LeanTrominoes.RetainedAngularFanFinalCopiedClauseQuery
 
@@ -19,11 +20,8 @@ open PeriodicEightOccurrenceSplit
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directRetainedCopiedClauseQueryDataStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance directRetainedCopiedClauseQueryDataVariableDecidableEq :
     DecidableEq Variable :=
@@ -35,7 +33,7 @@ def directRetainedFigureNineCopiedClauseQueries
     (symbols : List encoding.Γ) :
     List RetainedFinalCopiedClauseQuery :=
   retainedFinalCopiedClauseQueries
-    (sourceFormula (PolySpaceCompiler.formulaOfSymbols decider symbols))
+    (sourceFormula (ProgramSource.formulaOfSymbols decider symbols))
 
 /-- Evaluate the direct specialized query stream before retargeting it to the
 public copied descriptor name. -/

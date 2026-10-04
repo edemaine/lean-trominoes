@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectUnaryEmitter
 import LeanTrominoes.GadgetStripFlatFields
 
@@ -18,17 +19,14 @@ open Computability Turing Gadget
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance (stack : decider.tm.K) :
-    Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- Rectangular normalized drawing generated directly from source symbols. -/
 def directCompiledStripDrawingOfSymbols (symbols : List encoding.Γ) :
     PeriodicOrthogonalDrawing :=
   compiledStripDrawing
-    (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
 
 /-- Natural-range enumeration of all fixed gadget pixels in that drawing. -/
 def directCompiledTrominoMotifOfSymbols
@@ -86,7 +84,7 @@ def DirectCompiledTrominoStripExecutableUnaryFieldEmitters : Prop :=
   ∀ {Input : Type}
       (encoding : _root_.Computability.FinEncoding Input)
       (language : Input → Prop)
-      (decider : Complexity.DeciderInPolySpace encoding language)
+      (decider : PeriodicCNF.ProgramSource encoding language)
       (tromino : Tromino),
     Nonempty
       (TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields

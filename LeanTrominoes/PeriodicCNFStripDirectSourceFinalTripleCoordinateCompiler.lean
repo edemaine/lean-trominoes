@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalVariableTripleCoordinateCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseTripleCoordinateCompiler
 import LeanTrominoes.UnaryFieldEncoderAppendClosure
@@ -17,7 +18,7 @@ open Computability Turing PeriodicCNF PeriodicOrthocrossing
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Concatenate the variable prefix and clause suffix in actual triple order. -/
 def directSourceFinalTripleCoordinates (horizontal keepPositive : Bool)
@@ -36,7 +37,7 @@ noncomputable def directSourceFinalTripleCoordinatesComputableInPolyTime
 theorem directSourceFinalTripleCoordinates_eq_horizontal
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     directSourceFinalTripleCoordinates decider horizontal keepPositive symbols =
-      (horizontalThreeDMTriplePositionsComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).map
+      (horizontalThreeDMTriplePositionsComputed (ProgramSource.formulaOfSymbols decider symbols)).map
         (CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)) := by
   rw [directSourceFinalTripleCoordinates, directSourceFinalVariableTripleCoordinates_eq_horizontal,
     directSourceFinalClauseTripleCoordinates_eq_horizontal,
@@ -46,7 +47,7 @@ noncomputable def directSourceFinalHorizontalTripleCoordinatesComputableInPolyTi
     (horizontal keepPositive : Bool) :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun symbols => (horizontalThreeDMTriplePositionsComputed
-        (PolySpaceCompiler.formulaOfSymbols decider symbols)).map
+        (ProgramSource.formulaOfSymbols decider symbols)).map
           (CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive))) :=
   TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
     (directSourceFinalTripleCoordinatesComputableInPolyTime decider horizontal keepPositive)
@@ -56,7 +57,7 @@ noncomputable def directSourceFinalHorizontalTripleCoordinatesComputableInPolyTi
 @[simp] theorem directSourceFinalTripleCoordinates_length
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     (directSourceFinalTripleCoordinates decider horizontal keepPositive symbols).length =
-      (horizontalThreeDMTriplePositionsComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).length := by
+      (horizontalThreeDMTriplePositionsComputed (ProgramSource.formulaOfSymbols decider symbols)).length := by
   rw [directSourceFinalTripleCoordinates_eq_horizontal, List.length_map]
 
 /-- Each triple contributes the same source position to its red, green and
@@ -77,7 +78,7 @@ noncomputable def directSourceFinalIncidenceSourceCoordinatesComputableInPolyTim
 theorem directSourceFinalIncidenceSourceCoordinates_eq_horizontal
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     directSourceFinalIncidenceSourceCoordinates decider horizontal keepPositive symbols =
-      (horizontalThreeDMTriplePositionsComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).flatMap
+      (horizontalThreeDMTriplePositionsComputed (ProgramSource.formulaOfSymbols decider symbols)).flatMap
         (fun point => List.replicate 3
           (CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive) point)) := by
   rw [directSourceFinalIncidenceSourceCoordinates, directSourceFinalTripleCoordinates_eq_horizontal]

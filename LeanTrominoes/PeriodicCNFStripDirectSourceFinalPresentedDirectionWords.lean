@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalSourceWords
 import LeanTrominoes.PeriodicOneInThreePolarityNormalizationExactRouteDirectionBlockGeometry
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteGeometry
@@ -25,11 +26,8 @@ open PeriodicOneInThreePolarityNormalizationRouteSubdivision
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance presentedWordsStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance presentedWordsVariableDecidableEq : DecidableEq Variable :=
   directSourceVariableDecidableEq
@@ -51,17 +49,17 @@ theorem directSourceFinalGaugedIncidenceRoutes_geometry_of_members
       OrthogonalPolyline
         (directSourceFinalGaugedIncidenceRoutes decider symbols clauseIndex literalIndex) := by
   have sourceLocal : (directSourceFormula decider symbols).IsLocal :=
-    sourceFormula_isLocal (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    sourceFormula_isLocal (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
   have sourceWidth : (directSourceFormula decider symbols).WidthAtMost 3 :=
-    sourceFormula_widthAtMostThree (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    sourceFormula_widthAtMostThree (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
   have sourceOccurrences :
       @PeriodicCNF.OccurrencesAtMost Variable instBEqOfDecidableEq
         (by infer_instance) 3 (directSourceFormula decider symbols) := by
     exact PeriodicCNF.occurrencesAtMost_congr_beq
       _ _ (by infer_instance) (by infer_instance) 3 _
-      (sourceFormula_occurrencesAtMostThree (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+      (sourceFormula_occurrencesAtMostThree (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
   have sourceNonempty : ∀ clause ∈ (directSourceFormula decider symbols).clauses, clause ≠ [] :=
-    sourceFormula_clausesNonempty (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    sourceFormula_clausesNonempty (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
   have computedMember : (clause, clauseIndex) ∈
       (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormulaComputed
         (directSourceFormula decider symbols)).clauses.zipIdx := by
@@ -106,9 +104,9 @@ theorem directFigureNinePolarityRoutePairs_map_directions_eq_horizontal
           RetainedFigureNineRouteDirectionBlock.directions) =
       presentedIncidenceDirectionWords
         (horizontalRoutedFormulaComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
         (horizontalRoutedRoutesComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)) := by
   rw [horizontalRoutedFormulaComputed_eq_semantic,
     horizontalRoutedRoutesComputed_eq_semantic]
   exact directFigureNinePolarityRoutePairs_map_directions_eq_presented decider symbols
@@ -163,9 +161,9 @@ theorem directSourceFinalColoredOccurrenceDirectionBodies_eq_horizontalRouteWord
         (directSourceFinalOccurrenceFramesExpected decider symbols)
         (presentedIncidenceDirectionWords
           (horizontalRoutedFormulaComputed
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
           (horizontalRoutedRoutesComputed
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)))).flatten := by
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)))).flatten := by
   rw [directSourceFinalColoredOccurrenceDirectionBodies_eq_occurrenceBlocks,
     zipWith_occurrenceDirectionBodyBlock,
     directFigureNinePolarityRoutePairs_map_directions_eq_horizontal]

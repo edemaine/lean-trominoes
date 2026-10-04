@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceParentClauseSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseElementDegreeSemantics
 
@@ -17,11 +18,8 @@ open PeriodicCNF PeriodicPlanarOneInThreeToThreeDM
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance clauseFrameBlockStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- The existing frame stream with its final-clause boundaries retained. -/
 def directSourceFinalClauseFrameBlocks (symbols : List encoding.Γ) :
@@ -59,7 +57,7 @@ theorem directSourceFinalClauseFrameBlocks_lengths_eq_horizontalTyped
     (symbols : List encoding.Γ) :
     (directSourceFinalClauseFrameBlocks decider symbols).map List.length =
       (horizontalThreeDMTypedSourceComputed
-        (PolySpaceCompiler.formulaOfSymbols decider symbols)).clauses.map List.length := by
+        (ProgramSource.formulaOfSymbols decider symbols)).clauses.map List.length := by
   rw [directSourceFinalClauseFrameBlocks_lengths_eq_fans]
   have bits := directSourceFinalClauseFans_hasRight_eq_typedClauseTernary
     decider symbols
@@ -69,7 +67,7 @@ theorem directSourceFinalClauseFrameBlocks_lengths_eq_horizontalTyped
   apply List.map_congr_left
   intro clause clauseMember
   rcases horizontalThreeDMTypedSourceComputed_arityTwoOrThree
-      (PolySpaceCompiler.formulaOfSymbols decider symbols) clause clauseMember with two | three
+      (ProgramSource.formulaOfSymbols decider symbols) clause clauseMember with two | three
   · simp only [two, Nat.reduceEqDiff, decide_false, Bool.false_eq_true, if_false]
   · simp only [three, decide_true, if_true]
 
@@ -79,7 +77,7 @@ theorem directSourceFinalClauseFrameBlocks_lengths_eq_horizontalRouted
     (symbols : List encoding.Γ) :
     (directSourceFinalClauseFrameBlocks decider symbols).map List.length =
       (horizontalRoutedFormulaComputed
-        (PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses.map List.length := by
+        (ProgramSource.formulaOfSymbols decider symbols)).erase.clauses.map List.length := by
   rw [directSourceFinalClauseFrameBlocks_lengths_eq_horizontalTyped,
     horizontalThreeDMTypedSourceComputed_clauseLengths_eq_horizontalFormula,
     horizontalRoutedFormulaComputed_clauseLengths_eq_horizontalFormula]

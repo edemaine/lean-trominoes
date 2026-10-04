@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.GadgetSparseAffineIndexedEmitterPipelineCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTablePhaseData
 
@@ -19,11 +20,8 @@ open GadgetSparseAffineIndexedEmitter
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directSparseAffineTableGeneratedStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- Compose the verified uniform unary-program generator with the shared
 five-phase indexed affine-record pipeline. -/
@@ -36,7 +34,7 @@ noncomputable def directSparseAffineTablePhaseOutputComputableInPolyTime
       (DirectSparseAffineTablePhaseFamilies.output decider phases) := by
   unfold DirectSparseAffineTablePhaseFamilies.output
   exact TM2CompositionMachine.computableInPolyTime
-    (PeriodicCNF.PolySpaceRequestEmitter.sourceTokensComputableInPolyTime
+    (PeriodicCNF.ProgramSource.sourceTokensComputableInPolyTime
       decider)
     (emittedPhasesComputableInPolyTime phases.families)
 

@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeOrdinaryParentRoutes
 import LeanTrominoes.PeriodicCNFOrdinarySourceRouteWords
 
@@ -19,31 +20,31 @@ set_option maxHeartbeats 800000
 private theorem source_occurrences (s : List encoding.Γ) :
     @PeriodicCNF.OccurrencesAtMost Variable
       (@instBEqOfDecidableEq Variable ordinaryRouteSemanticVariableDecidableEq) (by infer_instance) 3
-      (directSourceFormula decider s) :=
+      (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) :=
   PeriodicCNF.occurrencesAtMost_congr_beq _ _ (by infer_instance) (by infer_instance) 3 _
     (sourceFormula_occurrencesAtMostThree_canonicalBEq (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider s))
 
 theorem nativeOrdinaryParentRouteDirections_eq (s : List encoding.Γ) :
     nativeOrdinaryParentRouteDirections decider s =
       (PositionedIncidenceRows.rows
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula (directSourceFormula decider s))).map
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s))).map
         (fun row => Gadget.unitSubdivisionDirections
-          (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes (directSourceFormula decider s) row.1.2 row.2.2)) := by
+          (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) row.1.2 row.2.2)) := by
   rw [retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula]
   rw [PositionedIncidenceRows.map_ordered_indices _ _ (fun ci li => Gadget.unitSubdivisionDirections
-    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes (directSourceFormula decider s) ci li))]
+    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) ci li))]
   simp only [nativeOrdinaryParentRouteDirections, directSourceFinalParentRouteBlocks, List.flatMap_map]
   apply List.flatMap_congr
   intro tagged member
   have nonempty := retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_clausesNonempty
-    (directSourceFormula decider s) (sourceFormula_clausesNonempty _) tagged.1 (List.fst_mem_of_mem_zipIdx member)
+    (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) (sourceFormula_clausesNonempty _) tagged.1 (List.fst_mem_of_mem_zipIdx member)
   have width := retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_widthAtMostThree
-    (directSourceFormula decider s) (sourceFormula_widthAtMostThree _) tagged.1.literals
+    (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) (sourceFormula_widthAtMostThree _) tagged.1.literals
     (PositionedPeriodicCNF.literals_mem_erase_of_mem_zipIdx member)
   let ordered := PositionedPeriodicCNF.orderClauseByRouteDirection
-    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes (directSourceFormula decider s)) tagged.2 tagged.1
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s)) tagged.2 tagged.1
   have orderedMember : (ordered, tagged.2) ∈
-      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula (directSourceFormula decider s)).clauses.zipIdx := by
+      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s)).clauses.zipIdx := by
     rw [retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula,
       PositionedPeriodicCNF.orderClausesByRouteDirection, List.zipIdx_map_zipIdx]
     exact List.mem_map.mpr ⟨tagged, member, rfl⟩
@@ -56,12 +57,12 @@ theorem nativeOrdinaryParentRouteDirections_eq (s : List encoding.Γ) :
   · intro i active
     obtain ⟨literal, hm⟩ := literalMember i active
     exact retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_unitSteps
-      (directSourceFormula decider s) (sourceFormula_isLocal _) (sourceFormula_widthAtMostThree _)
+      (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) (sourceFormula_isLocal _) (sourceFormula_widthAtMostThree _)
       (source_occurrences decider s) (sourceFormula_clausesNonempty _) orderedMember hm
   · intro i active
     obtain ⟨literal, hm⟩ := literalMember i active
     exact retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_length_ge_two
-      (directSourceFormula decider s) (sourceFormula_isLocal _) (sourceFormula_widthAtMostThree _)
+      (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) (sourceFormula_isLocal _) (sourceFormula_widthAtMostThree _)
       (source_occurrences decider s) (sourceFormula_clausesNonempty _) orderedMember hm
 
 end LeanTrominoes.PeriodicCNFStripReduction

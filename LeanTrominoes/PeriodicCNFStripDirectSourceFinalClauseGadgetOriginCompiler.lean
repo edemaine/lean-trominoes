@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFirstOccurrenceBits
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGadgetOriginCoordinateCompiler
 
@@ -39,7 +40,7 @@ theorem horizontalClauseGadgetOrigins_eq_affine (source : PeriodicCNF Nat) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- First-occurrence filtering removes repeated clause-origin coordinates. -/
 def directSourceFinalClauseGadgetOriginCoordinates (horizontal keepPositive : Bool) (symbols : List encoding.Γ) : List Nat :=
@@ -60,7 +61,7 @@ its original order, with no distinctness assumption on coordinates. -/
 theorem directSourceFinalClauseGadgetOriginCoordinates_eq_horizontal
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     directSourceFinalClauseGadgetOriginCoordinates decider horizontal keepPositive symbols =
-      (horizontalClauseGadgetOrigins (PolySpaceCompiler.formulaOfSymbols decider symbols)).map
+      (horizontalClauseGadgetOrigins (ProgramSource.formulaOfSymbols decider symbols)).map
         (CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)) := by
   unfold directSourceFinalClauseGadgetOriginCoordinates
   rw [directSourceFinalClauseFirstBits_eq_horizontal, directSourceFinalGadgetOriginCoordinates_eq_affine,
@@ -68,12 +69,12 @@ theorem directSourceFinalClauseGadgetOriginCoordinates_eq_horizontal
   simp only [directSourceFinalRoutedVertexPoints, horizontalGadgetOriginOffset, Bool.false_eq_true, ↓reduceIte,
     presentedIncidenceClausePositions, List.map_flatMap, List.map_replicate, Function.comp_def]
   exact selectedValues_firstBlocks _ _ _
-    (horizontalRoutedClause_length_pos (PolySpaceCompiler.formulaOfSymbols decider symbols))
+    (horizontalRoutedClause_length_pos (ProgramSource.formulaOfSymbols decider symbols))
 
 @[simp] theorem directSourceFinalClauseGadgetOriginCoordinates_length
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     (directSourceFinalClauseGadgetOriginCoordinates decider horizontal keepPositive symbols).length =
-      (horizontalRoutedFormulaComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).clauses.length := by
+      (horizontalRoutedFormulaComputed (ProgramSource.formulaOfSymbols decider symbols)).clauses.length := by
   rw [directSourceFinalClauseGadgetOriginCoordinates_eq_horizontal, List.length_map, horizontalClauseGadgetOrigins_length]
 
 end LeanTrominoes.PeriodicCNFStripReduction

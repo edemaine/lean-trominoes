@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableFanStableSemantics
 
 /-! # Canonical directions of inactive direct variable-fan slots -/
@@ -16,7 +17,7 @@ open PeriodicPlanarOneInThreeToThreeDM PlanarThreeDM
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Every unused slot in the clause-major fan stream has the horizontal
 semantic north fallback. -/

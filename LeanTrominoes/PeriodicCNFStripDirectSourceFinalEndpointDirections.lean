@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalPresentedDirectionWords
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalVariableOccurrenceData
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderClauseDirectionSemantics
@@ -22,11 +23,8 @@ open PeriodicOneInThreePolarityNormalizationRouteSubdivision
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directEndpointStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance directEndpointVariableDecidableEq : DecidableEq Variable :=
   directSourceVariableDecidableEq
@@ -39,9 +37,9 @@ theorem directSourceFinalVariableOccurrenceData_directions_eq_horizontal
         HorizontalRoutedRouteHeader.OccurrenceData.direction =
       (presentedIncidenceDirectionWords
         (horizontalRoutedFormulaComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
         (horizontalRoutedRoutesComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))).map
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))).map
           (fun word => (word.getLastD .invalid).opposite) := by
   rw [directSourceFinalVariableOccurrenceData_eq_routePairs,
     ← directFigureNinePolarityRoutePairs_map_directions_eq_horizontal,

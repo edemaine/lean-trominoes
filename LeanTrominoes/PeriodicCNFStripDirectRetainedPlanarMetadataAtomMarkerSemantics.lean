@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataAtomMarkerData
 import LeanTrominoes.PeriodicCNFStripDirectSourceFormulaShapeSemantics
 
@@ -30,11 +31,8 @@ theorem flatMap_retainedAtomMarkerBlock (shape : List FormulaShape.Token) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directRetainedAtomMarkerSemanticsStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- The extracted marker word contains exactly one marker per distinct
 variable of the guarded direct source formula. -/
@@ -43,7 +41,7 @@ theorem directRetainedPlanarMetadataAtomMarkers_eq_replicate
     directRetainedPlanarMetadataAtomMarkers decider symbols =
       List.replicate
         (sourceFormula
-          (PolySpaceCompiler.formulaOfSymbols
+          (ProgramSource.formulaOfSymbols
             decider symbols)).variableOccurrences.dedup.length
         .variable := by
   unfold directRetainedPlanarMetadataAtomMarkers

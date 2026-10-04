@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalIncidenceValueSelection
 import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceSourceFilter
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalIncidenceSourceCoordinateSemantics
@@ -18,7 +19,7 @@ open Computability Turing PeriodicCNF PeriodicOrthocrossing PeriodicThreeDM
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Regroup incidence coordinates by element and retain exactly the source
 incidence of each contracted edge. -/
@@ -47,20 +48,20 @@ retained edges and the first incidence of every through edge. -/
 theorem directSourceFinalContractedSourceCoordinates_eq_horizontal
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     directSourceFinalContractedSourceCoordinates decider horizontal keepPositive symbols =
-      (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).contractedEdges.map
+      (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).contractedEdges.map
         (fun edge => CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)
-          ((horizontalThreeDMDrawingComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).vertexPosition
-            (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceGraph
+          ((horizontalThreeDMDrawingComputed (ProgramSource.formulaOfSymbols decider symbols)).vertexPosition
+            (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).incidenceGraph
               edge.toPeriodicEdge.source)) := by
   unfold directSourceFinalContractedSourceCoordinates
   rw [directSourceFinalIncidenceSourceCoordinates_eq_drawing,
     directSourceFinalSelectedIncidenceValues_map_eq_horizontal,
     directSourceFinalCanonicalElementDegrees_eq_horizontal,
     CountedContractedIncidence.selected_sources_eq_contracted
-      (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols))
+      (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols))
       (fun tag : IncidenceTag => CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)
-        ((horizontalThreeDMDrawingComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).vertexPosition
-          (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceGraph
+        ((horizontalThreeDMDrawingComputed (ProgramSource.formulaOfSymbols decider symbols)).vertexPosition
+          (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).incidenceGraph
             (.triple tag.tripleIndex))) (by
       rw [horizontalThreeDMProblemComputed_eq_problem]
       exact problem_degreeTwoOrThree _)]
@@ -71,7 +72,7 @@ theorem directSourceFinalContractedSourceCoordinates_eq_horizontal
 @[simp] theorem directSourceFinalContractedSourceCoordinates_length
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     (directSourceFinalContractedSourceCoordinates decider horizontal keepPositive symbols).length =
-      (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).contractedEdges.length := by
+      (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).contractedEdges.length := by
   rw [directSourceFinalContractedSourceCoordinates_eq_horizontal, List.length_map]
 
 /-- An unconditional native compiler for each signed coordinate column of
@@ -80,10 +81,10 @@ noncomputable def directSourceFinalHorizontalContractedSourceCoordinatesComputab
     (horizontal keepPositive : Bool) :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun symbols =>
-        (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).contractedEdges.map
+        (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).contractedEdges.map
           (fun edge => CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)
-            ((horizontalThreeDMDrawingComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).vertexPosition
-              (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceGraph
+            ((horizontalThreeDMDrawingComputed (ProgramSource.formulaOfSymbols decider symbols)).vertexPosition
+              (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).incidenceGraph
                 edge.toPeriodicEdge.source))) :=
   TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
     (directSourceFinalContractedSourceCoordinatesComputableInPolyTime decider horizontal keepPositive)

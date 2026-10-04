@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicOneInThreePolyTimeCompiler
 import LeanTrominoes.PeriodicOneInThreePolyTimeSemantics
 import LeanTrominoes.PeriodicExactOneThreePolySpaceMembership
@@ -23,7 +24,7 @@ noncomputable def reductionComputableInPolyTime :
 theorem reduction_occurrences (input : Input) : (reduction decider input).OccurrencesAtMost 3 :=
   Numeric.occurrences_three _
     (PeriodicThreeSATThree.Numeric.width_three _
-      (PeriodicCNFStripReduction.formulaOfSymbols_widthAtMostThree decider (encoding.encode input)))
+      (PeriodicCNFStripReduction.formulaOfSymbols_widthAtMostThree (PeriodicCNF.ProgramSource.ofDecider decider) (encoding.encode input)))
     (PeriodicThreeSATThree.Numeric.occurrences_three _)
 
 theorem reduction_correct_without_occurrence_bound (input : Input) :

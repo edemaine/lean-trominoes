@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripHorizontalClauseIncomingDirectionBlocks
 import LeanTrominoes.ListFlattenWithBlockLengths
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFrameBlockLengths
@@ -24,11 +25,8 @@ open PeriodicOneInThreePolarityNormalizationRouteSubdivision
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance clauseDirectionBlocksStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance clauseDirectionBlocksVariableDecidableEq : DecidableEq Variable :=
   directSourceVariableDecidableEq
@@ -43,8 +41,8 @@ private theorem directSourceFinalClauseIncomingDirectionBlocks_flatten
     (symbols : List encoding.Γ) :
     (directSourceFinalClauseIncomingDirectionBlocks decider symbols).flatten =
       (presentedIncidenceDirectionWords
-        (horizontalRoutedFormulaComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
-        (horizontalRoutedRoutesComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))).map
+        (horizontalRoutedFormulaComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
+        (horizontalRoutedRoutesComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))).map
           (fun word => (word.headD .invalid).opposite) := by
   unfold directSourceFinalClauseIncomingDirectionBlocks
   rw [← List.map_flatten, directSourceFinalClauseFrameBlocks_flatten]
@@ -74,8 +72,8 @@ theorem directSourceFinalClauseIncomingDirectionBlocks_eq_horizontal
     (symbols : List encoding.Γ) :
     directSourceFinalClauseIncomingDirectionBlocks decider symbols =
       clauseIncomingDirectionBlocks
-        (horizontalRoutedFormulaComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
-        (horizontalRoutedRoutesComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
+        (horizontalRoutedFormulaComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
+        (horizontalRoutedRoutesComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)) := by
   apply List.eq_of_flatten_eq_of_map_length_eq
   · rw [directSourceFinalClauseIncomingDirectionBlocks_flatten,
       clauseIncomingDirectionBlocks_flatten]
@@ -90,8 +88,8 @@ theorem directSourceFinalClauseFans_eq_horizontalDirectionBlocks
     (symbols : List encoding.Γ) :
     directSourceFinalClauseFans decider symbols =
       (clauseIncomingDirectionBlocks
-        (horizontalRoutedFormulaComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
-        (horizontalRoutedRoutesComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))).map
+        (horizontalRoutedFormulaComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
+        (horizontalRoutedRoutesComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))).map
           HorizontalRoutedRouteHeaderClauseFrame.fanOfDirections := by
   rw [← directSourceFinalClauseIncomingDirectionBlocks_eq_horizontal]
   change (directSourceFinalClauseFrameBlocks decider symbols).map
@@ -113,7 +111,7 @@ theorem directSourceFinalClauseFrameBlocks_groups_eq_horizontal
     (directSourceFinalClauseFrameBlocks decider symbols).map
         (List.map HorizontalRoutedRouteHeaderClauseFrame.Data.group) =
       (horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.clauses.map
           (fun clause => (List.range clause.length).map terminalGroupOfLiteralIndex) := by
   have groups :
       (directSourceFinalClauseFrameBlocks decider symbols).map

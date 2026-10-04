@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMOccurrenceParentIndex
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceParentClauseSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseElementDegreeSemantics
@@ -25,7 +26,7 @@ attribute [local instance]
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 private theorem directSourceFinalClauseFrameBlockLengths_eq_fanArities
     (symbols : List encoding.Γ) :
@@ -47,7 +48,7 @@ private theorem directSourceFinalClauseFanArities_eq_typedLengths
     (directSourceFinalClauseFans decider symbols).map
         (fun fan => if fan.hasRight then 3 else 2) =
       (horizontalThreeDMTypedSourceComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).clauses.map List.length := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).clauses.map List.length := by
   have lifted := congrArg (List.map (fun flag : Bool => if flag then 3 else 2))
     (directSourceFinalClauseFans_hasRight_eq_typedClauseTernary decider symbols)
   simp only [List.map_map, Function.comp_def] at lifted
@@ -55,7 +56,7 @@ private theorem directSourceFinalClauseFanArities_eq_typedLengths
   apply List.map_congr_left
   intro clause member
   rcases horizontalThreeDMTypedSourceComputed_arityTwoOrThree
-    (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) clause member with two | three
+    (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) clause member with two | three
   · simp [two]
   · simp [three]
 
@@ -66,7 +67,7 @@ theorem directSourceFinalClauseFrameBlockLengths_eq_horizontal
     (HorizontalRoutedRouteHeaderClauseFrame.outputBlocks
         (directSourceFinalClauseDescriptors decider symbols)).map List.length =
       (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses.map List.length := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.clauses.map List.length := by
   rw [directSourceFinalClauseFrameBlockLengths_eq_fanArities,
     directSourceFinalClauseFanArities_eq_typedLengths]
   unfold horizontalThreeDMTypedSourceComputed
@@ -78,7 +79,7 @@ theorem directSourceFinalOccurrenceParentIndices_eq_horizontal
     (symbols : List encoding.Γ) :
     directSourceFinalOccurrenceParentIndices decider symbols =
       FiniteBlockIndices.expected List.length (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.clauses := by
   rw [directSourceFinalOccurrenceParentIndices_eq_expected]
   exact FiniteBlockIndices.expected_eq_of_lengths List.length List.length _ _
     (directSourceFinalClauseFrameBlockLengths_eq_horizontal decider symbols)
@@ -89,18 +90,18 @@ theorem directSourceFinalGroupedParentIndices_eq_horizontal
     (symbols : List encoding.Γ) :
     directSourceFinalGroupedParentIndices decider symbols =
       (occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase).map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase).map
         (fun entry => occurrenceClauseIndex (horizontalSemanticNormalizedRibbonSource
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry.1 entry.2) := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry.1 entry.2) := by
   rw [directSourceFinalGroupedParentIndices_eq_map_getD,
     directSourceFinalGroupedOccurrenceIndices_eq_occurrenceEntries, List.map_map,
     directSourceFinalOccurrenceParentIndices_eq_horizontal]
   have arity := horizontalThreeDMTypedSourceComputed_arityTwoOrThree
-    (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
   unfold horizontalThreeDMTypedSourceComputed at arity
   rw [horizontalNormalizedRoutedFormulaComputed_eq_semanticData] at arity
   have nonempty : ∀ clause ∈ (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses, clause ≠ [] := by
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.clauses, clause ≠ [] := by
     intro clause member empty
     have lengths := arity clause member
     simp [empty] at lengths
@@ -108,10 +109,10 @@ theorem directSourceFinalGroupedParentIndices_eq_horizontal
   intro entry member
   obtain ⟨tagged, lookup⟩ := occurrenceAt_exists_of_entry_mem
     (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry member
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry member
   have selected := clauseParentIndices_getD_of_occurrenceAt
     (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase nonempty
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase nonempty
     entry.1 entry.2 tagged lookup
   simpa only [Function.comp_def, occurrenceClauseIndex, lookup] using selected
 

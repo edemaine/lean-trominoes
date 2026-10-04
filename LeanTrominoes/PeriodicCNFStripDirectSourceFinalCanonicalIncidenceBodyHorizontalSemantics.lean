@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceBodyHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics
 
@@ -22,7 +23,7 @@ attribute [local instance]
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- The complete compiled variable-prefix and clause-suffix body list is
 exactly the actual horizontal typed incidence list. -/
@@ -30,7 +31,7 @@ theorem directSourceFinalCanonicalIncidenceBodies_eq_horizontalTyped
     (symbols : List encoding.Γ) :
     directSourceFinalCanonicalIncidenceBodies decider symbols =
       horizontalTypedIncidenceBodiesInTripleOrder
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) := by
   unfold directSourceFinalCanonicalIncidenceBodies horizontalTypedIncidenceBodiesInTripleOrder
   rw [directSourceFinalGroupedVariableIncidenceBodies_eq_horizontal,
     directSourceFinalClauseIncidenceBodies_eq_horizontalTyped,
@@ -44,9 +45,9 @@ theorem directSourceFinalCanonicalIncidenceBodies_eq_horizontal
     (symbols : List encoding.Γ) :
     directSourceFinalCanonicalIncidenceBodies decider symbols =
       (horizontalThreeDMProblemComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.map
         (fun tag => (horizontalCanonicalIncidenceDirectionBlock
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) tag).directions) := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) tag).directions) := by
   rw [directSourceFinalCanonicalIncidenceBodies_eq_horizontalTyped,
     horizontalCanonicalIncidenceBodies_eq_typedTripleOrder]
 
@@ -57,9 +58,9 @@ theorem directSourceFinalCanonicalIncidenceDirectionTokens_eq_horizontal
     directSourceFinalCanonicalIncidenceDirectionTokens decider symbols =
       FiniteAlphabetDelimitedBlockJoin.blocks
         ((horizontalThreeDMProblemComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.map
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.map
           (fun tag => (horizontalCanonicalIncidenceDirectionBlock
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) tag).directions)) := by
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) tag).directions)) := by
   rw [directSourceFinalCanonicalIncidenceDirectionTokens_eq_blocks,
     directSourceFinalCanonicalIncidenceBodies_eq_horizontal]
 

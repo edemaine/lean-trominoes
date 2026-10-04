@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalElementCodeNumberingSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalIncidenceBodyHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCountedContractionPlanSemantics
@@ -26,7 +27,7 @@ attribute [local instance]
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Stable compiled lookup returns all incidence bodies at each actual
 colored element, preserving the canonical order within every group. -/
@@ -39,9 +40,9 @@ theorem directSourceFinalSelectedIncidenceBodies_eq_horizontal
         (directSourceFinalCanonicalIncidenceBodies decider symbols) =
       CountedContractedIncidence.horizontalIncidenceDirectionBodiesByElement
         (horizontalThreeDMProblemComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
         (horizontalCanonicalIncidenceDirectionBlock
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)) := by
   rw [CountedContractedIncidence.selectedBodies_eq_map_alignedBody]
   · rw [CountedContractedIncidence.incidenceBlockKeys_eq_candidateKeys,
       CountedContractedIncidence.queryKeys_map_alignedBody_eq_flatMap_idxsOf_of_perm_expanded
@@ -77,9 +78,9 @@ theorem directSourceFinalCountedContractedEdgeBlocks_eq_horizontal
     directSourceFinalCountedContractedEdgeBlocks decider symbols =
       (horizontalContractedDirectionBlocks
         (horizontalThreeDMProblemComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
         (horizontalCanonicalIncidenceDirectionBlock
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))).map fun tagged =>
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))).map fun tagged =>
             HorizontalContractedRoutedRequest.ContractedBlock.assemblerEdge tagged.2 := by
   apply directSourceFinalCountedContractedEdgeBlocks_eq_horizontal_of
   · exact directSourceFinalCanonicalElementDegrees_eq_horizontal decider symbols

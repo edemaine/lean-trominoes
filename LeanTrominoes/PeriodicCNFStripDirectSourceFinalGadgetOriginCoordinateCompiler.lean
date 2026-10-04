@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalPolarityVariableCoordinateHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalPolarityClauseCoordinateHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalGadgetOriginAffineCoordinates
@@ -39,21 +40,19 @@ private theorem component_affine (horizontal : Bool) (origin offset : Cell) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance gadgetOriginCoordinatesStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 attribute [local instance] directSourceVariableDecidableEqInstance
 
 /-- Routed endpoints before padding and macrocell placement, in occurrence order. -/
 def directSourceFinalRoutedVertexPoints (isVariable : Bool) (symbols : List encoding.Γ) : List Cell :=
   if isVariable then
-    (horizontalRoutedFormulaComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.map
-      (horizontalRoutedPlacementComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).position
+    (horizontalRoutedFormulaComputed (ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.map
+      (horizontalRoutedPlacementComputed (ProgramSource.formulaOfSymbols decider symbols)).position
   else
     presentedIncidenceClausePositions
-      (horizontalRoutedFormulaComputed (PolySpaceCompiler.formulaOfSymbols decider symbols))
-      (horizontalRoutedPlacementComputed (PolySpaceCompiler.formulaOfSymbols decider symbols))
+      (horizontalRoutedFormulaComputed (ProgramSource.formulaOfSymbols decider symbols))
+      (horizontalRoutedPlacementComputed (ProgramSource.formulaOfSymbols decider symbols))
 
 def directSourceFinalRoutedVertexCoordinates (isVariable horizontal keepPositive : Bool) (symbols : List encoding.Γ) : List Nat :=
   if isVariable then directSourceFinalPolarityVariableCoordinates decider horizontal keepPositive symbols
@@ -131,9 +130,9 @@ theorem directSourceFinalGadgetOriginCoordinates_eq_affine (isVariable horizonta
 /-- Actual geometric gadget origins in the same complete occurrence order. -/
 def directSourceFinalHorizontalGadgetOrigins (isVariable : Bool) (symbols : List encoding.Γ) : List Cell :=
   if isVariable then
-    (horizontalRoutedFormulaComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.map
-      (horizontalThreeDMVariableOriginComputed (PolySpaceCompiler.formulaOfSymbols decider symbols))
-  else horizontalPresentedClauseGadgetOrigins (PolySpaceCompiler.formulaOfSymbols decider symbols)
+    (horizontalRoutedFormulaComputed (ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.map
+      (horizontalThreeDMVariableOriginComputed (ProgramSource.formulaOfSymbols decider symbols))
+  else horizontalPresentedClauseGadgetOrigins (ProgramSource.formulaOfSymbols decider symbols)
 
 theorem directSourceFinalHorizontalGadgetOrigins_eq_affine (isVariable : Bool) (symbols : List encoding.Γ) :
     directSourceFinalHorizontalGadgetOrigins decider isVariable symbols =
@@ -141,7 +140,7 @@ theorem directSourceFinalHorizontalGadgetOrigins_eq_affine (isVariable : Bool) (
         (fun point => Cell.add (Cell.scale 256 point) (horizontalGadgetOriginOffset isVariable)) := by
   cases isVariable <;> simp only [directSourceFinalHorizontalGadgetOrigins, directSourceFinalRoutedVertexPoints,
     horizontalGadgetOriginOffset, Bool.false_eq_true, ↓reduceIte]
-  · exact horizontalPresentedClauseGadgetOrigins_eq_affine (PolySpaceCompiler.formulaOfSymbols decider symbols)
+  · exact horizontalPresentedClauseGadgetOrigins_eq_affine (ProgramSource.formulaOfSymbols decider symbols)
   · simp only [List.map_map, Function.comp_def]
     apply List.map_congr_left
     intro atom _

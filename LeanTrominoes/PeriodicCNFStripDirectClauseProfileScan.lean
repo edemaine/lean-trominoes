@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFPolySpaceRequestEmitter
 import LeanTrominoes.PeriodicCNFStripDirectClauseArityScan
 import LeanTrominoes.PeriodicCNFUnaryProgramClauseProfileCompiler
@@ -24,11 +25,11 @@ open UnaryProgramClauseProfile
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 def sourceClauseProfiles (symbols : List encoding.Γ) :
     List ClauseProfile :=
-  requestScan (PolySpaceRequestEmitter.sourceTokens decider symbols)
+  requestScan (ProgramSource.sourceTokens decider symbols)
 
 noncomputable def sourceClauseProfilesComputableInPolyTime :
     @TM2ComputableInPolyTime
@@ -36,7 +37,7 @@ noncomputable def sourceClauseProfilesComputableInPolyTime :
       encoding.Γ ClauseProfile id id
       (sourceClauseProfiles decider) := by
   let complete := TM2CompositionMachine.computableInPolyTime
-    (PolySpaceRequestEmitter.sourceTokensComputableInPolyTime decider)
+    (ProgramSource.sourceTokensComputableInPolyTime decider)
     requestScanComputableInPolyTime
   exact complete
 
@@ -55,15 +56,12 @@ polarity and current/next-slice offset, in formula clause order. -/
 theorem sourceClauseProfiles_literals_eq_formula
     (symbols : List encoding.Γ) :
     (sourceClauseProfiles decider symbols).map ClauseProfile.literals =
-      (PolySpaceCompiler.formulaOfSymbols decider symbols).clauses.map
+      (ProgramSource.formulaOfSymbols decider symbols).clauses.map
         (List.map LiteralProfile.ofLiteral) := by
   unfold sourceClauseProfiles
-  rw [PolySpaceRequestEmitter.sourceTokens_eq_requestSource]
-  rw [← PolySpaceProgramSpec.sourceCompilerRequest_program,
-    ← PolySpaceProgramSpec.sourceCompilerRequest_fresh]
+  rw [ProgramSource.sourceTokens_eq_requestSource]
   rw [requestScan_literals_eq_clauseProfiles]
-  simp [PolySpaceCompiler.formulaOfSymbols,
-    BoundedMachineAtom.designatedMachinePeriodicCNF]
+  rw [ProgramSource.formula_eq]
 
 end StripDirectClauseProfileScan
 end PeriodicCNF

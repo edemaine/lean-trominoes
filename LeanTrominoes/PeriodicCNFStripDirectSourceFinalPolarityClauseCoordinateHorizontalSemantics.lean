@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalPolarityClauseCoordinateSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOriginalAtomHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedPlacementBridge
@@ -37,10 +38,8 @@ private theorem eq_map_of_pointwise_lookup {Source Target : Type}
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance horizontalClauseCoordinateStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 attribute [local instance] directSourceVariableDecidableEqInstance
 
 /-- Coherent source occurrences and exact semantic metadata have identical
@@ -63,8 +62,8 @@ theorem directSourceFinalOccurrences_map_clausePosition_eq_horizontal (symbols :
           (directSourceFinalGaugedPlacement decider symbols))
         (directSourceFinalGaugedIncidenceRoutes decider symbols)) =
       presentedIncidenceClausePositions
-        (horizontalRoutedFormulaComputed (PolySpaceCompiler.formulaOfSymbols decider symbols))
-        (horizontalRoutedPlacementComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
+        (horizontalRoutedFormulaComputed (ProgramSource.formulaOfSymbols decider symbols))
+        (horizontalRoutedPlacementComputed (ProgramSource.formulaOfSymbols decider symbols)) := by
   have identified := congrArg (List.map (fun descriptor : SourceIndexedDescriptor =>
     descriptor.clausePosition
       (refinedSource (directSourceFinalGaugedFormula decider symbols)
@@ -75,14 +74,14 @@ theorem directSourceFinalOccurrences_map_clausePosition_eq_horizontal (symbols :
   rw [directSourceFinalExactMetadataRouteBlocks, exactMetadataRouteBlocks_map_clausePosition] at identified
   have formulaEq : formula (directSourceFinalGaugedFormula decider symbols)
       (directSourceFinalGaugedPlacement decider symbols) (directSourceFinalGaugedIncidenceRoutes decider symbols) =
-      horizontalRoutedFormulaComputed (PolySpaceCompiler.formulaOfSymbols decider symbols) := by
+      horizontalRoutedFormulaComputed (ProgramSource.formulaOfSymbols decider symbols) := by
     rw [horizontalRoutedFormulaComputed_eq_semantic]
     unfold directSourceFinalGaugedFormula directSourceFinalClockwiseFormula
       directSourceFinalGaugedPlacement directSourceFinalGaugedIncidenceRoutes directSourceFormula
     rfl
   have placementEq : placement (directSourceFinalGaugedPlacement decider symbols)
       (directSourceFinalGaugedIncidenceRoutes decider symbols) =
-      horizontalRoutedPlacementComputed (PolySpaceCompiler.formulaOfSymbols decider symbols) := by
+      horizontalRoutedPlacementComputed (ProgramSource.formulaOfSymbols decider symbols) := by
     rw [horizontalRoutedPlacementComputed_eq_semantic]
     unfold directSourceFinalGaugedPlacement directSourceFinalGaugedIncidenceRoutes directSourceFormula
     rfl
@@ -93,8 +92,8 @@ theorem directSourceFinalOccurrences_map_clausePosition_eq_horizontal (symbols :
 repeated in clause-major, literal-minor order. -/
 def directSourceFinalHorizontalClauseCoordinates (horizontal keepPositive : Bool) (symbols : List encoding.Γ) : List Nat :=
   (presentedIncidenceClausePositions
-    (horizontalRoutedFormulaComputed (PolySpaceCompiler.formulaOfSymbols decider symbols))
-    (horizontalRoutedPlacementComputed (PolySpaceCompiler.formulaOfSymbols decider symbols))).map
+    (horizontalRoutedFormulaComputed (ProgramSource.formulaOfSymbols decider symbols))
+    (horizontalRoutedPlacementComputed (ProgramSource.formulaOfSymbols decider symbols))).map
       (CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive))
 
 /-- The single affine compiler emits all actual horizontal clause positions,
@@ -122,21 +121,21 @@ theorem directSourceFinalPolarityClauseCoordinates_eq_horizontal
       have decodedMember : (sourceOccurrencePolarityDescriptor occurrence).atom?
           (refinedSource (directSourceFinalGaugedFormula decider symbols)
             (directSourceFinalGaugedPlacement decider symbols)).erase ∈
-          (horizontalRoutedFormulaComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.map some := by
+          (horizontalRoutedFormulaComputed (ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.map some := by
         rw [← directSourceFinalOccurrences_map_atom_eq_horizontal decider symbols]
         exact List.mem_map.mpr ⟨occurrence, List.mem_iff_getElem?.mpr ⟨index, lookup⟩, rfl⟩
       obtain ⟨atom, _, decoded⟩ := List.mem_map.mp decodedMember
       have sourceLocal : (directSourceFormula decider symbols).IsLocal :=
-        sourceFormula_isLocal (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+        sourceFormula_isLocal (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
       have sourceWidth : (directSourceFormula decider symbols).WidthAtMost 3 :=
-        sourceFormula_widthAtMostThree (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+        sourceFormula_widthAtMostThree (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
       have sourceOccurrences : @PeriodicCNF.OccurrencesAtMost Variable
           (@instBEqOfDecidableEq Variable directSourceVariableDecidableEqInstance) (by infer_instance) 3
           (directSourceFormula decider symbols) :=
         PeriodicCNF.occurrencesAtMost_congr_beq _ _ (by infer_instance) (by infer_instance) 3 _
-          (sourceFormula_occurrencesAtMostThree (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+          (sourceFormula_occurrencesAtMostThree (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
       have sourceNonempty : ∀ clause ∈ (directSourceFormula decider symbols).clauses, clause ≠ [] :=
-        sourceFormula_clausesNonempty (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+        sourceFormula_clausesNonempty (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
       have coordinate := directSourceFinalPolarityClauseCoordinates_descriptor_lookup decider horizontal keepPositive symbols
         sourceLocal sourceWidth sourceOccurrences sourceNonempty index occurrence lookup witness atom
         (by simpa only [sourceOccurrencePolarityDescriptor, directSourceFinalGaugedFormula,

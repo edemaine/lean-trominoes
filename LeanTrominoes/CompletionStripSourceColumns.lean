@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.CompletionCircuitPaletteCompiler
 import LeanTrominoes.GadgetSparseAssignmentColumnCompiler
 import LeanTrominoes.UnaryColumnScalarCompiler
@@ -22,13 +23,13 @@ variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
 
 local instance sourceColumnStack (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
-abbrev sourceDrawing := directCompiledStripDrawingOfSymbols decider
-abbrev sourceRows := directSparseAssignmentsOfSymbols decider
+abbrev sourceDrawing := directCompiledStripDrawingOfSymbols (PeriodicCNF.ProgramSource.ofDecider decider)
+abbrev sourceRows := directSparseAssignmentsOfSymbols (PeriodicCNF.ProgramSource.ofDecider decider)
 
 def sourceRecordCompiler : TM2ComputableInPolyTime id GadgetSparseAssignmentTokens.assignmentsTokens
     (sourceRows decider) := by
-  let result := directSparseRecordEmitterOfAppenders decider
-    (directSparseVertexRecordAppender decider) (directSparseRouteRecordAppender decider)
+  let result := directSparseRecordEmitterOfAppenders (PeriodicCNF.ProgramSource.ofDecider decider)
+    (directSparseVertexRecordAppender (PeriodicCNF.ProgramSource.ofDecider decider)) (directSparseRouteRecordAppender (PeriodicCNF.ProgramSource.ofDecider decider))
   apply TM2PolyTimeOutputEncodingTransport.of_identity_output_eq result
   intro s
   unfold sourceRows directSparseAssignmentRecordsOfSymbols
@@ -47,7 +48,7 @@ def sourceKindCompiler : Compiler (sourceRows decider) (fun _ a => (kindIndex (L
     (GadgetSparseAssignmentColumns.typeCompiler (fun k => (kindIndex (LBricks.kindOf k)).val))
 
 def sourceWidthCompiler : ScalarCompiler (fun s => (sourceDrawing decider s).horizontalPeriod) := by
-  let units := directGridUnitsOfSymbolsComputableInPolyTime decider
+  let units := directGridUnitsOfSymbolsComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider)
   let count := TM2CompositionMachine.computableInPolyTime units UnaryFieldUnitLengthBroadcast.singletonComputableInPolyTime
   let result := TM2CompositionMachine.computableInPolyTime count
     (UnaryFieldConstantScale.computableInPolyTime normalizationPeriodFactor)

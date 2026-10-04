@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGadgetOriginCoordinateCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedOccurrenceEntryOrder
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedParentIndexCompiler
@@ -23,10 +24,8 @@ attribute [local instance]
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance groupedOriginStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 /-- Reuse the canonical occurrence queries for all four signed origin columns. -/
 def directSourceFinalGroupedVariableOriginCoordinates
@@ -70,9 +69,9 @@ theorem directSourceFinalGroupedVariableOriginCoordinates_eq_horizontal
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     directSourceFinalGroupedVariableOriginCoordinates decider horizontal keepPositive symbols =
       (occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-        (PolySpaceCompiler.formulaOfSymbols decider symbols)).erase).map
+        (ProgramSource.formulaOfSymbols decider symbols)).erase).map
         (fun entry => CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)
-          (horizontalThreeDMVariableOriginComputed (PolySpaceCompiler.formulaOfSymbols decider symbols) entry.1)) := by
+          (horizontalThreeDMVariableOriginComputed (ProgramSource.formulaOfSymbols decider symbols) entry.1)) := by
   unfold directSourceFinalGroupedVariableOriginCoordinates
   rw [UnaryIndexedValueLookup.values_eq_map_getD_of_forall_lt _ _ (fun index member => by
     rw [originCoordinates_length]
@@ -85,7 +84,7 @@ theorem directSourceFinalGroupedVariableOriginCoordinates_eq_horizontal
   apply List.map_congr_left
   intro entry member
   have lookup := (occurrenceEntryIndex_spec (horizontalSemanticNormalizedRibbonSource
-    (PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry member).1
+    (ProgramSource.formulaOfSymbols decider symbols)).erase entry member).1
   rw [horizontalSemanticNormalizedRibbonSource_variableOccurrences] at lookup
   simp only [List.getD_eq_getElem?_getD, List.getElem?_map, lookup,
     Option.map_some, Option.getD_some]

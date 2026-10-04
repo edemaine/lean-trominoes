@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataDirectionDescriptorBlockData
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataVariableEnumeration
 
@@ -17,11 +18,8 @@ open PeriodicCNF PeriodicOrthocrossing
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directRetainedVariableMarkersStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance directRetainedVariableMarkersDecidableEq :
     DecidableEq Variable := Classical.decEq _
@@ -34,18 +32,18 @@ theorem directRetainedPlanarMetadataVariableMarkers_eq_retainedVariables
       List.replicate
         (retainedDrawingPeriodicPlanarSATVariables
           (sourceFormula
-            (PolySpaceCompiler.formulaOfSymbols decider symbols))).length
+            (ProgramSource.formulaOfSymbols decider symbols))).length
         .variable := by
   unfold directRetainedPlanarMetadataVariableMarkers
   refine Eq.trans ?_
     (@FormulaShapeRetainedPlanarMetadataDirection.variableMarkers_eq_replicate_retainedVariables
       Variable (Classical.decEq Variable)
-      (sourceFormula (PolySpaceCompiler.formulaOfSymbols decider symbols)) ?_ ?_ ?_ ?_)
+      (sourceFormula (ProgramSource.formulaOfSymbols decider symbols)) ?_ ?_ ?_ ?_)
   · exact congrArg
       (fun equality : DecidableEq Variable =>
         @FormulaShapeRetainedPlanarMetadataDirection.variableMarkers
           Variable equality
-          (sourceFormula (PolySpaceCompiler.formulaOfSymbols decider symbols)))
+          (sourceFormula (ProgramSource.formulaOfSymbols decider symbols)))
       (Subsingleton.elim _ _)
   · exact sourceFormula_occurrencesAtMostThree_canonicalBEq _
   · exact PeriodicCNF.incidenceGraph_isWellFormed _

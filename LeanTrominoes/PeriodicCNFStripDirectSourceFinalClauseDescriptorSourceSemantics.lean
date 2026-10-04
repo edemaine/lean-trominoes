@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseDescriptorSemantics
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionSemantics
 
@@ -19,11 +20,8 @@ open FormulaShapeRetainedFigureNineDirection
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance descriptorSourceStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance descriptorSourceVariableDecidableEq : DecidableEq Variable :=
   directSourceVariableDecidableEq
@@ -63,13 +61,13 @@ theorem directSourceFinalClauseDescriptors_eq_source_prefix
         (by infer_instance) 3 (directSourceFormula decider symbols) := by
     exact PeriodicCNF.occurrencesAtMost_congr_beq
       _ _ (by infer_instance) (by infer_instance) 3 _
-      (sourceFormula_occurrencesAtMostThree (PolySpaceCompiler.formulaOfSymbols decider symbols))
+      (sourceFormula_occurrencesAtMostThree (ProgramSource.formulaOfSymbols decider symbols))
   rw [@descriptors_eq_finiteDescriptors Variable descriptorSourceVariableDecidableEq
     (directSourceFormula decider symbols)
-    (sourceFormula_isLocal (PolySpaceCompiler.formulaOfSymbols decider symbols))
-    (sourceFormula_widthAtMostThree (PolySpaceCompiler.formulaOfSymbols decider symbols))
+    (sourceFormula_isLocal (ProgramSource.formulaOfSymbols decider symbols))
+    (sourceFormula_widthAtMostThree (ProgramSource.formulaOfSymbols decider symbols))
     occurrences
-    (sourceFormula_clausesNonempty (PolySpaceCompiler.formulaOfSymbols decider symbols))]
+    (sourceFormula_clausesNonempty (ProgramSource.formulaOfSymbols decider symbols))]
   unfold finiteDescriptors directSourceFinalClauseDescriptors
   rw [← directSourceFinalCycleClauseDescriptors_eq_finiteCycle]
   rfl

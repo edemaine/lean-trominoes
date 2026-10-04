@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFanHorizontalCompiler
 import LeanTrominoes.PeriodicCNFStripHorizontalClauseGadgetOriginIndexSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineClauseElementTableScan
@@ -59,7 +60,7 @@ private theorem retainedElementLocalTable_eq (color : WireColor) (size : Nat) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- One finite arity bit per actual clause. -/
 def directSourceFinalClauseTernaryBits (symbols : List encoding.Γ) : List Bool :=
@@ -77,14 +78,14 @@ noncomputable def directSourceFinalClauseTernaryBitsComputableInPolyTime :
 
 theorem directSourceFinalClauseTernaryBits_eq_typedIndexed (symbols : List encoding.Γ) :
     directSourceFinalClauseTernaryBits decider symbols =
-      (horizontalThreeDMTypedSourceComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).clauses.zipIdx.map
+      (horizontalThreeDMTypedSourceComputed (ProgramSource.formulaOfSymbols decider symbols)).clauses.zipIdx.map
         (fun tagged => decide (tagged.1.length = 3)) := by
   unfold directSourceFinalClauseTernaryBits
   rw [directSourceFinalClauseFans_hasRight_eq_typedClauseTernary]
   simpa only [List.map_map, Function.comp_def] using
     (congrArg (List.map (fun clause => decide (clause.length = 3)))
       (List.zipIdx_map_fst 0
-        (horizontalThreeDMTypedSourceComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).clauses)).symm
+        (horizontalThreeDMTypedSourceComputed (ProgramSource.formulaOfSymbols decider symbols)).clauses)).symm
 
 /-- Select the three- or four-position local table at each compiled clause origin. -/
 def directSourceFinalRetainedElementCoordinates (color : WireColor) (horizontal keepPositive : Bool)
@@ -110,7 +111,7 @@ noncomputable def directSourceFinalRetainedElementCoordinatesComputableInPolyTim
 theorem directSourceFinalRetainedElementCoordinates_eq_horizontal
     (color : WireColor) (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     directSourceFinalRetainedElementCoordinates decider color horizontal keepPositive symbols =
-      (horizontalRetainedElementPositions (PolySpaceCompiler.formulaOfSymbols decider symbols) color).map
+      (horizontalRetainedElementPositions (ProgramSource.formulaOfSymbols decider symbols) color).map
         (CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)) := by
   unfold directSourceFinalRetainedElementCoordinates
   simp only [directSourceFinalClauseTernaryBits_eq_typedIndexed,

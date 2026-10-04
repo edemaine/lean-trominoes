@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PositionedIncidenceRows
 import LeanTrominoes.PeriodicCNFStripNativeRouteWords
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalPolarityClauseCoordinateHorizontalSemantics
@@ -29,7 +30,7 @@ noncomputable def nativeOffsetVariableColumn (horizontal positive : Bool) :
       (component horizontal ((horizontalRoutedPlacementComputed
         (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider s)).position row.2.1.atom))) := by
   apply TM2ComputableInPolyTime.of_eq
-    (directSourceFinalHorizontalVariableCoordinatesComputableInPolyTime decider horizontal positive)
+    (directSourceFinalHorizontalVariableCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive)
   intro s
   unfold directSourceFinalHorizontalVariableCoordinates
   rw [← PositionedIncidenceRows.atoms, List.map_map]
@@ -40,7 +41,7 @@ noncomputable def nativeOffsetClauseColumn (horizontal positive : Bool) :
       (component horizontal (PositionedPeriodicCNF.canonicalClausePosition
         (horizontalRoutedPlacementComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider s)) row.1.1))) := by
   apply TM2ComputableInPolyTime.of_eq
-    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime decider horizontal positive)
+    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive)
   intro s
   unfold directSourceFinalHorizontalClauseCoordinates
   rw [← PositionedIncidenceRows.clausePositions, List.map_map]

@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableFanHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripGroupedVariableIncidenceTypedDirectionBlockSemantics
 
@@ -23,10 +24,8 @@ attribute [local instance]
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance groupedPrefixHorizontalStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 /-- All compiled finite variable prefixes are the actual horizontal prefixes
 in canonical occurrence-entry, typed-triple, and red/green/blue order. -/
@@ -35,14 +34,14 @@ theorem directSourceFinalGroupedVariableIncidencePrefixBodies_eq_horizontal
     (directSourceFinalGroupedVariableIncidencePrefixQueries decider symbols).map
       HorizontalFiniteIncidenceDirectionQuery.directions =
       (occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase).flatMap
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase).flatMap
         (fun entry =>
           (occurrenceTriples (horizontalSemanticNormalizedRibbonSource
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase
             entry.1 entry.2).flatMap fun triple =>
               incidenceColors.map fun color => horizontalVariableIncidencePrefixDirections
-                (((PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, entry.1), triple), color)) := by
-  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols
+                (((PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, entry.1), triple), color)) := by
+  let source := PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols
   let positioned := horizontalSemanticNormalizedRibbonSource source
   unfold directSourceFinalGroupedVariableIncidencePrefixQueries
   rw [directSourceFinalGroupedVariableFanSlots_eq_horizontal,

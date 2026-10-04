@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSparseComputedAssignmentData
 import LeanTrominoes.PeriodicCNFStripHorizontalNormalizationInputSemanticBridge
 import LeanTrominoes.PeriodicCNFStripHorizontalThreeDMIncidenceRouteLookup
@@ -302,11 +303,8 @@ theorem ofEdge_header_eq_horizontalAssembled
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directSparseRouteIncidenceHeaderStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- Direct proof-free request headers use only assembled incidence routes. -/
 theorem directSparse_ofEdge_header_eq_horizontalAssembled
@@ -315,14 +313,14 @@ theorem directSparse_ofEdge_header_eq_horizontalAssembled
     (edgeMember : edge ∈
       (directSparseComputedNormalizationInputOfSymbols
         decider symbols).problem.contractedEdges) :
-    let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+    let source := PeriodicCNF.ProgramSource.formulaOfSymbols
       decider symbols
     (NormalizationDirectionRequest.ofEdge
         (directSparseComputedNormalizationInputOfSymbols decider symbols)
         edge).header =
       horizontalAssembledRouteRequestHeader source edge := by
   dsimp only
-  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+  let source := PeriodicCNF.ProgramSource.formulaOfSymbols
     decider symbols
   have inputEq :
       directSparseComputedNormalizationInputOfSymbols decider symbols =

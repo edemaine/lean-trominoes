@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalPolarityClauseCoordinateHorizontalSemantics
 import LeanTrominoes.UnaryPointFieldsCompiler
 
@@ -27,10 +28,10 @@ noncomputable def nativeIncidenceClauseFieldsCompilerOfInhabited [Inhabited enco
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun s => (nativeIncidenceClausePositions decider s).flatMap PeriodicGridDrawing.Arithmetic.pointFields) :=
   pointFieldsCompiler (rows := nativeIncidenceClausePositions decider) (point := fun _ p => p)
-    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime decider true true)
-    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime decider true false)
-    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime decider false true)
-    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime decider false false)
+    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) true true)
+    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) true false)
+    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) false true)
+    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) false false)
 
 noncomputable def nativeIncidenceClauseFieldsCompiler :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields

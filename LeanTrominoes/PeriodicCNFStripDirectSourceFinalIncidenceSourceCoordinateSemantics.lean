@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalTripleCoordinateCompiler
 import LeanTrominoes.PeriodicCNFStripHorizontalThreeDMVertexPositionAtComputed
 
@@ -57,17 +58,17 @@ theorem horizontalIncidenceSourcePosition_eq_triplePosition
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- RGB coordinate copies agree with the actual drawing at every canonical
 incidence tag, in exactly the order used by incidence identities and directions. -/
 theorem directSourceFinalIncidenceSourceCoordinates_eq_drawing
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     directSourceFinalIncidenceSourceCoordinates decider horizontal keepPositive symbols =
-      (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.map
+      (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.map
         (fun tag => CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)
-          ((horizontalThreeDMDrawingComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).vertexPosition
-            (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceGraph
+          ((horizontalThreeDMDrawingComputed (ProgramSource.formulaOfSymbols decider symbols)).vertexPosition
+            (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).incidenceGraph
               (.triple tag.tripleIndex))) := by
   rw [directSourceFinalIncidenceSourceCoordinates_eq_horizontal,
     ← incidenceTags_map_positions _ _ _ (triplePositions_length_problem _)]
@@ -78,17 +79,17 @@ theorem directSourceFinalIncidenceSourceCoordinates_eq_drawing
 @[simp] theorem directSourceFinalIncidenceSourceCoordinates_length
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     (directSourceFinalIncidenceSourceCoordinates decider horizontal keepPositive symbols).length =
-      (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.length := by
+      (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.length := by
   rw [directSourceFinalIncidenceSourceCoordinates_eq_drawing, List.length_map]
 
 noncomputable def directSourceFinalDrawingIncidenceSourceCoordinatesComputableInPolyTime
     (horizontal keepPositive : Bool) :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun symbols =>
-        (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.map
+        (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.map
           (fun tag => CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)
-            ((horizontalThreeDMDrawingComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).vertexPosition
-              (horizontalThreeDMProblemComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceGraph
+            ((horizontalThreeDMDrawingComputed (ProgramSource.formulaOfSymbols decider symbols)).vertexPosition
+              (horizontalThreeDMProblemComputed (ProgramSource.formulaOfSymbols decider symbols)).incidenceGraph
                 (.triple tag.tripleIndex)))) :=
   TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
     (directSourceFinalIncidenceSourceCoordinatesComputableInPolyTime decider horizontal keepPositive)

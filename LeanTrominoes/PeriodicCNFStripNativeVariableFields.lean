@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeAtomRenaming
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalPolarityVariableCoordinateHorizontalSemantics
 import LeanTrominoes.UnaryColumnDedupCompiler
@@ -37,7 +38,7 @@ noncomputable def nativeVariableCoordinateCompiler [Inhabited encoding.Γ] (hori
     Compiler (fun s => (nativeAtoms decider s).dedup)
       (fun s a => CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal positive) (nativeVariablePoint decider s a)) :=
   UnaryColumn.dedup (nativeAtomKeysCompiler decider)
-    (directSourceFinalHorizontalVariableCoordinatesComputableInPolyTime decider horizontal positive)
+    (directSourceFinalHorizontalVariableCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive)
     (nativeAtomRenaming_injective decider)
 
 noncomputable def nativeVariableFieldsCompilerOfInhabited [Inhabited encoding.Γ] :

@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSparseCompactContractedRouteRasterSourceCompiler
 import LeanTrominoes.PeriodicCNFStripHorizontalContractedDirectionBlockListData
 
@@ -259,7 +260,7 @@ noncomputable def directSparseCanonicalCompactContractedRouteSourceTokens
   HorizontalContractedRouteRasterSource.tokens
     (directSparseCompactContractedRouteEntries
       source
-      (directSparseAssembledRouteMetadata decider symbols)
+      (directSparseAssembledRouteMetadata (PeriodicCNF.ProgramSource.ofDecider decider) symbols)
       (horizontalCanonicalContractedDirectionBlocks source))
 
 /-- Interpreting the canonical compact source target gives exactly the
@@ -277,7 +278,7 @@ theorem directSparseCanonicalCompactContractedRouteSourceTokens_correct
           decider symbols) =
       GadgetSparseRouteRasterRequestTokens.tokens
         (RouteRasterRequest.directSparseRouteRasterRequestsOfSymbols
-          decider symbols) := by
+          (PeriodicCNF.ProgramSource.ofDecider decider) symbols) := by
   unfold directSparseCanonicalCompactContractedRouteSourceTokens
     horizontalCanonicalContractedDirectionBlocks
   exact

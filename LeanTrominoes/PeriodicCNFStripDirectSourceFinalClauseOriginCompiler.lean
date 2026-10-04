@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFirstParentCoordinateCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFirstParentRouteSemantics
 import LeanTrominoes.RetainedAngularFanClauseOriginFromDirections
@@ -44,10 +45,8 @@ private theorem field_not (positive : Bool) (value : Int) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance clauseOriginStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 attribute [local instance] directSourceVariableDecidableEqInstance
 
 /-- Subtract the selected complete route displacement from its variable endpoint. -/
@@ -122,7 +121,7 @@ theorem directSourceFinalClauseOrigins_eq_positions (horizontal keepPositive : B
   have sourceOccurrences : @PeriodicCNF.OccurrencesAtMost Variable
       (@instBEqOfDecidableEq Variable directSourceVariableDecidableEqInstance) (by infer_instance) 3 source := by
     exact PeriodicCNF.occurrencesAtMost_congr_beq _ _ (by infer_instance) (by infer_instance) 3 _
-      (sourceFormula_occurrencesAtMostThree (PolySpaceCompiler.formulaOfSymbols decider symbols))
+      (sourceFormula_occurrencesAtMostThree (ProgramSource.formulaOfSymbols decider symbols))
   calc
     _ = clauses.zipIdx.map (fun tagged => SignedUnaryCoordinateRefinement.field keepPositive
         (DelimitedDirectionDisplacement.component horizontal
@@ -130,15 +129,15 @@ theorem directSourceFinalClauseOrigins_eq_positions (horizontal keepPositive : B
       apply List.map_congr_left
       intro tagged member
       have nonempty := retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_clausesNonempty source
-        (sourceFormula_clausesNonempty (PolySpaceCompiler.formulaOfSymbols decider symbols))
+        (sourceFormula_clausesNonempty (ProgramSource.formulaOfSymbols decider symbols))
         tagged.1 (List.fst_mem_of_mem_zipIdx member)
       obtain ⟨literal, rest, literalsEq⟩ := List.exists_cons_of_ne_nil nonempty
       have firstLiteral : tagged.1.literals.head? = some literal := by simp only [literalsEq, List.head?_cons]
       have recovered := @retainedSplitClauseOrigin_eq_directionRecovery Variable
         directSourceVariableDecidableEqInstance source
-        (sourceFormula_isLocal (PolySpaceCompiler.formulaOfSymbols decider symbols))
-        (sourceFormula_widthAtMostThree (PolySpaceCompiler.formulaOfSymbols decider symbols))
-        sourceOccurrences (sourceFormula_clausesNonempty (PolySpaceCompiler.formulaOfSymbols decider symbols))
+        (sourceFormula_isLocal (ProgramSource.formulaOfSymbols decider symbols))
+        (sourceFormula_widthAtMostThree (ProgramSource.formulaOfSymbols decider symbols))
+        sourceOccurrences (sourceFormula_clausesNonempty (ProgramSource.formulaOfSymbols decider symbols))
         horizontal tagged.1 tagged.2 member literal firstLiteral
       apply congrArg (SignedUnaryCoordinateRefinement.field keepPositive)
       simp only [endpoint, routeDisplacement, firstParentPosition, firstLiteral, Option.map_some, Option.getD_some]

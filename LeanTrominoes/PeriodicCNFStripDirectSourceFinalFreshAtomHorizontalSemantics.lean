@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalFreshAtomIdentity
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalSourceIndexedAtomsHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedPlacementData
@@ -42,11 +43,8 @@ private theorem sourceOccurrenceDescriptor_identity_iff
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance freshHorizontalStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance freshHorizontalVariableDecidableEq : DecidableEq Variable :=
   directSourceVariableDecidableEq
@@ -60,7 +58,7 @@ theorem directSourceFinalOccurrences_map_atom_eq_horizontal
           (refinedSource (directSourceFinalGaugedFormula decider symbols)
             (directSourceFinalGaugedPlacement decider symbols)).erase) =
       (horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.map some := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.map some := by
   have identified := directFigureNinePolarityRoutePairs_sourceIndexedAtoms_eq_horizontal decider symbols
   rw [← directSourceFinalOccurrences_map_generatedClauseIndex,
     ← directSourceFinalOccurrences_map_pair, List.zipWith_map, List.zipWith_self,
@@ -75,7 +73,7 @@ theorem directSourceFinalOccurrence_atom_eq_of_horizontal_lookup
     (indexLt : index < (directSourceFinalOccurrences decider symbols).length)
     (atom : RoutedVariable)
     (atomLookup : (horizontalRoutedFormulaComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[index]? = some atom) :
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences[index]? = some atom) :
     (sourceOccurrencePolarityDescriptor (directSourceFinalOccurrences decider symbols)[index]).atom?
         (refinedSource (directSourceFinalGaugedFormula decider symbols)
           (directSourceFinalGaugedPlacement decider symbols)).erase = some atom := by
@@ -95,9 +93,9 @@ theorem directSourceFinalAtomIdentityCodes_fresh_eq_iff_horizontalAtoms
     (secondFresh : sourceOccurrenceIsFresh (directSourceFinalOccurrences decider symbols)[secondIndex])
     (firstAtom secondAtom : RoutedVariable)
     (firstLookup : (horizontalRoutedFormulaComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[firstIndex]? = some firstAtom)
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences[firstIndex]? = some firstAtom)
     (secondLookup : (horizontalRoutedFormulaComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[secondIndex]? = some secondAtom) :
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences[secondIndex]? = some secondAtom) :
     (directSourceFinalAtomIdentityCodes decider symbols).getD firstIndex 0 =
         (directSourceFinalAtomIdentityCodes decider symbols).getD secondIndex 0 ↔
       firstAtom = secondAtom := by
@@ -124,9 +122,9 @@ theorem directSourceFinalAtomIdentityCodes_eq_iff_horizontalAtoms_of_fresh
     (firstFresh : sourceOccurrenceIsFresh (directSourceFinalOccurrences decider symbols)[firstIndex])
     (firstAtom secondAtom : RoutedVariable)
     (firstLookup : (horizontalRoutedFormulaComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[firstIndex]? = some firstAtom)
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences[firstIndex]? = some firstAtom)
     (secondLookup : (horizontalRoutedFormulaComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[secondIndex]? = some secondAtom) :
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences[secondIndex]? = some secondAtom) :
     (directSourceFinalAtomIdentityCodes decider symbols).getD firstIndex 0 =
         (directSourceFinalAtomIdentityCodes decider symbols).getD secondIndex 0 ↔
       firstAtom = secondAtom := by

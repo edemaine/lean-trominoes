@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.ListZipWithFlatMapAligned
 import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceOccurrenceKeySemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCanonicalIncidenceElementCodeCompiler
@@ -79,7 +80,7 @@ private theorem degreeExpandedElementCodes_eq_duplicate_of_all_two
 private theorem directSourceFinalVariableElementDegrees_all_two
     {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
     {language : Input → Prop}
-    (decider : Complexity.DeciderInPolySpace encoding language)
+    (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
     ∀ degree ∈ directSourceFinalVariableElementDegrees decider symbols,
       degree = 2 := by
@@ -95,7 +96,7 @@ private theorem directSourceFinalVariableElementDegrees_all_two
 private theorem directSourceFinalVariableDegreeExpanded_eq_duplicate
     {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
     {language : Input → Prop}
-    (decider : Complexity.DeciderInPolySpace encoding language)
+    (decider : PeriodicCNF.ProgramSource encoding language)
     (color : WireColor) (symbols : List encoding.Γ) :
     degreeExpandedElementCodes
         (directSourceFinalCanonicalVariableElementCodes
@@ -135,7 +136,7 @@ private theorem degreeExpandedElementCodes_flatMap
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 private theorem directSourceFinalClauseIndexPlaceholders_length_eq_fans
     (symbols : List encoding.Γ) :

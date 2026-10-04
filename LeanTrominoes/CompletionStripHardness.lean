@@ -42,6 +42,7 @@ def sourceReductionCompiler (t : Tromino) :
   intro input
   unfold sourceDrawing PeriodicCNFStripReduction.directCompiledStripDrawingOfSymbols
     StripOrientation.compileSource StripOrientation.compileCNF
+  simp only [PeriodicCNF.ProgramSource.ofDecider]
   rw [PeriodicCNF.PolySpaceCompiler.formulaOfSymbols_encode]
 end LeanTrominoes.CompletionPattern.Runtime
 

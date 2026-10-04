@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceFieldsHorizontalSemantics
 
 /-! # Polynomial-time emission of the normalized occurrence fields -/
@@ -25,20 +26,17 @@ local instance normalizedOccurrenceFieldsInhabited :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance normalizedOccurrenceFieldsStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- The kind, polarity, and endpoint direction of each actual normalized
 horizontal occurrence, before regrouping by variable. -/
 def directSourceFinalNormalizedOccurrenceFields (symbols : List encoding.Γ) :
     List ((VariableConnectorKind × Bool) × AxisDirection) :=
   presentedOccurrenceFields
-    (horizontalSemanticNormalizedRibbonSource (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+    (horizontalSemanticNormalizedRibbonSource (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
     (horizontalSemanticNormalizedPlanarPresentation
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).routes
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).routes
 
 /-- The completed direct occurrence compiler emits exactly these semantic
 fields in polynomial time, with all three fields aligned to the same incidence. -/

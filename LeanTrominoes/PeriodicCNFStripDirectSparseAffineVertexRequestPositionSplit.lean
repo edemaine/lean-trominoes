@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineVertexRequestPositionData
 
 /-! # Computed-position affine requests split by vertex kind -/
@@ -83,19 +84,15 @@ theorem directSparseComputedAffineElementRequestsAtForColor_eq_atoms
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance
-    directSparseAffineVertexRequestPositionSplitStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- The lookup-free direct request stream is the concatenation of one triple
 scan and three constant-color degree-three element scans. -/
 theorem directSparseComputedAffineVertexRequestsAtOfSymbols_eq_vertexKinds
     (symbols : List encoding.Γ) :
     directSparseComputedAffineVertexRequestsAtOfSymbols decider symbols =
-      let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+      let source := PeriodicCNF.ProgramSource.formulaOfSymbols
         decider symbols
       let input := directSparseComputedNormalizationInputOfSymbols
         decider symbols

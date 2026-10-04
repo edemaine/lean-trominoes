@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceFrameHorizontalFields
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalStoredWordOccurrenceSemantics
 import LeanTrominoes.PeriodicCNFStripDirectFinalOccurrenceEndpointFrameHorizontalSemantics
@@ -65,10 +66,8 @@ theorem directFinalOccurrenceDirectionBodyBlock_eq_horizontal_of_fields
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance occurrenceBodyHorizontalStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 /-- At the presentation position recovered from a source entry, the actual
 compiled frame and header/tail pair render precisely that entry's three
@@ -76,32 +75,32 @@ coordinated geometric routes, in red/green/blue order. -/
 theorem directFinalOccurrenceDirectionBodyBlock_eq_horizontal_of_occurrenceAt
     (symbols : List encoding.Γ) (entry : RoutedVariable × OccurrenceSlot)
     (member : entry ∈ occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase)
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase)
     (tagged : TaggedOccurrence RoutedVariable)
     (lookup : occurrenceAt (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry.1 entry.2 = some tagged) :
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry.1 entry.2 = some tagged) :
     let index : Nat := occurrenceEntryIndex (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry
     directFinalOccurrenceDirectionBodyBlock
         ((directSourceFinalOccurrenceFramesExpected decider symbols).getD index default)
         ((directFigureNinePolarityRoutePairs decider symbols).getD index default) =
       incidenceColors.map (fun color => unitSubdivisionDirections
         (horizontalOccurrenceCoordinatedRouteComputed
-          (((PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, entry.1), entry.2), color))) := by
+          (((PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, entry.1), entry.2), color))) := by
   have fields := directSourceFinalOccurrenceFrame_fields_of_occurrenceAt decider symbols entry member tagged lookup
   dsimp only at fields
   have computedLookup := horizontalOccurrenceLookupComputed_eq_of_semanticLookup
-    (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) entry.1 entry.2 tagged lookup
+    (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) entry.1 entry.2 tagged lookup
   dsimp only
   -- Explicit terms avoid expanding the source compiler during clause-fan conversion.
   apply directFinalOccurrenceDirectionBodyBlock_eq_horizontal_of_fields
     ((directSourceFinalOccurrenceFramesExpected decider symbols).getD
       (occurrenceEntryIndex (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry) default)
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry) default)
     ((directFigureNinePolarityRoutePairs decider symbols).getD
       (occurrenceEntryIndex (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry) default)
-    ((PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, entry.1), entry.2)
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry) default)
+    ((PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, entry.1), entry.2)
     tagged computedLookup fields.1 fields.2.1 fields.2.2
   have selected := directFigureNinePolarityRoutePair_directions_of_occurrenceAt decider symbols
     entry.1 entry.2 tagged lookup

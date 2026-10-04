@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalPolarityVariableCoordinateCompiler
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedPlacementBridge
 
@@ -36,10 +37,8 @@ private theorem eq_map_of_pointwise_lookup {Source Target : Type}
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance horizontalCoordinateStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 attribute [local instance] directSourceVariableDecidableEqInstance
 
 /-- At each actual horizontal occurrence, the compiled coordinate names its
@@ -51,24 +50,24 @@ theorem directSourceFinalPolarityVariableCoordinates_horizontal_lookup
     (witness : OccurrenceWitness (directSourceFormula decider symbols) occurrence)
     (atom : RoutedVariable)
     (atomLookup : (horizontalRoutedFormulaComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[index]? = some atom) :
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences[index]? = some atom) :
     (directSourceFinalPolarityVariableCoordinates decider horizontal keepPositive symbols)[index]? =
       some (CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)
-        ((horizontalRoutedPlacementComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).position atom)) := by
+        ((horizontalRoutedPlacementComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).position atom)) := by
   have indexLt := (List.getElem?_eq_some_iff.mp lookup).1
   have decoded := directSourceFinalOccurrence_atom_eq_of_horizontal_lookup decider symbols index indexLt atom atomLookup
   rw [(List.getElem?_eq_some_iff.mp lookup).2] at decoded
   have sourceLocal : (directSourceFormula decider symbols).IsLocal :=
-    sourceFormula_isLocal (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    sourceFormula_isLocal (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
   have sourceWidth : (directSourceFormula decider symbols).WidthAtMost 3 :=
-    sourceFormula_widthAtMostThree (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    sourceFormula_widthAtMostThree (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
   have sourceOccurrences : @PeriodicCNF.OccurrencesAtMost Variable
       (@instBEqOfDecidableEq Variable directSourceVariableDecidableEqInstance) (by infer_instance) 3
       (directSourceFormula decider symbols) :=
     PeriodicCNF.occurrencesAtMost_congr_beq _ _ (by infer_instance) (by infer_instance) 3 _
-      (sourceFormula_occurrencesAtMostThree (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+      (sourceFormula_occurrencesAtMostThree (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
   have sourceNonempty : ∀ clause ∈ (directSourceFormula decider symbols).clauses, clause ≠ [] :=
-    sourceFormula_clausesNonempty (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    sourceFormula_clausesNonempty (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)
   have coordinate := directSourceFinalPolarityVariableCoordinates_lookup decider horizontal keepPositive symbols
     sourceLocal sourceWidth sourceOccurrences sourceNonempty index occurrence lookup witness atom
     (by simpa only [sourceOccurrencePolarityDescriptor, directSourceFinalGaugedFormula,
@@ -82,9 +81,9 @@ positions in clause-major, literal-minor order. -/
 theorem directSourceFinalPolarityVariableCoordinates_eq_horizontal
     (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     directSourceFinalPolarityVariableCoordinates decider horizontal keepPositive symbols =
-      (horizontalRoutedFormulaComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.map
+      (horizontalRoutedFormulaComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.map
         (fun atom => CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)
-          ((horizontalRoutedPlacementComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).position atom)) := by
+          ((horizontalRoutedPlacementComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).position atom)) := by
   have lengths := congrArg List.length (directSourceFinalOccurrences_map_atom_eq_horizontal decider symbols)
   simp only [List.length_map] at lengths
   apply eq_map_of_pointwise_lookup
@@ -101,9 +100,9 @@ theorem directSourceFinalPolarityVariableCoordinates_eq_horizontal
 
 /-- Coordinate fields of every actual horizontal routed variable occurrence. -/
 def directSourceFinalHorizontalVariableCoordinates (horizontal keepPositive : Bool) (symbols : List encoding.Γ) : List Nat :=
-  (horizontalRoutedFormulaComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.map
+  (horizontalRoutedFormulaComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.map
     (fun atom => CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive)
-      ((horizontalRoutedPlacementComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).position atom))
+      ((horizontalRoutedPlacementComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).position atom))
 
 /-- The native compiler emits the actual geometric variable-coordinate
 column in polynomial time, with no residual source or agreement hypotheses. -/

@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFFormulaShapeBaseBendAtomWordSemantics
 import LeanTrominoes.PeriodicCNFFormulaShapeCarrierAtomWordSemantics
 import LeanTrominoes.PeriodicCNFFormulaShapeCrossoverAtomWordSemantics
@@ -24,11 +25,8 @@ open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directFinalCompactAtomWordFamiliesStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance directFinalCompactAtomWordFamiliesVariableDecidableEq :
     DecidableEq Variable :=
@@ -107,7 +105,7 @@ theorem directSourceFinalCompactOccurrenceAtomWords_eq_blocks
     (symbols : List encoding.Γ) :
     (directSourceFinalCompactOccurrenceAtomWords decider symbols).words =
       directSourceFinalFiveFamilyCompactAtomWordBlocks decider symbols := by
-  let original := PolySpaceCompiler.formulaOfSymbols decider symbols
+  let original := ProgramSource.formulaOfSymbols decider symbols
   let source := PeriodicThreeCNF.formula original
   let formula := PeriodicThreeSATThree.formula source
   have sourceLocal : source.IsLocal := by

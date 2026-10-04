@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripTypedIncidenceElementCodes
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseIncidenceCoreMultiplicity
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseIncidenceBodyHorizontalSemantics
@@ -44,7 +45,7 @@ theorem finalClauseIncidenceElementCodeBlock_eq_typed
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- The complete clause-incidence code suffix references the actual typed
 horizontal elements, independently of how variable occurrence keys are named. -/
@@ -52,10 +53,10 @@ theorem directSourceFinalClauseIncidenceElementCodes_eq_horizontalTyped
     (symbols : List encoding.Γ) (key : RoutedVariable × OccurrenceSlot → Nat) :
     directSourceFinalClauseIncidenceElementCodes decider symbols =
       (clauseTriples (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase).flatMap
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase).flatMap
         (fun triple => incidenceColors.map fun color => TypedElementCode.reference key
           (tripleReferences (horizontalSemanticNormalizedRibbonSource
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase triple) color) := by
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase triple) color) := by
   rw [TypedElementCode.clauseTriples_codes_eq,
     directSourceFinalClauseIncidenceElementCodes_eq_blocks]
   have blockEq : finalClauseIncidenceElementCodeBlock =

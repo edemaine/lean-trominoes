@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalAtomIdentityHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceKeySemantics
 import LeanTrominoes.StableOccurrenceRanksPartition
@@ -16,10 +17,8 @@ namespace LeanTrominoes.PeriodicCNFStripReduction
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance stableHorizontalStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 local instance stableHorizontalVariableDecidableEq : DecidableEq Variable := directSourceVariableDecidableEq
 
@@ -27,7 +26,7 @@ local instance stableHorizontalVariableDecidableEq : DecidableEq Variable := dir
 theorem directSourceFinalOccurrences_length_eq_horizontalAtoms (symbols : List encoding.Γ) :
     (directSourceFinalOccurrences decider symbols).length =
       (horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.length := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.length := by
   have lengths := congrArg List.length (directSourceFinalOccurrences_map_atom_eq_horizontal decider symbols)
   simpa only [List.length_map] using lengths
 
@@ -35,7 +34,7 @@ theorem directSourceFinalOccurrences_length_eq_horizontalAtoms (symbols : List e
 theorem directSourceFinalAtomIdentityCodes_length_eq_horizontalAtoms (symbols : List encoding.Γ) :
     (directSourceFinalAtomIdentityCodes decider symbols).length =
       (horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.length := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.length := by
   rw [directSourceFinalAtomIdentityCodes_length, ← directSourceFinalOccurrences_length_eq_compiled,
     directSourceFinalOccurrences_length_eq_horizontalAtoms]
 
@@ -48,20 +47,20 @@ theorem directSourceFinalAtomIdentityCodes_partition_horizontal
     (directSourceFinalAtomIdentityCodes decider symbols)[firstIndex] =
         (directSourceFinalAtomIdentityCodes decider symbols)[secondIndex] ↔
       ((horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[firstIndex]'(by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences[firstIndex]'(by
           rw [← directSourceFinalAtomIdentityCodes_length_eq_horizontalAtoms]; exact firstLt)) =
       ((horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences[secondIndex]'(by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences[secondIndex]'(by
           rw [← directSourceFinalAtomIdentityCodes_length_eq_horizontalAtoms]; exact secondLt)) := by
   have firstOccurrenceLt : firstIndex < (directSourceFinalOccurrences decider symbols).length := by
     rwa [directSourceFinalAtomIdentityCodes_length, ← directSourceFinalOccurrences_length_eq_compiled] at firstLt
   have secondOccurrenceLt : secondIndex < (directSourceFinalOccurrences decider symbols).length := by
     rwa [directSourceFinalAtomIdentityCodes_length, ← directSourceFinalOccurrences_length_eq_compiled] at secondLt
   have firstHorizontalLt : firstIndex < (horizontalRoutedFormulaComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.length := by
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.length := by
     rwa [← directSourceFinalOccurrences_length_eq_horizontalAtoms]
   have secondHorizontalLt : secondIndex < (horizontalRoutedFormulaComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.length := by
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.length := by
     rwa [← directSourceFinalOccurrences_length_eq_horizontalAtoms]
   have comparison := directSourceFinalAtomIdentityCodes_eq_iff_horizontalAtoms
     decider symbols firstIndex secondIndex firstOccurrenceLt secondOccurrenceLt _ _
@@ -73,7 +72,7 @@ actual horizontal variable, in the actual clause/literal presentation order. -/
 theorem directSourceFinalOccurrenceStableRanks_eq_horizontalAtoms (symbols : List encoding.Γ) :
     directSourceFinalOccurrenceStableRanks decider symbols =
       StableOccurrenceRanks.ranks (horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences := by
   rw [directSourceFinalOccurrenceStableRanks_eq_identityCodes]
   exact StableOccurrenceRanks.ranks_eq_of_partition _ _
     (directSourceFinalAtomIdentityCodes_length_eq_horizontalAtoms decider symbols)
@@ -84,13 +83,13 @@ actual horizontal atom. -/
 theorem directSourceFinalOccurrenceGroupSizes_eq_horizontalAtoms (symbols : List encoding.Γ) :
     directSourceFinalOccurrenceGroupSizes decider symbols =
       (horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.map
         (fun atom => (horizontalRoutedFormulaComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences.count atom) := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences.count atom) := by
   have identified := StableOccurrenceRanks.multiplicities_eq_of_partition
     (directSourceFinalAtomIdentityCodes decider symbols)
     (horizontalRoutedFormulaComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.variableOccurrences
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.variableOccurrences
     (directSourceFinalAtomIdentityCodes_length_eq_horizontalAtoms decider symbols)
     (directSourceFinalAtomIdentityCodes_partition_horizontal decider symbols)
   rw [directSourceFinalOccurrenceGroupSizes_eq_identityCodes]

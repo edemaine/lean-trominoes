@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripHorizontalAssembledRouteRasterRequestDirectionBlockList
 import LeanTrominoes.PeriodicThreeDMContractedRouteRasterSourceData
 
@@ -139,10 +140,10 @@ def directSparseContractedRouteEntries
     {Input : Type}
     {encoding : _root_.Computability.FinEncoding Input}
     {language : Input → Prop}
-    (decider : Complexity.DeciderInPolySpace encoding language)
+    (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
     List PeriodicThreeDM.ContractedRouteRasterSource.Entry :=
-  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+  let source := PeriodicCNF.ProgramSource.formulaOfSymbols
     decider symbols
   (horizontalThreeDMProblemComputed source).contractedEdges.map
     (directSparseContractedRouteEntry source
@@ -154,7 +155,7 @@ def directSparseContractedRouteSourceTokens
     {Input : Type}
     {encoding : _root_.Computability.FinEncoding Input}
     {language : Input → Prop}
-    (decider : Complexity.DeciderInPolySpace encoding language)
+    (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
     List PeriodicThreeDM.ContractedRouteRasterSource.Token :=
   PeriodicThreeDM.ContractedRouteRasterSource.tokens
@@ -166,7 +167,7 @@ theorem directSparseContractedRouteSourceTokens_output
     {Input : Type}
     {encoding : _root_.Computability.FinEncoding Input}
     {language : Input → Prop}
-    (decider : Complexity.DeciderInPolySpace encoding language)
+    (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
     TM2EndDelimitedBlockMap.mappedOutput
         PeriodicThreeDM.ContractedRouteRasterSource.isEnd

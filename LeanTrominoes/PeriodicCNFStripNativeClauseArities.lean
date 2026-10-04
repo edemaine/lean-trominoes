@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalParentIndexHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedFormulaSemanticBridge
 import LeanTrominoes.FiniteUnaryFieldBlockMapCompiler
@@ -29,17 +30,18 @@ private theorem normalizedClauseLengths (source : PeriodicCNF Nat) :
 
 theorem nativeClauseArities_eq (symbols : List encoding.Γ) :
     (HorizontalRoutedRouteHeaderClauseFrame.outputBlocks
-      (directSourceFinalClauseDescriptors decider symbols)).map List.length =
+      (directSourceFinalClauseDescriptors (PeriodicCNF.ProgramSource.ofDecider decider) symbols)).map List.length =
     (horizontalRoutedFormulaComputed
       (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses.map List.length := by
   rw [directSourceFinalClauseFrameBlockLengths_eq_horizontal, normalizedClauseLengths]
+  rfl
 
 noncomputable def nativeClauseAritiesCompiler :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun symbols => (horizontalRoutedFormulaComputed
         (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses.map List.length) := by
   let physical := TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
+    (directSourceFinalClauseDescriptorsComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
     (FiniteUnaryFieldBlockMap.computableInPolyTime (fun token =>
       (HorizontalRoutedRouteHeaderClauseFrame.tokenBlocks token).map List.length))
   apply TM2ComputableInPolyTime.of_eq physical

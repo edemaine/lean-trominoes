@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeThreeDMElements
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalTripleCoordinateCompiler
 import LeanTrominoes.PeriodicCNFStripNativePeriodCompiler
@@ -52,7 +53,7 @@ def nativeThreeDMSourcePointCompiler (horizontal positive : Bool) :
     Compiler (nativeThreeDMIncidences decider) (fun s tag =>
       SignedUnaryCoordinateRefinement.field positive (component horizontal (nativeThreeDMSourcePoint decider s tag))) := by
   apply TM2ComputableInPolyTime.of_eq
-    (directSourceFinalIncidenceSourceCoordinatesComputableInPolyTime decider horizontal positive)
+    (directSourceFinalIncidenceSourceCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive)
   intro s
   dsimp only
   rw [directSourceFinalIncidenceSourceCoordinates_eq_horizontal,

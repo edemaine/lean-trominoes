@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalElementCodeNumberingSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalCountedContractionPlanSemantics
 import LeanTrominoes.UnaryKeyedValueLookupUniqueSemantics
@@ -17,10 +18,8 @@ open Computability Turing Gadget PeriodicThreeDM
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance selectedIncidenceValueStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 /-- Use the same element/rank keys as the verified direction-word contraction. -/
 def directSourceFinalSelectedIncidenceValues (symbols : List encoding.Γ) (values : List Nat) : List Nat :=
@@ -34,7 +33,7 @@ def directSourceFinalSelectedIncidenceValues (symbols : List encoding.Γ) (value
 private theorem candidateKeys_length (symbols : List encoding.Γ) :
     (CountedContractedIncidence.incidenceBlockKeys
       (directSourceFinalCanonicalIncidenceElementCodes decider symbols)).length =
-        (horizontalThreeDMProblemComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.length := by
+        (horizontalThreeDMProblemComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.length := by
   rw [CountedContractedIncidence.incidenceBlockKeys, UnaryFieldStableOccurrenceKeys.keys_length,
     directSourceFinalCanonicalIncidenceElementCodes_eq_horizontal, List.length_map]
 
@@ -43,7 +42,7 @@ this selection without constructing another machine. -/
 noncomputable def directSourceFinalSelectedIncidenceValuesComputableInPolyTime
     (values : List encoding.Γ → List Nat)
     (aligned : ∀ symbols, (values symbols).length =
-      (horizontalThreeDMProblemComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.length)
+      (horizontalThreeDMProblemComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.length)
     (compiler : TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields values) :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun symbols => directSourceFinalSelectedIncidenceValues decider symbols (values symbols)) := by
@@ -69,7 +68,7 @@ noncomputable def directSourceFinalSelectedIncidenceValuesComputableInPolyTime
 theorem directSourceFinalSelectedIncidenceValues_eq_grouped
     (symbols : List encoding.Γ) (values : List Nat)
     (aligned : values.length =
-      (horizontalThreeDMProblemComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.length) :
+      (horizontalThreeDMProblemComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.length) :
     directSourceFinalSelectedIncidenceValues decider symbols values =
       (directSourceFinalCanonicalElementCodes decider symbols).flatMap fun elementCode =>
         ((directSourceFinalCanonicalIncidenceElementCodes decider symbols).idxsOf elementCode).map
@@ -94,11 +93,11 @@ element, in the exact order used by executable contraction. -/
 theorem directSourceFinalSelectedIncidenceValues_map_eq_horizontal
     (symbols : List encoding.Γ) (field : IncidenceTag → Nat) :
     directSourceFinalSelectedIncidenceValues decider symbols
-        ((horizontalThreeDMProblemComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidenceTags.map field) =
+        ((horizontalThreeDMProblemComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidenceTags.map field) =
       (CountedContractedIncidence.horizontalElementPairs
-        (horizontalThreeDMProblemComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))).flatMap
+        (horizontalThreeDMProblemComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))).flatMap
         (fun element => ((horizontalThreeDMProblemComputed
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).incidences element.1 element.2).map
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).incidences element.1 element.2).map
             (fun incidence => field ⟨incidence.tripleIndex, element.1⟩)) := by
   rw [directSourceFinalSelectedIncidenceValues_eq_grouped decider symbols _ (List.length_map ..),
     directSourceFinalCanonicalElementCodes_eq_horizontal,

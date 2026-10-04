@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripVariableIncidenceTypedElementCodeSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalNextOccurrenceKeyHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalParentIndexHorizontalSemantics
@@ -66,7 +67,7 @@ theorem horizontalVariableIncidenceElementCodeBlock_eq_typed
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Compiled variable incidences refer to the actual typed elements in
 canonical variable-triple and red/green/blue order. -/
@@ -74,11 +75,11 @@ theorem directSourceFinalVariableIncidenceElementCodes_eq_horizontalTyped
     (symbols : List encoding.Γ) :
     directSourceFinalVariableIncidenceElementCodes decider symbols =
       (variableTriples (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase).flatMap
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase).flatMap
         (fun triple => incidenceColors.map fun color => TypedElementCode.reference
           (directSourceFinalHorizontalOccurrenceKey decider symbols)
           (tripleReferences (horizontalSemanticNormalizedRibbonSource
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase triple) color) := by
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase triple) color) := by
   rw [directSourceFinalVariableIncidenceElementCodes_eq_occurrenceBlocks,
     directSourceFinalGroupedVariableFanSlots_eq_horizontal,
     directSourceFinalUniqueFanQueryKeys_eq_horizontal,
@@ -88,7 +89,7 @@ theorem directSourceFinalVariableIncidenceElementCodes_eq_horizontalTyped
   apply List.flatMap_congr
   intro entry member
   exact horizontalVariableIncidenceElementCodeBlock_eq_typed
-    (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) entry member
+    (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) entry member
     (directSourceFinalHorizontalOccurrenceKey decider symbols)
 
 /-- The complete emitted incidence-code column is the structural coding of
@@ -97,11 +98,11 @@ theorem directSourceFinalCanonicalIncidenceElementCodes_eq_horizontalTyped
     (symbols : List encoding.Γ) :
     directSourceFinalCanonicalIncidenceElementCodes decider symbols =
       (triples (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase).flatMap
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase).flatMap
         (fun triple => incidenceColors.map fun color => TypedElementCode.reference
           (directSourceFinalHorizontalOccurrenceKey decider symbols)
           (tripleReferences (horizontalSemanticNormalizedRibbonSource
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase triple) color) := by
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase triple) color) := by
   unfold directSourceFinalCanonicalIncidenceElementCodes PeriodicPlanarOneInThreeToThreeDM.triples
   rw [directSourceFinalVariableIncidenceElementCodes_eq_horizontalTyped,
     directSourceFinalClauseIncidenceElementCodes_eq_horizontalTyped decider symbols

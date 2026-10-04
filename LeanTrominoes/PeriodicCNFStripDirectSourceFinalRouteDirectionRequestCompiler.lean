@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicThreeDMNormalizationDirectionRequestAssemblyCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalContractedRouteHeaderSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalContractedDirectionTokenHorizontalSemantics
@@ -31,7 +32,7 @@ private opaque listOutputCompiler_of_pointwise_eq
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 def directSourceFinalRouteDirectionRequestTokens (symbols : List encoding.Γ) : List Batch.Token :=
   Batch.RequestAssembly.output
@@ -58,11 +59,11 @@ as the explicit header and direction compilers. -/
 theorem directSparseRouteDirectionRequestsOfSymbols_eq_horizontal (symbols : List encoding.Γ) :
     directSparseRouteDirectionRequestsOfSymbols decider symbols =
       (horizontalThreeDMProblemComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).contractedEdges.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).contractedEdges.map
         (horizontalAssembledNormalizationRequest
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)) := by
   have problemEq : (directSparseComputedNormalizationInputOfSymbols decider symbols).problem =
-      horizontalThreeDMProblemComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) := by
+      horizontalThreeDMProblemComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) := by
     rfl
   dsimp only [directSparseRouteDirectionRequestsOfSymbols]
   rw [← problemEq]
@@ -80,9 +81,9 @@ theorem directSourceFinalRouteDirectionRequestTokens_eq (symbols : List encoding
     directSparseRouteDirectionRequestsOfSymbols_eq_horizontal]
   have exact := Batch.RequestAssembly.output_requests
     ((horizontalThreeDMProblemComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).contractedEdges.map
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).contractedEdges.map
       (horizontalAssembledNormalizationRequest
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)))
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)))
   simpa only [List.map_map, List.flatMap_map, Function.comp_def,
     horizontalAssembledNormalizationRequest] using exact
 

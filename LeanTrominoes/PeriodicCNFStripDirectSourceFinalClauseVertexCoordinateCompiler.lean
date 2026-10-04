@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseGadgetOriginCompiler
 import LeanTrominoes.SignedUnaryCoordinateTableExpansion
 
@@ -28,7 +29,7 @@ private theorem component_add (horizontal : Bool) (origin offset : Cell) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Emit each finite local vertex table once per clause, in clause-major order. -/
 def directSourceFinalClauseVertexCoordinates (table : List Cell) (horizontal keepPositive : Bool)
@@ -51,7 +52,7 @@ noncomputable def directSourceFinalClauseVertexCoordinatesComputableInPolyTime
 theorem directSourceFinalClauseVertexCoordinates_eq_horizontal
     (table : List Cell) (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     directSourceFinalClauseVertexCoordinates decider table horizontal keepPositive symbols =
-      (horizontalClauseGadgetOrigins (PolySpaceCompiler.formulaOfSymbols decider symbols)).flatMap
+      (horizontalClauseGadgetOrigins (ProgramSource.formulaOfSymbols decider symbols)).flatMap
         (fun origin => table.map fun offset =>
           CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal keepPositive) (Cell.add origin offset)) := by
   unfold directSourceFinalClauseVertexCoordinates
@@ -62,7 +63,7 @@ theorem directSourceFinalClauseVertexCoordinates_eq_horizontal
 @[simp] theorem directSourceFinalClauseVertexCoordinates_length
     (table : List Cell) (horizontal keepPositive : Bool) (symbols : List encoding.Γ) :
     (directSourceFinalClauseVertexCoordinates decider table horizontal keepPositive symbols).length =
-      (horizontalRoutedFormulaComputed (PolySpaceCompiler.formulaOfSymbols decider symbols)).clauses.length * table.length := by
+      (horizontalRoutedFormulaComputed (ProgramSource.formulaOfSymbols decider symbols)).clauses.length * table.length := by
   unfold directSourceFinalClauseVertexCoordinates
   rw [SignedUnaryCoordinateTableExpansion.values_length _ _ _
     (fun positive => by rw [directSourceFinalClauseGadgetOriginCoordinates_length,

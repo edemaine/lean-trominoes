@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceBodyHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableIncidenceLocalColumns
 
@@ -33,10 +34,8 @@ private theorem zipWith_getD_of_lt
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance groupedBodyHorizontalStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
 /-- The actual grouped RGB body blocks are precisely the coordinated
 geometric routes of the normalized source's canonical atom/slot entries. -/
@@ -44,10 +43,10 @@ theorem directSourceFinalGroupedOccurrenceDirectionBodyBlocks_eq_horizontal
     (symbols : List encoding.Γ) :
     directSourceFinalGroupedOccurrenceDirectionBodyBlocks decider symbols =
       (occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase).map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase).map
         (fun entry => incidenceColors.map fun color => unitSubdivisionDirections
           (horizontalOccurrenceCoordinatedRouteComputed
-            (((PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols, entry.1), entry.2), color))) := by
+            (((PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols, entry.1), entry.2), color))) := by
   unfold directSourceFinalGroupedOccurrenceDirectionBodyBlocks
   rw [directSourceFinalGroupedOccurrenceIndices_eq_occurrenceEntries, List.map_map]
   apply List.map_congr_left
@@ -56,18 +55,18 @@ theorem directSourceFinalGroupedOccurrenceDirectionBodyBlocks_eq_horizontal
   dsimp only [Function.comp_def]
   obtain ⟨tagged, lookup⟩ := occurrenceAt_exists_of_entry_mem
     (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry member
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry member
   have indexMember := List.mem_map_of_mem
     (f := occurrenceEntryIndex (horizontalSemanticNormalizedRibbonSource
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase) member
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase) member
   have indexLt := directSourceFinalGroupedOccurrenceIndex_lt decider symbols _
     ((directSourceFinalGroupedOccurrenceIndices_eq_occurrenceEntries decider symbols).symm ▸ indexMember)
   have frameLt : occurrenceEntryIndex (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry <
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry <
       (directSourceFinalOccurrenceFramesExpected decider symbols).length :=
     lt_of_lt_of_eq indexLt (directSourceFinalOccurrenceFramesExpected_length decider symbols).symm
   have pairLt : occurrenceEntryIndex (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry <
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry <
       (directFigureNinePolarityRoutePairs decider symbols).length :=
     lt_of_lt_of_eq frameLt (directSourceFinalOccurrenceFramesExpected_length_eq_routePairs decider symbols)
   exact (zipWith_getD_of_lt directFinalOccurrenceDirectionBodyBlock

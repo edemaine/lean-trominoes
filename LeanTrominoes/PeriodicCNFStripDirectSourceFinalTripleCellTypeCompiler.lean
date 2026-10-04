@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalIncidenceEndpointSummaryHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalThreeDMTripleCellTypeDirections
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalTripleCoordinateCompiler
@@ -58,7 +59,7 @@ private theorem actualTripleCellType (source : PeriodicCNF Nat) (index : Nat)
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- One compiled final cell type for each triple in canonical presentation order. -/
 def directSourceFinalTripleCellTypes (symbols : List encoding.Γ) : List OrthogonalCellType :=
@@ -74,9 +75,9 @@ noncomputable def directSourceFinalTripleCellTypesComputableInPolyTime :
 theorem directSourceFinalTripleCellTypes_eq_range (symbols : List encoding.Γ) :
     directSourceFinalTripleCellTypes decider symbols =
       (List.range (horizontalThreeDMProblemComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).triples.length).map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).triples.length).map
           (fun index => NormalizationCompiler.finalVertexCellType
-            (horizontalNormalizationInputComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+            (horizontalNormalizationInputComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
               (.triple index)) := by
   unfold directSourceFinalTripleCellTypes
   rw [directSourceFinalIncidenceEndpointSummaries_eq_horizontal]
@@ -90,24 +91,24 @@ theorem directSourceFinalTripleCellTypes_eq_range (symbols : List encoding.Γ) :
 theorem directSourceFinalTripleCellTypes_eq_indexedPositions (symbols : List encoding.Γ) :
     directSourceFinalTripleCellTypes decider symbols =
       (horizontalThreeDMTriplePositionsComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).zipIdx.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).zipIdx.map
           (fun tagged => NormalizationCompiler.finalVertexCellType
-            (horizontalNormalizationInputComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+            (horizontalNormalizationInputComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
               (.triple tagged.2)) := by
   rw [directSourceFinalTripleCellTypes_eq_range]
   have lengthEq : (horizontalThreeDMProblemComputed
-      (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).triples.length =
+      (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).triples.length =
       (horizontalThreeDMTriplePositionsComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).length := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).length := by
     rw [← horizontalThreeDMPositionProblemComputed_eq]
     exact (horizontalThreeDMTriplePositionsComputed_length _).symm
   rw [lengthEq]
   have mapped := congrArg
     (List.map (fun index => NormalizationCompiler.finalVertexCellType
-      (horizontalNormalizationInputComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+      (horizontalNormalizationInputComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
         (.triple index)))
     (List.zipIdx_map_snd 0
-      (horizontalThreeDMTriplePositionsComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)))
+      (horizontalThreeDMTriplePositionsComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)))
   simpa only [List.map_map, Function.comp_def, ← List.range_eq_range'] using mapped.symm
 
 end LeanTrominoes.PeriodicCNFStripReduction

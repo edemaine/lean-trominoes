@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalSelectedIncidenceBodyHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalContractedDirectionTokenSemantics
 import LeanTrominoes.TM2PolyTimeOutputEncodingTransport
@@ -29,7 +30,7 @@ private opaque listOutputCompiler_of_pointwise_eq
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Every delimited compiled route word is the actual geometric word at the
 same canonical contracted-edge position. -/
@@ -37,10 +38,10 @@ theorem directSourceFinalCountedContractedDirectionTokens_eq_horizontal
     (symbols : List encoding.Γ) :
     directSourceFinalCountedContractedDirectionTokens decider symbols =
       (horizontalThreeDMProblemComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).contractedEdges.flatMap
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).contractedEdges.flatMap
         (fun edge => NormalizationDirectionRequest.Batch.DelimitedReversal.routeBlock
           (horizontalAssembledContractedDirections
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) edge)) := by
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) edge)) := by
   rw [directSourceFinalCountedContractedDirectionTokens_eq_edgeBlocks,
     directSourceFinalCountedContractedEdgeBlocks_eq_horizontal]
   exact horizontalContractedDirectionBlocks_outputTokens _ _
@@ -51,18 +52,18 @@ geometric route-word stream in polynomial time. -/
 noncomputable def horizontalAssembledContractedDirectionTokensComputableInPolyTime :
     TM2ComputableInPolyTime id id (fun symbols : List encoding.Γ =>
       (horizontalThreeDMProblemComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).contractedEdges.flatMap
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).contractedEdges.flatMap
         (fun edge => NormalizationDirectionRequest.Batch.DelimitedReversal.routeBlock
           (horizontalAssembledContractedDirections
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) edge))) := by
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) edge))) := by
   exact listOutputCompiler_of_pointwise_eq id
     (directSourceFinalCountedContractedDirectionTokens decider)
     (fun symbols : List encoding.Γ =>
       (horizontalThreeDMProblemComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).contractedEdges.flatMap
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).contractedEdges.flatMap
         (fun edge => NormalizationDirectionRequest.Batch.DelimitedReversal.routeBlock
           (horizontalAssembledContractedDirections
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) edge)))
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) edge)))
     (@directSourceFinalCountedContractedDirectionTokensComputableInPolyTime
       Input encoding language decider)
     (@directSourceFinalCountedContractedDirectionTokens_eq_horizontal

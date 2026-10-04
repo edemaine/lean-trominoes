@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalElementCodeNumberingSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalThreeDMProblemSemanticBridge
 import LeanTrominoes.UnaryColumnKeyedRelation
@@ -35,9 +36,9 @@ abbrev nativeThreeDMElements (s : List encoding.Γ) :=
 abbrev nativeThreeDMIncidences (s : List encoding.Γ) := (nativeThreeDMProblem decider s).incidenceTags
 
 theorem nativeThreeDMOneColorCodes (s : List encoding.Γ) (color : WireColor) :
-    directSourceFinalOneColorElementCodes decider color s =
+    directSourceFinalOneColorElementCodes (PeriodicCNF.ProgramSource.ofDecider decider) color s =
       (List.range ((nativeThreeDMProblem decider s).elementCount color)).map
-        (fun atom => directSourceFinalHorizontalElementCode decider s (color,atom)) := by
+        (fun atom => directSourceFinalHorizontalElementCode (PeriodicCNF.ProgramSource.ofDecider decider) s (color,atom)) := by
   rw [directSourceFinalOneColorElementCodes_eq_horizontalTyped]
   unfold nativeThreeDMProblem directSourceFinalHorizontalElementCode
   rw [horizontalThreeDMProblemComputed_eq_semantic]
@@ -46,7 +47,7 @@ theorem nativeThreeDMOneColorCodes (s : List encoding.Γ) (color : WireColor) :
 def nativeThreeDMElementCountCompiler (color : WireColor) :
     ScalarCompiler (fun s => (nativeThreeDMProblem decider s).elementCount color) := by
   let physical := TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalOneColorElementCodesComputableInPolyTime decider color)
+    (directSourceFinalOneColorElementCodesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) color)
     UnaryFieldAggregate.countCompiler
   apply TM2ComputableInPolyTime.of_eq physical
   intro s
@@ -65,16 +66,16 @@ def nativeThreeDMElementIndexCompiler [Inhabited encoding.Γ] :
     incidenceColors,List.map_map]
 
 def nativeThreeDMElementKeyCompiler : Compiler (nativeThreeDMElements decider)
-    (directSourceFinalHorizontalElementCode decider) := by
-  apply TM2ComputableInPolyTime.of_eq (directSourceFinalCanonicalElementCodesComputableInPolyTime decider)
+    (directSourceFinalHorizontalElementCode (PeriodicCNF.ProgramSource.ofDecider decider)) := by
+  apply TM2ComputableInPolyTime.of_eq (directSourceFinalCanonicalElementCodesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
   intro s
-  exact directSourceFinalCanonicalElementCodes_eq_horizontal decider s
+  exact directSourceFinalCanonicalElementCodes_eq_horizontal (PeriodicCNF.ProgramSource.ofDecider decider) s
 
 def nativeThreeDMIncidenceKeyCompiler : Compiler (nativeThreeDMIncidences decider)
-    (fun s tag => directSourceFinalHorizontalElementCode decider s ((nativeThreeDMProblem decider s).incidenceElement tag)) := by
-  apply TM2ComputableInPolyTime.of_eq (directSourceFinalCanonicalIncidenceElementCodesComputableInPolyTime decider)
+    (fun s tag => directSourceFinalHorizontalElementCode (PeriodicCNF.ProgramSource.ofDecider decider) s ((nativeThreeDMProblem decider s).incidenceElement tag)) := by
+  apply TM2ComputableInPolyTime.of_eq (directSourceFinalCanonicalIncidenceElementCodesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
   intro s
-  exact directSourceFinalCanonicalIncidenceElementCodes_eq_horizontal decider s
+  exact directSourceFinalCanonicalIncidenceElementCodes_eq_horizontal (PeriodicCNF.ProgramSource.ofDecider decider) s
 
 theorem nativeThreeDMElement_mem (s : List encoding.Γ) (e : WireColor × Nat) :
     e ∈ nativeThreeDMElements decider s ↔ e.2 < (nativeThreeDMProblem decider s).elementCount e.1 := by
@@ -100,14 +101,14 @@ def nativeThreeDMIncidenceAtomCompiler [Inhabited encoding.Γ] : Compiler (nativ
   apply keyedRelation (nativeThreeDMIncidenceKeyCompiler decider)
     (nativeThreeDMElementKeyCompiler decider) (nativeThreeDMElementIndexCompiler decider)
   · intro s a ha b hb eq
-    have unique := directSourceFinalCanonicalElementCodes_nodup decider s
+    have unique := directSourceFinalCanonicalElementCodes_nodup (PeriodicCNF.ProgramSource.ofDecider decider) s
     rw [directSourceFinalCanonicalElementCodes_eq_horizontal] at unique
     have same : a = b := List.inj_on_of_nodup_map unique ha hb eq
     exact congrArg Prod.snd same
   · intro s tag ht
     exact ⟨_,nativeThreeDMIncidenceElement_mem decider s tag ht,rfl⟩
   · intro s tag ht e he eq
-    have same := (directSourceFinalHorizontalIncidenceCode_eq_iff decider s e
+    have same := (directSourceFinalHorizontalIncidenceCode_eq_iff (PeriodicCNF.ProgramSource.ofDecider decider) s e
       ((nativeThreeDMElement_mem decider s e).1 he) tag ht).1 eq.symm
     exact congrArg Prod.snd same.symm
 

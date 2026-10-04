@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeOrdinaryProfiles
 import LeanTrominoes.PeriodicCNFOrdinarySourceValueGeometry
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalAtomValueRowCodes
@@ -18,23 +19,23 @@ variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance ordinaryValueStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 local instance ordinaryValueVariableDecidableEq : DecidableEq Variable := directSourceVariableDecidableEq
-set_option maxHeartbeats 800000
+set_option maxHeartbeats 3000000
 
 def nativeOrdinaryQueries (s : List encoding.Γ) : List Nat :=
-  queries (directSourceFinalClauseDescriptors decider s)
+  queries (directSourceFinalClauseDescriptors (PeriodicCNF.ProgramSource.ofDecider decider) s)
 
 def nativeOrdinaryQueriesCompiler : TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
     (nativeOrdinaryQueries decider) := by
   unfold nativeOrdinaryQueries
   exact TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalClauseDescriptorsComputableInPolyTime decider) OrdinarySourceProjection.compiler
+    (directSourceFinalClauseDescriptorsComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider)) OrdinarySourceProjection.compiler
 
 private theorem orderedBlocks (s : List encoding.Γ) (blocks : List ValueBlock)
     (value : PeriodicLiteral OrdinaryVariable → Nat)
-    (profiles : blocks.map (fun block => Token.clause block.1) = directSourceFinalClauseDescriptors decider s)
+    (profiles : blocks.map (fun block => Token.clause block.1) = directSourceFinalClauseDescriptors (PeriodicCNF.ProgramSource.ofDecider decider) s)
     (literals : blocks.map (fun block => block.2.literals) =
       (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
-        (directSourceFormula decider s)).clauses.map (fun clause => clause.literals.map value)) :
+        (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s)).clauses.map (fun clause => clause.literals.map value)) :
     blocks.flatMap (fun block => orderedValues block.1 block.2.literals) =
       (nativeOrdinaryBaseInput decider s).1.clauses.flatMap (List.map value) := by
   have profileEq : blocks.map Prod.fst = nativeOrdinaryProfiles decider s := by
@@ -45,14 +46,14 @@ private theorem orderedBlocks (s : List encoding.Γ) (blocks : List ValueBlock)
   rw [orderedValueBlocks_eq, profileEq, literals]
   unfold nativeOrdinaryProfiles directSourceFinalParentRouteBlocks
   simp only [List.map_map, Function.comp_def]
-  let source := retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula (directSourceFormula decider s)
+  let source := retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s)
   have rows : source.clauses.map (fun clause => clause.literals.map value) =
       source.clauses.zipIdx.map (fun tagged => tagged.1.literals.map value) := by
     simpa only [List.map_map, Function.comp_def] using
       (congrArg (List.map (fun clause => clause.literals.map value)) (List.zipIdx_map_fst 0 source.clauses)).symm
   rw [rows, List.zipWith_map, List.zipWith_self, ← List.flatMap_def]
   change _ = ((PositionedPeriodicCNF.orderClausesByRouteDirection source
-    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes (directSourceFormula decider s))).scale
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s))).scale
       retainedFigureNineSourceClearanceFactor).erase.clauses.flatMap (List.map value)
   rw [PositionedPeriodicCNF.erase_scale]
   simp only [PositionedPeriodicCNF.erase, PositionedPeriodicCNF.orderClausesByRouteDirection, List.flatMap_map]
@@ -60,10 +61,10 @@ private theorem orderedBlocks (s : List encoding.Γ) (blocks : List ValueBlock)
   intro tagged member
   apply orderedValues_ofClause
   · exact retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_clausesNonempty
-      (directSourceFormula decider s) (sourceFormula_clausesNonempty _) tagged.1
+      (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) (sourceFormula_clausesNonempty _) tagged.1
       (List.fst_mem_of_mem_zipIdx member)
   · exact retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_widthAtMostThree
-      (directSourceFormula decider s) (sourceFormula_widthAtMostThree _) tagged.1.literals
+      (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s) (sourceFormula_widthAtMostThree _) tagged.1.literals
       (PositionedPeriodicCNF.literals_mem_erase_of_mem_zipIdx member)
 
 private def projectColumn [Inhabited encoding.Γ]
@@ -72,10 +73,10 @@ private def projectColumn [Inhabited encoding.Γ]
     (value : List encoding.Γ → PeriodicLiteral OrdinaryVariable → Nat)
     (columnCompiler : TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields column)
     (columnEq : ∀ s, column s = (blocks s).flatMap valueBlock)
-    (profiles : ∀ s, (blocks s).map (fun block => Token.clause block.1) = directSourceFinalClauseDescriptors decider s)
+    (profiles : ∀ s, (blocks s).map (fun block => Token.clause block.1) = directSourceFinalClauseDescriptors (PeriodicCNF.ProgramSource.ofDecider decider) s)
     (literals : ∀ s, (blocks s).map (fun block => block.2.literals) =
       (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
-        (directSourceFormula decider s)).clauses.map (fun clause => clause.literals.map (value s))) :
+        (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s)).clauses.map (fun clause => clause.literals.map (value s))) :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun s => (nativeOrdinaryBaseInput decider s).1.clauses.flatMap (List.map (value s))) := by
   let physical := UnaryIndexedValueLookup.valuesComputableInPolyTime id
@@ -88,11 +89,11 @@ private def projectColumn [Inhabited encoding.Γ]
 def nativeOrdinaryAtomCodesCompiler [Inhabited encoding.Γ] :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields (nativeOrdinaryAtomCodes decider) := by
   apply TM2ComputableInPolyTime.of_eq (projectColumn decider
-    (directSourceFinalInheritedRingAtomCodes decider) (directSourceFinalAtomValueBlocks decider)
-    (fun s literal => directSourceFinalRingVariableCode decider s literal.atom)
-    (directSourceFinalInheritedRingAtomCodesComputableInPolyTime decider)
-    (directSourceFinalInheritedRingAtomCodes_eq_value_blocks decider)
-    (directSourceFinalAtomValueBlocks_profiles decider) (directSourceFinalAtomValueBlocks_literals decider))
+    (directSourceFinalInheritedRingAtomCodes (PeriodicCNF.ProgramSource.ofDecider decider)) (directSourceFinalAtomValueBlocks (PeriodicCNF.ProgramSource.ofDecider decider))
+    (fun s literal => directSourceFinalRingVariableCode (PeriodicCNF.ProgramSource.ofDecider decider) s literal.atom)
+    (directSourceFinalInheritedRingAtomCodesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
+    (directSourceFinalInheritedRingAtomCodes_eq_value_blocks (PeriodicCNF.ProgramSource.ofDecider decider))
+    (directSourceFinalAtomValueBlocks_profiles (PeriodicCNF.ProgramSource.ofDecider decider)) (directSourceFinalAtomValueBlocks_literals (PeriodicCNF.ProgramSource.ofDecider decider)))
   intro s
   simp only [nativeOrdinaryAtomCodes, PeriodicCNF.variableOccurrences, List.map_flatMap, List.map_map, Function.comp_def]
 
@@ -100,13 +101,13 @@ def nativeOrdinaryPositionFieldsCompiler [Inhabited encoding.Γ] (horizontal pos
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun s => (nativeOrdinaryBaseInput decider s).1.clauses.flatMap (fun clause => clause.map (fun literal =>
         CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal positive)
-          ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement (directSourceFormula decider s)).position literal.atom)))) :=
-  projectColumn decider (directSourceFinalInheritedCoordinates decider horizontal positive)
-    (directSourceFinalCoordinateValueBlocks decider horizontal positive) _
-    (directSourceFinalInheritedCoordinatesComputableInPolyTime decider horizontal positive)
-    (directSourceFinalInheritedCoordinates_eq_value_blocks decider horizontal positive)
-    (directSourceFinalCoordinateValueBlocks_profiles decider horizontal positive)
-    (directSourceFinalCoordinateValueBlocks_literals decider horizontal positive)
+          ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s)).position literal.atom)))) :=
+  projectColumn decider (directSourceFinalInheritedCoordinates (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive)
+    (directSourceFinalCoordinateValueBlocks (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive) _
+    (directSourceFinalInheritedCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive)
+    (directSourceFinalInheritedCoordinates_eq_value_blocks (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive)
+    (directSourceFinalCoordinateValueBlocks_profiles (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive)
+    (directSourceFinalCoordinateValueBlocks_literals (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive)
 
 end LeanTrominoes.PeriodicCNFStripReduction
 end

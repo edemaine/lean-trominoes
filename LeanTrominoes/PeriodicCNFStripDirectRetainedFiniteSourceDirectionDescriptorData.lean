@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionFixedEight
 import LeanTrominoes.PeriodicCNFStripSourceFormula
 
@@ -18,11 +19,8 @@ open PeriodicCNF
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directRetainedFiniteSourceDirectionDataStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance directRetainedFiniteSourceDirectionDataVariableDecidableEq :
     DecidableEq Variable :=
@@ -33,7 +31,7 @@ def directRetainedFigureNineCopiedClauseDescriptors
     (symbols : List encoding.Γ) :
     List FormulaShapeDirectionOrdering.Token :=
   FormulaShapeRetainedFigureNineDirection.copiedClauseDescriptors
-    (sourceFormula (PolySpaceCompiler.formulaOfSymbols decider symbols))
+    (sourceFormula (ProgramSource.formulaOfSymbols decider symbols))
 
 /-- One marker per stable retained source variable, before fixed-eight
 expansion. -/
@@ -41,7 +39,7 @@ def directRetainedFigureNineFiniteSourceVariableMarkers
     (symbols : List encoding.Γ) :
     List FormulaShapeDirectionOrdering.Token :=
   let source :=
-    sourceFormula (PolySpaceCompiler.formulaOfSymbols decider symbols)
+    sourceFormula (ProgramSource.formulaOfSymbols decider symbols)
   List.replicate
     (PeriodicThreeSATThree.sourceVariables
       (FormulaShapeRetainedFigureNineDirection.sourceScaledForFigureSeven
@@ -54,7 +52,7 @@ def directRetainedFigureNineFiniteSourceDescriptors
     (symbols : List encoding.Γ) :
     List FormulaShapeDirectionOrdering.Token :=
   FormulaShapeRetainedFigureNineDirection.finiteSourceDescriptors
-    (sourceFormula (PolySpaceCompiler.formulaOfSymbols decider symbols))
+    (sourceFormula (ProgramSource.formulaOfSymbols decider symbols))
 
 /-- The finite-source target is exactly its separately streamable copied
 clause and variable-marker phases. -/

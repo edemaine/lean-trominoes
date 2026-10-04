@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicThreeSATThreeNumericProfiles
 import LeanTrominoes.PeriodicCNFRouteTargetCompiler
 import LeanTrominoes.PeriodicCNFSourceSplitRouteDescriptorTokenCompiler
@@ -30,7 +31,7 @@ def cycleProfiles (ps : List ClauseProfile) : List ClauseProfile :=
   ps.flatMap fun p => List.replicate p.literals.length Numeric.cycleProfile
 
 def profiles (symbols : List encoding.Γ) : List ClauseProfile :=
-  let ps := StripDirectClauseProfileScan.sourceClauseProfiles decider symbols
+  let ps := StripDirectClauseProfileScan.sourceClauseProfiles (PeriodicCNF.ProgramSource.ofDecider decider) symbols
   ps ++ cycleProfiles ps
 
 private theorem cycleProfiles_eq (ps : List ClauseProfile) :
@@ -44,17 +45,17 @@ private theorem cycleProfiles_eq (ps : List ClauseProfile) :
 theorem profiles_correct (symbols : List encoding.Γ) :
     (profiles decider symbols).map ClauseProfile.literals =
       (formula decider symbols).clauses.map (List.map LiteralProfile.ofLiteral) := by
-  have base := StripDirectClauseProfileScan.sourceClauseProfiles_literals_eq_formula decider symbols
+  have base := StripDirectClauseProfileScan.sourceClauseProfiles_literals_eq_formula (PeriodicCNF.ProgramSource.ofDecider decider) symbols
   have count := congrArg (fun lists : List (List LiteralProfile) => lists.flatten.length) base
   simp only [List.length_flatten,List.map_map,List.length_map] at count
   unfold profiles formula
   rw [Numeric.profiles,List.map_append,base,cycleProfiles_eq,List.map_replicate]
   congr 2
   simp only [List.length_flatMap]
-  simpa only [Function.comp_def,List.length_map,presentationLiteralCount,source,List.length_flatten] using count
+  simpa only [Function.comp_def,List.length_map,presentationLiteralCount,source,List.length_flatten,ProgramSource.ofDecider] using count
 
 noncomputable def profilesComputableInPolyTime : TM2ComputableInPolyTime id id (profiles decider) := by
-  let first := StripDirectClauseProfileScan.sourceClauseProfilesComputableInPolyTime decider
+  let first := StripDirectClauseProfileScan.sourceClauseProfilesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider)
   let second := TM2CompositionMachine.computableInPolyTime first
     (FiniteBlockTransducer.computableInPolyTime fun p : ClauseProfile =>
       List.replicate p.literals.length Numeric.cycleProfile)
@@ -80,7 +81,7 @@ def atoms (symbols : List encoding.Γ) := (formula decider symbols).variableOccu
 
 noncomputable def atomsComputableInPolyTime :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields (atoms decider) := by
-  let promised := PeriodicCNFStripReduction.directSourceRouteTokenSourceComputableInPolyTime decider
+  let promised := PeriodicCNFStripReduction.directSourceRouteTokenSourceComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider)
   let routes := TM2CompositionMachine.computableInPolyTime promised SourceSplitRouteDescriptorTokens.compiler
   let projected := TM2CompositionMachine.computableInPolyTime routes RouteTargetCompiler.computableInPolyTime
   refine TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq projected ?_

@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeClauseArities
 import LeanTrominoes.PeriodicCNFStripNativeIncidenceClauseFields
 import LeanTrominoes.PeriodicCNFStripHorizontalThreeDMSourceArity
@@ -28,7 +29,7 @@ def nativeClauseFirstControlsCompiler : TM2ComputableInPolyTime id id (fun s =>
     (horizontalRoutedFormulaComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider s)).clauses.flatMap
       (fun clause => firstBlockControls clause.literals.length)) := by
   let physical := TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
+    (directSourceFinalClauseDescriptorsComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
     (FiniteBlockTransducer.computableInPolyTime (fun token =>
       (HorizontalRoutedRouteHeaderClauseFrame.tokenBlocks token).flatMap
         (fun block => firstBlockControls block.length)))
@@ -56,7 +57,7 @@ def nativeClauseCoordinateCompiler [Inhabited encoding.Γ] (horizontal positive 
     Compiler (nativeClausePositions decider) (fun _ point =>
       SignedUnaryCoordinateRefinement.field positive (DelimitedDirectionDisplacement.component horizontal point)) := by
   let physical := selectedValuesComputableInPolyTime id _ _ (nativeClauseFirstControlsCompiler decider)
-    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime decider horizontal positive)
+    (directSourceFinalHorizontalClauseCoordinatesComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider) horizontal positive)
   apply TM2ComputableInPolyTime.of_eq physical
   intro s
   unfold directSourceFinalHorizontalClauseCoordinates
@@ -68,7 +69,7 @@ def nativeClauseCoordinateCompiler [Inhabited encoding.Γ] (horizontal positive 
         (horizontalRoutedPlacementComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider s)) c)))
     (routed_clause_positive _)
   cases horizontal <;> cases positive <;>
-    simpa only [nativeClausePositions, presentedIncidenceClausePositions,
+    simpa only [PeriodicCNF.ProgramSource.ofDecider, nativeClausePositions, presentedIncidenceClausePositions,
       List.map_flatMap, List.map_replicate, List.map_map, Function.comp_def,
       SignedUnaryCoordinateRefinement.field, DelimitedDirectionDisplacement.component,
       PeriodicOrthocrossing.coordinateFieldOfBools, PeriodicOrthocrossing.CarrierCrossingPointField.pointValue,

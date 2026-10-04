@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalTripleCellTypeCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineVertexIndexedAppenderData
 import LeanTrominoes.PeriodicCNFStripDirectDrawingGridUnitEmitter
@@ -23,12 +24,12 @@ private theorem positivePointValue (horizontal : Bool) :
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 private noncomputable def tripleCoordinateCompiler (horizontal : Bool) :
     TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
       (fun symbols => (horizontalThreeDMTriplePositionsComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).zipIdx.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).zipIdx.map
           (fun tagged => (DelimitedDirectionDisplacement.component horizontal tagged.1).toNat)) :=
   TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
     (directSourceFinalTripleCoordinatesComputableInPolyTime decider horizontal true)
@@ -37,20 +38,20 @@ private noncomputable def tripleCoordinateCompiler (horizontal : Bool) :
       simpa only [List.map_map, Function.comp_def] using
         (congrArg (List.map (fun point => (DelimitedDirectionDisplacement.component horizontal point).toNat))
           (List.zipIdx_map_fst 0 (horizontalThreeDMTriplePositionsComputed
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)))).symm))
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)))).symm))
 
 private noncomputable def tripleCellTypeCompiler :
     @TM2ComputableInPolyTime (List encoding.Γ) (List OrthogonalCellType) encoding.Γ OrthogonalCellType id id
       (fun symbols => (horizontalThreeDMTriplePositionsComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).zipIdx.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).zipIdx.map
           (fun tagged => PeriodicThreeDM.NormalizationCompiler.finalVertexCellType
-            (horizontalNormalizationInputComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+            (horizontalNormalizationInputComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
               (.triple tagged.2))) := by
   have equal : directSourceFinalTripleCellTypes decider =
       (fun symbols => (horizontalThreeDMTriplePositionsComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).zipIdx.map
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).zipIdx.map
           (fun tagged => PeriodicThreeDM.NormalizationCompiler.finalVertexCellType
-            (horizontalNormalizationInputComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+            (horizontalNormalizationInputComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
               (.triple tagged.2))) :=
     funext (directSourceFinalTripleCellTypes_eq_indexedPositions decider)
   rw [← equal]
@@ -65,12 +66,12 @@ noncomputable def directSourceFinalTripleRecordsComputableInPolyTime :
     letI : Inhabited encoding.Γ := ⟨Classical.choice nonemptyAlphabet⟩
     let compiler := GadgetSparseAffineVertexTokens.RecordColumns.computableInPolyTimeOf
       (fun symbols => (horizontalThreeDMTriplePositionsComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).zipIdx)
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).zipIdx)
       (directDrawingGridUnitsOfSymbols decider)
       (fun _ tagged => (DelimitedDirectionDisplacement.component true tagged.1).toNat)
       (fun _ tagged => (DelimitedDirectionDisplacement.component false tagged.1).toNat)
       (fun symbols tagged => PeriodicThreeDM.NormalizationCompiler.finalVertexCellType
-        (horizontalNormalizationInputComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols))
+        (horizontalNormalizationInputComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols))
           (.triple tagged.2))
       (tripleCoordinateCompiler decider true)
       (tripleCoordinateCompiler decider false)

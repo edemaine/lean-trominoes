@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalClauseFanHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalThreeDMSourceArity
 import LeanTrominoes.UnaryFieldFirstBlockFilter
@@ -40,7 +41,7 @@ theorem horizontalRoutedClause_length_pos (source : PeriodicCNF Nat)
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Only the top terminal is the first occurrence of its actual clause. -/
 def directSourceFinalClauseFirstBits (symbols : List encoding.Γ) : List Bool :=
@@ -56,7 +57,7 @@ noncomputable def directSourceFinalClauseFirstBitsComputableInPolyTime :
 
 theorem directSourceFinalClauseFirstBits_eq_horizontal (symbols : List encoding.Γ) :
     directSourceFinalClauseFirstBits decider symbols =
-      (horizontalRoutedFormulaComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).clauses.flatMap
+      (horizontalRoutedFormulaComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).clauses.flatMap
         (fun clause => firstBlockControls clause.literals.length) := by
   have identified := congrArg (List.map fun pair : ClauseRibbonFanData × PlanarThreeDM.X3CClauseTerminalGroup =>
     decide (pair.2 = .top)) (directSourceFinalClauseFrames_fan_groups_eq_horizontal decider symbols)
@@ -68,7 +69,7 @@ theorem directSourceFinalClauseFirstBits_eq_horizontal (symbols : List encoding.
   exact PeriodicCNF.zipIdx_flatMap_fst
     (fun clause : PositionedPeriodicClause RoutedVariable =>
       (List.range clause.literals.length).map (fun index => decide (index = 0)))
-    (horizontalRoutedFormulaComputed (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).clauses 0
+    (horizontalRoutedFormulaComputed (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).clauses 0
 
 end LeanTrominoes.PeriodicCNFStripReduction
 end

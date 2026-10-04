@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicThreeSATThreePolyTimeColumns
 import LeanTrominoes.TM2EmptyAlphabetListInputCompiler
 
@@ -52,8 +53,8 @@ noncomputable def fieldsComputableInPolyTime [Inhabited encoding.Γ] :
   refine TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq physical ?_
   intro symbols
   exact finalize_records _ (clauses_nonempty decider symbols)
-    (Numeric.width_three _ (PeriodicCNFStripReduction.formulaOfSymbols_widthAtMostThree decider symbols))
-    (Numeric.forward _ (PeriodicCNFStripReduction.formulaOfSymbols_isForwardLocal decider symbols))
+    (Numeric.width_three _ (PeriodicCNFStripReduction.formulaOfSymbols_widthAtMostThree (PeriodicCNF.ProgramSource.ofDecider decider) symbols))
+    (Numeric.forward _ (PeriodicCNFStripReduction.formulaOfSymbols_isForwardLocal (PeriodicCNF.ProgramSource.ofDecider decider) symbols))
 
 noncomputable def formulaComputableInPolyTimeOfInhabited [Inhabited encoding.Γ] :
     TM2ComputableInPolyTime id PeriodicCNFFlatEncoding.finEncoding.encode (formula decider) := by

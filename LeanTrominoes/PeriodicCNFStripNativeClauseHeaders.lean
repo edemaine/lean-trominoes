@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PositionedIncidenceHeaderBlocks
 import LeanTrominoes.PeriodicCNFStripNativeClauseArities
 import LeanTrominoes.PeriodicCNFStripNativeOffsetColumns
@@ -22,7 +23,7 @@ its other literals, with one explicit block boundary per occurrence. -/
 noncomputable def nativeClauseHeaderBlocksCompiler :
     BlocksCompiler (nativeIncidenceRows decider) (fun _ row => header row) := by
   let physical := TM2CompositionMachine.computableInPolyTime
-    (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
+    (directSourceFinalClauseDescriptorsComputableInPolyTime (PeriodicCNF.ProgramSource.ofDecider decider))
     (FiniteBlockTransducer.computableInPolyTime (fun token =>
       FiniteAlphabetDelimitedBlockJoin.blocks
         ((HorizontalRoutedRouteHeaderClauseFrame.tokenBlocks token).flatMap

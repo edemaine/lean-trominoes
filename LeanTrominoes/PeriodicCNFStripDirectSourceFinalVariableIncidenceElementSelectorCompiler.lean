@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.FiniteBlockTransducer
 import LeanTrominoes.FiniteUnaryFieldMapCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableIncidencePrefixCompiler
@@ -125,7 +126,7 @@ def groupedVariableIncidenceElementSelectorBlock
 def directSourceFinalVariableIncidenceElementSelectors
     {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
     {language : Input → Prop}
-    (decider : Complexity.DeciderInPolySpace encoding language)
+    (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
     List VariableIncidenceElementSelector :=
   (directSourceFinalGroupedVariableFanSlots decider symbols).flatMap
@@ -163,11 +164,8 @@ def directSourceFinalVariableIncidenceTags
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directFinalVariableIncidenceSelectorStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- The complete finite selector stream compiles in polynomial time. -/
 noncomputable def

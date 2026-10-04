@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.GadgetStripReduction
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
 import LeanTrominoes.PeriodicCNFStripCompiledTromino
@@ -19,18 +20,15 @@ open Computability Turing
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance (stack : decider.tm.K) :
-    Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- Compose the established PSPACE-to-local-CNF formula with the verified
 semantic tromino-strip compiler. -/
 def directCompiledTrominoStrip (tromino : Tromino) (input : Input) :
     PeriodicStrip :=
   compiledTrominoStrip tromino
-    (PeriodicCNF.PolySpaceReduction.formula decider input)
+    (PeriodicCNF.ProgramSource.formula decider input)
 
 theorem directCompiledTrominoStrip_correct
     (tromino : Tromino)
@@ -40,10 +38,10 @@ theorem directCompiledTrominoStrip_correct
       PeriodicStripTrominoTiling tromino
         (directCompiledTrominoStrip decider tromino input) := by
   exact
-    (PeriodicCNF.PolySpaceReduction.mem_iff_localPeriodicCNF1DSAT
+    (PeriodicCNF.ProgramSource.mem_iff_localPeriodicCNF1DSAT
       decider input).trans
       (compiledTrominoStrip_correct tromino behavior
-        (PeriodicCNF.PolySpaceReduction.formula decider input))
+        (PeriodicCNF.ProgramSource.formula decider input))
 
 /-- A direct machine for the bounded generated formulas gives the required
 many-one reduction without implementing the general local-CNF guard. -/
@@ -67,7 +65,7 @@ def DirectCompiledTrominoStripMachines : Prop :=
   ∀ {Input : Type}
       (encoding : _root_.Computability.FinEncoding Input)
       (language : Input → Prop)
-      (decider : Complexity.DeciderInPolySpace encoding language)
+      (decider : PeriodicCNF.ProgramSource encoding language)
       (tromino : Tromino),
     Nonempty
       (TM2ComputableInPolyTime encoding.encode
@@ -82,8 +80,9 @@ theorem periodicStripTrominoTiling_PSPACEHard_of_directMachines
       (PeriodicStripTrominoTiling tromino) := by
   intro Input encoding language sourceInPSPACE
   obtain ⟨decider⟩ := sourceInPSPACE
-  exact directPolyTimeManyOneReducible decider tromino behavior
-    (machines encoding language decider tromino)
+  let source := PeriodicCNF.ProgramSource.ofDecider decider
+  exact directPolyTimeManyOneReducible (encoding := encoding) (language := language)
+    source tromino behavior (machines encoding language source tromino)
 
 /-- Direct bounded-formula machines plus the existing target membership prove
 the full strip half of Theorem 5.2. -/

@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripTypedElementCodes
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalOccurrenceKeyHorizontalSemantics
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalGroupedVariableFanHorizontalSemantics
@@ -52,7 +53,7 @@ theorem horizontalVariableElementCodeBlock_eq_typed
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
 /-- Actual source entries determine the complete compiled variable-element
 code prefix, with each code using its own occurrence key. -/
@@ -60,11 +61,11 @@ theorem directSourceFinalCanonicalVariableElementCodes_eq_horizontalBlocks
     (color : WireColor) (symbols : List encoding.Γ) :
     directSourceFinalCanonicalVariableElementCodes decider color symbols =
       (occurrenceEntries (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase).flatMap
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase).flatMap
         (fun entry => TypedElementCode.variableBlock
           (directSourceFinalHorizontalOccurrenceKey decider symbols entry) color
           (occurrenceConnectorKind (horizontalSemanticNormalizedRibbonSource
-            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase entry.1 entry.2)) := by
+            (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase entry.1 entry.2)) := by
   rw [directSourceFinalCanonicalVariableElementCodes_eq_zipWith,
     directSourceFinalGroupedVariableFanSlots_eq_horizontal,
     directSourceFinalUniqueFanQueryKeys_eq_horizontal,
@@ -72,19 +73,19 @@ theorem directSourceFinalCanonicalVariableElementCodes_eq_horizontalBlocks
   apply List.flatMap_congr
   intro entry member
   exact horizontalVariableElementCodeBlock_eq_typed
-    (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) entry member color _
+    (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) entry member color _
 
 /-- Clause elements use their actual normalized clause positions. -/
 theorem directSourceFinalClauseElementCodes_eq_horizontalBlocks
     (color : WireColor) (symbols : List encoding.Γ) :
     directSourceFinalClauseElementCodes decider color symbols =
       (List.range (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses.length).flatMap
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.clauses.length).flatMap
         (fun index => TypedElementCode.clauseBlock index color) := by
   rw [directSourceFinalClauseElementCodes_eq_flatMap]
   have countEq : (directSourceFinalClauseIndexPlaceholders decider symbols).length =
       (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses.length := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.clauses.length := by
     unfold directSourceFinalClauseIndexPlaceholders FiniteUnaryFieldBlockMap.values
     unfold directSourceFinalClauseIndexPlaceholderBlock
     rw [← List.map_eq_flatMap, List.length_map]
@@ -102,7 +103,7 @@ theorem directSourceFinalOneColorElementCodes_eq_horizontalTyped
     (color : WireColor) (symbols : List encoding.Γ) :
     directSourceFinalOneColorElementCodes decider color symbols =
       TypedElementCode.elements (horizontalSemanticNormalizedRibbonSource
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase
         (directSourceFinalHorizontalOccurrenceKey decider symbols) color := by
   unfold directSourceFinalOneColorElementCodes
   rw [TypedElementCode.elements_eq_blocks,
@@ -116,7 +117,7 @@ theorem directSourceFinalCanonicalElementCodes_eq_horizontalTyped
     directSourceFinalCanonicalElementCodes decider symbols =
       PeriodicThreeDM.incidenceColors.flatMap (TypedElementCode.elements
         (horizontalSemanticNormalizedRibbonSource
-          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase
+          (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase
         (directSourceFinalHorizontalOccurrenceKey decider symbols)) := by
   unfold directSourceFinalCanonicalElementCodes directSourceFinalGreenBlueElementCodes
   rw [directSourceFinalOneColorElementCodes_eq_horizontalTyped,

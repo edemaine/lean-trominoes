@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripDirectSourceFinalExactMetadataPolarityOperationSemantics
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedFormulaBridge
 import LeanTrominoes.PeriodicOneInThreePolarityNormalizationSourceIndexedAtoms
@@ -18,11 +19,8 @@ open PeriodicOneInThreePolarityNormalizationRouteSubdivision
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance sourceIndexedAtomsStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 local instance sourceIndexedAtomsVariableDecidableEq : DecidableEq Variable :=
   directSourceVariableDecidableEq
@@ -40,14 +38,14 @@ theorem directFigureNinePolarityRoutePairs_sourceIndexedAtoms_eq_horizontal
           (refinedSource (directSourceFinalGaugedFormula decider symbols)
             (directSourceFinalGaugedPlacement decider symbols)).erase) =
       (horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)).erase.clauses.flatMap
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols)).erase.clauses.flatMap
           (fun clause => clause.map (fun literal => some literal.atom)) := by
   have positionedEq :
       formula (directSourceFinalGaugedFormula decider symbols)
         (directSourceFinalGaugedPlacement decider symbols)
         (directSourceFinalGaugedIncidenceRoutes decider symbols) =
       horizontalRoutedFormulaComputed
-        (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols) := by
+        (PeriodicCNF.ProgramSource.formulaOfSymbols decider symbols) := by
     rw [horizontalRoutedFormulaComputed_eq_semantic]
     unfold directSourceFinalGaugedFormula directSourceFinalClockwiseFormula
       directSourceFinalGaugedPlacement directSourceFinalGaugedIncidenceRoutes

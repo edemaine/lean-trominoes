@@ -2,6 +2,7 @@
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFStripNativeOrdinaryRouteWords
 import LeanTrominoes.PeriodicCNFStripNativeOrdinaryValueColumns
 import LeanTrominoes.PositionedIncidenceFormulaFields
@@ -37,7 +38,7 @@ def nativeOrdinaryVariableColumn [Inhabited encoding.Γ] (horizontal positive : 
       (component horizontal ((nativeOrdinaryPlacement decider s).position row.2.1.atom))) := by
   let original : Compiler (nativeOrdinaryRows decider) (fun s row =>
       CarrierCrossingPointField.pointValue (coordinateFieldOfBools horizontal positive)
-        ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement (directSourceFormula decider s)).position row.2.1.atom)) :=
+        ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s)).position row.2.1.atom)) :=
     TM2ComputableInPolyTime.of_eq (nativeOrdinaryPositionFieldsCompiler decider horizontal positive)
       (fun s => (PositionedIncidenceRows.map_literals (nativeOrdinaryFormula decider s) _).symm)
   apply TM2ComputableInPolyTime.of_eq (scale original 2)
@@ -45,7 +46,7 @@ def nativeOrdinaryVariableColumn [Inhabited encoding.Γ] (horizontal positive : 
   apply List.map_congr_left
   intro row _
   have doubled := pointField_double horizontal positive
-    ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement (directSourceFormula decider s)).position row.2.1.atom)
+    ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement (directSourceFormula (PeriodicCNF.ProgramSource.ofDecider decider) s)).position row.2.1.atom)
   cases horizontal <;> cases positive <;> exact doubled.symm
 
 def nativeOrdinaryDisplacementColumn [Inhabited encoding.Γ] (horizontal positive : Bool) :

@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFProgramSource
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
 import LeanTrominoes.PeriodicCNFStripSparseCompiledTromino
 
@@ -18,17 +19,14 @@ open Computability Turing
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
-variable (decider : Complexity.DeciderInPolySpace encoding language)
+variable (decider : PeriodicCNF.ProgramSource encoding language)
 
-noncomputable local instance directSparseHardnessStackFintype
-    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
-  decider.stackAlphabetFinite stack
 
 /-- Direct PSPACE-source reduction with the sparse assignment-order motif. -/
 def directSparseCompiledTrominoStrip
     (tromino : Tromino) (input : Input) : PeriodicStrip :=
   sparseCompiledTrominoStrip tromino
-    (PeriodicCNF.PolySpaceReduction.formula decider input)
+    (PeriodicCNF.ProgramSource.formula decider input)
 
 theorem directSparseCompiledTrominoStrip_correct
     (tromino : Tromino)
@@ -37,10 +35,10 @@ theorem directSparseCompiledTrominoStrip_correct
     language input ↔ PeriodicStripTrominoTiling tromino
       (directSparseCompiledTrominoStrip decider tromino input) := by
   exact
-    (PeriodicCNF.PolySpaceReduction.mem_iff_localPeriodicCNF1DSAT
+    (PeriodicCNF.ProgramSource.mem_iff_localPeriodicCNF1DSAT
       decider input).trans
       (sparseCompiledTrominoStrip_correct tromino behavior
-        (PeriodicCNF.PolySpaceReduction.formula decider input))
+        (PeriodicCNF.ProgramSource.formula decider input))
 
 /-- A polynomial-time sparse compiler supplies the desired many-one
 reduction. -/
@@ -63,7 +61,7 @@ def DirectSparseCompiledTrominoStripMachines : Prop :=
   ∀ {Input : Type}
       (encoding : _root_.Computability.FinEncoding Input)
       (language : Input → Prop)
-      (decider : Complexity.DeciderInPolySpace encoding language)
+      (decider : PeriodicCNF.ProgramSource encoding language)
       (tromino : Tromino),
     Nonempty
       (TM2ComputableInPolyTime encoding.encode
@@ -82,15 +80,16 @@ theorem theorem52_stripStatement_of_directSparseMachines
   refine ⟨membership tromino, ?_⟩
   intro Input encoding language sourceInPSPACE
   obtain ⟨decider⟩ := sourceInPSPACE
+  let source := PeriodicCNF.ProgramSource.ofDecider decider
   cases tromino with
   | I =>
-      exact directSparsePolyTimeManyOneReducible decider .I
+      exact directSparsePolyTimeManyOneReducible (encoding := encoding) (language := language) source .I
         Gadget.iOrientationBehaviorCorrect
-        (machines encoding language decider .I)
+        (machines encoding language source .I)
   | L =>
-      exact directSparsePolyTimeManyOneReducible decider .L
+      exact directSparsePolyTimeManyOneReducible (encoding := encoding) (language := language) source .L
         Gadget.lOrientationBehaviorCorrect
-        (machines encoding language decider .L)
+        (machines encoding language source .L)
 
 end PeriodicCNFStripReduction
 end LeanTrominoes
