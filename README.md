@@ -251,9 +251,17 @@ protruding outside the box. The
 an actual finite-alphabet polynomial-time machine. Its
 [geometric correctness](LeanTrominoes/FiniteTrominoVerifierBackend.lean) and
 [serialized candidate-table bound](LeanTrominoes/FiniteTrominoVerifierSize.lean)
-are proved. The backend's input includes the candidate table; a polynomial-time
-emitter from the original coordinate input remains outstanding, along with
-the finite tromino hardness reductions. Both NP-completeness clauses remain open.
+are proved. The [native coordinate verifier](LeanTrominoes/FiniteTrominoNativeVerifier.lean)
+now generates the candidate table itself, including signed coordinate arithmetic,
+canonical footprint names, and stable deduplication. This proves
+[finite-region membership in NP](LeanTrominoes/FiniteTrominoRegionInNP.lean)
+under the explicit unary coordinate encoding, and
+[finite-preplacement completion membership in NP](LeanTrominoes/FiniteTrominoCompletionInNP.lean)
+when the canonical bounding box is explicitly listed in that encoding.
+These statements charge for unary coordinate magnitudes and the listed box;
+they do not establish membership under an unpadded binary-coordinate encoding.
+The finite tromino hardness reductions remain open, so both NP-completeness
+clauses remain open.
 
 The [domino results](LeanTrominoes/DominoTheorems.lean) use exact covers by
 face-adjacent two-cell footprints. The proofs allow disconnected regions and

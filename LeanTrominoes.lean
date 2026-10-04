@@ -1,3 +1,4 @@
+import LeanTrominoes.FiniteTrominoCompletionInNP
 import LeanTrominoes.FiniteTrominoVerifierSize
 import LeanTrominoes.FiniteTrominoCompletionCertificate
 import LeanTrominoes.FiniteSATNPHard
