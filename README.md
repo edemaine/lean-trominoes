@@ -263,6 +263,32 @@ they do not establish membership under an unpadded binary-coordinate encoding.
 The finite tromino hardness reductions remain open, so both NP-completeness
 clauses remain open.
 
+The [finite substitution bridge](LeanTrominoes/FiniteGadgetSubstitution.lean)
+now proves orientation equivalent to finite-motif tileability for both trominoes,
+when the normalized drawing has a blank final row and column. A three-cell gap
+separates its periodic copies, so this uses the existing substitution theorem
+without assuming a periodic tiling. The
+[finite region emitter](LeanTrominoes/FiniteGadgetRegionCompiler.lean) expands
+compiled sparse drawing records into the original unary coordinate encoding
+with verified polynomial-time machines. The finite SAT source-to-drawing
+reduction still needs to be connected to this endpoint.
+
+[Finite occurrence-three SAT](LeanTrominoes/FiniteThreeSATThreeNPHard.lean)
+is now NP-hard under the native binary formula encoding, with clauses of
+width at most three, compact natural variable names, and no empty clauses.
+The [compiler](LeanTrominoes/FiniteNPThreeOccurrenceCompiler.lean) composes
+the finite Cook–Levin emitter with verified occurrence-splitting machines.
+For its zero-offset graph, the
+[route bounds](LeanTrominoes/FiniteOrthocrossingBounds.lean) place every segment
+inside one fundamental square; canonical crossings use only zero translates.
+The [retained planarization](LeanTrominoes/FiniteRetainedPlanarSAT.lean)
+now preserves ordinary finite SAT, including its canonical gauge and clause
+deduplication. [Zero offsets](LeanTrominoes/FiniteRetainedThreeDMOffsets.lean)
+persist through fixed-eight splitting, Figure 9, unit elimination, the final
+canonical gauge, routed polarity normalization, and planar 3DM assembly.
+The bounded normalized drawing and its polynomial-time source compiler remain
+to be connected to the finite tromino endpoint.
+
 The [domino results](LeanTrominoes/DominoTheorems.lean) use exact covers by
 face-adjacent two-cell footprints. The proofs allow disconnected regions and
 arbitrary initial tilings. Completion keeps every prefilled domino fixed.
