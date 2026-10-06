@@ -225,7 +225,7 @@ theorem
       0 < retainedTerminalFanOuterRadialLength firstTerminal := by
     have escapePositive :
         0 < retainedTerminalFanOuterSourceEscapeLength := by
-      native_decide
+      decide +kernel
     omega
   have spokeEqual :
       retainedTerminalFanFigure7SpokeRouteAt
@@ -683,7 +683,7 @@ theorem
   have ordinarySeparated :=
     retainedAngularFanSourceScaledSplicedBoundaryPolyline_strictlyAvoids_pointNeighborhood
       retainedAngularFanSourceClearanceFactor_pos
-      (by native_decide)
+      (by decide +kernel)
       firstRawRoute firstRawTerminal firstSlot
       firstLength firstClassified target
       prefixClearance.1 prefixClearance.2
@@ -692,7 +692,7 @@ theorem
   have escapedSeparated :=
     retainedAngularFanSourceScaledEscapedSplicedBoundaryPolyline_strictlyAvoids_pointNeighborhood
       retainedAngularFanSourceClearanceFactor_pos
-      (by native_decide)
+      (by decide +kernel)
       firstRawRoute firstRawTerminal firstSlot
       firstLength firstClassified escapeFits target
       prefixClearance.1 prefixClearance.2

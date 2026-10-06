@@ -77,7 +77,7 @@ theorem retainedDirectRoutedClauseFanEscapeAt_strictly_inside_carrierBoundary
         directRefinedCarrierBoundaryValue port <
           Cell.linearValue (carrierBoundaryInwardNormal port) point := by
   cases port <;>
-    native_decide
+    decide +kernel
 
 /-- A routed-clause terminal vector cannot occur in any other direct atlas
 kind.  This finite uniqueness fact lets route equality recover the kind of
@@ -96,7 +96,7 @@ theorem
           (retainedDirectSourceLocalRouteAt
             RetainedDirectClauseKind.routedClause routedIndex) →
         kind = RetainedDirectClauseKind.routedClause := by
-  native_decide
+  decide +kernel
 
 /-- Every routed-clause atlas incidence is genuinely oblique.  Thus the
 exceptional wide escape never overlaps the aligned direct-source branch. -/
@@ -110,7 +110,7 @@ theorem retainedDirectRoutedClauseLocalSegment_not_axisAligned :
             (retainedDirectSourceLocalRouteAt
               RetainedDirectClauseKind.routedClause index).getLastD
                 (0, 0)⟩ : GridSegment).IsAxisAligned := by
-  native_decide
+  decide +kernel
 
 /-- A positioned choice of routed-clause kind retains that obliqueness. -/
 theorem RetainedDirectSourceRouteChoice.sourceSegment_not_axisAligned_of_kind_eq_routedClause
@@ -217,7 +217,7 @@ theorem retainedDirectRoutedClauseLocalRouteAt_head? :
       (retainedDirectSourceLocalRouteAt
         RetainedDirectClauseKind.routedClause index).head? =
         some (10, 10) := by
-  native_decide
+  decide +kernel
 
 /-- Inverting a successful routed-clause lookup exposes the exact routed
 atlas shape and its unscaled physical macrocell origin. -/

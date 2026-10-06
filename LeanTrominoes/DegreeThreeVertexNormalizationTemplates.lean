@@ -172,25 +172,25 @@ theorem route_endpoints (omitted : VertexSide)
     (route omitted port).head? = some center ∧
       (route omitted port).getLast? =
         some (boundaryPoint (boundarySide omitted port)) := by
-  cases omitted <;> cases port <;> native_decide
+  cases omitted <;> cases port <;> decide +kernel
 
 /-- Each Figure 2 route takes a genuine unit axis step at every move. -/
 theorem route_unitSteps (omitted : VertexSide)
     (port : CanonicalVertexPort) :
     (route omitted port).IsChain AxisDirection.IsUnitAxisStep := by
-  cases omitted <;> cases port <;> native_decide
+  cases omitted <;> cases port <;> decide +kernel
 
 /-- Every Figure 2 route remains inside its replacement square. -/
 theorem route_inSquare (omitted : VertexSide)
     (port : CanonicalVertexPort) :
     RouteInSquare (route omitted port) := by
-  cases omitted <;> cases port <;> native_decide
+  cases omitted <;> cases port <;> decide +kernel
 
 /-- The three Figure 2 routes are point-disjoint away from their common
 center. -/
 theorem routes_meetOnlyAtCenter (omitted : VertexSide) :
     RoutesMeetOnlyAtCenter (route omitted) := by
-  cases omitted <;> native_decide
+  cases omitted <;> decide +kernel
 
 /-- The four templates use each old direction except the one omitted,
 exactly once. -/
@@ -200,7 +200,7 @@ theorem boundarySides_complete (omitted : VertexSide) :
         boundarySide omitted .east]
     sides.Nodup ∧ omitted ∉ sides ∧
       ∀ side, side ≠ omitted → side ∈ sides := by
-  cases omitted <;> native_decide
+  cases omitted <;> decide +kernel
 
 /-- The identity rotation has the expected center and boundary endpoints. -/
 theorem identityRotationRoute_endpoints (port : CanonicalVertexPort) :
@@ -211,7 +211,7 @@ theorem identityRotationRoute_endpoints (port : CanonicalVertexPort) :
           | .west => .west
           | .north => .north
           | .east => .east)) := by
-  cases port <;> native_decide
+  cases port <;> decide +kernel
 
 /-- The identity routes are valid, bounded, and mutually disjoint away from
 the center. -/
@@ -220,7 +220,7 @@ theorem identityRotationRoute_geometry :
         AxisDirection.IsUnitAxisStep ∧
       RouteInSquare (identityRotationRoute port)) ∧
       RoutesMeetOnlyAtCenter identityRotationRoute := by
-  native_decide
+  decide +kernel
 
 /-- The clockwise rotation has the endpoint permutation advertised in
 Figure 3. -/
@@ -228,7 +228,7 @@ theorem clockwiseRotationRoute_endpoints (port : CanonicalVertexPort) :
     (clockwiseRotationRoute port).head? = some center ∧
       (clockwiseRotationRoute port).getLast? =
         some (boundaryPoint (clockwiseBoundarySide port)) := by
-  cases port <;> native_decide
+  cases port <;> decide +kernel
 
 /-- The clockwise routes are valid, bounded, and mutually disjoint away from
 the center. -/
@@ -237,7 +237,7 @@ theorem clockwiseRotationRoute_geometry :
         AxisDirection.IsUnitAxisStep ∧
       RouteInSquare (clockwiseRotationRoute port)) ∧
       RoutesMeetOnlyAtCenter clockwiseRotationRoute := by
-  native_decide
+  decide +kernel
 
 end DegreeThreeVertexNormalization
 end LeanTrominoes

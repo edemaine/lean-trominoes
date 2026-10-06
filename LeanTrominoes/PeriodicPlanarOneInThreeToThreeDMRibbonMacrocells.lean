@@ -140,7 +140,7 @@ theorem standardRibbonMacrocellRoute_simple
   cases incoming <;> cases outgoing <;> cases color <;>
     simp_all [AxisDirection.IsGenuine,
       AxisDirection.opposite] <;>
-    native_decide
+    decide +kernel
 
 /-- Distinct colored lanes in one legal standard macrocell are continuously
 separated. -/
@@ -158,7 +158,7 @@ theorem standardRibbonMacrocellRoutes_avoidEachOther
     cases first <;> cases second <;>
     simp_all [AxisDirection.IsGenuine,
       AxisDirection.opposite] <;>
-    native_decide
+    decide +kernel
 
 /-- Refined origin of the macrocell centered at a source lattice point. -/
 def ribbonMacrocellOrigin (center : Cell) : Cell :=

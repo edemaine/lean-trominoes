@@ -133,7 +133,7 @@ theorem metadata_localRoutePoint_within_variablePredPeriod
         1 ≤ planarMacroScale.toNat *
           drawingGridSize (PeriodicCNF.incidenceGraph formula) := by
       exact Nat.one_le_iff_ne_zero.mpr
-        (Nat.mul_ne_zero (by native_decide)
+        (Nat.mul_ne_zero (by decide +kernel)
           (Nat.ne_of_gt (drawingGridSize_pos _)))
     rw [Nat.cast_sub periodOne]
     by_cases horizontal : link.first.isHorizontal = true

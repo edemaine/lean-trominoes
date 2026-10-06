@@ -38,7 +38,7 @@ theorem retainedDirectSourceLocalRouteAt_terminalClassify :
           (routeTerminalVector
             (retainedDirectSourceLocalRouteAt kind index)) =
         some (retainedDirectSourceLocalTerminalAt kind index) := by
-  native_decide
+  decide +kernel
 
 /-- The direction stored in an atlas choice is the direction component of
 its classified local terminal datum. -/

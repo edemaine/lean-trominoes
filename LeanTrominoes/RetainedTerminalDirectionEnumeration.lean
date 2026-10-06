@@ -47,7 +47,7 @@ theorem retainedTerminalDirections_length :
 /-- The finite direction catalog contains no duplicate direction. -/
 theorem retainedTerminalDirections_nodup :
     retainedTerminalDirections.Nodup := by
-  native_decide
+  decide +kernel
 
 /-- Every retained terminal direction occurs in the finite catalog. -/
 theorem mem_retainedTerminalDirections
@@ -70,7 +70,7 @@ instance : Fintype RetainedTerminalDirection :=
 @[simp]
 theorem card_retainedTerminalDirection :
     Fintype.card RetainedTerminalDirection = 11 := by
-  native_decide
+  decide +kernel
 
 /-- Mapping the catalog to angular ranks produces exactly `0, …, 10`. -/
 @[simp]
@@ -78,7 +78,7 @@ theorem retainedTerminalDirections_map_angularRank :
     retainedTerminalDirections.map
         RetainedTerminalDirection.angularRank =
       List.range 11 := by
-  native_decide
+  decide +kernel
 
 /-- Angular rank uniquely identifies a retained terminal direction. -/
 theorem RetainedTerminalDirection.angularRank_injective :

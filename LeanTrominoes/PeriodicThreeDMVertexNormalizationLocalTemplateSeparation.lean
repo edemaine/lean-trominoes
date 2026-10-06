@@ -34,7 +34,7 @@ theorem routes_avoidEachOther
     RoutesAvoidEachOther
       (route omitted first) (route omitted second) := by
   cases omitted <;> cases first <;> cases second <;>
-    simp_all <;> native_decide
+    simp_all <;> decide +kernel
 
 /-- Every contact of two distinct Figure 2 routes is their common head at
 the template center. -/
@@ -59,7 +59,7 @@ theorem route_withinCoordinateRadius
     ∀ point ∈ route omitted port,
       WithinCoordinateRadius 3 center point := by
   cases omitted <;> cases port <;>
-    native_decide
+    decide +kernel
 
 end DegreeThreeVertexNormalization
 

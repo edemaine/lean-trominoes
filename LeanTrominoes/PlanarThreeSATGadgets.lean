@@ -202,7 +202,7 @@ theorem crossoverExtends_iff (aLeft aRight bTop bBottom : Bool) :
     CrossoverExtends aLeft aRight bTop bBottom ↔
       aLeft = aRight ∧ bTop = bBottom := by
   cases aLeft <;> cases aRight <;> cases bTop <;> cases bBottom <;>
-    native_decide
+    decide +kernel
 
 /-- Every satisfying assignment to the crossover propagates each boundary
 value to the opposite port.  This is the soundness direction needed when a
@@ -364,7 +364,7 @@ theorem duplicatorHolds_iff (center left top right : Bool) :
         duplicatorFormula ↔
       left = center ∧ top = center ∧ right = center := by
   cases center <;> cases left <;> cases top <;> cases right <;>
-    native_decide
+    decide +kernel
 
 /-- Assignment-independent form of `duplicatorHolds_iff`, convenient when
 the four vertices are supplied by a larger embedded formula. -/

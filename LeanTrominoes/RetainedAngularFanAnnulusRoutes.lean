@@ -97,7 +97,7 @@ theorem retainedTerminalFanPortToAnnulusCut_head? :
     ∀ port : RetainedTerminalAdapterPort,
       (retainedTerminalFanPortToAnnulusCut port).head? =
         some (retainedTerminalFanPortOffset port) := by
-  native_decide
+  decide +kernel
 
 /-- The outer half ends at the common radius-34 cut. -/
 @[simp]
@@ -105,14 +105,14 @@ theorem retainedTerminalFanPortToAnnulusCut_getLast? :
     ∀ port : RetainedTerminalAdapterPort,
       (retainedTerminalFanPortToAnnulusCut port).getLast? =
         some retainedTerminalFanAnnulusCut := by
-  native_decide
+  decide +kernel
 
 /-- Every outer-to-cut witness is orthogonal. -/
 theorem retainedTerminalFanPortToAnnulusCut_orthogonal :
     ∀ port : RetainedTerminalAdapterPort,
       PeriodicOrthocrossing.OrthogonalPolyline
         (retainedTerminalFanPortToAnnulusCut port) := by
-  native_decide
+  decide +kernel
 
 /-- The inward half starts at the common radius-34 cut. -/
 @[simp]
@@ -120,7 +120,7 @@ theorem retainedTerminalFanAnnulusCutToAnchor_head? :
     ∀ slot : RetainedTerminalSlot,
       (retainedTerminalFanAnnulusCutToAnchor slot).head? =
         some retainedTerminalFanAnnulusCut := by
-  native_decide
+  decide +kernel
 
 /-- The inward half ends at its exact radius-22 compass anchor. -/
 @[simp]
@@ -130,14 +130,14 @@ theorem retainedTerminalFanAnnulusCutToAnchor_getLast? :
         some
           (retainedTerminalAdapterPortOffset
             (retainedTerminalFanAnchorPort slot)) := by
-  native_decide
+  decide +kernel
 
 /-- Every cut-to-anchor witness is orthogonal. -/
 theorem retainedTerminalFanAnnulusCutToAnchor_orthogonal :
     ∀ slot : RetainedTerminalSlot,
       PeriodicOrthocrossing.OrthogonalPolyline
         (retainedTerminalFanAnnulusCutToAnchor slot) := by
-  native_decide
+  decide +kernel
 
 /-- Every complete witness starts at its requested outer port. -/
 @[simp]
@@ -184,7 +184,7 @@ theorem retainedTerminalFanAnnulusWitnessRoute_points_in_shell :
       point ∈ retainedTerminalFanAnnulusWitnessRoute port slot →
         WithinCoordinateRadius 36 (0, 0) point ∧
           ¬ WithinCoordinateRadius 21 (0, 0) point := by
-  native_decide
+  decide +kernel
 
 /-- Optional elementary witness selected by one finite shape slot. -/
 def RetainedAngularTerminalShape.fanAnnulusWitnessRoute

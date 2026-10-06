@@ -80,7 +80,7 @@ namespace DegreeThreeVertexNormalization
 theorem route_nodup (omitted : VertexSide)
     (port : CanonicalVertexPort) :
     (route omitted port).Nodup := by
-  cases omitted <;> cases port <;> native_decide
+  cases omitted <;> cases port <;> decide +kernel
 
 /-- The selected Figure 2 arm lies no farther outward than its boundary
 midpoint in the old side assigned to that arm. -/

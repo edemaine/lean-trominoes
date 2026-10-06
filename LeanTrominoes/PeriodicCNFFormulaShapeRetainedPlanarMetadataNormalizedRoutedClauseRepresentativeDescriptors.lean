@@ -43,7 +43,7 @@ theorem representativeClauseDescriptor_eq_normalizedRoutedClause
   have taggedSiteMember : (taggedClause, (0, 0)) ∈
       source.clauses.zipIdx.product neighborTranslations := by
     apply List.mem_product.mpr
-    exact ⟨taggedClauseMember, by native_decide⟩
+    exact ⟨taggedClauseMember, by decide +kernel⟩
   have routedMember : baseClause ∈
       routedClauseMetadataNormalizedClauses source := by
     rw [routedClauseMetadataNormalizedClauses_eq_map_taggedSites]

@@ -349,7 +349,7 @@ private theorem blockFan_frameBlock
 
 private theorem routeBlock_nonempty (profile : ClauseProfile) :
     ∀ routed ∈ clauseRouteBlocks profile, 0 < routed.2.length := by
-  cases profile <;> native_decide +revert
+  cases profile <;> decide +kernel +revert
 
 private theorem clauseFrameBlocks_fan_spec
     (profile : ClauseProfile)

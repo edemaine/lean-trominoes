@@ -255,6 +255,7 @@ theorem portConfiguration_eq_footprintPortConfiguration (tromino : Tromino)
       footprintPortConfiguration gadget (windowFootprints tromino placements) := by
   rw [portConfiguration, footprintPortConfiguration,
     boundarySignature_eq_footprintBoundary]
+  rfl
 
 /-! ## Elementary tromino-footprint geometry -/
 

@@ -75,7 +75,7 @@ theorem
   let spoke :=
     retainedTerminalFanFigure7SpokeRouteAt center slot
   have combinedPositive : 0 < combinedFactor := by
-    exact Nat.mul_pos (by native_decide) factorPositive
+    exact Nat.mul_pos (by decide +kernel) factorPositive
   have scaledSeparated :=
     separated.scale_left_rectangle_radius
       combinedPositive clearance

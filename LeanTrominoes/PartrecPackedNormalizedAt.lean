@@ -154,7 +154,7 @@ theorem packedNormalizedAtCoordinateTag_eq
         exact coordinateH
       rw [decision]
       simp only [nonnegativeH, equalH, if_pos]
-      native_decide
+      decide +kernel
     · have coordinateH :
           ¬ cell.1 =
             ((packedColumnPhaseNumerator
@@ -174,7 +174,7 @@ theorem packedNormalizedAtCoordinateTag_eq
           exact coordinateH)
       rw [decision]
       simp only [nonnegativeH, equalH, if_pos]
-      native_decide
+      decide +kernel
   · have coordinateH :
         ¬ cell.1 =
           ((packedColumnPhaseNumerator
@@ -195,7 +195,7 @@ theorem packedNormalizedAtCoordinateTag_eq
     rw [decision]
     simp only [nonnegativeH, if_false, true_or,
       if_true, Bool.toNat]
-    native_decide
+    decide +kernel
 
 @[simp]
 theorem packedNormalizedAtCoordinateCode_eval
@@ -253,7 +253,7 @@ theorem packedNormalizedAtCoordinateCode_eval
         rw [decision]
         simp only [nonnegative, equal, nonnegativeH,
           equalH, if_pos]
-        native_decide
+        decide +kernel
       · have coordinateH :
             ¬ cell.1 =
               ((packedColumnPhaseNumerator
@@ -274,7 +274,7 @@ theorem packedNormalizedAtCoordinateCode_eval
         rw [decision]
         simp only [nonnegative, equal, nonnegativeH,
           equalH, if_pos]
-        native_decide
+        decide +kernel
     · have coordinateH :
           ¬ cell.1 =
             ((packedColumnPhaseNumerator
@@ -295,7 +295,7 @@ theorem packedNormalizedAtCoordinateCode_eval
       rw [decision]
       simp only [nonnegative, nonnegativeH, if_false,
         true_or, if_true, Bool.toNat]
-      native_decide
+      decide +kernel
   rw [tagEq]
   exact combined
 
@@ -463,7 +463,7 @@ theorem packedNormalizedAtCode_eval_semantic
         packed.assignmentAtCell periodicStrip column cell = none <;>
       simp only [coordinate, assignmentNone,
         coordinateH, assignmentH, decide_true, decide_false] <;>
-      native_decide
+      decide +kernel
   rw [tagEq]
   exact combined
 

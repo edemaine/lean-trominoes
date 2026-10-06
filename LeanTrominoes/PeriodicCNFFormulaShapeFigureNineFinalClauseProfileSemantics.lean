@@ -28,7 +28,7 @@ theorem figureClauseProfiles_map_literalValues :
         ((ClauseProfileFigureNine.clauseProfiles
           (clauseProfile profile)).map fun generated =>
             generated.literals.map LiteralProfile.value) := by
-  native_decide
+  decide +kernel
 
 /-- The arity-indexed final permutation is natural with respect to mapping
 the entries of a list. -/

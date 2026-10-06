@@ -107,7 +107,7 @@ theorem
     ⟨polylineLastEntrance route,
       route.getLastD (0, 0)⟩
   have combinedPositive : 0 < combinedFactor := by
-    exact Nat.mul_pos (by native_decide) factorPositive
+    exact Nat.mul_pos (by decide +kernel) factorPositive
   have radiusLt : 96 < combinedFactor := by
     omega
   have prefixAvoid :
@@ -298,8 +298,8 @@ theorem
         (referenceUpper := finalPoint)
         (factor := retainedTerminalFanTotalRefinement)
         (radius := 96)
-        (by native_decide)
-        (by native_decide)
+        (by decide +kernel)
+        (by decide +kernel)
         (fun point pointMember =>
           closedGridSingletons_separated_of_ne
             (prefixClearance.1 point pointMember))

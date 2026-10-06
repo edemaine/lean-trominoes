@@ -402,7 +402,7 @@ theorem
   have combinedPositive :
       0 <
         retainedTerminalFanTotalRefinement * factor :=
-    Nat.mul_pos (by native_decide) factorPositive
+    Nat.mul_pos (by decide +kernel) factorPositive
   apply
     routesStrictlyAvoidEachOther_of_inSeparatedClosedGridRectangles
       (firstLower :=
@@ -505,7 +505,7 @@ theorem
   have combinedPositive :
       0 <
         retainedTerminalFanTotalRefinement * factor :=
-    Nat.mul_pos (by native_decide) factorPositive
+    Nat.mul_pos (by decide +kernel) factorPositive
   apply
     routesStrictlyAvoidEachOther_of_inSeparatedClosedGridRectangles
       (firstLower :=

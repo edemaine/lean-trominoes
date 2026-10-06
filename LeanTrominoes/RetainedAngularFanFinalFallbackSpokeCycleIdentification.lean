@@ -101,7 +101,7 @@ theorem
   cases angularPortOfIndex
       (angularOccurrenceIndex order literal
         clauseIndex literalIndex) <;>
-    native_decide
+    decide +kernel
 
 /-- Equality of a centered fallback spoke with a scaled occurrence suffix
 forces equality of the corresponding total centered cycle lookup and
@@ -151,7 +151,7 @@ theorem
     cases angularPortOfIndex
         (angularOccurrenceIndex order literal
           clauseIndex literalIndex) <;>
-      native_decide
+      decide +kernel
   have offsetsEqual :
       Cell.add
           (Cell.sub (0, 0)

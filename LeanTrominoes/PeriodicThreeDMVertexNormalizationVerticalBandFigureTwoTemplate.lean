@@ -23,7 +23,7 @@ private theorem figureTwoRoute_withinCoordinateRadius
     (omitted : VertexSide) (port : CanonicalVertexPort) :
     ∀ point ∈ route omitted port,
       WithinCoordinateRadius 3 center point := by
-  cases omitted <;> cases port <;> native_decide
+  cases omitted <;> cases port <;> decide +kernel
 
 /-- An anchored Figure 2 route at an old band point lies in the enlarged
 open vertical halo. -/

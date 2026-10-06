@@ -35,7 +35,7 @@ theorem rotationRoundPort_injective (active : Bool) :
 theorem rotationRoundRoute_nodup
     (active : Bool) (oldPort : CanonicalVertexPort) :
     (rotationRoundPortAndRoute active oldPort).2.Nodup := by
-  cases active <;> cases oldPort <;> native_decide
+  cases active <;> cases oldPort <;> decide +kernel
 
 /-- Every selected cyclic-round route lies within coordinate radius three
 of the local center. -/
@@ -43,7 +43,7 @@ theorem rotationRoundRoute_withinCoordinateRadius
     (active : Bool) (oldPort : CanonicalVertexPort) :
     ∀ point ∈ (rotationRoundPortAndRoute active oldPort).2,
       WithinCoordinateRadius 3 center point := by
-  cases active <;> cases oldPort <;> native_decide
+  cases active <;> cases oldPort <;> decide +kernel
 
 set_option maxHeartbeats 1000000 in
 /-- Distinct inputs to one selected cyclic-round mode produce completely
@@ -55,7 +55,7 @@ theorem rotationRoundRoutes_avoidEachOther
       (rotationRoundPortAndRoute active first).2
       (rotationRoundPortAndRoute active second).2 := by
   cases active <;> cases first <;> cases second <;>
-    simp_all [rotationRoundPortAndRoute] <;> native_decide
+    simp_all [rotationRoundPortAndRoute] <;> decide +kernel
 
 /-- Any listed contact between distinct selected cyclic-round routes is at
 their common local head. -/
@@ -66,7 +66,7 @@ theorem rotationRoundRoutes_meetOnlyAtHeads
       (rotationRoundPortAndRoute active first).2
       (rotationRoundPortAndRoute active second).2 := by
   cases active <;> cases first <;> cases second <;>
-    simp_all [rotationRoundPortAndRoute] <;> native_decide
+    simp_all [rotationRoundPortAndRoute] <;> decide +kernel
 
 /-- Anchoring a cyclic-round route preserves its duplicate-free point list. -/
 theorem normalizationTemplateAt_rotationRoundRoute_nodup

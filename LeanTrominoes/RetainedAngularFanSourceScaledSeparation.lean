@@ -478,7 +478,7 @@ theorem
     exact_mod_cast factorPositive
   have refinementPositive :
       (0 : Int) < retainedTerminalFanTotalRefinement := by
-    native_decide
+    decide +kernel
   have refinedRoutesAvoid :
       RoutesAvoidEachOther firstRefined secondRefined := by
     have scaledAvoid :=

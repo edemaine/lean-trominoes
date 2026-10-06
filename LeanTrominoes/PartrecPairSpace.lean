@@ -221,11 +221,11 @@ theorem natPairUnit_le_linear (left right : Nat) :
     (64 * (left + right + left * left + right * right +
       Nat.pair left right + 100)) 1000
   have hundredBits :
-      (Computability.encodeNat 100).length = 7 := by native_decide
+      (Computability.encodeNat 100).length = 7 := by decide +kernel
   have sixtyFourBits :
-      (Computability.encodeNat 64).length = 7 := by native_decide
+      (Computability.encodeNat 64).length = 7 := by decide +kernel
   have thousandBits :
-      (Computability.encodeNat 1000).length = 10 := by native_decide
+      (Computability.encodeNat 1000).length = 10 := by decide +kernel
   simp only [natPairUnit, natPairLimit,
     encodedListSpace_cons, encodedListSpace_nil]
   omega

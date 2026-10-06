@@ -61,11 +61,11 @@ theorem orthogonalCellPixels_length_le_36
     (orthogonalCellPixels tromino cellType).length ≤ 36 := by
   cases tromino <;>
     cases cellType with
-    | blank => native_decide
-    | wire axis color => cases axis <;> cases color <;> native_decide
-    | bend bend color => cases bend <;> cases color <;> native_decide
-    | monochromaticVertex color => cases color <;> native_decide
-    | trichromaticVertex order => cases order <;> native_decide
+    | blank => decide +kernel
+    | wire axis color => cases axis <;> cases color <;> decide +kernel
+    | bend bend color => cases bend <;> cases color <;> decide +kernel
+    | monochromaticVertex color => cases color <;> decide +kernel
+    | trichromaticVertex order => cases order <;> decide +kernel
 
 private theorem flatMap_length_le
     {α β : Type*} (values : List α) (function : α → List β)

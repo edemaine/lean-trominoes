@@ -198,9 +198,9 @@ theorem positionedCycleRingVertex_avoidsRouteInterior
       vertex ∈ (translatedCycleDrawing offset).variableVertices := by
     change vertex ∈ cycleDrawing.variableVertices
     cases vertex with
-    | separator => native_decide
+    | separator => decide +kernel
     | port port =>
-        cases port <;> native_decide
+        cases port <;> decide +kernel
   have translatedVertexMember :
       (translatedCycleDrawing offset).variablePosition vertex ∈
         (translatedCycleDrawing offset).vertexPositions := by

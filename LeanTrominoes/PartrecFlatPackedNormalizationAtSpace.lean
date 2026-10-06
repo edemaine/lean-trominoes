@@ -471,7 +471,7 @@ theorem flatPackedNormalizationAssignmentNativeSpace_le
       simp [values, Code.flatPackedTransitionScanState])
   have columnLe : column.val ≤ 4 := by omega
   have columnBits := listCodeEncodeNat_length_mono columnLe
-  have fourBits : (Computability.encodeNat 4).length = 3 := by native_decide
+  have fourBits : (Computability.encodeNat 4).length = 3 := by decide +kernel
   have columnSpace : encodedListSpace [column.val] ≤ unit := by
     simp only [encodedListSpace_cons, encodedListSpace_nil]
     rw [fourBits] at columnBits
@@ -535,7 +535,7 @@ theorem flatPackedNormalizationPackedInputUnit_le
   have columnBits := listCodeEncodeNat_length_mono columnLe
   have pairBits := encodeNat_pair_length_le
     (Encodable.encode cell.1) (Encodable.encode cell.2)
-  have fourBits : (Computability.encodeNat 4).length = 3 := by native_decide
+  have fourBits : (Computability.encodeNat 4).length = 3 := by decide +kernel
   have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
   have cellSpace : encodedListSpace [Encodable.encode cell] ≤ 7 * unit := by
     rcases cell with ⟨x, y⟩
@@ -652,7 +652,7 @@ theorem flatPackedNormalizationNumeralCost_le_core
       flatPackedNormalizationAtCoreBound values := by
   have zero := listCodeZeroCost_le_linear values
   have addSmall : addConstCost column.val [0] ≤ 1000000 := by
-    fin_cases column <;> native_decide
+    fin_cases column <;> decide +kernel
   simp only [numeralCost]
   simp [flatPackedNormalizationAtCoreBound,
     flatPackedNormalizationAtUnit] at zero ⊢

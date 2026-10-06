@@ -24,7 +24,7 @@ private theorem localQuery_sourceSlotNat_lt
       ((templateDrawingOfClauseProfile query.1).incidenceAt query.2).literal.1 = some slot) :
     sourceSlotNat slot < query.1.literals.length := by
   rcases query with ⟨profile, index⟩
-  cases profile <;> native_decide +revert
+  cases profile <;> decide +kernel +revert
 
 /-- The local query's complete source-literal profile is the actual profile
 of the occurrence's own clockwise parent. -/

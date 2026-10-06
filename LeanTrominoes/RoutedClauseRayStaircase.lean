@@ -67,7 +67,7 @@ theorem routedClauseRayOffsets_orthogonal
     PeriodicOrthocrossing.OrthogonalPolyline
       (routedClauseRayOffsets arm) := by
   unfold PeriodicOrthocrossing.OrthogonalPolyline
-  cases arm <;> native_decide
+  cases arm <;> decide +kernel
 
 /-- Place one primitive staircase block at an arbitrary start point. -/
 def routedClauseRayBlock

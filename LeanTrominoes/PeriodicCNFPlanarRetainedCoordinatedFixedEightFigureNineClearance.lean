@@ -37,7 +37,7 @@ theorem retainedFigureNineSourceClearanceFactor_eq :
 
 theorem retainedFigureNineSourceClearanceFactor_pos :
     0 < retainedFigureNineSourceClearanceFactor := by
-  native_decide
+  decide +kernel
 
 /-- The clockwise source presentation after the extra whole-source
 refinement. -/

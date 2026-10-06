@@ -15,7 +15,7 @@ namespace FormulaShapeCrossoverDirection
 crossover descriptors in clause order. -/
 theorem pairedDescriptors_eq_descriptors :
     pairedDescriptors = descriptors := by
-  native_decide
+  decide +kernel
 
 end FormulaShapeCrossoverDirection
 end PeriodicCNF

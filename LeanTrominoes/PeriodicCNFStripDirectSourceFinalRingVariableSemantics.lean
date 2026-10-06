@@ -46,7 +46,7 @@ theorem directSourceFinalRingVariableCode_ringCopy
 private theorem cycleRingSlot_val_eq_iff (first second : RingVertex) :
     (directFinalCycleRingVertexSlot first).val = (directFinalCycleRingVertexSlot second).val ↔
       first = second := by
-  have injective : Function.Injective directFinalCycleRingVertexSlot := by native_decide
+  have injective : Function.Injective directFinalCycleRingVertexSlot := by decide +kernel
   exact ⟨fun equal => injective (Fin.ext equal), fun equal => congrArg (fun vertex => (directFinalCycleRingVertexSlot vertex).val) equal⟩
 
 private theorem ringCopy_fst {Atom : Type*} (atom : Atom) (vertex : RingVertex) :

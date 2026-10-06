@@ -289,7 +289,7 @@ theorem retainedFinalCrossClauseFallbackOrdinaryBoundarySplices_strictlyAvoid
         certificate.graphDegreeAtMostThree
         certificate.graphIsLocal retainedClausesNonempty fits
         retainedAngularFanSourceClearanceFactor_gt_one
-        (by native_decide)
+        (by decide +kernel)
         firstClauseMember secondClauseMember
         firstLiteralMember secondLiteralMember
         atomsEqual copiesDifferent sourcesDifferent centersEqual
@@ -345,7 +345,7 @@ theorem retainedFinalCrossClauseFallbackOrdinaryBoundarySplices_strictlyAvoid
         certificate.graphDegreeAtMostThree
         certificate.graphIsLocal retainedClausesNonempty fits
         retainedAngularFanSourceClearanceFactor_gt_one
-        (by native_decide)
+        (by decide +kernel)
         firstClauseMember secondClauseMember
         firstLiteralMember secondLiteralMember
         copiesDifferent sourcesDifferent centersEqual

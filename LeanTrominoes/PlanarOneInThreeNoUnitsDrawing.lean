@@ -84,7 +84,7 @@ def emptyDrawing :
 
 /-- The empty-clause triangle is a valid continuous orthogonal drawing. -/
 theorem emptyDrawing_isValid : emptyDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-! ## Unit source clause -/
 
@@ -113,7 +113,7 @@ def unitDrawing :
 
 /-- The unit-clause diamond is a valid continuous orthogonal drawing. -/
 theorem unitDrawing_isValid : unitDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-! ## Retained source clauses -/
 
@@ -137,7 +137,7 @@ def twoDrawing :
 
 /-- A retained binary clause is a valid continuous orthogonal drawing. -/
 theorem twoDrawing_isValid : twoDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-- A retained ternary exact-one clause at the central generated position. -/
 def threeFormula : List (EmbeddedClause UnitEliminationVariable) :=
@@ -162,7 +162,7 @@ def threeDrawing :
 
 /-- A retained ternary clause is a valid continuous orthogonal drawing. -/
 theorem threeDrawing_isValid : threeDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-! ## Source-polarity-independent certificates -/
 
@@ -187,7 +187,7 @@ def unitDrawingFor
 theorem unitDrawingFor_isValid
     (polarity : Bool) :
     (unitDrawingFor polarity).IsValid := by
-  cases polarity <;> native_decide
+  cases polarity <;> decide +kernel
 
 /-- A retained binary clause with arbitrary literal polarities. -/
 def twoFormulaFor
@@ -208,7 +208,7 @@ def twoDrawingFor
 theorem twoDrawingFor_isValid
     (first second : Bool) :
     (twoDrawingFor first second).IsValid := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- A retained ternary clause with arbitrary literal polarities. -/
 def threeFormulaFor
@@ -231,7 +231,7 @@ theorem threeDrawingFor_isValid
     (first second third : Bool) :
     (threeDrawingFor first second third).IsValid := by
   cases first <;> cases second <;> cases third <;>
-    native_decide
+    decide +kernel
 
 @[simp]
 theorem unitFormulaFor_true :
@@ -317,26 +317,26 @@ def generatedTemplateFor
 replacement. -/
 theorem generatedTemplate_zero :
     generatedTemplate [] = emptyFormula := by
-  native_decide
+  decide +kernel
 
 /-- The unit finite template is exactly the positioned unit-clause
 replacement. -/
 theorem generatedTemplate_one :
     generatedTemplate [.first] = unitFormula := by
-  native_decide
+  decide +kernel
 
 /-- The binary finite template is exactly the retained positioned binary
 clause. -/
 theorem generatedTemplate_two :
     generatedTemplate [.first, .second] = twoFormula := by
-  native_decide
+  decide +kernel
 
 /-- The ternary finite template is exactly the retained positioned ternary
 clause. -/
 theorem generatedTemplate_three :
     generatedTemplate [.first, .second, .third] =
       threeFormula := by
-  native_decide
+  decide +kernel
 
 /-- The arbitrary-polarity unit template is exactly the corresponding
 positioned unit-elimination output. -/
@@ -344,7 +344,7 @@ theorem generatedTemplateFor_one
     (polarity : Bool) :
     generatedTemplateFor [(.first, polarity)] =
       unitFormulaFor polarity := by
-  cases polarity <;> native_decide
+  cases polarity <;> decide +kernel
 
 /-- The arbitrary-polarity binary template is exactly the retained
 positioned source clause. -/
@@ -353,7 +353,7 @@ theorem generatedTemplateFor_two
     generatedTemplateFor
         [(.first, first), (.second, second)] =
       twoFormulaFor first second := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- The arbitrary-polarity ternary template is exactly the retained
 positioned source clause. -/
@@ -363,7 +363,7 @@ theorem generatedTemplateFor_three
         [(.first, first), (.second, second), (.third, third)] =
       threeFormulaFor first second third := by
   cases first <;> cases second <;> cases third <;>
-    native_decide
+    decide +kernel
 
 end PlanarOneInThreeNoUnits
 end LeanTrominoes

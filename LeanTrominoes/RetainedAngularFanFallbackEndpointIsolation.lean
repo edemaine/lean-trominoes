@@ -32,7 +32,7 @@ theorem retainedTerminalFanFigure7SpokeRouteAt_length_ge_two
     translatePolyline scalePolyline
   simp only [List.length_map]
   generalize portEquation : angularPortOfIndex slot.val = port
-  cases port <;> native_decide
+  cases port <;> decide +kernel
 
 /-- Every centered factor-eight Figure 7 spoke is orthogonal. -/
 theorem retainedTerminalFanFigure7SpokeRouteAt_orthogonal
@@ -42,11 +42,11 @@ theorem retainedTerminalFanFigure7SpokeRouteAt_orthogonal
   have localRoute : OrthogonalPolyline
       (spokeRoute (angularPortOfIndex slot.val)) := by
     generalize portEquation : angularPortOfIndex slot.val = port
-    cases port <;> native_decide
+    cases port <;> decide +kernel
   unfold retainedTerminalFanFigure7SpokeRouteAt
   apply OrthogonalPolyline.translate
   apply OrthogonalPolyline.translate
-  exact localRoute.scalePolyline (by native_decide)
+  exact localRoute.scalePolyline (by decide +kernel)
 
 /-- Every centered factor-eight Figure 7 spoke is geometrically simple. -/
 theorem retainedTerminalFanFigure7SpokeRouteAt_isSimple
@@ -59,7 +59,7 @@ theorem retainedTerminalFanFigure7SpokeRouteAt_isSimple
   apply
     PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.routeIsSimple_translate
   exact routeIsSimple_scalePolyline
-    (by native_decide)
+    (by decide +kernel)
     (spokeRoute_isSimple (angularPortOfIndex slot.val))
 
 /-- The implication edge entering the spoke's ring vertex is orthogonal. -/
@@ -71,12 +71,12 @@ theorem retainedTerminalFanSelectedInnerCycleRouteAt_orthogonal
   have localRoute : OrthogonalPolyline
       (cycleRoute (.port (angularPortOfIndex slot.val)) 0) := by
     generalize portEquation : angularPortOfIndex slot.val = port
-    cases port <;> native_decide
+    cases port <;> decide +kernel
   unfold retainedTerminalFanInnerCycleRouteAt
     retainedTerminalFanInnerCycleRoute
   apply OrthogonalPolyline.translate
   apply OrthogonalPolyline.translate
-  exact localRoute.scalePolyline (by native_decide)
+  exact localRoute.scalePolyline (by decide +kernel)
 
 /-- The selected spoke and entering implication edge have the same final
 ring vertex. -/

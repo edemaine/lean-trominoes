@@ -118,7 +118,7 @@ theorem packedCenterSymmetryListOneCost_le_linear
   let values := Code.packedCenterCandidateInput periodicStrip packed base
   have zeroBound := listCodeZeroCost_le_linear values
   have successorSmall : succCost [0] ≤ 100000 := by
-    native_decide
+    decide +kernel
   change oneCost values ≤
     200000 * (encodedListSpace values + 1)
   simp only [oneCost]

@@ -59,7 +59,7 @@ theorem instantiateFormula_clausesNonempty
 /-- The fixed crossover truth-table presentation has no empty clause. -/
 theorem crossoverFormula_clausesNonempty :
     ∀ clause ∈ crossoverFormula, clause.literals ≠ [] := by
-  native_decide
+  decide +kernel
 
 /-- Every finite family of scoped crossover instances has nonempty
 clauses. -/

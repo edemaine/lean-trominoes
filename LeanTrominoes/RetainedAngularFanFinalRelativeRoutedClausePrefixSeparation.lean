@@ -146,7 +146,7 @@ theorem
   rw [lowerEq, upperEq] at startBound finishBound
   have factorPositive :
       (0 : Int) < retainedTerminalFanTotalRefinement * 4 := by
-    native_decide
+    decide +kernel
   simp only [GridSegment.coordinateLower,
     GridSegment.coordinateUpper, coordinateRadiusLower,
     coordinateRadiusUpper, Cell.scale,

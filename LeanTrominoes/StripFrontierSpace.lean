@@ -34,7 +34,7 @@ theorem windowState_card (periodicStrip : PeriodicStrip) :
         9 ^ (5 * periodicStrip.motif.toFinset.card) := by
   rw [Fintype.card_congr (equivData periodicStrip)]
   have symmetryCard : Fintype.card SquareSymmetry = 8 := by
-    native_decide
+    decide +kernel
   have motifCard :
       Fintype.card periodicStrip.MotifCell =
         periodicStrip.motif.toFinset.card :=

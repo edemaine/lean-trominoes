@@ -120,12 +120,12 @@ theorem formulaWidthAtMost_flatMap_iff
 /-- Every clause of the fixed Figure 8 crossover has width at most three. -/
 theorem crossoverFormula_widthAtMostThree :
     FormulaWidthAtMost 3 crossoverFormula := by
-  native_decide
+  decide +kernel
 
 /-- Every clause of the fixed Figure 8 duplicator is binary. -/
 theorem duplicatorFormula_widthAtMostThree :
     FormulaWidthAtMost 3 duplicatorFormula := by
-  native_decide
+  decide +kernel
 
 /-- Affine placement and renaming preserve a formula width bound. -/
 theorem instantiateFormula_widthAtMost

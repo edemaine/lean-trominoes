@@ -132,7 +132,7 @@ theorem retainedTerminalFanOuterCollarSample_zero :
       (slot : RetainedTerminalSlot),
       retainedTerminalFanOuterCollarSample direction slot 0 =
         retainedTerminalFanOuterLanePortOffset direction slot := by
-  native_decide
+  decide +kernel
 
 /-- The last collar sample is the exact radius-264 fan-facing port. -/
 theorem retainedTerminalFanOuterCollarSample_last :
@@ -143,7 +143,7 @@ theorem retainedTerminalFanOuterCollarSample_last :
         Cell.scale retainedTerminalFanRoutingRefinement
           (retainedTerminalFanPortOffset
             (retainedTerminalFanPort direction slot)) := by
-  native_decide
+  decide +kernel
 
 /-- Every collar route starts at its exact outer lane port. -/
 @[simp]
@@ -155,7 +155,7 @@ theorem retainedTerminalFanOuterCollarRoute_head? :
           some
             (retainedTerminalFanOuterLanePortOffset
               direction slot) := by
-  native_decide
+  decide +kernel
 
 /-- Every collar route ends at its exact fan-facing port. -/
 @[simp]
@@ -168,7 +168,7 @@ theorem retainedTerminalFanOuterCollarRoute_getLast? :
             (Cell.scale retainedTerminalFanRoutingRefinement
               (retainedTerminalFanPortOffset
                 (retainedTerminalFanPort direction slot))) := by
-  native_decide
+  decide +kernel
 
 /-- Every finite outer-collar route is orthogonal. -/
 theorem retainedTerminalFanOuterCollarRoute_orthogonal :
@@ -177,7 +177,7 @@ theorem retainedTerminalFanOuterCollarRoute_orthogonal :
       PeriodicOrthocrossing.OrthogonalPolyline
         (retainedTerminalFanOuterCollarRoute
           direction slot) := by
-  native_decide
+  decide +kernel
 
 /-- Every collar point stays within radius 288 and outside radius 263. -/
 theorem retainedTerminalFanOuterCollarRoute_points_in_shell :
@@ -186,7 +186,7 @@ theorem retainedTerminalFanOuterCollarRoute_points_in_shell :
       point ∈ retainedTerminalFanOuterCollarRoute direction slot →
         WithinCoordinateRadius 288 (0, 0) point ∧
           ¬ WithinCoordinateRadius 263 (0, 0) point := by
-  native_decide
+  decide +kernel
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

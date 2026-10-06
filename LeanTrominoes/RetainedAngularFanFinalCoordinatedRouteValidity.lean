@@ -490,7 +490,7 @@ theorem finalCoordinatedScaledSourceRoute_retainedRay
   (finalCoordinatedSourceRoutes_retainedRay
     formula sourceLocal sourceWidth sourceOccurrences
     sourceClausesNonempty clauseMember literalMember).scale
-      (by native_decide)
+      (by decide +kernel)
 
 /-- Source scaling transports the clause endpoint of a genuine final
 incidence. -/

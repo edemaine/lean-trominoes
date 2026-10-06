@@ -84,7 +84,7 @@ theorem retainedFallbackCardinalForwardTarget_noImmediateReversal
         retainedTerminalInterfaceMultiplier] at lengthLarge ⊢ <;>
       omega
   have sourcePrefixOrthogonal : OrthogonalPolyline sourcePrefix :=
-    (routeOrthogonal.scalePolyline (by native_decide)).dropLast
+    (routeOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have sourcePrefixLength : 2 ≤ sourcePrefix.length := by
     dsimp [sourcePrefix, retainedFallbackSourcePrefix]
     rw [List.length_dropLast]

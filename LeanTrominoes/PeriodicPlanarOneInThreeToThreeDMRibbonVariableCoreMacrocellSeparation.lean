@@ -45,7 +45,30 @@ theorem routedVariableSiteRoute_points_bounded :
                   slot active color⟩
               color) →
         InStandardRibbonMacrocell point := by
-  native_decide
+  intro countPred kind polarity slot active color point member
+  have bounded := VariableRibbonFanData.all_variableSiteRoute_points_in_coreRectangle
+    countPred kind polarity
+    ⟨VariableRibbonFanData.routedTriple ⟨countPred, kind, polarity, fun _ => .invalid⟩ slot color,
+      VariableRibbonFanData.routedTriple_matches ⟨countPred, kind, polarity, fun _ => .invalid⟩ slot active color⟩
+    color point member
+  simp only [InClosedGridRectangle] at bounded
+  simp only [InStandardRibbonMacrocell, standardThreeStrandLayout]
+  omega
+
+private theorem coreExit_check :
+    (finiteAll fun countPred : Fin 3 =>
+      finiteAll fun kind : VariableSiteSlot → VariableConnectorKind =>
+      finiteAll fun polarity : VariableSiteSlot → Bool =>
+      finiteAll fun triple : ActiveVariableSiteTriple (countPred + 1) kind =>
+      finiteAll fun slot : VariableSiteSlot => finiteAll fun color : WireColor =>
+      guardedCheck (triple.1 =
+        (⟨countPred, kind, polarity, fun _ => .invalid⟩ : VariableRibbonFanData).routedTriple slot color)
+        (finiteAll fun direction : AxisDirection => finiteAll fun lane : WireColor =>
+          routesStrictlyAvoidEachOtherCheck
+            (translatePolyline standardThreeStrandLayout.variableOffset
+              ((variableSiteDrawing (countPred + 1) kind polarity).route triple color))
+            [standardRibbonMacrocellExit direction lane])) = true := by
+  decide +kernel
 
 /-- A routed finite variable-site core has no contact with any standard
 ribbon exit point. -/
@@ -69,7 +92,14 @@ theorem routedVariableSiteRoute_strictlyAvoids_ribbonMacrocellExit :
                 slot active color⟩
             color))
         [standardRibbonMacrocellExit direction lane] := by
-  native_decide
+  intro countPred kind polarity slot active color direction lane
+  have checked := coreExit_check
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact (routesStrictlyAvoidEachOtherCheck_eq_true _ _).mp
+    (checked countPred kind polarity
+      ⟨VariableRibbonFanData.routedTriple ⟨countPred, kind, polarity, fun _ => .invalid⟩ slot color,
+        VariableRibbonFanData.routedTriple_matches ⟨countPred, kind, polarity, fun _ => .invalid⟩ slot active color⟩
+      slot color rfl direction lane)
 
 /-- A routed finite variable-site core has no contact with any legal ribbon
 tile in a neighboring macrocell. -/
@@ -98,7 +128,25 @@ theorem routedVariableSiteRoute_strictlyAvoids_adjacentRibbonMacrocellRoute :
         (ribbonMacrocellRoute
           (ribbonAdjacentMacrocellOffsets.get offsetIndex)
           incoming outgoing tileColor) := by
-  native_decide +revert
+  intro countPred kind polarity slot active color offsetIndex incoming outgoing tileColor _ _ _
+  let offset := ribbonAdjacentMacrocellOffsets.get offsetIndex
+  apply routesStrictlyAvoidEachOther_of_inSeparatedClosedGridRectangles
+    (firstLower := (11, 48)) (firstUpper := (109, 107))
+    (secondLower := ribbonMacrocellOrigin offset)
+    (secondUpper := Cell.add (ribbonMacrocellOrigin offset) (128, 128))
+  · exact VariableRibbonFanData.all_variableSiteRoute_points_in_coreRectangle
+      countPred kind polarity
+      ⟨VariableRibbonFanData.routedTriple ⟨countPred, kind, polarity, fun _ => .invalid⟩ slot color,
+        VariableRibbonFanData.routedTriple_matches ⟨countPred, kind, polarity, fun _ => .invalid⟩ slot active color⟩ color
+  · intro point member
+    simpa [InRibbonMacrocell, InClosedGridRectangle, Cell.add,
+      standardThreeStrandLayout] using ribbonMacrocellRoute_points_bounded offset incoming outgoing tileColor point member
+  · have checked : ∀ index : Fin ribbonAdjacentMacrocellOffsets.length,
+        ClosedGridRectanglesSeparated (11, 48) (109, 107)
+          (ribbonMacrocellOrigin (ribbonAdjacentMacrocellOffsets.get index))
+          (Cell.add (ribbonMacrocellOrigin (ribbonAdjacentMacrocellOffsets.get index)) (128, 128)) := by
+      decide +kernel
+    exact checked offsetIndex
 
 namespace VariableRibbonFanData
 

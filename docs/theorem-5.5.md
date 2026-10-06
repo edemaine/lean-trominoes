@@ -72,10 +72,10 @@ space bound polynomial in the original input length through composition.
 
 ## Validation
 
-The strip completion build passed 9,854 jobs and the public import check.
-Its audit found no `sorryAx`: 5,315 inherited native checks came from hardness
-and 12 from membership. The new geometric identification used only standard
-axioms. Plane completeness likewise added no axioms to its existing source proof.
+The plane and strip completeness theorems use only `propext`,
+`Classical.choice`, and `Quot.sound`. All finite certificates use kernel
+reduction. [Axiom regression checks](../LeanTrominoes/AxiomAudit.lean) cover
+both final theorems.
 
 ```sh
 lake build +LeanTrominoes.Theorem55Proof:olean +LeanTrominoes.Theorem55StripProof:olean

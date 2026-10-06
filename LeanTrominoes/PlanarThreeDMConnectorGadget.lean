@@ -160,21 +160,21 @@ theorem fixedRedConnector_mem_red_neighbors_iff
     (triple : FixedRedConnectorTriple)
     (element : FixedRedConnectorRed) :
     triple ∈ element.neighbors ↔ triple.references.red = element := by
-  cases triple <;> cases element <;> native_decide
+  cases triple <;> cases element <;> decide +kernel
 
 /-- The green incidence list agrees with the triple references. -/
 theorem fixedRedConnector_mem_green_neighbors_iff
     (triple : FixedRedConnectorTriple)
     (element : FixedRedConnectorGreen) :
     triple ∈ element.neighbors ↔ triple.references.green = element := by
-  cases triple <;> cases element <;> native_decide
+  cases triple <;> cases element <;> decide +kernel
 
 /-- The blue incidence list agrees with the triple references. -/
 theorem fixedRedConnector_mem_blue_neighbors_iff
     (triple : FixedRedConnectorTriple)
     (element : FixedRedConnectorBlue) :
     triple ∈ element.neighbors ↔ triple.references.blue = element := by
-  cases triple <;> cases element <;> native_decide
+  cases triple <;> cases element <;> decide +kernel
 
 /-- Exact-cover constraints on the eight internal elements.  The five ports
 are deliberately omitted because the surrounding variable cycle and clause
@@ -242,7 +242,7 @@ private theorem fixedRedConnectorAssignment_holds_iff
           bottomRight = true ∧ auxiliary = true) := by
   cases topLeft <;> cases topMiddle <;> cases topRight <;>
     cases bottomLeft <;> cases bottomMiddle <;> cases bottomRight <;>
-    cases auxiliary <;> native_decide
+    cases auxiliary <;> decide +kernel
 
 /-- Read the two satisfying bit patterns directly from an arbitrary
 selection function. -/
@@ -284,7 +284,7 @@ theorem fixedRedConnectorHolds_iff
     · right
       funext triple
       cases triple <;> simp_all [fixedRedConnectorSelection]
-  · rintro (rfl | rfl) <;> native_decide
+  · rintro (rfl | rfl) <;> decide +kernel
 
 /-- The continuation ports have opposite states, and all three connector
 ports have the same state. -/
@@ -294,7 +294,7 @@ theorem fixedRedConnector_port_behavior
     selected .topLeft = !selected .bottomLeft ∧
       selected .auxiliary = selected .bottomRight := by
   rcases (fixedRedConnectorHolds_iff selected).mp holds with
-    rfl | rfl <;> native_decide
+    rfl | rfl <;> decide +kernel
 
 /-- Each of the eight internal elements has degree two. -/
 theorem fixedRedConnector_internal_degrees :
@@ -306,7 +306,7 @@ theorem fixedRedConnector_internal_degrees :
       (FixedRedConnectorBlue.neighbors .topLeftLink).length = 2 ∧
       (FixedRedConnectorBlue.neighbors .bottomLeftLink).length = 2 ∧
       (FixedRedConnectorBlue.neighbors .rightRung).length = 2 := by
-  native_decide
+  decide +kernel
 
 end PlanarThreeDM
 end LeanTrominoes

@@ -97,7 +97,7 @@ private theorem retainedComposedRawVariablePosition_eq_translated_data
     exact positionsEqual
   rcases Cell.inMacrocellOrbit_eq_periodTranslate
       (show 0 < finalFigureNineMacrocellScale by
-        native_decide)
+        decide +kernel)
       (finalFigureNineLocalAddress_position_halfOpen firstAddress)
       (finalFigureNineLocalAddress_position_halfOpen secondAddress)
       firstOrbit secondOrbit refinedPositionsEqual with

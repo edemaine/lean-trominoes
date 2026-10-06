@@ -51,7 +51,7 @@ theorem retainedTerminalAdapterPortOffset_on_square :
           (retainedTerminalAdapterPortOffset port) ∧
         ¬ WithinCoordinateRadius 21 (0, 0)
           (retainedTerminalAdapterPortOffset port) := by
-  native_decide
+  decide +kernel
 
 /-- In particular, every adapter port lies strictly outside the local
 radius-12 Figure 7 fan. -/
@@ -59,7 +59,7 @@ theorem retainedTerminalAdapterPortOffset_outside_fan :
     ∀ port : RetainedTerminalAdapterPort,
       ¬ WithinCoordinateRadius 12 (0, 0)
         (retainedTerminalAdapterPortOffset port) := by
-  native_decide
+  decide +kernel
 
 /-- The radius-22 adapter frame is contained in the radius-36 retained-ray
 interface square. -/
@@ -67,12 +67,12 @@ theorem retainedTerminalAdapterPortOffset_within_interface :
     ∀ port : RetainedTerminalAdapterPort,
       WithinCoordinateRadius 36 (0, 0)
         (retainedTerminalAdapterPortOffset port) := by
-  native_decide
+  decide +kernel
 
 /-- Distinct finite port identities have distinct square-frame coordinates. -/
 theorem retainedTerminalAdapterPortOffset_injective :
     Function.Injective retainedTerminalAdapterPortOffset := by
-  native_decide
+  decide +kernel
 
 /-- Centering the adapter frame at an arbitrary variable preserves its exact
 coordinate radius. -/

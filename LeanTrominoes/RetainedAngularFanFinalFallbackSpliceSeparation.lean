@@ -735,7 +735,7 @@ theorem
         retainedFinalEscapedOuterCompleteRoute_strictlyAvoid_ordinary_of_axisAligned_of_not_both_singletonPrefixes
           formula wellFormed degree isLocal retainedClausesNonempty
           retainedAngularFanSourceClearanceFactor_pos
-          (by native_decide)
+          (by decide +kernel)
           firstRawRouteMember secondRawRouteMember
           firstLength secondLength routeIndicesDifferent
           firstEndpoints.1 secondEndpoints.1

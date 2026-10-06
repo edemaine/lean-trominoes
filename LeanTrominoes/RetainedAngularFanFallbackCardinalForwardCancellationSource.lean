@@ -111,7 +111,7 @@ theorem retainedFallbackCardinalForwardKeptRoute_data
       center port length slot
   have routeLengthTwo : 2 ≤ route.length := by omega
   have sourcePrefixOrthogonal : OrthogonalPolyline sourcePrefix := by
-    exact (routeOrthogonal.scalePolyline (by native_decide)).dropLast
+    exact (routeOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have sourcePrefixLength : 2 ≤ sourcePrefix.length := by
     dsimp [sourcePrefix, retainedFallbackSourcePrefix]
     rw [List.length_dropLast]
@@ -255,7 +255,7 @@ theorem retainedFallbackSourcePrefix_forward_directions
   let path := retainedTerminalFanCardinalForwardOverlapPath
     center port length slot
   have sourcePrefixOrthogonal : OrthogonalPolyline sourcePrefix :=
-    (routeOrthogonal.scalePolyline (by native_decide)).dropLast
+    (routeOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have pathNonempty : path ≠ [] :=
     retainedTerminalFanCardinalForwardOverlapPath_ne_nil
       center port length slot

@@ -510,8 +510,8 @@ theorem flatStripReachBoolCost_le
   have normalized : predCost
       [FiniteState.divideOptionBoolTag finalState.answer] ≤ 1000000 := by
     cases answer : finalState.answer with
-    | none => native_decide
-    | some answerValue => cases answerValue <;> native_decide
+    | none => decide +kernel
+    | some answerValue => cases answerValue <;> decide +kernel
   change flatStripReachBoolCost tromino periodicStrip first last ≤
     flatStripReachCallSpaceBound inputLength
   simp [flatStripReachBoolCost, values, output, finalState, inputLength,

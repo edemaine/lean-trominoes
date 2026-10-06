@@ -86,9 +86,9 @@ theorem routedVariableFinalSiteNormalizedLinkArms_eq_full
           (List.fst_mem_of_mem_zipIdx selectedMember) with
         offsetZero | offsetOne
       · rw [offsetZero]
-        native_decide
+        decide +kernel
       · rw [offsetOne]
-        native_decide
+        decide +kernel
 
 /-- Concatenating the canonical final-site normalized links over rotated
 occurrences yields one complete arm triple per occurrence. -/

@@ -59,18 +59,18 @@ theorem carrierLensTemplateRoute_upperLeft_normalized_fallback_directions
         (carrierLensTemplateRoute false 8 0 0)
         (carrierLensRouteTerminalData false 8 0 0) slot
         retainedAngularFanSourceClearanceFactor_pos
-        (by native_decide)
-        (by native_decide)
-        (by native_decide)
-        (by native_decide)
-        (by native_decide)
+        (by decide +kernel)
+        (by decide +kernel)
+        (by decide +kernel)
+        (by decide +kernel)
+        (by decide +kernel)
         (by
           simpa [RetainedFallbackFanKind.Valid,
             retainedAngularFanSourceClearanceFactor_eq] using
             retainedTerminalFanOuterSourceEscape_fits_scale_four
               (carrierLensRouteTerminalData false 8 0 0)
-              (by native_decide))
-        (by native_decide)
+              (by decide +kernel))
+        (by decide +kernel)
     rw [retainedFallbackSourcePrefix_sourceClearanceScaled_directions]
       at normalized
     simpa [carrierLensTemplateRoute, horizontalEqualityLensRoutes,
@@ -84,18 +84,18 @@ theorem carrierLensTemplateRoute_upperLeft_normalized_fallback_directions
         (carrierLensTemplateRoute true 8 0 0)
         (carrierLensRouteTerminalData true 8 0 0) slot
         retainedAngularFanSourceClearanceFactor_pos
-        (by native_decide)
-        (by native_decide)
-        (by native_decide)
-        (by native_decide)
-        (by native_decide)
+        (by decide +kernel)
+        (by decide +kernel)
+        (by decide +kernel)
+        (by decide +kernel)
+        (by decide +kernel)
         (by
           simpa [RetainedFallbackFanKind.Valid,
             retainedAngularFanSourceClearanceFactor_eq] using
             retainedTerminalFanOuterSourceEscape_fits_scale_four
               (carrierLensRouteTerminalData true 8 0 0)
-              (by native_decide))
-        (by native_decide)
+              (by decide +kernel))
+        (by decide +kernel)
     rw [retainedFallbackSourcePrefix_sourceClearanceScaled_directions]
       at normalized
     simpa [carrierLensTemplateRoute, horizontalEqualityLensRoutes,

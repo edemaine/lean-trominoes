@@ -100,7 +100,7 @@ theorem retainedFallbackSourcePrefix_unitSubdivide_eq_forwardLeading_append_over
       route port length slot distance
   have routeLengthTwo : 2 ≤ route.length := by omega
   have sourcePrefixOrthogonal : OrthogonalPolyline sourcePrefix := by
-    exact (routeOrthogonal.scalePolyline (by native_decide)).dropLast
+    exact (routeOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have sourcePrefixLength : 2 ≤ sourcePrefix.length := by
     dsimp [sourcePrefix, retainedFallbackSourcePrefix]
     rw [List.length_dropLast]

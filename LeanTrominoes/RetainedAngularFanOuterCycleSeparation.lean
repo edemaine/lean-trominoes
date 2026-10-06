@@ -30,6 +30,13 @@ open PeriodicOrthocrossing
 
 set_option maxRecDepth 8192
 set_option maxHeartbeats 8000000
+private instance : Fintype RingVertex :=
+  Fintype.ofList [.separator, .port .east, .port .southeast, .port .south,
+    .port .southwest, .port .west, .port .northwest, .port .north, .port .northeast] (by
+      intro vertex
+      cases vertex with
+      | separator => simp
+      | port port => cases port <;> simp)
 
 /-- One factor-eight implication route centered at the retained source
 variable position. -/
@@ -51,11 +58,11 @@ theorem retainedTerminalFanInnerCycleRoute_points_within_inner_square :
       (point : Cell),
       point ∈ retainedTerminalFanInnerCycleRoute vertex literalIndex →
         WithinCoordinateRadius 48 (0, 0) point := by
-  intro vertex
-  cases vertex with
-  | separator => native_decide
-  | port port =>
-      cases port <;> native_decide
+  have checked : (finiteAll fun vertex : RingVertex => finiteAll fun literalIndex : Fin 2 =>
+      (retainedTerminalFanInnerCycleRoute vertex literalIndex).all
+        fun point => decide (WithinCoordinateRadius 48 (0, 0) point)) = true := by
+    decide +kernel
+  simpa only [finiteAll_eq_true, List.all_eq_true, decide_eq_true_eq] using checked
 
 /-- Translate a centered implication route to an arbitrary retained source
 variable position. -/
@@ -110,21 +117,16 @@ theorem retainedTerminalFanOuterLocalRoute_strictlyAvoid_innerCycleRoute :
       RoutesStrictlyAvoidEachOther
         (retainedTerminalFanOuterLocalRoute direction slot)
         (retainedTerminalFanInnerCycleRoute vertex literalIndex) := by
+  have checked : (finiteAll fun direction : RetainedTerminalDirection =>
+      finiteAll fun slot : RetainedTerminalSlot => finiteAll fun vertex : RingVertex =>
+      finiteAll fun literalIndex : Fin 2 =>
+        segmentBoxesSeparateCheck (retainedTerminalFanOuterLocalRoute direction slot)
+          (retainedTerminalFanInnerCycleRoute vertex literalIndex)) = true := by
+    decide +kernel
   intro direction slot vertex literalIndex
-  cases vertex with
-  | separator =>
-      rcases direction with _ | _ <;>
-        rename_i kind <;>
-        cases kind <;>
-        revert slot literalIndex <;>
-        native_decide
-  | port port =>
-      cases port <;>
-        rcases direction with _ | _ <;>
-          rename_i kind <;>
-          cases kind <;>
-          revert slot literalIndex <;>
-          native_decide
+  simp only [finiteAll_eq_true] at checked
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked direction slot vertex literalIndex)
 
 /-- Positioning both the finite adapter and inner cycle preserves their
 strict separation. -/
@@ -155,21 +157,16 @@ theorem
       RoutesStrictlyAvoidEachOther
         (retainedTerminalFanOuterRadialFinalStub direction slot)
         (retainedTerminalFanInnerCycleRoute vertex literalIndex) := by
+  have checked : (finiteAll fun direction : RetainedTerminalDirection =>
+      finiteAll fun slot : RetainedTerminalSlot => finiteAll fun vertex : RingVertex =>
+      finiteAll fun literalIndex : Fin 2 =>
+        segmentBoxesSeparateCheck (retainedTerminalFanOuterRadialFinalStub direction slot)
+          (retainedTerminalFanInnerCycleRoute vertex literalIndex)) = true := by
+    decide +kernel
   intro direction slot vertex literalIndex
-  cases vertex with
-  | separator =>
-      rcases direction with _ | _ <;>
-        rename_i kind <;>
-        cases kind <;>
-        revert slot literalIndex <;>
-        native_decide
-  | port port =>
-      cases port <;>
-        rcases direction with _ | _ <;>
-          rename_i kind <;>
-          cases kind <;>
-          revert slot literalIndex <;>
-          native_decide
+  simp only [finiteAll_eq_true] at checked
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked direction slot vertex literalIndex)
 
 /-- Positioning both a final radial stub and inner cycle preserves their
 strict separation. -/

@@ -3,12 +3,26 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.FiniteBlockIndexCompiler
-import LeanTrominoes.FiniteBlockTransducer
-import LeanTrominoes.FiniteUnaryFieldMapCompiler
-import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderClauseFrameData
-import LeanTrominoes.TM2CompositionMachine
-import LeanTrominoes.UnaryPrefixSumsTime
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case0
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case1
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case2
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case3
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case4
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case5
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case6
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case7
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case8
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case9
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case10
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case11
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case12
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case13
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case14
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case15
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case16
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case17
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case18
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompilerCertificates.Case19
 
 /-! # Parent indices of actual final clauses
 
@@ -26,52 +40,35 @@ namespace HorizontalRoutedRouteHeaderFinalClauseParentIndex
 open Computability Turing
 open PeriodicCNF.FormulaShapeDirectionOrdering
 
-abbrev Frame := HorizontalRoutedRouteHeaderClauseFrame.Data
+private theorem finalClauseParentMarkersCheck_first_correct
+    (first : LeanTrominoes.PeriodicCNF.UnaryProgramClauseProfile.LiteralProfile)
+    (direction : AxisDirection) : firstDirectedProfileCheck finalClauseParentMarkersCheck first direction = true := by
+  rcases first with ⟨nextSlice, value⟩
+  cases nextSlice <;> cases value <;> cases direction
+  · exact finalClauseParentMarkersCheck_case0
+  · exact finalClauseParentMarkersCheck_case1
+  · exact finalClauseParentMarkersCheck_case2
+  · exact finalClauseParentMarkersCheck_case3
+  · exact finalClauseParentMarkersCheck_case4
+  · exact finalClauseParentMarkersCheck_case5
+  · exact finalClauseParentMarkersCheck_case6
+  · exact finalClauseParentMarkersCheck_case7
+  · exact finalClauseParentMarkersCheck_case8
+  · exact finalClauseParentMarkersCheck_case9
+  · exact finalClauseParentMarkersCheck_case10
+  · exact finalClauseParentMarkersCheck_case11
+  · exact finalClauseParentMarkersCheck_case12
+  · exact finalClauseParentMarkersCheck_case13
+  · exact finalClauseParentMarkersCheck_case14
+  · exact finalClauseParentMarkersCheck_case15
+  · exact finalClauseParentMarkersCheck_case16
+  · exact finalClauseParentMarkersCheck_case17
+  · exact finalClauseParentMarkersCheck_case18
+  · exact finalClauseParentMarkersCheck_case19
 
-/-- Mark the last occurrence frame of every actual final clause.  A new
-clause starts at a `.top` frame; the final frame of a descriptor block is
-always a clause end. -/
-def endingMarkers : List Frame → List Bool
-  | [] => []
-  | _ :: [] => [true]
-  | _ :: next :: remaining =>
-      decide (next.group = .top) :: endingMarkers (next :: remaining)
-
-/-- Actual-final-clause boundaries contributed by one finite descriptor. -/
-def tokenMarkers (token : Token) : List Bool :=
-  endingMarkers (HorizontalRoutedRouteHeaderClauseFrame.tokenBlock token)
-
-/-- Clause-start markers on the same finite frame block. -/
-def tokenTopMarkers (token : Token) : List Bool :=
-  (HorizontalRoutedRouteHeaderClauseFrame.tokenBlock token).map fun frame =>
-    decide (frame.group = .top)
-
-/-- One boundary marker per final occurrence frame. -/
-def markers (source : List Token) : List Bool :=
-  source.flatMap tokenMarkers
-
-def increments (source : List Token) : List Nat :=
-  FiniteUnaryFieldMap.values Bool.toNat (markers source)
-
-/-- Zero-based actual final-clause index, repeated at every occurrence of
-that clause. -/
-def parentIndices (source : List Token) : List Nat :=
-  PrefixSums.starts (increments source)
-
-@[simp] theorem endingMarkers_length (frames : List Frame) :
-    (endingMarkers frames).length = frames.length := by
-  induction frames with
-  | nil => rfl
-  | cons frame frames induction =>
-      cases frames with
-      | nil => rfl
-      | cons next remaining =>
-          simp only [endingMarkers, List.length_cons, induction]
-
-@[simp] theorem tokenMarkers_length (token : Token) :
-    (tokenMarkers token).length =
-      (HorizontalRoutedRouteHeaderClauseFrame.tokenBlock token).length := by
-  simp [tokenMarkers]
+private theorem finalClauseParentMarkersCheck_correct (profile : DirectedClauseProfile) :
+    finalClauseParentMarkersCheck profile = true :=
+  firstDirectedProfileCheck_sound finalClauseParentMarkersCheck finalClauseParentMarkersCheck_first_correct profile
 
 /-- Every finite descriptor block has exactly as many ending boundaries as
 actual final clauses.  This audit includes all unary, binary, and ternary
@@ -81,7 +78,10 @@ theorem tokenMarkers_count_true_eq_topMarkers (token : Token) :
       (tokenTopMarkers token).count true := by
   cases token with
   | «variable» => rfl
-  | clause profile => cases profile <;> native_decide +revert
+  | clause profile =>
+      have checked := finalClauseParentMarkersCheck_correct profile
+      simp only [finalClauseParentMarkersCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+      exact checked.1
 
 /-- More strongly, the boundary detector is exactly the ordinary
 block-ending marker stream of the boundary-preserving final-clause frames. -/
@@ -91,7 +91,10 @@ theorem tokenMarkers_eq_blockMarkers (token : Token) :
         (HorizontalRoutedRouteHeaderClauseFrame.tokenBlocks token) := by
   cases token with
   | «variable» => rfl
-  | clause profile => cases profile <;> native_decide +revert
+  | clause profile =>
+      have checked := finalClauseParentMarkersCheck_correct profile
+      simp only [finalClauseParentMarkersCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+      exact checked.2
 
 /-- Globally, final-clause ends and final-clause starts have the same count. -/
 theorem markers_count_true_eq_topMarkers (source : List Token) :

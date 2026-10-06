@@ -302,9 +302,9 @@ private theorem
     retainedTerminalFanTotalRefinement *
       retainedAngularFanSourceClearanceFactor
   have combinedPositive : 0 < combinedFactor := by
-    native_decide
+    decide +kernel
   have clearance : 2 * 288 < combinedFactor := by
-    native_decide
+    decide +kernel
   constructor
   · apply
       routesStrictlyAvoidEachOther_of_inSeparatedClosedGridRectangles

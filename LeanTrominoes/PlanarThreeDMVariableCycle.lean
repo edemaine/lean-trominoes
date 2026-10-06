@@ -28,7 +28,7 @@ theorem exactlyOne_pair_iff_not
     (first second : Bool) :
     PeriodicOneInThree.ExactlyOne [first, second] ↔
       first = !second := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- A one-occurrence cycle closes its two continuation ports together. -/
 def OneVariableCycleRealizable
@@ -46,7 +46,7 @@ theorem oneVariableCycleRealizable
   refine ⟨VariableConnectorBoundary.canonical signal,
     variableConnectorBoundary_canonical_realizable kind signal,
     rfl, ?_⟩
-  cases signal <;> native_decide
+  cases signal <;> decide +kernel
 
 /-- Close two occurrence modules into one variable cycle. -/
 def TwoVariableCycleRealizable
@@ -96,8 +96,8 @@ theorem twoVariableCycleRealizable_iff
       variableConnectorBoundary_canonical_realizable
         secondKind firstSignal,
       rfl, rfl, ?_, ?_⟩
-    · cases firstSignal <;> native_decide
-    · cases firstSignal <;> native_decide
+    · cases firstSignal <;> decide +kernel
+    · cases firstSignal <;> decide +kernel
 
 /-- Close three occurrence modules into one variable cycle. -/
 def ThreeVariableCycleRealizable
@@ -171,9 +171,9 @@ theorem threeVariableCycleRealizable_iff
       variableConnectorBoundary_canonical_realizable
         thirdKind firstSignal,
       rfl, rfl, rfl, ?_, ?_, ?_⟩
-    · cases firstSignal <;> native_decide
-    · cases firstSignal <;> native_decide
-    · cases firstSignal <;> native_decide
+    · cases firstSignal <;> decide +kernel
+    · cases firstSignal <;> decide +kernel
+    · cases firstSignal <;> decide +kernel
 
 /-! ## Signed occurrence cycles -/
 
@@ -195,8 +195,8 @@ theorem oneSignedVariableCycleRealizable
       variableValue polarity,
     variableConnectorBoundary_canonicalFor_realizable
       kind variableValue polarity, ?_, ?_⟩
-  · cases signal <;> cases polarity <;> native_decide
-  · cases signal <;> cases polarity <;> native_decide
+  · cases signal <;> cases polarity <;> decide +kernel
+  · cases signal <;> cases polarity <;> decide +kernel
 
 /-- A two-occurrence cycle with independently signed literal ports. -/
 def TwoSignedVariableCycleRealizable
@@ -270,9 +270,9 @@ theorem twoSignedVariableCycleRealizable_iff
         secondKind variableValue secondPolarity,
       rfl, rfl, ?_, ?_⟩
     · cases variableValue <;>
-        native_decide +revert
+        decide +kernel +revert
     · cases variableValue <;>
-        native_decide +revert
+        decide +kernel +revert
 
 /-- A three-occurrence cycle with independently signed literal ports. -/
 def ThreeSignedVariableCycleRealizable
@@ -380,11 +380,11 @@ theorem threeSignedVariableCycleRealizable_iff
         thirdKind variableValue thirdPolarity,
       rfl, rfl, rfl, ?_, ?_, ?_⟩
     · cases variableValue <;>
-        native_decide +revert
+        decide +kernel +revert
     · cases variableValue <;>
-        native_decide +revert
+        decide +kernel +revert
     · cases variableValue <;>
-        native_decide +revert
+        decide +kernel +revert
 
 end PlanarThreeDM
 end LeanTrominoes

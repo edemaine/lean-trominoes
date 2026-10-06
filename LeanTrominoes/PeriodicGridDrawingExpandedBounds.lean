@@ -116,7 +116,7 @@ theorem doubleNeighborCoordinates_nodup :
 
 theorem doubleNeighborTranslations_nodup :
     doubleNeighborTranslations.Nodup := by
-  native_decide
+  decide +kernel
 
 /-- The `5 × 5` relative-translation set is closed under negation. -/
 theorem sub_zero_mem_doubleNeighborTranslations_iff (translate : Cell) :

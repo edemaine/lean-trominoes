@@ -124,7 +124,7 @@ literal is true. -/
 theorem exists_unitGadgetHolds_iff (literal : Bool) :
     (∃ first second, UnitGadgetHolds literal first second) ↔
       literal = true := by
-  cases literal <;> native_decide
+  cases literal <;> decide +kernel
 
 /-- Any completion of the unit gadget recovers the source literal. -/
 theorem unitGadgetHolds_literal_true
@@ -140,7 +140,7 @@ theorem emptyTriangle_impossible (first second third : Bool) :
     ¬(PeriodicOneInThree.ExactlyOne [first, second] ∧
       PeriodicOneInThree.ExactlyOne [second, third] ∧
       PeriodicOneInThree.ExactlyOne [first, third]) := by
-  cases first <;> cases second <;> cases third <;> native_decide
+  cases first <;> cases second <;> cases third <;> decide +kernel
 
 /-- A fixed completion used for every satisfiable unit gadget. -/
 def extendAssignment {Variable : Type*}
@@ -267,17 +267,17 @@ theorem clauseClauses_complete {Variable : Type*}
                 have falseH :
                     PeriodicOneInThree.ExactlyOne [false] := by
                   simpa only [truthEq] using sourceHolds
-                exact ((by native_decide :
+                exact ((by decide +kernel :
                   ¬PeriodicOneInThree.ExactlyOne [false])
                     falseH).elim
             | true => rfl
           simp [PeriodicOneInThree.ClauseHolds,
             clauseValues_eq_map_literalTruth, literalTrue,
             PeriodicOneInThree.literalTruth_negate] ;
-            native_decide
+            decide +kernel
         · simp [PeriodicOneInThree.ClauseHolds,
             clauseValues_eq_map_literalTruth] ;
-            native_decide
+            decide +kernel
     | cons second rest =>
         simp only [clauseClauses, List.mem_singleton] at generatedMem
         subst generated
@@ -359,7 +359,7 @@ theorem clauseClauses_sound {Variable : Type*}
         rw [clauseValues_eq_map_literalTruth]
         change PeriodicOneInThree.ExactlyOne [literalValue]
         rw [literalTrue]
-        native_decide
+        decide +kernel
     | cons second rest =>
         have embedded :=
           generatedHolds

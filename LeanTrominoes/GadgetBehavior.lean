@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.GadgetAssembly
 import LeanTrominoes.GadgetSubstitution
+import LeanTrominoes.GadgetCellPortTable
 
 /-!
 # Infinite compatible assignments of local gadget tilings
@@ -42,8 +43,7 @@ theorem mem_exactCellTilings_iff (tromino : Tromino)
 type. -/
 def exactCellPortConfigurations (tromino : Tromino)
     (cellType : OrthogonalCellType) : Finset PortConfiguration :=
-  exactPortConfigurations tromino (orthogonalCellGadget tromino cellType)
-    (orthogonalCellPixels tromino cellType)
+  cachedCellPortConfigurations tromino cellType
 
 /-- The executable port behavior has the expected semantic interpretation. -/
 theorem mem_exactCellPortConfigurations_iff (tromino : Tromino)
@@ -55,6 +55,7 @@ theorem mem_exactCellPortConfigurations_iff (tromino : Tromino)
           (orthogonalCellGadget tromino cellType).region placements ∧
         portConfiguration tromino
           (orthogonalCellGadget tromino cellType) placements = configuration := by
+  rw [exactCellPortConfigurations, cachedCellPortConfigurations_eq]
   exact mem_exactPortConfigurations_iff tromino
     (orthogonalCellGadget tromino cellType)
     (orthogonalCellGadget_wellFormed tromino cellType)

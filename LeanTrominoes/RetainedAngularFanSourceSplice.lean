@@ -103,7 +103,7 @@ theorem retainedAngularFanSplicedBoundaryPolyline_orthogonal
   have scaledOrthogonal :
       PeriodicOrthocrossing.OrthogonalPolyline scaledRoute :=
     PeriodicOrthocrossing.OrthogonalPolyline.scalePolyline
-      routeOrthogonal (by native_decide)
+      routeOrthogonal (by decide +kernel)
   have replacementOrthogonal :
       PeriodicOrthocrossing.OrthogonalPolyline replacement :=
     retainedTerminalFanOuterCompleteRoute_orthogonal
@@ -174,7 +174,7 @@ theorem retainedAngularFanSplicedBoundaryPolyline_retained
     (retainedTerminalDirectionClassify_sound classified).1
   have scaledRetained :
       RetainedRayPolyline scaledRoute :=
-    retained.scale (by native_decide)
+    retained.scale (by decide +kernel)
   have replacementRetained :
       RetainedRayPolyline replacement :=
     RetainedRayPolyline.of_orthogonal
@@ -289,7 +289,7 @@ theorem retainedAngularFanSplicedBoundaryRoute_valid
     replacePolylineTail_getLast? replacementLast
   have scaledRetained :
       RetainedRayPolyline scaledRoute := by
-    exact retained.scale (by native_decide)
+    exact retained.scale (by decide +kernel)
   have replacementRetained :
       RetainedRayPolyline replacement :=
     RetainedRayPolyline.of_orthogonal

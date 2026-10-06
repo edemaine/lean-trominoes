@@ -26,8 +26,46 @@ open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 set_option maxHeartbeats 2500000
 set_option maxRecDepth 10000
 
+private def firstTailContactCheck (first second : List Cell) : Bool :=
+  first.all fun a => second.all fun b => guardedCheck (a = b)
+    (decide (first.getLast? = some a ∧ RoutePointIsEndpoint second b))
+
+private theorem firstTailContactCheck_eq_true (first second : List Cell) :
+    firstTailContactCheck first second = true ↔ RoutesMeetOnlyAtFirstTail first second := by
+  simp only [firstTailContactCheck, RoutesMeetOnlyAtFirstTail, List.all_eq_true,
+    guardedCheck_eq_true, decide_eq_true_eq]
+
+private def clauseLocalMacrocellSeparationCheck (first second : List Cell) : Bool :=
+  segmentBoxesSeparateCheck first second || routesStrictlyAvoidEachOtherCheck first second
+
+private theorem clauseLocalMacrocellSeparationCheck_sound (first second : List Cell)
+    (checked : clauseLocalMacrocellSeparationCheck first second = true) :
+    RoutesStrictlyAvoidEachOther first second := by
+  simp only [clauseLocalMacrocellSeparationCheck, Bool.or_eq_true] at checked
+  rcases checked with boxes | exactCheck
+  · exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck first second boxes
+  · exact (routesStrictlyAvoidEachOtherCheck_eq_true first second).mp exactCheck
+
 /-- Local clause gates avoid every legal corridor tile in an adjacent
 macrocell. -/
+private def clauseMacrocellCheck0 (offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length) : Bool :=
+  finiteAll fun hasRight =>
+      finiteAll fun group =>
+      finiteAll fun fanLane =>
+      finiteAll fun incoming =>
+      finiteAll fun outgoing =>
+      finiteAll fun tileColor =>
+      guardedCheck (incoming.IsGenuine ∧ outgoing.IsGenuine ∧ outgoing ≠ incoming.opposite)
+        (clauseLocalMacrocellSeparationCheck
+          ((clauseRibbonFanShape hasRight).localGateRoute group fanLane)
+        (ribbonMacrocellRoute
+          (ribbonAdjacentMacrocellOffsets.get offsetIndex)
+          incoming outgoing tileColor))
+
+private theorem clauseMacrocellCheck0_correct (offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length) :
+    clauseMacrocellCheck0 offsetIndex = true := by
+  fin_cases offsetIndex <;> decide +kernel
+
 theorem standardClauseLocalGateRoute_strictlyAvoids_adjacentRibbonMacrocellRoute :
     ∀ (offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length)
       hasRight group fanLane incoming outgoing tileColor,
@@ -38,11 +76,51 @@ theorem standardClauseLocalGateRoute_strictlyAvoids_adjacentRibbonMacrocellRoute
         (ribbonMacrocellRoute
           (ribbonAdjacentMacrocellOffsets.get offsetIndex)
           incoming outgoing tileColor) := by
-  native_decide
+  have checked := clauseMacrocellCheck0_correct
+  intro offsetIndex hasRight group fanLane incoming outgoing tileColor incomingGenuine outgoingGenuine notReverse
+  simp only [clauseMacrocellCheck0, finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact clauseLocalMacrocellSeparationCheck_sound _ _
+    (checked offsetIndex hasRight group fanLane incoming outgoing tileColor ⟨incomingGenuine, outgoingGenuine, notReverse⟩)
 
 /-- A selected outer clause route avoids an adjacent legal corridor tile
 unless the tile is immediately before the clause, leaves in the advertised
 direction, and carries the same physical lane. -/
+private def clauseMacrocellCheck1 (templateIndex : Fin standardVariableOuterFanTemplates.length) : Bool :=
+  finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun hasRight =>
+      finiteAll fun group =>
+      finiteAll fun fanLane =>
+      finiteAll fun incoming =>
+      finiteAll fun outgoing =>
+      finiteAll fun tileColor =>
+      guardedCheck (((clauseRibbonFanShape hasRight).variableSlotForGroup group).index < (standardVariableOuterFanTemplates.get templateIndex).directions.length ∧ incoming.IsGenuine ∧ outgoing.IsGenuine ∧ outgoing ≠ incoming.opposite ∧ ((ribbonAdjacentMacrocellOffsets.get offsetIndex ≠
+              (ClauseRibbonFanData.reflectedDirection
+                ((standardVariableOuterFanTemplates.get templateIndex).directions.getD
+                  ((clauseRibbonFanShape hasRight).variableSlotForGroup
+                    group).index .invalid)).opposite.step ∨
+            outgoing =
+              ClauseRibbonFanData.reflectedDirection
+                ((standardVariableOuterFanTemplates.get templateIndex).directions.getD
+                  ((clauseRibbonFanShape hasRight).variableSlotForGroup
+                    group).index .invalid)) ∧
+          (ribbonAdjacentMacrocellOffsets.get offsetIndex ≠
+              (ClauseRibbonFanData.reflectedDirection
+                ((standardVariableOuterFanTemplates.get templateIndex).directions.getD
+                  ((clauseRibbonFanShape hasRight).variableSlotForGroup
+                    group).index .invalid)).opposite.step ∨
+            fanLane ≠ tileColor)))
+        (segmentBoxesSeparateCheck
+          (clauseOuterRouteFromTemplate
+            (standardVariableOuterFanTemplates.get templateIndex)
+            hasRight group fanLane)
+          (ribbonMacrocellRoute
+            (ribbonAdjacentMacrocellOffsets.get offsetIndex)
+            incoming outgoing tileColor))
+
+private theorem clauseMacrocellCheck1_correct (templateIndex : Fin standardVariableOuterFanTemplates.length) :
+    clauseMacrocellCheck1 templateIndex = true := by
+  fin_cases templateIndex <;> decide +kernel
+
 theorem standardClauseOuterRoute_strictlyAvoids_adjacentRibbonMacrocellRoute_of_separated :
     ∀ (templateIndex : Fin standardVariableOuterFanTemplates.length)
       (offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length)
@@ -75,10 +153,36 @@ theorem standardClauseOuterRoute_strictlyAvoids_adjacentRibbonMacrocellRoute_of_
           (ribbonMacrocellRoute
             (ribbonAdjacentMacrocellOffsets.get offsetIndex)
             incoming outgoing tileColor) := by
-  native_decide
+  have checked := clauseMacrocellCheck1_correct
+  intro templateIndex offsetIndex hasRight group active fanLane incoming outgoing tileColor incomingGenuine outgoingGenuine notReverse separated
+  simp only [clauseMacrocellCheck1, finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked templateIndex offsetIndex hasRight group fanLane incoming outgoing tileColor ⟨active, incomingGenuine, outgoingGenuine, notReverse, separated⟩)
 
 /-- A matching final corridor tile is ordinarily separated from the
 selected clause outer route; their shared boundary point is permitted. -/
+private def clauseMacrocellCheck2 (templateIndex : Fin standardVariableOuterFanTemplates.length) : Bool :=
+  finiteAll fun hasRight =>
+      finiteAll fun group =>
+      finiteAll fun lane =>
+      finiteAll fun incoming =>
+      let direction :=
+          ClauseRibbonFanData.reflectedDirection
+            ((standardVariableOuterFanTemplates.get templateIndex).directions.getD
+              ((clauseRibbonFanShape hasRight).variableSlotForGroup
+                group).index .invalid)
+      guardedCheck (((clauseRibbonFanShape hasRight).variableSlotForGroup group).index < (standardVariableOuterFanTemplates.get templateIndex).directions.length ∧ incoming.IsGenuine ∧ direction.IsGenuine ∧ direction ≠ incoming.opposite)
+        (routesAvoidEachOtherCheck
+          (ribbonMacrocellRoute
+            direction.opposite.step incoming direction lane)
+          (clauseOuterRouteFromTemplate
+            (standardVariableOuterFanTemplates.get templateIndex)
+            hasRight group lane))
+
+private theorem clauseMacrocellCheck2_correct (templateIndex : Fin standardVariableOuterFanTemplates.length) :
+    clauseMacrocellCheck2 templateIndex = true := by
+  fin_cases templateIndex <;> decide +kernel
+
 theorem matchingRibbonMacrocellRoute_avoids_standardClauseOuterRoute :
     ∀ (templateIndex : Fin standardVariableOuterFanTemplates.length)
       hasRight group,
@@ -98,10 +202,36 @@ theorem matchingRibbonMacrocellRoute_avoids_standardClauseOuterRoute :
           (clauseOuterRouteFromTemplate
             (standardVariableOuterFanTemplates.get templateIndex)
             hasRight group lane) := by
-  native_decide
+  have checked := clauseMacrocellCheck2_correct
+  intro templateIndex hasRight group active lane incoming direction incomingGenuine directionGenuine notReverse
+  simp only [clauseMacrocellCheck2, finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact (routesAvoidEachOtherCheck_eq_true _ _).mp
+    (checked templateIndex hasRight group lane incoming ⟨active, incomingGenuine, directionGenuine, notReverse⟩)
 
 /-- Every listed contact in the matching clause-fan interface occurs at
 the tail of the final corridor tile. -/
+private def clauseMacrocellCheck3 (templateIndex : Fin standardVariableOuterFanTemplates.length) : Bool :=
+  finiteAll fun hasRight =>
+      finiteAll fun group =>
+      finiteAll fun lane =>
+      finiteAll fun incoming =>
+      let direction :=
+          ClauseRibbonFanData.reflectedDirection
+            ((standardVariableOuterFanTemplates.get templateIndex).directions.getD
+              ((clauseRibbonFanShape hasRight).variableSlotForGroup
+                group).index .invalid)
+      guardedCheck (((clauseRibbonFanShape hasRight).variableSlotForGroup group).index < (standardVariableOuterFanTemplates.get templateIndex).directions.length ∧ incoming.IsGenuine ∧ direction.IsGenuine ∧ direction ≠ incoming.opposite)
+        (firstTailContactCheck
+          (ribbonMacrocellRoute
+            direction.opposite.step incoming direction lane)
+          (clauseOuterRouteFromTemplate
+            (standardVariableOuterFanTemplates.get templateIndex)
+            hasRight group lane))
+
+private theorem clauseMacrocellCheck3_correct (templateIndex : Fin standardVariableOuterFanTemplates.length) :
+    clauseMacrocellCheck3 templateIndex = true := by
+  fin_cases templateIndex <;> decide +kernel
+
 theorem matchingRibbonMacrocellRoute_meets_standardClauseOuterRoute_onlyAtTail :
     ∀ (templateIndex : Fin standardVariableOuterFanTemplates.length)
       hasRight group,
@@ -121,7 +251,11 @@ theorem matchingRibbonMacrocellRoute_meets_standardClauseOuterRoute_onlyAtTail :
           (clauseOuterRouteFromTemplate
             (standardVariableOuterFanTemplates.get templateIndex)
             hasRight group lane) := by
-  native_decide
+  have checked := clauseMacrocellCheck3_correct
+  intro templateIndex hasRight group active lane incoming direction incomingGenuine directionGenuine notReverse
+  simp only [clauseMacrocellCheck3, finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact (firstTailContactCheck_eq_true _ _).mp
+    (checked templateIndex hasRight group lane incoming ⟨active, incomingGenuine, directionGenuine, notReverse⟩)
 
 /-- The exit of a tile centered one step before the standard macrocell is
 the matching standard entry point. -/
@@ -130,7 +264,7 @@ theorem ribbonMacrocellExit_opposite_step_eq_standardEntry :
       ∀ color,
         ribbonMacrocellExit direction.opposite.step direction color =
           standardRibbonMacrocellEntry direction color := by
-  native_decide
+  decide +kernel
 
 /-- Complete coordinated clause fans avoid adjacent legal corridor tiles
 away from the selected final source step, and also avoid that final tile

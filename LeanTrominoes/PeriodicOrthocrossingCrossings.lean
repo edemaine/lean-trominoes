@@ -50,7 +50,7 @@ theorem neighborCoordinates_nodup : neighborCoordinates.Nodup := by
   decide
 
 theorem neighborTranslations_nodup : neighborTranslations.Nodup := by
-  native_decide
+  decide +kernel
 
 /-- Every indexed segment paired with each neighboring cell translation. -/
 def neighborOccurrences {Vertex : Type*} [DecidableEq Vertex]

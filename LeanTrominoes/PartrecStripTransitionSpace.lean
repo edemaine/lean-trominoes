@@ -337,7 +337,7 @@ theorem stripPackedNormalizationAllUnit_le_contextUnit
   have rawBits := encodeNat_length_mono rawBound
   have scaledBits := encodeNat_mul_length_le_sum 1000000 limit
   have coefficientBits :
-      (Computability.encodeNat 1000000).length = 20 := by native_decide
+      (Computability.encodeNat 1000000).length = 20 := by decide +kernel
   have contextEq :
       stripFrontierContextPolynomialSpaceUnit
           periodicStrip first last =
@@ -396,7 +396,7 @@ theorem stripPackedOverlapColumnsUnit_le_contextUnit
   have rawBits := encodeNat_length_mono rawBound
   have scaledBits := encodeNat_mul_length_le_sum 1000000 limit
   have coefficientBits :
-      (Computability.encodeNat 1000000).length = 20 := by native_decide
+      (Computability.encodeNat 1000000).length = 20 := by decide +kernel
   have contextEq :
       stripFrontierContextPolynomialSpaceUnit
           periodicStrip first last =
@@ -463,7 +463,7 @@ theorem stripPackedTransitionNativeSpaceUnit_le_contextUnit
   have rawBits := encodeNat_length_mono rawBound
   have scaledBits := encodeNat_mul_length_le_sum 1000000 limit
   have coefficientBits :
-      (Computability.encodeNat 1000000).length = 20 := by native_decide
+      (Computability.encodeNat 1000000).length = 20 := by decide +kernel
   have contextEq :
       stripFrontierContextPolynomialSpaceUnit
           periodicStrip first last =

@@ -144,7 +144,7 @@ theorem retainedAngularFanSplicedBoundaryPolyline_firstDirection
       center terminal slot
   have scaledOrthogonal :
       PeriodicOrthocrossing.OrthogonalPolyline scaledRoute :=
-    routeOrthogonal.scalePolyline (by native_decide)
+    routeOrthogonal.scalePolyline (by decide +kernel)
   rw [retainedAngularFanSplicedBoundaryPolyline,
     replacePolylineTail_eq_joinAtEndpoint_dropLast
       scaledRoute replacement routeEntrance replacementHead,
@@ -153,7 +153,7 @@ theorem retainedAngularFanSplicedBoundaryPolyline_firstDirection
       scaledLength]
     exact AxisDirection.polylineFirstDirection_scalePolyline
       retainedTerminalFanTotalRefinement
-      (by native_decide) route
+      (by decide +kernel) route
   · rw [polylineFirstDirection_dropLast_of_three_le_length
       scaledLength]
     exact polylineFirstDirection_isGenuine_of_orthogonal

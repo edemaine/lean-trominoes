@@ -288,7 +288,7 @@ theorem x3cClause_coloredReferences_eq_references
     ([set.coloredReferences.red, set.coloredReferences.green,
         set.coloredReferences.blue] : List X3CClauseElement).toFinset =
       set.references.toFinset := by
-  cases set <;> native_decide
+  cases set <;> decide +kernel
 
 /-- The red field really is red in every clause-core set. -/
 theorem x3cClause_coloredReferences_red
@@ -316,7 +316,7 @@ theorem x3cClause_terminal_colors
         X3CClauseTerminal.color ⟨group, .third⟩] :
           List WireColor).toFinset) =
       ([WireColor.red, .green, .blue] : List WireColor).toFinset := by
-  cases group <;> native_decide
+  cases group <;> decide +kernel
 
 /-- In attachment order, the three terminals have the red-blue-green,
 blue-green-red, and green-red-blue patterns described by Dyer and Frieze
@@ -333,7 +333,7 @@ theorem x3cClause_terminal_attachment_colors
       | .top => [.red, .blue, .green]
       | .left => [.blue, .green, .red]
       | .right => [.green, .red, .blue] := by
-  cases group <;> native_decide
+  cases group <;> decide +kernel
 
 /-- The two incidence descriptions agree. -/
 theorem x3cClause_mem_neighbors_iff_mem_references
@@ -341,10 +341,10 @@ theorem x3cClause_mem_neighbors_iff_mem_references
     set ∈ element.neighbors ↔ element ∈ set.references := by
   cases set <;>
     cases element with
-    | internal value => cases value <;> native_decide
+    | internal value => cases value <;> decide +kernel
     | terminal value =>
         rcases value with ⟨group, slot⟩
-        cases group <;> cases slot <;> native_decide
+        cases group <;> cases slot <;> decide +kernel
 
 /-- Every set in the clause core contains exactly three elements. -/
 theorem x3cClauseSet_reference_length (set : X3CClauseSet) :
@@ -354,7 +354,7 @@ theorem x3cClauseSet_reference_length (set : X3CClauseSet) :
 /-- Every set in the clause core contains three distinct elements. -/
 theorem x3cClauseSet_references_nodup (set : X3CClauseSet) :
     set.references.Nodup := by
-  cases set <;> native_decide
+  cases set <;> decide +kernel
 
 /-- Every internal element has degree three. -/
 theorem x3cClauseInternal_degree_three (element : X3CClauseInternal) :
@@ -427,7 +427,7 @@ theorem x3cClauseCoreSelection_holds
   cases top <;> cases left <;> cases right
   all_goals
     simp [PeriodicOneInThree.ExactlyOne] at exactlyOne
-  all_goals native_decide
+  all_goals decide +kernel
 
 /-- Exhaustive truth table for the nine-set core. -/
 private theorem exists_x3cClauseCoreHolds_assignment_iff
@@ -436,7 +436,7 @@ private theorem exists_x3cClauseCoreHolds_assignment_iff
         X3CClauseCoreHolds selected
           (x3cClauseExternalAssignment top left right)) ↔
       PeriodicOneInThree.ExactlyOne [top, left, right] := by
-  cases top <;> cases left <;> cases right <;> native_decide
+  cases top <;> cases left <;> cases right <;> decide +kernel
 
 /-- The Figure 5 clause core admits an exact cover precisely when exactly one
 of its three terminals is covered externally. -/

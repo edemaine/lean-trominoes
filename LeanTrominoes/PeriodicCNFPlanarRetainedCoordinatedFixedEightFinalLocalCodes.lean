@@ -128,14 +128,14 @@ def FinalFigureNineLocalAddress.position :
 /-- The finite local code table has no collisions. -/
 theorem finalFigureNineLocalAddress_position_injective :
     Function.Injective FinalFigureNineLocalAddress.position := by
-  native_decide +revert
+  decide +kernel +revert
 
 /-- Every final local code lies in the half-open `72 × 72` macrocell. -/
 theorem finalFigureNineLocalAddress_position_halfOpen
     (address : FinalFigureNineLocalAddress) :
     Cell.PositionInHalfOpenMacrocell
       finalFigureNineMacrocellScale address.position := by
-  native_decide +revert
+  decide +kernel +revert
 
 end PeriodicOrthocrossing
 end LeanTrominoes

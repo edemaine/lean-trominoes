@@ -20,7 +20,7 @@ def roles : List CrossoverVariable :=
     clause.literals.map Prod.fst
 
 @[simp] theorem roles_length : roles.length = 58 := by
-  native_decide
+  decide +kernel
 
 /-- Boundary side supplying the compact source-key pair of a crossover role.
 Internal variables use the fixed left boundary as their site identifier. -/

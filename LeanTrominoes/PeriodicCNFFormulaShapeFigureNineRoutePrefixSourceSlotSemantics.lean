@@ -26,7 +26,7 @@ private theorem sourceSlot?_incidenceAt_some_lt
         (clauseProfile profile)).incidenceAt index).literal.1 =
           some sourceSlot) :
     sourceSlotNat sourceSlot < (clauseProfile profile).literals.length := by
-  cases profile <;> native_decide +revert
+  cases profile <;> decide +kernel +revert
 
 /-- Every inherited finite-template descriptor names an active literal slot
 of the source clause profile. -/

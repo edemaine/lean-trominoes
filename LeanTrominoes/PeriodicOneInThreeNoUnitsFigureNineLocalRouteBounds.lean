@@ -33,7 +33,7 @@ source neighborhood. -/
 theorem zeroDrawing_routePoints_within_sourceNeighborhood :
     zeroDrawing.RoutePointsSatisfy
       (WithinCoordinateRadius 36 localRouteNeighborhoodOffset) := by
-  native_decide
+  decide +kernel
 
 /-- Every genuine unit-source template route lies in the tight radius-36
 source neighborhood, independently of its polarity. -/
@@ -41,7 +41,7 @@ theorem oneDrawingFor_routePoints_within_sourceNeighborhood
     (first : Bool) :
     (oneDrawingFor first).RoutePointsSatisfy
       (WithinCoordinateRadius 36 localRouteNeighborhoodOffset) := by
-  cases first <;> native_decide
+  cases first <;> decide +kernel
 
 /-- Every genuine binary-source template route lies in the tight radius-36
 source neighborhood, independently of its polarities. -/
@@ -49,7 +49,7 @@ theorem twoDrawingFor_routePoints_within_sourceNeighborhood
     (first second : Bool) :
     (twoDrawingFor first second).RoutePointsSatisfy
       (WithinCoordinateRadius 36 localRouteNeighborhoodOffset) := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- Every genuine ternary-source template route lies in the tight radius-36
 source neighborhood, independently of its polarities. -/
@@ -57,7 +57,7 @@ theorem fullDrawingFor_routePoints_within_sourceNeighborhood
     (first second third : Bool) :
     (fullDrawingFor first second third).RoutePointsSatisfy
       (WithinCoordinateRadius 36 localRouteNeighborhoodOffset) := by
-  cases first <;> cases second <;> cases third <;> native_decide
+  cases first <;> cases second <;> cases third <;> decide +kernel
 
 /-- Every genuine route of the finite template selected at any source arity
 lies in the tight radius-36 source neighborhood. -/

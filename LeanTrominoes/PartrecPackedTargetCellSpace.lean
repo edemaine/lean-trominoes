@@ -366,13 +366,13 @@ theorem packedTargetCellUnit_le_linear
             (intOffsetResultCode verticalOffset rowCode)).length + 1) := by
     simpa [x, yCode] using pairUnit
   have twoBits :
-      (Computability.encodeNat 2).length = 2 := by native_decide
+      (Computability.encodeNat 2).length = 2 := by decide +kernel
   have sixtyFourBits :
-      (Computability.encodeNat 64).length = 7 := by native_decide
+      (Computability.encodeNat 64).length = 7 := by decide +kernel
   have twoFiftySixBits :
-      (Computability.encodeNat 256).length = 9 := by native_decide
+      (Computability.encodeNat 256).length = 9 := by decide +kernel
   have thousandBits :
-      (Computability.encodeNat 1000).length = 10 := by native_decide
+      (Computability.encodeNat 1000).length = 10 := by decide +kernel
   simp only [packedTargetCellUnit, packedTargetAuxUnit,
     packedTargetAuxLimit, encodedListSpace_cons,
     encodedListSpace_nil]

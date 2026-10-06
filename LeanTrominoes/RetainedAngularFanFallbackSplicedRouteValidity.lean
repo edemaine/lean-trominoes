@@ -44,7 +44,7 @@ theorem RetainedFallbackFanKind.splicedOwnFigure7Route_valid
   have prefixNonempty : sourcePrefix ≠ [] :=
     List.ne_nil_of_length_pos prefixLength
   have prefixOrthogonal : OrthogonalPolyline sourcePrefix := by
-    exact (routeOrthogonal.scalePolyline (by native_decide)).dropLast
+    exact (routeOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have suffixOrthogonal : OrthogonalPolyline fanSuffix := by
     exact retainedFallbackFanSuffixRouteAt_orthogonal
       kind center terminal slot terminalLengthPositive valid

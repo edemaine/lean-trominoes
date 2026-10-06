@@ -23,7 +23,7 @@ theorem retainedFallbackSourcePrefix_directions
   unfold retainedFallbackSourcePrefix
   rw [scalePolyline_dropLast_eq]
   exact Gadget.unitSubdivisionDirections_scalePolyline
-    retainedTerminalFanTotalRefinement (by native_decide) route.dropLast
+    retainedTerminalFanTotalRefinement (by decide +kernel) route.dropLast
 
 /-- If the source route was already positively scaled, the two fixed-copy
 expansions combine into one product factor on the original source prefix. -/

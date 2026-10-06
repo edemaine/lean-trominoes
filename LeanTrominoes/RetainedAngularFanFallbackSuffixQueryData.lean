@@ -133,7 +133,7 @@ theorem bendRouteTerminalDataBlock_lengthPositive
     (firstPort secondPort : CornerPort) :
     ∀ terminal ∈ bendRouteTerminalDataBlock firstPort secondPort,
       0 < terminal.2 := by
-  cases firstPort <;> cases secondPort <;> native_decide
+  cases firstPort <;> cases secondPort <;> decide +kernel
 
 /-- Every query of a geometrically valid carrier block has positive raw
 terminal length. -/

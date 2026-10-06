@@ -34,7 +34,7 @@ theorem finalClauseIncidenceElementTagBlock_perm_expected
     clauseIncidenceReferenceTag clauseIncidenceElementTag
     X3CClauseSet.coloredReferences
     directSourceFinalClauseElementColorTagBase
-  native_decide
+  decide +kernel
 
 /-- The exact compiled code block belonging to one actual clause position. -/
 def finalClauseIncidenceElementCodeBlock

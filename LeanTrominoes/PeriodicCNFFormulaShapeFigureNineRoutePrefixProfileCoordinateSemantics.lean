@@ -15,27 +15,6 @@ open FormulaShapeDirectionOrdering
 open FormulaShapeFigureNinePolarityRouteHeader
 open PlanarOneInThreeNoUnitsFigureNine
 
-/-- The parent local-query profile together with the existing operation and
-template incidence coordinates selected by one final Figure 9 header. -/
-structure HeaderTemplateProfileCoordinate where
-  profile : UnaryProgramClauseProfile.ClauseProfile
-  coordinate : HeaderTemplateCoordinate
-  deriving DecidableEq
-
-/-- Read the profile-qualified finite coordinate of one header. -/
-def headerTemplateProfileCoordinate
-    (header : Header) : HeaderTemplateProfileCoordinate :=
-  ⟨header.figurePrefix.localQuery.1,
-    headerTemplateCoordinate header⟩
-
-/-- Profile-qualified coordinate block prescribed by one directed source
-clause before Figure 9 expansion. -/
-def expectedSourceClauseHeaderTemplateProfileCoordinates
-    (profile : DirectedClauseProfile) :
-    List HeaderTemplateProfileCoordinate :=
-  (expectedSourceClauseHeaderTemplateCoordinates profile).map fun coordinate =>
-    ⟨clauseProfile (orderedDirectedProfile profile), coordinate⟩
-
 /-- Every emitted header carries the exact clockwise parent profile in
 addition to its already-established template coordinates. -/
 theorem sourceClauseHeaders_map_headerTemplateProfileCoordinate :
@@ -43,7 +22,10 @@ theorem sourceClauseHeaders_map_headerTemplateProfileCoordinate :
       (sourceClauseHeaders profile).map
           headerTemplateProfileCoordinate =
         expectedSourceClauseHeaderTemplateProfileCoordinates profile := by
-  native_decide
+  intro profile
+  have checked := sourceHeaderCoordinatesCheck_correct profile
+  simp only [sourceHeaderCoordinatesCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+  exact checked.2
 
 /-- Profile-qualified coordinate block emitted by one source token. -/
 def expectedHeaderTemplateProfileCoordinateBlock :

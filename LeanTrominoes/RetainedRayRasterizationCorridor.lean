@@ -120,7 +120,7 @@ theorem routedClauseRayOffsets_within_radius
     (arm : DuplicatorArm) :
     ∀ point ∈ routedClauseRayOffsets arm,
       WithinCoordinateRadius 9 (0, 0) point := by
-  cases arm <;> native_decide
+  cases arm <;> decide +kernel
 
 /-- Translating a routed-clause block translates its radius-nine bound. -/
 theorem routedClauseRayBlock_within_radius

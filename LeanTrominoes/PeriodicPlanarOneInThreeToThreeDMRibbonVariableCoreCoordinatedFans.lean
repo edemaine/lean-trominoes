@@ -23,6 +23,9 @@ any additional continuous contact.
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 10000
+
 open Gadget PlanarThreeDM
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 open PeriodicOrthocrossing
@@ -42,7 +45,16 @@ theorem all_variableSiteRoute_points_in_coreRectangle :
             ((variableSiteDrawing (countPred + 1) kind polarity).route
               triple color) →
         InClosedGridRectangle (11, 48) (109, 107) point := by
-  native_decide
+  have checked : (finiteAll fun countPred : Fin 3 =>
+      finiteAll fun kind : VariableSiteSlot → VariableConnectorKind =>
+      finiteAll fun polarity : VariableSiteSlot → Bool =>
+      finiteAll fun triple : ActiveVariableSiteTriple (countPred + 1) kind =>
+      finiteAll fun color : WireColor =>
+        (translatePolyline standardThreeStrandLayout.variableOffset
+          ((variableSiteDrawing (countPred + 1) kind polarity).route triple color)).all
+          fun point => decide (InClosedGridRectangle (11, 48) (109, 107) point)) = true := by
+    decide +kernel
+  simpa only [finiteAll_eq_true, List.all_eq_true, decide_eq_true_eq] using checked
 
 /-- A route in the protected central rectangle is strictly separated from
 an outer route whose points and segments remain in the four-arm safe frame. -/
@@ -282,7 +294,8 @@ theorem routedVariableSiteRoute_strictlyAvoids_outerRoute
           (data.activeRoutedTriple slot active color) color))
       (data.outerData.outerRoute slot
         ((data.kind slot).ribbonLaneForColor color)) := by
-  native_decide +revert
+  exact data.variableSiteRoute_strictlyAvoids_outerRoute compatible slot active
+    (data.activeRoutedTriple slot active color) color color
 
 /-- The finite variable-site route selected by a colored occurrence avoids
 the entire coordinated local-plus-outer fan route for that occurrence. -/
@@ -308,6 +321,20 @@ theorem routedVariableSiteRoute_avoids_coordinatedRoute
       compatible slot active
       ((data.kind slot).ribbonLaneForColor color)
 
+private theorem routedCoreLocalHead_check :
+    (finiteAll fun countPred : Fin 3 =>
+      finiteAll fun kind : VariableSiteSlot → VariableConnectorKind =>
+      finiteAll fun polarity : VariableSiteSlot → Bool =>
+      finiteAll fun triple : ActiveVariableSiteTriple (countPred + 1) kind =>
+      finiteAll fun slot : VariableSiteSlot => finiteAll fun color : WireColor =>
+      guardedCheck (triple.1 =
+        (⟨countPred, kind, polarity, fun _ => .invalid⟩ : VariableRibbonFanData).routedTriple slot color)
+        ((translatePolyline standardThreeStrandLayout.variableOffset
+          ((variableSiteDrawing (countPred + 1) kind polarity).route triple color)).all fun point =>
+          guardedCheck (point ∈ standardVariableLocalGateRoute slot (kind slot) (polarity slot) color)
+            (decide ((standardVariableLocalGateRoute slot (kind slot) (polarity slot) color).head? = some point)))) = true := by
+  decide +kernel
+
 /-- The advertised variable port is the only listed point shared by the
 routed finite variable-site route and its complete coordinated fan. -/
 theorem routedVariableSiteRoute_coordinatedRoute_only_common
@@ -324,7 +351,15 @@ theorem routedVariableSiteRoute_coordinatedRoute_only_common
             (data.activeRoutedTriple slot active color) color))
     (fanMember : point ∈ data.coordinatedRoute slot color) :
     point = data.port slot active color := by
-  native_decide +revert
+  rcases mem_joinAtEndpoint fanMember with localMember | outerMember
+  · have checked := routedCoreLocalHead_check
+    simp only [finiteAll_eq_true, guardedCheck_eq_true, List.all_eq_true, decide_eq_true_eq] at checked
+    have atHead := checked data.countPred data.kind data.polarity
+      (data.activeRoutedTriple slot active color) slot color rfl point coreMember localMember
+    rw [data.localGateRoute_head? slot active color] at atHead
+    exact (Option.some.inj atHead).symm
+  · have separated := data.routedVariableSiteRoute_strictlyAvoids_outerRoute compatible slot active color
+    exact False.elim (separated.2.2.2 point coreMember point outerMember rfl)
 
 end VariableRibbonFanData
 end PeriodicPlanarOneInThreeToThreeDM

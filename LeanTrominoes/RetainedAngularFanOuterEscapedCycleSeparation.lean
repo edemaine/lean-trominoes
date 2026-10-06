@@ -73,7 +73,7 @@ theorem retainedTerminalFanOuterLaneOffset_side_zero :
     rename_i kind <;>
     cases kind <;>
     revert slot <;>
-    native_decide
+    decide +kernel
 
 /-- Every point of a translated lane shift has the same supporting-side
 value as its start. -/

@@ -102,7 +102,7 @@ theorem scaledSplicedOwnFigure7Route_cardinalTangent_normalized_directions
     exact retainedFallbackSourcePrefix_isSimple scaledRoute scaledSimple
   have sourcePrefixOrthogonal : OrthogonalPolyline sourcePrefix := by
     exact
-      (scaledOrthogonal.scalePolyline (by native_decide)).dropLast
+      (scaledOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have leadingOrthogonal : OrthogonalPolyline sourcePrefix.dropLast :=
     sourcePrefixOrthogonal.dropLast
   have suffixOrthogonal : OrthogonalPolyline suffix := by

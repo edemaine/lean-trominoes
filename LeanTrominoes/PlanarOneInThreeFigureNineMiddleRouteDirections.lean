@@ -22,21 +22,21 @@ open PlanarThreeSAT
 theorem figureNineDrawingFor_middleRoutesDoNotExitRight
     (first second third : Bool) :
     (figureNineDrawingFor first second third).MiddleRoutesDoNotExitRight := by
-  cases first <;> cases second <;> cases third <;> native_decide
+  cases first <;> cases second <;> cases third <;> decide +kernel
 
 theorem figureNineTwoDrawingFor_middleRoutesDoNotExitRight
     (first second : Bool) :
     (figureNineTwoDrawingFor first second).MiddleRoutesDoNotExitRight := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 theorem figureNineOneDrawingFor_middleRoutesDoNotExitRight
     (first : Bool) :
     (figureNineOneDrawingFor first).MiddleRoutesDoNotExitRight := by
-  cases first <;> native_decide
+  cases first <;> decide +kernel
 
 theorem figureNineZeroDrawing_middleRoutesDoNotExitRight :
     figureNineZeroDrawing.MiddleRoutesDoNotExitRight := by
-  native_decide
+  decide +kernel
 
 theorem instantiatedThreeDrawing_middleRoutesDoNotExitRight
     {Variable : Type*} [DecidableEq Variable]

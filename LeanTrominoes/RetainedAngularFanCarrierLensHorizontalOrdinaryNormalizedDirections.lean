@@ -72,7 +72,7 @@ theorem horizontalEqualityLensUpperRightRoute_normalized_fallback_directions
     scaledSplicedOwnFigure7Route_cardinalTangent_normalized_directions
       route terminal slot .north 8 (1152 * (span - 3))
       retainedAngularFanSourceClearanceFactor_pos
-      (by native_decide)
+      (by decide +kernel)
       (by simp [route, horizontalEqualityLensUpperRightRoute])
       classified simple orthogonal
       (by simp [terminal, carrierLensRouteTerminalData])
@@ -136,20 +136,20 @@ theorem horizontalEqualityLensLowerLeftRoute_normalized_fallback_directions
       retainedTerminalDirectionClassify
           (PeriodicThreeSATThree.routeTerminalVector route) =
         some terminal := by
-    native_decide
+    decide +kernel
   have simple : LocalIncidenceDrawing.RouteIsSimple route := by
-    native_decide
+    decide +kernel
   have orthogonal : OrthogonalPolyline route := by
-    native_decide
+    decide +kernel
   have normalized :=
     scaledSplicedOwnFigure7Route_cardinalTangent_normalized_directions
       route terminal slot .south 4 6912
       retainedAngularFanSourceClearanceFactor_pos
-      (by native_decide)
-      (by native_decide)
+      (by decide +kernel)
+      (by decide +kernel)
       classified simple orthogonal
-      (by native_decide)
-      (by native_decide)
+      (by decide +kernel)
+      (by decide +kernel)
       (by simp)
       (by omega)
       (by omega)

@@ -31,7 +31,7 @@ def assignmentOfDigit (digit : Nat) : Option SquareSymmetry :=
 @[simp]
 theorem length_assignmentStateList :
     TrominoAssignment.assignmentStateList.length = 9 := by
-  native_decide
+  decide +kernel
 
 theorem assignmentDigit_lt (state : Option SquareSymmetry) :
     assignmentDigit state < 9 := by

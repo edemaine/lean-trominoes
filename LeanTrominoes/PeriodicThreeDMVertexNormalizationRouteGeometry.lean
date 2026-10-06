@@ -73,7 +73,7 @@ theorem route_firstDirection (omitted : VertexSide)
     (port : CanonicalVertexPort) :
     AxisDirection.polylineFirstDirection (route omitted port) =
       port.direction := by
-  cases omitted <;> cases port <;> native_decide
+  cases omitted <;> cases port <;> decide +kernel
 
 /-- Identity rotation templates initially leave through the unchanged
 canonical port. -/
@@ -81,7 +81,7 @@ theorem identityRotationRoute_firstDirection
     (port : CanonicalVertexPort) :
     AxisDirection.polylineFirstDirection (identityRotationRoute port) =
       port.direction := by
-  cases port <;> native_decide
+  cases port <;> decide +kernel
 
 /-- Clockwise rotation templates initially leave through the new canonical
 port naming the route. -/
@@ -89,7 +89,7 @@ theorem clockwiseRotationRoute_firstDirection
     (port : CanonicalVertexPort) :
     AxisDirection.polylineFirstDirection (clockwiseRotationRoute port) =
       port.direction := by
-  cases port <;> native_decide
+  cases port <;> decide +kernel
 
 end DegreeThreeVertexNormalization
 
@@ -111,7 +111,7 @@ theorem rotationRoundPortAndRoute_geometry
       2 ≤ result.2.length ∧
       result.2.IsChain AxisDirection.IsUnitAxisStep ∧
       AxisDirection.polylineFirstDirection result.2 = result.1.direction := by
-  cases active <;> cases oldPort <;> native_decide
+  cases active <;> cases oldPort <;> decide +kernel
 
 /-- The second point of either rotation-round template is the unit step
 through its returned new canonical port. -/
@@ -120,14 +120,14 @@ theorem rotationRoundPortAndRoute_secondPoint
     let result := rotationRoundPortAndRoute active oldPort
     result.2.tail.head? =
       some (Cell.add center result.1.direction.step) := by
-  cases active <;> cases oldPort <;> native_decide
+  cases active <;> cases oldPort <;> decide +kernel
 
 /-- Every selected rotation-round template contains at least four points,
 so both of its endpoint-adjacent points survive reversal and joining. -/
 theorem rotationRoundPortAndRoute_length_ge_four
     (active : Bool) (oldPort : CanonicalVertexPort) :
     4 ≤ (rotationRoundPortAndRoute active oldPort).2.length := by
-  cases active <;> cases oldPort <;> native_decide
+  cases active <;> cases oldPort <;> decide +kernel
 
 /-- The final local endpoint template has the geometry advertised by the
 endpoint's final normalized port. -/

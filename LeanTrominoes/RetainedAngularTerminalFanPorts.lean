@@ -102,7 +102,7 @@ theorem retainedTerminalFanPortOffset_on_square :
           (retainedTerminalFanPortOffset port) ∧
         ¬ WithinCoordinateRadius 32 (0, 0)
           (retainedTerminalFanPortOffset port) := by
-  native_decide
+  decide +kernel
 
 /-- The fan-facing frame remains inside the common radius-36 retained-ray
 interface. -/
@@ -110,12 +110,12 @@ theorem retainedTerminalFanPortOffset_within_interface :
     ∀ port : RetainedTerminalAdapterPort,
       WithinCoordinateRadius 36 (0, 0)
         (retainedTerminalFanPortOffset port) := by
-  native_decide
+  decide +kernel
 
 /-- Different fan-facing identities have different radius-33 coordinates. -/
 theorem retainedTerminalFanPortOffset_injective :
     Function.Injective retainedTerminalFanPortOffset := by
-  native_decide
+  decide +kernel
 
 /-- Fan-facing port selected by a shape slot.  Inactive slots select none. -/
 def RetainedAngularTerminalShape.fanPort

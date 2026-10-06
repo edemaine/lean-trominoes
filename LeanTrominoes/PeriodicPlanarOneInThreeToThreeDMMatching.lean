@@ -126,7 +126,7 @@ theorem matchingOfAssignment_ordinary_holds
     (variableOccurrenceSelection
       (occurrenceSignal source assignment atom slot cell))
   cases occurrenceSignal source assignment atom slot cell <;>
-    native_decide
+    decide +kernel
 
 /-- The canonical fixed-red detour covers all eight private elements. -/
 theorem matchingOfAssignment_fixedRed_holds
@@ -141,7 +141,7 @@ theorem matchingOfAssignment_fixedRed_holds
     (fixedRedConnectorSelection
       (!occurrenceSignal source assignment atom slot cell))
   cases occurrenceSignal source assignment atom slot cell <;>
-    native_decide
+    decide +kernel
 
 /-- At a genuine occurrence, the connector signal is exactly the signed
 source literal's truth value. -/

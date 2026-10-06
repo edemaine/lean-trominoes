@@ -75,7 +75,7 @@ theorem
     cases angularPortOfIndex
         (angularOccurrenceIndex order literal
           clauseIndex literalIndex) <;>
-      native_decide
+      decide +kernel
   have offsetsEqual :
       Cell.add
           (Cell.sub

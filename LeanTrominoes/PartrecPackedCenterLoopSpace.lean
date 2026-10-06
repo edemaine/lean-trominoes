@@ -1026,10 +1026,10 @@ theorem packedCenterLoopInputCost_le_linear
   have zeroBound := listCodeZeroCost_le_linear values
   have addSmall :
       addConstCost WindowState.center.val [0] ≤ 100000 := by
-    native_decide
+    decide +kernel
   have centerBits :
       (Computability.encodeNat WindowState.center.val).length ≤ 100 := by
-    native_decide
+    decide +kernel
   have numeralBound : numeralCost WindowState.center.val values ≤
       1000000 * unit := by
     simp only [numeralCost]
@@ -1037,7 +1037,7 @@ theorem packedCenterLoopInputCost_le_linear
   have oneCostBound : oneCost values ≤ 200000 * unit := by
     simp only [oneCost]
     have successorSmall : succCost [0] ≤ 100000 := by
-      native_decide
+      decide +kernel
     omega
   change packedCenterLoopInputCost periodicStrip packed ≤
     10000000000 * unit

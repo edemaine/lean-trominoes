@@ -874,8 +874,8 @@ theorem
         (offset :=
           PlanarOneInThreeNoUnitsFigureNine.localRouteNeighborhoodOffset)
         centersEqual
-    · native_decide
-    · native_decide
+    · decide +kernel
+    · decide +kernel
     · intro point pointMember
       have bounded := firstBounded point pointMember
       have centerEq :

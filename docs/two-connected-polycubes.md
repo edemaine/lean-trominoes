@@ -60,12 +60,10 @@ This works for every primitive-recursive voxel region.
 
 ## Validation
 
-The height-two, full-space, and all-slabs completion builds passed, as did
-the public import checks. The geometric, connectivity, and compiler audits
-used only `propext`, `Classical.choice`, and `Quot.sound`. Finite geometric
-certificates use kernel reduction. Completeness also inherits native checks
-from the source reduction and Wang theorem; the audits found no `sorryAx`
-or new native axiom.
+The full-space and all-slabs completeness theorems use only `propext`,
+`Classical.choice`, and `Quot.sound`. All finite certificates use kernel
+reduction. [Axiom regression checks](../LeanTrominoes/AxiomAudit.lean) cover
+both final theorems.
 
 ```sh
 lake build +LeanTrominoes.TwoConnectedPolycubesSpaceProof:olean +LeanTrominoes.TwoConnectedPolycubesSlabsProof:olean

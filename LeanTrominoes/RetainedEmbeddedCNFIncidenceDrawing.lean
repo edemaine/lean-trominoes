@@ -284,7 +284,7 @@ theorem routedClausePortFormula_retainedRayVectors
   change
     RetainedRayVector
       (Cell.sub arm.portPosition (10, 10))
-  cases arm <;> native_decide
+  cases arm <;> decide +kernel
 
 /-- Every genuine route of the direct routed-clause template is supported
 by the combined retained-ray rasterizer. -/

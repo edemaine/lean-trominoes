@@ -48,7 +48,7 @@ theorem routedVariableSiteEdgeIndexBlock_dedup_eq_final
       CNFRouteOccurrence.edgeIndex
   have translationsEq : neighborTranslations =
       neighborTranslations.dropLast ++ [((1, 1) : Cell)] := by
-    native_decide
+    decide +kernel
   unfold routedVariableSiteEdgeIndexBlock
     routedVariableFinalSiteEdgeIndexBlock
   rw [variableRouteSiteBlock, List.flatMap_map]

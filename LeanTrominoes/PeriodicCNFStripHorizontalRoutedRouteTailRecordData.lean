@@ -60,7 +60,7 @@ headers.  This exact finite bound is discharged over the descriptor alphabet. -/
 theorem sourceClauseHeaders_length_le :
     ∀ profile : DirectedClauseProfile,
       (sourceClauseHeaders profile).length ≤ 43 := by
-  native_decide
+  decide +kernel
 
 abbrev HeaderIndex := Fin 43
 

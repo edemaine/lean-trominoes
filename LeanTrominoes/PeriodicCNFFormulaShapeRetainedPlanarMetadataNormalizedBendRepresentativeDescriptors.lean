@@ -160,7 +160,7 @@ theorem baseRouteBends_subset_drawing
   refine ⟨descriptor, descriptorMember, ?_⟩
   apply List.mem_flatMap.mpr
   refine ⟨(0, 0), ?_, routeBendMember⟩
-  native_decide
+  decide +kernel
 
 /-- The canonical bend links are exactly the wrapped normalizations of the
 untranslated base bend scan. -/

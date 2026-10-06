@@ -72,17 +72,17 @@ private theorem templateClause_arity_two_or_three
       simp only [FormulaShapeFigureNineRoutePrefix.clauseProfile,
         PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile]
       clear direction
-      native_decide +revert
+      decide +kernel +revert
   | binary first firstDirection second secondDirection =>
       simp only [FormulaShapeFigureNineRoutePrefix.clauseProfile,
         PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile]
       clear firstDirection secondDirection
-      native_decide +revert
+      decide +kernel +revert
   | ternary first firstDirection second secondDirection third thirdDirection =>
       simp only [FormulaShapeFigureNineRoutePrefix.clauseProfile,
         PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile]
       clear firstDirection secondDirection thirdDirection
-      native_decide +revert
+      decide +kernel +revert
 
 private theorem clauseDescriptors_length_eq_figureClauseProfiles
     (profile : FormulaShapeDirectionOrdering.DirectedClauseProfile) :

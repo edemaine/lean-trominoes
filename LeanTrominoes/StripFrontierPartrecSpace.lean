@@ -526,11 +526,11 @@ theorem stripFrontierContextPolynomialSpaceUnit_le_inputLength
     Turing.PartrecToTM2.encodeNat_add_length_le_sum
       (64 * (stripCode + first + last + 100)) 1000
   have sixtyFourBits :
-      (Computability.encodeNat 64).length = 7 := by native_decide
+      (Computability.encodeNat 64).length = 7 := by decide +kernel
   have hundredBits :
-      (Computability.encodeNat 100).length = 7 := by native_decide
+      (Computability.encodeNat 100).length = 7 := by decide +kernel
   have thousandBits :
-      (Computability.encodeNat 1000).length = 10 := by native_decide
+      (Computability.encodeNat 1000).length = 10 := by decide +kernel
   have limitEq :
       limit = 64 * (stripCode + first + last + 100) + 1000 := by
     simp [limit,
@@ -589,11 +589,11 @@ theorem stripFrontierContextPolynomialSpaceUnit_le_inputLength_of_lt_stateBound
   have final := Turing.PartrecToTM2.encodeNat_add_length_le_sum
     (64 * (stripCode + first + last + 100)) 1000
   have sixtyFourBits : (Computability.encodeNat 64).length = 7 := by
-    native_decide
+    decide +kernel
   have hundredBits : (Computability.encodeNat 100).length = 7 := by
-    native_decide
+    decide +kernel
   have thousandBits : (Computability.encodeNat 1000).length = 10 := by
-    native_decide
+    decide +kernel
   have limitEq : limit = 64 * (stripCode + first + last + 100) + 1000 := by
     simp [limit,
       Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceLimit,
@@ -2661,7 +2661,7 @@ theorem exactStep
           have explicitValuesBound := valuesBound
           have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
           have oneBits : (Computability.encodeNat 1).length = 1 := rfl
-          have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
+          have twoBits : (Computability.encodeNat 2).length = 2 := by decide +kernel
           cases baseAnswer :
               (decide (first = last) ||
                 indexedTransitionRawBool tromino periodicStrip first last)
@@ -2897,7 +2897,7 @@ theorem exactStep
             have explicitValuesBound := valuesBound
             have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
             have oneBits : (Computability.encodeNat 1).length = 1 := rfl
-            have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
+            have twoBits : (Computability.encodeNat 2).length = 2 := by decide +kernel
             rw [show stepCost tromino periodicStrip stateCount state =
                 1000000000000000000000000000000 * unit by rfl]
             simp [branchZeroZeroCost, branchZeroSuccCost,
@@ -3001,7 +3001,7 @@ theorem exactStep
                 have explicitValuesBound := valuesBound
                 have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
                 have oneBits : (Computability.encodeNat 1).length = 1 := rfl
-                have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
+                have twoBits : (Computability.encodeNat 2).length = 2 := by decide +kernel
                 rw [show stepCost tromino periodicStrip stateCount state =
                     1000000000000000000000000000000 * unit by rfl]
                 simp [fieldsCost, branchZeroZeroCost, branchZeroSuccCost,
@@ -3211,7 +3211,7 @@ theorem exactStep
                   have explicitValuesBound := valuesBound
                   have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
                   have oneBits : (Computability.encodeNat 1).length = 1 := rfl
-                  have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
+                  have twoBits : (Computability.encodeNat 2).length = 2 := by decide +kernel
                   rw [show stepCost tromino periodicStrip stateCount state =
                       1000000000000000000000000000000 * unit by rfl]
                   simp [fieldsCost, branchZeroZeroCost, branchZeroSuccCost,
@@ -3421,7 +3421,7 @@ theorem exactStep
                   have explicitValuesBound := valuesBound
                   have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
                   have oneBits : (Computability.encodeNat 1).length = 1 := rfl
-                  have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
+                  have twoBits : (Computability.encodeNat 2).length = 2 := by decide +kernel
                   rw [show stepCost tromino periodicStrip stateCount state =
                       1000000000000000000000000000000 * unit by rfl]
                   simp [fieldsCost, branchZeroZeroCost, branchZeroSuccCost,
@@ -4414,8 +4414,8 @@ theorem stripReachBoolCost_le
       EvaluatorCodeFits.predCost
           [FiniteState.divideOptionBoolTag finalState.answer] ≤ 1000000 := by
     cases answer : finalState.answer with
-    | none => native_decide
-    | some answerValue => cases answerValue <;> native_decide
+    | none => decide +kernel
+    | some answerValue => cases answerValue <;> decide +kernel
   simp [stripReachBoolCost, values, output, finalState, inputLength,
     stripReachCallSpaceBound, stripSavitchBodySpaceBound,
     stripSavitchStepSpaceBound]
@@ -4591,8 +4591,8 @@ theorem stripReachBoolCostAt_le
   have normalized : EvaluatorCodeFits.predCost
       [FiniteState.divideOptionBoolTag finalState.answer] ≤ 1000000 := by
     cases answer : finalState.answer with
-    | none => native_decide
-    | some answerValue => cases answerValue <;> native_decide
+    | none => decide +kernel
+    | some answerValue => cases answerValue <;> decide +kernel
   simp [stripReachBoolCostAt, values, output, finalState, inputLength,
     stripReachCallSpaceBound, stripSavitchBodySpaceBound,
     stripSavitchStepSpaceBound]
@@ -4723,8 +4723,8 @@ private theorem candidateScaledFieldSpace_le (value : Nat) :
       10 * (encodedListSpace [value] + 1) := by
   have product := encodeNat_mul_length_le_sum 2 value
   have sum := encodeNat_add_length_le_sum (2 * value) 4
-  have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
-  have fourBits : (Computability.encodeNat 4).length = 3 := by native_decide
+  have twoBits : (Computability.encodeNat 2).length = 2 := by decide +kernel
+  have fourBits : (Computability.encodeNat 4).length = 3 := by decide +kernel
   simp only [encodedListSpace_cons, encodedListSpace_nil]
   rw [twoBits] at product
   rw [fourBits] at sum

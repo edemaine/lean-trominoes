@@ -466,8 +466,8 @@ theorem packedAssignmentIsCost_le_linear
   have zeroCostBound := listCodeZeroCost_le_linear values
   have addCostSmall : addConstCost selected [0] ≤ 1000000 := by
     cases state with
-    | none => native_decide
-    | some symmetry => fin_cases symmetry <;> native_decide
+    | none => decide +kernel
+    | some symmetry => fin_cases symmetry <;> decide +kernel
   have numeralCostBound :
       numeralCost selected values ≤ 100000000 * unit := by
     simp only [numeralCost]

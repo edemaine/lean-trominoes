@@ -85,10 +85,10 @@ theorem packedCenterAssignmentArgumentsCost_le_linear
   have zeroBound := listCodeZeroCost_le_linear values
   have addSmall :
       addConstCost WindowState.center.val [0] ≤ 100000 := by
-    native_decide
+    decide +kernel
   have centerBits :
       (Computability.encodeNat WindowState.center.val).length ≤ 100 := by
-    native_decide
+    decide +kernel
   have numeralBound :
       numeralCost WindowState.center.val values ≤
         1000000 * unit := by
@@ -176,7 +176,7 @@ theorem packedCenterAssignmentIsSpaceBound_le_input
         packedCenterCandidateInputUnit periodicStrip packed base := by
     have centerBits :
         (Computability.encodeNat WindowState.center.val).length = 2 := by
-      native_decide
+      decide +kernel
     simp only [packedAssignmentLookupInputUnit,
       packedCenterCandidateInputUnit, Code.packedCenterCandidateInput,
       encodedListSpace_cons, encodedListSpace_nil]
@@ -350,7 +350,7 @@ theorem packedCenterTargetMembershipUnit_le_input
     column verticalOffset periodicStrip.period packed.phase
     periodicStrip.motif base.2 packed.assignmentWord
   have fourBits :
-      (Computability.encodeNat 4).length = 3 := by native_decide
+      (Computability.encodeNat 4).length = 3 := by decide +kernel
   have columnSmall : column.val ≤ 4 := by
     exact Nat.le_pred_of_lt column.isLt
   have columnBits := encodeNat_length_mono columnSmall
@@ -636,15 +636,15 @@ theorem packedCenterAllSourcesInsideSpaceBound_le_input
     simp [input, packedCenterCandidateInputUnit]
   have first := packedCenterSourceInsideSpaceBound_le_input
     symmetry (0, 0) periodicStrip packed base
-    (by cases symmetry <;> native_decide)
+    (by cases symmetry <;> decide +kernel)
   have second := packedCenterSourceInsideSpaceBound_le_input
     symmetry (1, 0) periodicStrip packed base
-    (by cases symmetry <;> native_decide)
+    (by cases symmetry <;> decide +kernel)
   cases tromino with
   | I =>
       have third := packedCenterSourceInsideSpaceBound_le_input
         symmetry (2, 0) periodicStrip packed base
-        (by cases symmetry <;> native_decide)
+        (by cases symmetry <;> decide +kernel)
       have sumBound :
           packedCenterSourceInsideSpaceBound symmetry (0, 0)
                 periodicStrip packed base +
@@ -691,7 +691,7 @@ theorem packedCenterAllSourcesInsideSpaceBound_le_input
   | L =>
       have third := packedCenterSourceInsideSpaceBound_le_input
         symmetry (0, 1) periodicStrip packed base
-        (by cases symmetry <;> native_decide)
+        (by cases symmetry <;> decide +kernel)
       have sumBound :
           packedCenterSourceInsideSpaceBound symmetry (0, 0)
                 periodicStrip packed base +

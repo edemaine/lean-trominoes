@@ -38,7 +38,7 @@ theorem retainedAngularFanSourceClearanceFactor_eq :
 
 theorem retainedAngularFanSourceClearanceFactor_gt_one :
     1 < retainedAngularFanSourceClearanceFactor := by
-  native_decide
+  decide +kernel
 
 theorem retainedAngularFanSourceClearanceFactor_pos :
     0 < retainedAngularFanSourceClearanceFactor :=
@@ -49,7 +49,7 @@ theorem retainedAngularFanSourceClearanceFactor_clears_transverseBand :
     845 <
       retainedTerminalFanTotalRefinement *
         retainedAngularFanSourceClearanceFactor := by
-  native_decide
+  decide +kernel
 
 /-- Insert the retained angular fans after uniformly refining the source
 positioned formula, placement, and route family. -/

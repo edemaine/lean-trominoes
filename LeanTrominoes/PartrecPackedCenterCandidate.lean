@@ -125,7 +125,7 @@ theorem packedSourceColumn_displacement
       (symmetry.act source).1 := by
   cases tromino <;> cases symmetry <;>
     simp [TrominoAssignment.trominoCellList] at sourceMember
-  all_goals rcases sourceMember with rfl | rfl | rfl <;> native_decide
+  all_goals rcases sourceMember with rfl | rfl | rfl <;> decide +kernel
 
 /-- Membership test for one transformed source cell of a candidate. -/
 def packedCenterSourceInsideCode

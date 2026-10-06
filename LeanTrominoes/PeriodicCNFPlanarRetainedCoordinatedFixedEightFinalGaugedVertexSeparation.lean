@@ -90,7 +90,7 @@ theorem retainedOrderedFixedEightComposedRawVariablePosition_ne_translated_claus
     rw [PeriodicVariablePlacement.translation, rawPeriod] at positionsEqual
     exact positionsEqual
   rcases Cell.inMacrocellOrbit_eq_periodTranslate
-      (show 0 < finalFigureNineMacrocellScale by native_decide)
+      (show 0 < finalFigureNineMacrocellScale by decide +kernel)
       (finalFigureNineLocalAddress_position_halfOpen variableAddress)
       (finalFigureNineLocalAddress_position_halfOpen clauseAddress)
       variableOrbit clauseOrbit refinedPositionsEqual with

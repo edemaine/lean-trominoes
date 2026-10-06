@@ -119,7 +119,7 @@ private theorem selectedCompleteRoutes_strictlyAvoid_of_order
         retainedTerminalFanOuterCompleteRoute
           center secondTerminal secondSlot) := by
   have escapePositive : 0 < retainedTerminalFanOuterSourceEscapeLength := by
-    native_decide
+    decide +kernel
   have firstRadialPositive :
       0 < retainedTerminalFanOuterRadialLength firstTerminal := by
     omega

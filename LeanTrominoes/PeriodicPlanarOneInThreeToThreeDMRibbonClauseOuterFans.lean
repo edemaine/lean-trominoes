@@ -128,7 +128,7 @@ theorem reflectedOuterData_slotActive :
       data.GroupActive group →
       data.reflectedOuterData.SlotActive
         (data.variableSlotForGroup group) := by
-  native_decide
+  decide +kernel
 
 /-- Physical-lane gate obtained by reflecting a variable outer gate. -/
 def outerGate
@@ -198,7 +198,7 @@ theorem outerRoute_head? :
           some
             (standardRibbonMacrocellEntry
               (data.direction group) lane) := by
-  native_decide
+  decide +kernel
 
 /-- Every selected clause outer route ends at its reflected physical-lane
 gate. -/
@@ -210,7 +210,7 @@ theorem outerRoute_getLast? :
       ∀ lane,
         (data.outerRoute group lane).getLast? =
           some (data.outerGate group lane) := by
-  native_decide
+  decide +kernel
 
 /-- Every selected clause outer route is rectilinear. -/
 theorem outerRoute_orthogonal :
@@ -218,7 +218,7 @@ theorem outerRoute_orthogonal :
       data.IsClockwiseCompatible →
       ∀ group, data.GroupActive group →
       ∀ lane, OrthogonalPolyline (data.outerRoute group lane) := by
-  native_decide
+  decide +kernel
 
 /-- Every point of a selected clause outer route remains in the standard
 ribbon macrocell. -/
@@ -229,7 +229,7 @@ theorem outerRoute_points_bounded :
       ∀ lane point,
         point ∈ data.outerRoute group lane →
         InStandardRibbonMacrocell point := by
-  native_decide
+  decide +kernel
 
 /-- Distinct active physical strands in one clause outer fan are strictly
 separated. -/
@@ -244,7 +244,7 @@ theorem outerRoutes_strictlyAvoidEachOther :
           RoutesStrictlyAvoidEachOther
             (data.outerRoute firstGroup firstLane)
             (data.outerRoute secondGroup secondLane) := by
-  native_decide
+  decide +kernel
 
 end ClauseRibbonFanData
 end PeriodicPlanarOneInThreeToThreeDM

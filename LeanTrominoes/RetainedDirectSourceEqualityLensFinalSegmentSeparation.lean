@@ -64,17 +64,17 @@ theorem retainedDirectSourceLocalSegment_strictlyInside_or_finish_eq_port :
       fin_cases clauseIndex <;>
         fin_cases index <;>
         cases port <;>
-        native_decide
+        decide +kernel
   | duplicator arm clauseIndex =>
       cases arm <;>
         fin_cases clauseIndex <;>
         fin_cases index <;>
         cases port <;>
-        native_decide
+        decide +kernel
   | routedClause =>
       fin_cases index <;>
         cases port <;>
-        native_decide
+        decide +kernel
 
 /-- Translating a segment translates the lower corner of its endpoint
 rectangle by the same vector. -/
@@ -151,7 +151,7 @@ private theorem axisEqualityLensDrawing_first_nearTerminal_zero :
             carrierFinal.coordinateLower carrierFinal.coordinateUpper
             directFinal.coordinateLower directFinal.coordinateUpper ∨
           carrierFinal.finish = directFinal.finish := by
-  native_decide
+  decide +kernel
 
 /-- A first-end lens terminal segment is the zero-origin terminal segment
 translated by the lens origin. -/

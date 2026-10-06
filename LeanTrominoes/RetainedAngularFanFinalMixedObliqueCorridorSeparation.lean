@@ -36,7 +36,7 @@ private theorem localRoute_terminalClassify :
           (routeTerminalVector
             (retainedDirectSourceLocalRouteAt kind index)) =
         some (retainedDirectSourceLocalTerminalAt kind index) := by
-  native_decide
+  decide +kernel
 
 private theorem prefixChoice_direction_eq_localTerminal
     (kind : RetainedDirectClauseKind)

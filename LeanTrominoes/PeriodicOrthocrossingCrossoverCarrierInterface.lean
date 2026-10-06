@@ -45,7 +45,7 @@ theorem
     apply
     EmbeddedCNFIncidenceDrawing.straightIncidenceDrawing_routePointsSatisfy
       crossoverFormula CrossoverVariable.position
-  all_goals native_decide
+  all_goals decide +kernel
 
 /-- The fixed crossover has endpoint-only contact with each of its four
 carrier ports. -/

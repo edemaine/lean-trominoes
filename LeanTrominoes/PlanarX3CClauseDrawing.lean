@@ -190,7 +190,7 @@ theorem right_attachmentPositions :
 /-- The explicit clause-core drawing has the correct endpoints, is
 orthogonal, and is continuously planar. -/
 theorem drawing_isValid : drawing.IsValid := by
-  native_decide
+  decide +kernel
 
 end X3CClauseOrthogonal
 

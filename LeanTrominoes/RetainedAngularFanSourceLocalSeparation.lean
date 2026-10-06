@@ -88,7 +88,7 @@ theorem
   have combinedPositive : 0 < combinedFactor := by
     dsimp [combinedFactor]
     exact Nat.mul_pos
-      (by native_decide) (by omega)
+      (by decide +kernel) (by omega)
   have radiusLt : 288 < combinedFactor := by
     dsimp [combinedFactor]
     rw [retainedTerminalFanTotalRefinement_eq]

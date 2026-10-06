@@ -49,11 +49,11 @@ private theorem normalizedCrossoverLiteral_injective
 private theorem crossoverFormula_indexedLiteralLists_nodup :
     (crossoverFormula.zipIdx.map fun taggedClause =>
       taggedClause.1.literals).Nodup := by
-  native_decide
+  decide +kernel
 
 private theorem crossoverFormula_clauses_nonempty :
     ∀ clause ∈ crossoverFormula, clause.literals ≠ [] := by
-  native_decide
+  decide +kernel
 
 /-- No fixed crossover clause repeats within one canonical normalized
 block. -/

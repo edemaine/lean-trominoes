@@ -119,7 +119,7 @@ theorem all_variableSiteRoute_points_in_inset_rectangle :
             ((variableSiteDrawing (countPred + 1) kind polarity).route
               triple color) →
         InClosedGridRectangle (1, 1) (127, 127) point := by
-  native_decide
+  decide +kernel
 
 /-- Every route in the fixed clause core has the same strict inset bound. -/
 theorem all_clauseRoute_points_in_inset_rectangle :
@@ -128,7 +128,7 @@ theorem all_clauseRoute_points_in_inset_rectangle :
           translatePolyline standardThreeStrandLayout.clauseOffset
             (X3CClauseOrthogonal.route set color) →
         InClosedGridRectangle (1, 1) (127, 127) point := by
-  native_decide
+  decide +kernel
 
 /-- Routes contained in strict standard-macrocell insets become
 contact-free after placement at two distinct source lattice points. -/

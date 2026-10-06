@@ -20,7 +20,7 @@ open PeriodicOrthocrossing
 open PlanarThreeSAT
 
 private theorem crossoverFormula_length : crossoverFormula.length = 26 := by
-  native_decide
+  decide +kernel
 
 /-- Fixed crossover queries indexed through the actual fixed clause list. -/
 private def retainedFinalDirectCrossoverClauseQueriesByFormula :
@@ -33,7 +33,7 @@ private theorem
     retainedFinalDirectCrossoverClauseQueriesByFormula_eq :
     retainedFinalDirectCrossoverClauseQueriesByFormula =
       retainedFinalDirectCrossoverClauseQueries := by
-  native_decide
+  decide +kernel
 
 /-- The exact globally indexed crossover prefix is one stable fixed query
 block per canonical oriented crossing. -/

@@ -144,7 +144,7 @@ theorem cornerEqualityDrawing_isValid
     (first second : CornerPort) (different : first ≠ second) :
     (cornerEqualityDrawing first second).IsValid := by
   cases first <;> cases second <;>
-    simp_all <;> native_decide
+    simp_all <;> decide +kernel
 
 /-- Translate the fixed corner drawing and rename its Boolean endpoints to
 an arbitrary distinct pair of logical variables. -/

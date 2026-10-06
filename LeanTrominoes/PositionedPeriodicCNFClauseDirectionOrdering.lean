@@ -42,7 +42,7 @@ theorem inClockwiseOrder_of_rank_le
     (firstLeSecond : first.clockwiseRank ≤ second.clockwiseRank)
     (secondLeThird : second.clockwiseRank ≤ third.clockwiseRank) :
     InClockwiseOrder first second third := by
-  native_decide +revert
+  decide +kernel +revert
 
 /-- Distinct genuine cardinal directions have distinct clockwise ranks. -/
 theorem clockwiseRank_ne_of_ne
@@ -51,7 +51,7 @@ theorem clockwiseRank_ne_of_ne
     (secondGenuine : second.IsGenuine)
     (different : first ≠ second) :
     first.clockwiseRank ≠ second.clockwiseRank := by
-  native_decide +revert
+  decide +kernel +revert
 
 end AxisDirection
 

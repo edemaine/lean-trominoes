@@ -50,11 +50,9 @@ occurrence routes and completed variable-fan tails.
 
 ## Validation
 
-The completion build on September 12, 2026 passed all 10,469 jobs, followed
-by a public-import audit. The audited full theorem and strip projection
-contained no `sorryAx`; they retained the standard axioms and 5,877 inherited
-native-evaluation certificates. This is a historical completion audit, not a
-claim that every dependency uses kernel reduction alone.
+The full theorem and strip projection use only `propext`, `Classical.choice`,
+and `Quot.sound`. All finite certificates use kernel reduction.
+[Axiom regression checks](../LeanTrominoes/AxiomAudit.lean) cover the full theorem.
 
 To check the proof and inspect its current dependencies:
 

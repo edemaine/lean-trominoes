@@ -50,7 +50,7 @@ private theorem retainedDirectSourceFanEscapeAt_angular_linear_upper_checked :
                 retainedTerminalFanOuterRadialSeparatorBound
                   (retainedDirectSourceFanTerminalAt kind index).1
                   secondDirection)) = true := by
-  native_decide
+  decide +kernel
 
 /-- Finite certificate for a direct escape whose direction and slot follow
 the comparison direction and slot. -/
@@ -78,7 +78,7 @@ private theorem retainedDirectSourceFanEscapeAt_angular_linear_lower_checked :
                   firstDirection
                   (retainedDirectSourceFanTerminalAt kind index).1)
                 point)) = true := by
-  native_decide
+  decide +kernel
 
 /-- Every point of an earlier direct escape lies on the weak side of the
 ordinary angular separator. -/

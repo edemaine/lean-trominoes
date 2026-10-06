@@ -117,8 +117,8 @@ theorem
       (factor := 288)
       (radius := 96)
       centersDifferent
-  · native_decide
-  · native_decide
+  · decide +kernel
+  · decide +kernel
   · intro point pointMember
     simpa [retainedTerminalFanRoutingRefinement,
       PeriodicEightOccurrenceSplitPositioned.refinementScale] using

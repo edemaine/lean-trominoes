@@ -255,7 +255,7 @@ theorem
     ⟨polylineLastEntrance referenceRoute,
       referenceRoute.getLastD (0, 0)⟩
   have combinedPositive : 0 < combinedFactor := by
-    exact Nat.mul_pos (by native_decide) (by omega)
+    exact Nat.mul_pos (by decide +kernel) (by omega)
   have radiusLt : 288 < combinedFactor := by
     dsimp [combinedFactor]
     rw [retainedTerminalFanTotalRefinement_eq]

@@ -17,6 +17,9 @@ source-geometric obstruction: the two incoming clause directions would have
 to enter their adjacent targets from the shared unit edge.
 -/
 
+set_option maxRecDepth 10000
+set_option maxHeartbeats 3000000
+
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
@@ -85,9 +88,34 @@ theorem ClauseRibbonFanData.selectedTemplate_reflectedDirection
         (data.reflectedOuterData.selectedTemplate.directions.getD
           (data.variableSlotForGroup group).index .invalid) =
       data.direction group := by
-  native_decide +revert
+  decide +kernel +revert
 
 set_option maxHeartbeats 3000000
+
+private def reflectedTemplateRoute (template : VariableOuterFanTemplate)
+    (slot : VariableSiteSlot) (lane : WireColor) : List Cell :=
+  (template.route slot lane).reverse.map ClauseRibbonFanData.reflectCell
+
+private theorem reflectedAdjacentOuter_check :
+    (finiteAll fun firstIndex : Fin standardVariableOuterFanTemplates.length =>
+      finiteAll fun secondIndex : Fin standardVariableOuterFanTemplates.length =>
+      finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun firstSlot : VariableSiteSlot => finiteAll fun secondSlot : VariableSiteSlot =>
+      guardedCheck (firstSlot.index < (standardVariableOuterFanTemplates.get firstIndex).directions.length ∧
+        secondSlot.index < (standardVariableOuterFanTemplates.get secondIndex).directions.length ∧
+        (∀ direction : AxisDirection, direction.IsGenuine →
+          ribbonAdjacentMacrocellOffsets.get offsetIndex ≠ direction.step ∨
+          ClauseRibbonFanData.reflectedDirection
+            ((standardVariableOuterFanTemplates.get firstIndex).directions.getD firstSlot.index .invalid) ≠ direction.opposite ∨
+          ClauseRibbonFanData.reflectedDirection
+            ((standardVariableOuterFanTemplates.get secondIndex).directions.getD secondSlot.index .invalid) ≠ direction))
+        (finiteAll fun firstLane : WireColor => finiteAll fun secondLane : WireColor =>
+          segmentBoxesSeparateCheck
+            (reflectedTemplateRoute (standardVariableOuterFanTemplates.get firstIndex) firstSlot firstLane)
+            (translatePolyline
+              (Cell.scale standardThreeStrandLayout.factor (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+              (reflectedTemplateRoute (standardVariableOuterFanTemplates.get secondIndex) secondSlot secondLane)))) = true := by
+  decide +kernel
 
 /-- Reflected clause outer routes in adjacent macrocells are contact-free
 unless both incoming directions come from the shared cardinal edge. -/
@@ -123,7 +151,26 @@ theorem standardClauseOuterRoutes_strictlyAvoidEachOther_of_notFacing :
             (clauseOuterRouteFromTemplate
               (standardVariableOuterFanTemplates.get secondIndex)
               secondHasRight secondGroup secondLane)) := by
-  native_decide
+  intro firstIndex secondIndex offsetIndex firstHasRight secondHasRight firstGroup secondGroup
+    firstActive secondActive firstLane secondLane notFacing
+  have checked := reflectedAdjacentOuter_check
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked firstIndex secondIndex offsetIndex
+      ((clauseRibbonFanShape firstHasRight).variableSlotForGroup firstGroup)
+      ((clauseRibbonFanShape secondHasRight).variableSlotForGroup secondGroup)
+      ⟨firstActive, secondActive, notFacing⟩ firstLane secondLane)
+
+private def clauseLocalSeparationCheck (first second : List Cell) : Bool :=
+  segmentBoxesSeparateCheck first second || routesStrictlyAvoidEachOtherCheck first second
+
+private theorem clauseLocalSeparationCheck_sound (first second : List Cell)
+    (checked : clauseLocalSeparationCheck first second = true) :
+    RoutesStrictlyAvoidEachOther first second := by
+  simp only [clauseLocalSeparationCheck, Bool.or_eq_true] at checked
+  rcases checked with boxes | exactCheck
+  · exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck first second boxes
+  · exact (routesStrictlyAvoidEachOtherCheck_eq_true first second).mp exactCheck
 
 /-- Local clause gates in adjacent macrocells are always strictly
 separated. -/
@@ -139,7 +186,26 @@ theorem standardClauseLocalGateRoutes_strictlyAvoidEachOther_of_adjacent :
             (ribbonAdjacentMacrocellOffsets.get offsetIndex))
           ((clauseRibbonFanShape secondHasRight).localGateRoute
             secondGroup secondLane)) := by
-  native_decide
+  have checked : (finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun firstHasRight =>
+      finiteAll fun secondHasRight =>
+      finiteAll fun firstGroup =>
+      finiteAll fun secondGroup =>
+      finiteAll fun firstLane =>
+      finiteAll fun secondLane =>
+      clauseLocalSeparationCheck
+          ((clauseRibbonFanShape firstHasRight).localGateRoute
+          firstGroup firstLane)
+        (translatePolyline
+          (Cell.scale standardThreeStrandLayout.factor
+            (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+          ((clauseRibbonFanShape secondHasRight).localGateRoute
+            secondGroup secondLane))) = true := by
+    decide +kernel
+  intro offsetIndex firstHasRight secondHasRight firstGroup secondGroup firstLane secondLane
+  simp only [finiteAll_eq_true] at checked
+  exact clauseLocalSeparationCheck_sound _ _
+    (checked offsetIndex firstHasRight secondHasRight firstGroup secondGroup firstLane secondLane)
 
 /-- A reflected clause outer route strictly avoids every local clause gate
 in an adjacent macrocell. -/
@@ -160,7 +226,29 @@ theorem standardClauseOuterRoute_strictlyAvoids_localGateRoute_of_adjacent :
               (ribbonAdjacentMacrocellOffsets.get offsetIndex))
             ((clauseRibbonFanShape localHasRight).localGateRoute
               localGroup localLane)) := by
-  native_decide
+  have checked : (finiteAll fun outerIndex : Fin standardVariableOuterFanTemplates.length =>
+      finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun outerHasRight =>
+      finiteAll fun localHasRight =>
+      finiteAll fun outerGroup =>
+      finiteAll fun localGroup =>
+      finiteAll fun outerLane =>
+      finiteAll fun localLane =>
+      guardedCheck (((clauseRibbonFanShape outerHasRight).variableSlotForGroup outerGroup).index < (standardVariableOuterFanTemplates.get outerIndex).directions.length)
+        (clauseLocalSeparationCheck
+          (clauseOuterRouteFromTemplate
+            (standardVariableOuterFanTemplates.get outerIndex)
+            outerHasRight outerGroup outerLane)
+          (translatePolyline
+            (Cell.scale standardThreeStrandLayout.factor
+              (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+            ((clauseRibbonFanShape localHasRight).localGateRoute
+              localGroup localLane)))) = true := by
+    decide +kernel
+  intro outerIndex offsetIndex outerHasRight localHasRight outerGroup localGroup active outerLane localLane
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact clauseLocalSeparationCheck_sound _ _
+    (checked outerIndex offsetIndex outerHasRight localHasRight outerGroup localGroup outerLane localLane active)
 
 /-- A local clause gate strictly avoids every reflected clause outer route
 in an adjacent macrocell. -/
@@ -181,7 +269,29 @@ theorem standardClauseLocalGateRoute_strictlyAvoids_outerRoute_of_adjacent :
             (clauseOuterRouteFromTemplate
               (standardVariableOuterFanTemplates.get outerIndex)
               outerHasRight outerGroup outerLane)) := by
-  native_decide
+  have checked : (finiteAll fun outerIndex : Fin standardVariableOuterFanTemplates.length =>
+      finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun localHasRight =>
+      finiteAll fun outerHasRight =>
+      finiteAll fun localGroup =>
+      finiteAll fun outerGroup =>
+      finiteAll fun localLane =>
+      finiteAll fun outerLane =>
+      guardedCheck (((clauseRibbonFanShape outerHasRight).variableSlotForGroup outerGroup).index < (standardVariableOuterFanTemplates.get outerIndex).directions.length)
+        (clauseLocalSeparationCheck
+          ((clauseRibbonFanShape localHasRight).localGateRoute
+            localGroup localLane)
+          (translatePolyline
+            (Cell.scale standardThreeStrandLayout.factor
+              (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+            (clauseOuterRouteFromTemplate
+              (standardVariableOuterFanTemplates.get outerIndex)
+              outerHasRight outerGroup outerLane)))) = true := by
+    decide +kernel
+  intro outerIndex offsetIndex localHasRight outerHasRight localGroup outerGroup active localLane outerLane
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact clauseLocalSeparationCheck_sound _ _
+    (checked outerIndex offsetIndex localHasRight outerHasRight localGroup outerGroup localLane outerLane active)
 
 /-- Complete coordinated clause routes in adjacent standard macrocells are
 strictly separated unless their source routes enter the two targets from the

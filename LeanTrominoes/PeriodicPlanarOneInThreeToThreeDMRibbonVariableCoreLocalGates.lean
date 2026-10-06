@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoordinatedFans
-import LeanTrominoes.OrthogonalPolylineStrictSeparation
+import LeanTrominoes.OrthogonalPolylineStrictSeparationCheck
+import LeanTrominoes.OrthogonalPolylineSegmentBoxCheck
 
 /-!
 # Variable-site cores versus coordinated ribbon gates
@@ -26,6 +27,9 @@ configurations and then packaged for `VariableRibbonFanData`.
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 10000
+
 open Gadget PlanarThreeDM
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 open PeriodicOrthocrossing
@@ -42,6 +46,90 @@ def VariableLocalGateTableEndpointClear
 instance (kind : VariableConnectorKind) (polarity : Bool) :
     Decidable (VariableLocalGateTableEndpointClear kind polarity) := by
   unfold VariableLocalGateTableEndpointClear
+  infer_instance
+
+private def coreTripleKind : VariableSiteTriple → VariableConnectorKind
+  | .ordinary _ .fixedGreen _ => .fixedGreen
+  | .ordinary _ .fixedBlue _ => .fixedBlue
+  | .fixedRed _ _ => .fixedRed
+
+private theorem coreTriple_matches {count : Nat} {kind : VariableSiteSlot → VariableConnectorKind}
+    (triple : ActiveVariableSiteTriple count kind) :
+    triple.1.slot.index < count ∧ kind triple.1.slot = coreTripleKind triple.1 := by
+  rcases triple with ⟨triple, member⟩
+  cases triple with
+  | ordinary slot variant localTriple => cases variant <;> exact member
+  | fixedRed slot localTriple => exact member
+
+private def scalarCoreLocalRoute (polarity : Bool) (triple : VariableSiteTriple)
+    (color : WireColor) : List Cell :=
+  match triple with
+  | .ordinary slot variant localTriple =>
+      ((VariableOccurrence.orientedBoundaryDrawing
+        variant polarity).route localTriple color).map
+          (placeVariableModulePoint slot)
+  | .fixedRed slot localTriple =>
+      ((FixedRedConnector.boundaryDrawing
+        polarity).route localTriple color).map
+          (placeVariableModulePoint slot)
+
+private def scalarCoreRoute (count : Nat) (polarity : Bool) (triple : VariableSiteTriple)
+    (color : WireColor) : List Cell :=
+  let localRoute := scalarCoreLocalRoute polarity triple color
+  match triple with
+  | .ordinary slot _ localTriple =>
+      if color = .red ∧
+          localTriple =
+            VariableOccurrence.slotContinuationTriple polarity then
+        localRoute ++ currentCycleExtension slot
+      else if color = .red ∧
+          localTriple =
+            VariableOccurrence.nextContinuationTriple polarity then
+        localRoute ++ nextCycleExtension count slot
+      else
+        localRoute
+  | .fixedRed slot localTriple =>
+      if color = .red ∧
+          localTriple =
+            FixedRedConnector.slotContinuationTriple polarity then
+        localRoute ++ currentCycleExtension slot
+      else if color = .red ∧
+          localTriple =
+            FixedRedConnector.nextContinuationTriple polarity then
+        localRoute ++ nextCycleExtension count slot
+      else
+        localRoute
+
+private theorem scalarCoreRoute_eq (count : Nat) (kind : VariableSiteSlot → VariableConnectorKind)
+    (polarity : VariableSiteSlot → Bool) (triple : ActiveVariableSiteTriple count kind)
+    (color : WireColor) :
+    scalarCoreRoute count (polarity triple.1.slot) triple.1 color =
+      (variableSiteDrawing count kind polarity).route triple color := by
+  rcases triple with ⟨triple, member⟩
+  cases triple <;> rfl
+
+private def scalarSelectedTriple (kind : VariableConnectorKind) (slot : VariableSiteSlot)
+    (color : WireColor) : VariableSiteTriple :=
+  VariableRibbonFanData.routedTriple ⟨0, fun _ => kind, fun _ => false, fun _ => .invalid⟩ slot color
+
+private theorem scalarSelectedTriple_eq (countPred : Fin 3)
+    (kind : VariableSiteSlot → VariableConnectorKind) (polarity : VariableSiteSlot → Bool)
+    (slot : VariableSiteSlot) (color : WireColor) :
+    scalarSelectedTriple (kind slot) slot color =
+      VariableRibbonFanData.routedTriple ⟨countPred, kind, polarity, fun _ => .invalid⟩ slot color := by
+  rfl
+
+private def coreGateCompatible (count : Nat) (triple : VariableSiteTriple)
+    (corePolarity : Bool) (slot : VariableSiteSlot) (kind : VariableConnectorKind)
+    (gatePolarity : Bool) : Prop :=
+  triple.slot.index < count ∧ slot.index < count ∧
+    (triple.slot = slot → coreTripleKind triple = kind ∧ corePolarity = gatePolarity) ∧
+    VariableLocalGateTableEndpointClear kind gatePolarity
+
+private instance (count : Nat) (triple : VariableSiteTriple) (corePolarity : Bool)
+    (slot : VariableSiteSlot) (kind : VariableConnectorKind) (gatePolarity : Bool) :
+    Decidable (coreGateCompatible count triple corePolarity slot kind gatePolarity) := by
+  unfold coreGateCompatible
   infer_instance
 
 /-- The three continuous-separation fields used by periodic continuous
@@ -284,52 +372,41 @@ theorem RoutesAvoidInteriorContacts.translatePolyline
         [PeriodicOrthocrossing.translatePolyline,
         Cell.add, add_comm] using interiorContains)
 
-/-- Every route in a complete one-, two-, or three-module variable site
-avoids the continuous interiors of every active normalized local gate, in
-both directions. -/
-theorem variableSiteRoute_avoids_standardVariableLocalGateRoute :
-    ∀ (countPred : Fin 3)
-      (kind : VariableSiteSlot → VariableConnectorKind)
-      (polarity : VariableSiteSlot → Bool)
-      (slot : VariableSiteSlot),
-      ∀ (_active : slot.index < countPred + 1)
-        (triple : ActiveVariableSiteTriple (countPred + 1) kind)
-        (routeColor gateColor : WireColor),
-        VariableLocalGateTableEndpointClear
-            (kind slot) (polarity slot) →
-        RoutesAvoidInteriorContacts
+private theorem coreGateStrict_check :
+    (finiteAll fun countPred : Fin 3 => finiteAll fun triple : VariableSiteTriple =>
+      finiteAll fun corePolarity : Bool => finiteAll fun slot : VariableSiteSlot =>
+      finiteAll fun kind : VariableConnectorKind => finiteAll fun gatePolarity : Bool =>
+      finiteAll fun routeColor : WireColor => finiteAll fun gateColor : WireColor =>
+      guardedCheck (coreGateCompatible (countPred + 1) triple corePolarity slot kind gatePolarity ∧
+        (triple, routeColor) ≠ (scalarSelectedTriple kind slot gateColor, gateColor))
+        (segmentBoxesSeparateCheck
           (translatePolyline standardThreeStrandLayout.variableOffset
-            ((variableSiteDrawing (countPred + 1) kind polarity).route
-              triple routeColor))
-          (standardVariableLocalGateRoute
-            slot (kind slot) (polarity slot) gateColor) := by
-  native_decide
+            (scalarCoreRoute (countPred + 1) corePolarity triple routeColor))
+          (standardVariableLocalGateRoute slot kind gatePolarity gateColor))) = true := by
+  decide +kernel
 
-/-- A finite variable-site route and a normalized gate belonging to a
-different occurrence module have complete endpoint-aware separation. -/
-theorem variableSiteRoute_avoids_standardVariableLocalGateRoute_of_slot_ne :
-    ∀ (countPred : Fin 3)
-      (kind : VariableSiteSlot → VariableConnectorKind)
-      (polarity : VariableSiteSlot → Bool)
-      (slot : VariableSiteSlot),
-      ∀ (_active : slot.index < countPred + 1)
-        (triple : ActiveVariableSiteTriple (countPred + 1) kind)
-        (routeColor gateColor : WireColor),
-        VariableLocalGateTableEndpointClear
-            (kind slot) (polarity slot) →
-        triple.1.slot ≠ slot →
-          RoutesAvoidEachOther
+private theorem selectedCoreGateAvoid_check :
+    (finiteAll fun countPred : Fin 3 => finiteAll fun slot : VariableSiteSlot =>
+      finiteAll fun kind : VariableConnectorKind => finiteAll fun polarity : Bool =>
+      finiteAll fun color : WireColor => guardedCheck (slot.index < countPred + 1)
+        (routesAvoidEachOtherCheck
+          (translatePolyline standardThreeStrandLayout.variableOffset
+            (scalarCoreRoute (countPred + 1) polarity (scalarSelectedTriple kind slot color) color))
+          (standardVariableLocalGateRoute slot kind polarity color))) = true := by
+  decide +kernel
+
+private theorem coreGateAvoid_check :
+    (finiteAll fun countPred : Fin 3 => finiteAll fun triple : VariableSiteTriple =>
+      finiteAll fun corePolarity : Bool => finiteAll fun slot : VariableSiteSlot =>
+      finiteAll fun kind : VariableConnectorKind => finiteAll fun gatePolarity : Bool =>
+      guardedCheck (coreGateCompatible (countPred + 1) triple corePolarity slot kind gatePolarity)
+        (finiteAll fun routeColor : WireColor => finiteAll fun gateColor : WireColor =>
+          routesAvoidEachOtherCheck
             (translatePolyline standardThreeStrandLayout.variableOffset
-              ((variableSiteDrawing (countPred + 1) kind polarity).route
-                triple routeColor))
-            (standardVariableLocalGateRoute
-              slot (kind slot) (polarity slot) gateColor) := by
-  native_decide
+              (scalarCoreRoute (countPred + 1) corePolarity triple routeColor))
+            (standardVariableLocalGateRoute slot kind gatePolarity gateColor))) = true := by
+  decide +kernel
 
-/-- In each polarity-normalized endpoint-clear local table, every core route has full
-endpoint-aware separation from every gate in the selected occurrence
-module.  The certificate ranges over complete one-, two-, and three-module
-sites, so it includes the closing variable-cycle route. -/
 theorem
     variableSiteRoute_avoids_standardVariableLocalGateRoute_of_endpointClear :
     ∀ (countPred : Fin 3)
@@ -347,7 +424,62 @@ theorem
                 triple routeColor))
             (standardVariableLocalGateRoute
               slot (kind slot) (polarity slot) gateColor) := by
-  native_decide
+  intro countPred kind polarity slot active triple routeColor gateColor clear
+  have compatible : coreGateCompatible (countPred + 1) triple.1
+      (polarity triple.1.slot) slot (kind slot) (polarity slot) := by
+    refine ⟨(coreTriple_matches triple).1, active, ?_, clear⟩
+    intro equalSlot
+    constructor
+    · simpa only [equalSlot] using (coreTriple_matches triple).2.symm
+    · rw [equalSlot]
+  have checked := ((finiteAll_eq_true _).mp coreGateAvoid_check) countPred
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  have avoid := (routesAvoidEachOtherCheck_eq_true _ _).mp
+    (checked triple.1 (polarity triple.1.slot) slot (kind slot) (polarity slot)
+      compatible routeColor gateColor)
+  simpa only [scalarCoreRoute_eq] using avoid
+
+theorem variableSiteRoute_avoids_standardVariableLocalGateRoute :
+    ∀ (countPred : Fin 3)
+      (kind : VariableSiteSlot → VariableConnectorKind)
+      (polarity : VariableSiteSlot → Bool)
+      (slot : VariableSiteSlot),
+      ∀ (_active : slot.index < countPred + 1)
+        (triple : ActiveVariableSiteTriple (countPred + 1) kind)
+        (routeColor gateColor : WireColor),
+        VariableLocalGateTableEndpointClear
+            (kind slot) (polarity slot) →
+        RoutesAvoidInteriorContacts
+          (translatePolyline standardThreeStrandLayout.variableOffset
+            ((variableSiteDrawing (countPred + 1) kind polarity).route
+              triple routeColor))
+          (standardVariableLocalGateRoute
+            slot (kind slot) (polarity slot) gateColor) := by
+  intro countPred kind polarity slot active triple routeColor gateColor clear
+  exact RoutesAvoidEachOther.toRoutesAvoidInteriorContacts
+    (variableSiteRoute_avoids_standardVariableLocalGateRoute_of_endpointClear
+      countPred kind polarity slot active triple routeColor gateColor clear)
+
+theorem variableSiteRoute_avoids_standardVariableLocalGateRoute_of_slot_ne :
+    ∀ (countPred : Fin 3)
+      (kind : VariableSiteSlot → VariableConnectorKind)
+      (polarity : VariableSiteSlot → Bool)
+      (slot : VariableSiteSlot),
+      ∀ (_active : slot.index < countPred + 1)
+        (triple : ActiveVariableSiteTriple (countPred + 1) kind)
+        (routeColor gateColor : WireColor),
+        VariableLocalGateTableEndpointClear
+            (kind slot) (polarity slot) →
+        triple.1.slot ≠ slot →
+          RoutesAvoidEachOther
+            (translatePolyline standardThreeStrandLayout.variableOffset
+              ((variableSiteDrawing (countPred + 1) kind polarity).route
+                triple routeColor))
+            (standardVariableLocalGateRoute
+              slot (kind slot) (polarity slot) gateColor) := by
+  intro countPred kind polarity slot active triple routeColor gateColor clear _differentSlot
+  exact variableSiteRoute_avoids_standardVariableLocalGateRoute_of_endpointClear
+    countPred kind polarity slot active triple routeColor gateColor clear
 
 /-- In an endpoint-clear local table, a core route is contact-free from a
 gate unless that gate is the route's own selected colored occurrence. -/
@@ -373,7 +505,23 @@ theorem
                 triple routeColor))
             (standardVariableLocalGateRoute
               slot (kind slot) (polarity slot) gateColor) := by
-  native_decide
+  intro countPred kind polarity slot active triple routeColor gateColor clear different
+  have compatible : coreGateCompatible (countPred + 1) triple.1
+      (polarity triple.1.slot) slot (kind slot) (polarity slot) := by
+    refine ⟨(coreTriple_matches triple).1, active, ?_, clear⟩
+    intro equalSlot
+    constructor
+    · simpa only [equalSlot] using (coreTriple_matches triple).2.symm
+    · rw [equalSlot]
+  have checked := coreGateStrict_check
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  have different' : (triple.1, routeColor) ≠
+      (scalarSelectedTriple (kind slot) slot gateColor, gateColor) := by
+    simpa only [scalarSelectedTriple_eq countPred kind polarity] using different
+  have separated := routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked countPred triple.1 (polarity triple.1.slot) slot (kind slot) (polarity slot)
+      routeColor gateColor ⟨compatible, different'⟩)
+  simpa only [scalarCoreRoute_eq] using separated
 
 /-- The finite variable-site route selected for an active gate has
 endpoint-permitting continuous separation from that gate. -/
@@ -396,7 +544,18 @@ theorem routedVariableSiteRoute_avoids_standardVariableLocalGateRoute :
                 gateColor))
             (standardVariableLocalGateRoute
               slot (kind slot) (polarity slot) gateColor) := by
-  native_decide
+  intro countPred kind polarity slot active gateColor
+  have checked := selectedCoreGateAvoid_check
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  have avoid := (routesAvoidEachOtherCheck_eq_true _ _).mp
+    (checked countPred slot (kind slot) (polarity slot) gateColor active)
+  rw [scalarSelectedTriple_eq countPred kind polarity] at avoid
+  have selectedSlot : (VariableRibbonFanData.routedTriple
+      ⟨countPred, kind, polarity, fun _ => .invalid⟩ slot gateColor).slot = slot := by
+    cases eq : kind slot <;> cases gateColor <;>
+      simp [VariableRibbonFanData.routedTriple, eq, VariableSiteTriple.slot]
+  rw [← scalarCoreRoute_eq]
+  simpa only [selectedSlot] using avoid
 
 namespace VariableRibbonFanData
 

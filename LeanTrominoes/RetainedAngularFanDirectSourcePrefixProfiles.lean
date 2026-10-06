@@ -60,7 +60,7 @@ theorem retainedDirectCrossoverPrefixChoices_length :
         (.crossover clauseIndex)).length =
       (retainedDirectCrossoverClauseAt
         clauseIndex).literals.length := by
-  native_decide
+  decide +kernel
 
 /-- Every crossover atlas entry carries the exact classified terminal
 direction of its direct local incidence. -/
@@ -75,7 +75,7 @@ theorem retainedDirectCrossoverPrefixChoice_direction :
         (routeTerminalVector
           (crossoverStraightIncidenceDrawing.routes
             clauseIndex.val literalIndex.val)) := by
-  native_decide
+  decide +kernel
 
 /-- Translation and logical renaming do not change the crossover atlas
 direction selected at an actual crossing macrocell. -/
@@ -116,7 +116,7 @@ theorem retainedDirectDuplicatorPrefixChoices_length :
         (.duplicator arm clauseIndex)).length =
       (retainedDirectDuplicatorClauseAt
         arm clauseIndex).literals.length := by
-  native_decide
+  decide +kernel
 
 /-- Every duplicator-arm atlas entry carries the exact classified terminal
 direction of its direct local incidence. -/
@@ -131,7 +131,7 @@ theorem retainedDirectDuplicatorPrefixChoice_direction :
         (routeTerminalVector
           ((duplicatorArmStraightIncidenceDrawing arm).routes
             clauseIndex.val literalIndex.val)) := by
-  native_decide
+  decide +kernel
 
 /-- Translation and endpoint renaming do not change the duplicator-arm atlas
 direction selected at an actual routed-variable macrocell. -/
@@ -170,7 +170,7 @@ theorem retainedDirectDuplicatorPrefixChoice_positionedDirection
 theorem retainedDirectRoutedClausePrefixChoices_length :
     (retainedDirectSourcePrefixChoices
       .routedClause).length = 3 := by
-  native_decide
+  decide +kernel
 
 /-- Routed-clause atlas entries carry the exact classified directions of the
 left, middle, and right source arms. -/
@@ -185,7 +185,7 @@ theorem retainedDirectRoutedClausePrefixChoice_direction :
           ((routedClausePortStraightIncidenceDrawing
             retainedDirectRoutedClauseRepresentativeLiterals).routes
               0 literalIndex.val)) := by
-  native_decide
+  decide +kernel
 
 /-- Physical routed-clause arms select their corresponding full-atlas
 positions. -/
@@ -193,9 +193,9 @@ def retainedDirectRoutedClauseArmIndex :
     DuplicatorArm →
       Fin (retainedDirectSourcePrefixChoices
         .routedClause).length
-  | .left => ⟨0, by native_decide⟩
-  | .middle => ⟨1, by native_decide⟩
-  | .right => ⟨2, by native_decide⟩
+  | .left => ⟨0, by decide +kernel⟩
+  | .middle => ⟨1, by decide +kernel⟩
+  | .right => ⟨2, by decide +kernel⟩
 
 /-- The three physical arms occupy different routed-clause atlas entries. -/
 theorem retainedDirectRoutedClauseArmIndex_injective :
@@ -212,7 +212,7 @@ theorem retainedDirectRoutedClauseArmChoice_direction
       .routedClause
       (retainedDirectRoutedClauseArmIndex arm)).direction =
         .routedClause arm := by
-  cases arm <;> native_decide
+  cases arm <;> decide +kernel
 
 /-- The route at any valid presentation index in a routed source clause has
 the exceptional retained direction named by that literal's physical arm. -/
@@ -235,7 +235,7 @@ theorem routedClausePortStraightIncidenceDrawing_direction
       retainedTerminalDirectionClassify,
       DuplicatorArm.portPosition,
       Cell.sub] <;>
-    native_decide
+    decide +kernel
 
 /-- A genuine routed source-clause literal selects the atlas entry indexed
 by its physical arm, independently of the clause's literal presentation

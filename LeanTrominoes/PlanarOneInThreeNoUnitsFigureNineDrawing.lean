@@ -114,7 +114,7 @@ def fullDrawing :
 orthogonal simple routes, vertex avoidance, and continuous pairwise
 planarity. -/
 theorem fullDrawing_isValid : fullDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-! ## Short source clauses -/
 
@@ -193,7 +193,7 @@ def twoDrawing :
 /-- The complete binary-source two-stage neighborhood is continuously
 planar. -/
 theorem twoDrawing_isValid : twoDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-- Figure 9 for a unit source clause after eliminating its two padding unit
 clauses. -/
@@ -260,7 +260,7 @@ def oneDrawing :
 
 /-- The complete unit-source two-stage neighborhood is continuously planar. -/
 theorem oneDrawing_isValid : oneDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-- Figure 9 for an empty source clause after eliminating all three padding
 unit clauses. -/
@@ -332,7 +332,7 @@ def zeroDrawing :
 /-- The complete empty-source two-stage neighborhood is continuously
 planar. -/
 theorem zeroDrawing_isValid : zeroDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-! ## Source-polarity-independent certificates -/
 
@@ -366,7 +366,7 @@ theorem fullDrawingFor_isValid
     (first second third : Bool) :
     (fullDrawingFor first second third).IsValid := by
   cases first <;> cases second <;> cases third <;>
-    native_decide
+    decide +kernel
 
 /-- Binary-source composed formula with arbitrary present-source
 polarities. -/
@@ -400,7 +400,7 @@ def twoDrawingFor
 theorem twoDrawingFor_isValid
     (first second : Bool) :
     (twoDrawingFor first second).IsValid := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- Unit-source composed formula with arbitrary source polarity. -/
 def oneFormulaFor
@@ -433,7 +433,7 @@ def oneDrawingFor
 theorem oneDrawingFor_isValid
     (first : Bool) :
     (oneDrawingFor first).IsValid := by
-  cases first <;> native_decide
+  cases first <;> decide +kernel
 
 @[simp]
 theorem fullFormulaFor_true :
@@ -498,7 +498,7 @@ theorem generatedComposedTemplateFor_three
         [(.first, first), (.second, second), (.third, third)] =
       fullFormulaFor first second third := by
   cases first <;> cases second <;> cases third <;>
-    native_decide
+    decide +kernel
 
 /-- The arbitrary-polarity binary template is exactly the corresponding
 two-stage positioned transformation. -/
@@ -507,7 +507,7 @@ theorem generatedComposedTemplateFor_two
     generatedComposedTemplateFor
         [(.first, first), (.second, second)] =
       twoFormulaFor first second := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- The arbitrary-polarity unit template is exactly the corresponding
 two-stage positioned transformation. -/
@@ -515,13 +515,13 @@ theorem generatedComposedTemplateFor_one
     (first : Bool) :
     generatedComposedTemplateFor [(.first, first)] =
       oneFormulaFor first := by
-  cases first <;> native_decide
+  cases first <;> decide +kernel
 
 /-- The empty template is exactly the corresponding two-stage positioned
 transformation. -/
 theorem generatedComposedTemplateFor_zero :
     generatedComposedTemplateFor [] = zeroFormula := by
-  native_decide
+  decide +kernel
 
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes

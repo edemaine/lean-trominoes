@@ -165,9 +165,9 @@ theorem retainedTerminalFanOuterTransverseNormal_primitive_zero :
   intro direction
   cases direction with
   | compass port =>
-      cases port <;> native_decide
+      cases port <;> decide +kernel
   | routedClause arm =>
-      cases arm <;> native_decide
+      cases arm <;> decide +kernel
 
 /-- Every clockwise lane step advances strictly in the selected transverse
 functional. -/
@@ -180,9 +180,9 @@ theorem retainedTerminalFanOuterTransverseNormal_laneStep_positive :
   intro direction
   cases direction with
   | compass port =>
-      cases port <;> native_decide
+      cases port <;> decide +kernel
   | routedClause arm =>
-      cases arm <;> native_decide
+      cases arm <;> decide +kernel
 
 @[simp]
 theorem Cell.linearValue_add
@@ -257,7 +257,7 @@ theorem routedClauseRayOffsets_transverse_bounds :
               offset ≤
             retainedTerminalFanOuterTransverseUpperDeviation
               (.routedClause arm) := by
-  native_decide
+  decide +kernel
 
 /-- A translated exceptional primitive block has the same transverse
 deviation bounds as its finite offset list. -/
@@ -347,7 +347,7 @@ theorem routedClauseRay_transverse_bounds
                 (retainedTerminalFanOuterTransverseNormal
                   (.routedClause arm))
                 (routedClauseRayPrimitive arm) = 0 := by
-          cases arm <;> native_decide
+          cases arm <;> decide +kernel
         rw [Cell.linearValue_add,
           primitiveZero, add_zero] at trailing
         exact trailing
@@ -401,9 +401,9 @@ theorem compassInwardRay_transverse_bounds
             (retainedTerminalFanOuterTransverseUpperDeviation
               (.compass .northwest))
             1 1
-            (by native_decide) (by native_decide)
-            (by native_decide) (by native_decide)
-            (by native_decide)
+            (by decide +kernel) (by decide +kernel)
+            (by decide +kernel) (by decide +kernel)
+            (by decide +kernel)
             (length + 1) start point
             (by simpa [compassRay, oppositePort] using pointMember)
       | north =>
@@ -426,9 +426,9 @@ theorem compassInwardRay_transverse_bounds
             (retainedTerminalFanOuterTransverseUpperDeviation
               (.compass .northeast))
             (-1) 1
-            (by native_decide) (by native_decide)
-            (by native_decide) (by native_decide)
-            (by native_decide)
+            (by decide +kernel) (by decide +kernel)
+            (by decide +kernel) (by decide +kernel)
+            (by decide +kernel)
             (length + 1) start point
             (by simpa [compassRay, oppositePort] using pointMember)
       | east =>
@@ -451,9 +451,9 @@ theorem compassInwardRay_transverse_bounds
             (retainedTerminalFanOuterTransverseUpperDeviation
               (.compass .southeast))
             (-1) (-1)
-            (by native_decide) (by native_decide)
-            (by native_decide) (by native_decide)
-            (by native_decide)
+            (by decide +kernel) (by decide +kernel)
+            (by decide +kernel) (by decide +kernel)
+            (by decide +kernel)
             (length + 1) start point
             (by simpa [compassRay, oppositePort] using pointMember)
       | south =>
@@ -476,9 +476,9 @@ theorem compassInwardRay_transverse_bounds
             (retainedTerminalFanOuterTransverseUpperDeviation
               (.compass .southwest))
             1 (-1)
-            (by native_decide) (by native_decide)
-            (by native_decide) (by native_decide)
-            (by native_decide)
+            (by decide +kernel) (by decide +kernel)
+            (by decide +kernel) (by decide +kernel)
+            (by decide +kernel)
             (length + 1) start point
             (by simpa [compassRay, oppositePort] using pointMember)
       | west =>

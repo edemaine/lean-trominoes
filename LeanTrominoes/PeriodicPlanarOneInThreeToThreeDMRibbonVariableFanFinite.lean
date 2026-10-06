@@ -156,7 +156,7 @@ def oneFixedRedEast : VariableRibbonFanData where
 requirements (there is only one active occurrence). -/
 theorem oneFixedRedEast_isValid :
     oneFixedRedEast.IsValid := by
-  native_decide
+  decide +kernel
 
 /-- Even at one occurrence, choosing the three colored elbows independently
 does not give a separated fan.  The green horizontal segment and the blue
@@ -168,7 +168,7 @@ theorem oneFixedRedEast_green_blue_not_separated :
         .first active .green)
       (oneFixedRedEast.independentRoute
         .first active .blue) := by
-  native_decide
+  decide +kernel
 
 end VariableRibbonFanData
 end PeriodicPlanarOneInThreeToThreeDM

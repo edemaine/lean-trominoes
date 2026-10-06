@@ -68,7 +68,7 @@ certificate over its nine possible fan sizes. -/
 theorem angularFanDrawing_isValid
     (count : Nat) (fits : count ≤ 8) :
     (angularFanDrawing count).IsValid := by
-  interval_cases count <;> native_decide
+  interval_cases count <;> decide +kernel
 
 theorem angularFanDrawing_routesMatch
     (count : Nat) (fits : count ≤ 8) :

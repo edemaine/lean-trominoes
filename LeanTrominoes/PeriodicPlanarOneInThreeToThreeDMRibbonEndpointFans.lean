@@ -164,7 +164,7 @@ theorem standardRibbonMacrocellEntry_bounded
     InStandardRibbonMacrocell
       (standardRibbonMacrocellEntry direction color) := by
   cases direction <;> cases color <;>
-    native_decide
+    decide +kernel
 
 /-- Every standard colored ribbon exit lies in the closed standard block. -/
 theorem standardRibbonMacrocellExit_bounded
@@ -172,7 +172,7 @@ theorem standardRibbonMacrocellExit_bounded
     InStandardRibbonMacrocell
       (standardRibbonMacrocellExit direction color) := by
   cases direction <;> cases color <;>
-    native_decide
+    decide +kernel
 
 /-- Exact local variable-gadget port inside its owning refined block. -/
 def occurrenceVariableRibbonFanPort
@@ -202,7 +202,7 @@ theorem all_oneVariableSiteDrawing_elementPositionsInRibbonBlock :
         (Cell.add standardThreeStrandLayout.variableOffset
           ((oneVariableSiteDrawing kind polarity).elementPosition
             element)) := by
-  native_decide
+  decide +kernel
 
 /-- The corresponding finite check for every two-occurrence variable site. -/
 theorem all_twoVariableSiteDrawing_elementPositionsInRibbonBlock :
@@ -211,7 +211,7 @@ theorem all_twoVariableSiteDrawing_elementPositionsInRibbonBlock :
         (Cell.add standardThreeStrandLayout.variableOffset
           ((twoVariableSiteDrawing firstKind secondKind
             firstPolarity secondPolarity).elementPosition element)) := by
-  native_decide
+  decide +kernel
 
 /-- The corresponding finite check for every three-occurrence variable
 site. -/
@@ -224,7 +224,7 @@ theorem all_threeVariableSiteDrawing_elementPositionsInRibbonBlock :
             firstKind secondKind thirdKind
             firstPolarity secondPolarity thirdPolarity)
             |>.elementPosition element)) := by
-  native_decide
+  decide +kernel
 
 /-- Every element position in an actual finite variable-site drawing lies
 in its standard closed ribbon block. -/

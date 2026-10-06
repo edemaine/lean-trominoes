@@ -1076,13 +1076,13 @@ theorem packedNormalizationPolynomialEnvelopeUnit_le_linear
       packed.assignmentWord + 100)) 2000
   have columnSmall : column.val ≤ 4 := Nat.le_pred_of_lt column.isLt
   have columnBits := encodeNat_length_mono columnSmall
-  have fourBits : (Computability.encodeNat 4).length = 3 := by native_decide
+  have fourBits : (Computability.encodeNat 4).length = 3 := by decide +kernel
   have hundredBits :
-      (Computability.encodeNat 100).length = 7 := by native_decide
+      (Computability.encodeNat 100).length = 7 := by decide +kernel
   have scaleBits :
-      (Computability.encodeNat 4096).length = 13 := by native_decide
+      (Computability.encodeNat 4096).length = 13 := by decide +kernel
   have twoThousandBits :
-      (Computability.encodeNat 2000).length = 11 := by native_decide
+      (Computability.encodeNat 2000).length = 11 := by decide +kernel
   simp only [motifCode] at sum2 sum3 sum4 sum5 sum6 sum7 sum8 sum9 sum10
   simp only [motifCode] at sum11 scaled final
   simp only [packedNormalizationInputUnit,

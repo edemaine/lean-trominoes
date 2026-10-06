@@ -656,7 +656,7 @@ theorem flatPackedCenterBaseArgumentsCost_le_quadratic
   have fieldCoefficient :
       4 *
           100000000000000000000000000000000000000000000000000000000000000000 ≤
-        10 ^ 80 := by native_decide
+        10 ^ 80 := by decide +kernel
   have fieldBound (field : Fin 2) :
       flatPackedTransitionCellFieldCost field periodicStrip current next valid
           processed.length ≤ (10 ^ 80) * unit ^ 2 := by
@@ -738,7 +738,7 @@ theorem flatPackedCenterBaseAtCost_le_context_core
     periodicStrip current next valid processed cell remaining split
   have coefficientBound :
       256 * coefficient + 10 ^ 100 ≤ 10 ^ 1000 := by
-    cases tromino <;> native_decide
+    cases tromino <;> decide +kernel
   change flatPackedCenterBaseValidCost tromino periodicStrip current cell +
       flatPackedCenterBaseArgumentsCost periodicStrip current next valid
         processed cell ≤
@@ -774,7 +774,7 @@ theorem flatPackedCenterGetCost_le_context_core
   have unitPositive : 1 ≤ unit := by
     simp [unit, flatPackedCenterContextUnit]
   have unitQuadratic : unit ≤ unit ^ 2 := by nlinarith
-  have coefficient : 200000 ≤ 10 ^ 1000 := by native_decide
+  have coefficient : 200000 ≤ 10 ^ 1000 := by decide +kernel
   calc
     getCost index values ≤
         (10000 * (index + 1)) * (encodedListSpace values + 1) := raw
@@ -1228,7 +1228,7 @@ theorem flatPackedCenterBodySuccCost_le_context
         processed cell remaining.length ≤ 2011 * core := bodyBound
     _ ≤ flatPackedCenterBodySpaceBound periodicStrip current next := by
       have coefficient : 2011 * (10 ^ 1000) ≤ 10 ^ 1100 := by
-        native_decide
+        decide +kernel
       change 2011 * ((10 ^ 1000) * unit ^ 2) ≤
         (10 ^ 1100) * unit ^ 2
       calc
@@ -1259,7 +1259,7 @@ theorem flatPackedCenterBodyZeroCost_le_context
   have coreToBody : flatPackedCenterContextCore periodicStrip current
       next ≤ flatPackedCenterBodySpaceBound periodicStrip current
       next := by
-    have coefficient : 10 ^ 1000 ≤ 10 ^ 1100 := by native_decide
+    have coefficient : 10 ^ 1000 ≤ 10 ^ 1100 := by decide +kernel
     change (10 ^ 1000) * unit ^ 2 ≤ (10 ^ 1100) * unit ^ 2
     exact Nat.mul_le_mul_right (unit ^ 2) coefficient
   change zeroPrimeCost payload + encodedListSpace (0 :: payload) +

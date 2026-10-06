@@ -12,7 +12,7 @@ Open gadget windows contain transient boundary states.  We first remove every
 port configuration lacking a compatible neighbor on one of its four sides.
 For the L-tromino library, the remaining colored ports admit a uniform Boolean
 interpretation depending only on the edge color, its axis, and whether a
-tromino crosses the block boundary.  Native certificates check that every
+tromino crosses the block boundary.  Kernel-checked certificates establish that every
 supported local state satisfies the intended wire/vertex constraint and that
 every satisfying local orientation is represented.
 
@@ -22,6 +22,8 @@ supported local table has no single universal Boolean labeling of port states.
 
 namespace LeanTrominoes
 namespace Gadget
+
+set_option maxRecDepth 10000
 
 /-- All local drawing-cell types paired with their exact geometric port
 configurations. -/
@@ -121,7 +123,7 @@ def pruneCellPortTable
     Finset (OrthogonalCellType × PortConfiguration) :=
   table.filter fun entry => ∀ side, CellPortEntrySupported table entry side
 
-/-- The one-step supported core of the constant Figure 11/12 table.  A native
+/-- The one-step supported core of the constant Figure 11/12 table.  A kernel-checked
 certificate below verifies that another pruning round changes nothing. -/
 def supportedCellPortTable (tromino : Tromino) :
     Finset (OrthogonalCellType × PortConfiguration) :=
@@ -131,7 +133,7 @@ def supportedCellPortTable (tromino : Tromino) :
 theorem supportedCellPortTable_fixed (tromino : Tromino) :
     pruneCellPortTable (supportedCellPortTable tromino) =
       supportedCellPortTable tromino := by
-  cases tromino <;> native_decide
+  cases tromino <;> decide +kernel
 
 /-- The wire axis perpendicular to a block side. -/
 def Side.axis : Side → WireAxis
@@ -229,7 +231,7 @@ set_option maxHeartbeats 1000000 in
 geometric port. -/
 theorem lGlobalCellPortTable_unused :
     TableUnusedPortsEmpty (globalCellPortTable .L) := by
-  native_decide
+  decide +kernel
 
 /-- Actual neighboring states witness one-step support for every side of a
 locally exact, port-compatible assignment. -/
@@ -303,7 +305,7 @@ set_option maxRecDepth 100000 in
 set_option maxHeartbeats 1000000 in
 /-- Exhaustive certificate for all Figure 11 local states. -/
 theorem lLocalOrientationTableCorrect : LLocalOrientationTableCorrect := by
-  native_decide
+  decide +kernel
 
 /-- The orientation read from every local state of an L-gadget assignment. -/
 def lOrientationFromAssignment (drawing : PeriodicOrthogonalDrawing)

@@ -78,7 +78,7 @@ theorem retainedFallbackCardinalForwardLeadingPoints_disjoint_afterLaneRest
   let rest := retainedTerminalFanCardinalOrdinaryAfterLaneRest
     center port length slot
   have sourcePrefixOrthogonal : OrthogonalPolyline sourcePrefix :=
-    (routeOrthogonal.scalePolyline (by native_decide)).dropLast
+    (routeOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have sourceLeadingOrthogonal : OrthogonalPolyline sourceLeading :=
     sourcePrefixOrthogonal.dropLast
   have sourcePrefixLength : 2 ≤ sourcePrefix.length := by
@@ -251,7 +251,7 @@ theorem retainedFallbackCardinalForwardCancellationResult_nodup
         retainedTerminalInterfaceMultiplier] at lengthLarge ⊢ <;>
       omega
   have sourcePrefixOrthogonal : OrthogonalPolyline sourcePrefix :=
-    (routeOrthogonal.scalePolyline (by native_decide)).dropLast
+    (routeOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have sourceNodup :
       (AxisDirection.unitSubdividePolyline sourcePrefix).Nodup :=
     AxisDirection.unitSubdividePolyline_nodup

@@ -144,13 +144,13 @@ theorem cycleClausePosition_ne_ringVariablePosition :
         ringVariablePosition variableVertex := by
   intro clauseVertex variableVertex
   cases clauseVertex <;> cases variableVertex
-  · native_decide
+  · decide +kernel
   · rename_i variablePort
-    cases variablePort <;> native_decide
+    cases variablePort <;> decide +kernel
   · rename_i clausePort
-    cases clausePort <;> native_decide
+    cases clausePort <;> decide +kernel
   · rename_i clausePort variablePort
-    cases clausePort <;> cases variablePort <;> native_decide
+    cases clausePort <;> cases variablePort <;> decide +kernel
 
 /-- One retained old incidence, represented locally as a unary port clause. -/
 def spokeClause (port : Port) : EmbeddedClause RingVertex where
@@ -220,7 +220,7 @@ def drawing : EmbeddedCNFIncidenceDrawing RingVertex where
 /-- The degree-eight ring has exact endpoints, orthogonal routes, and exact
 continuous planarity. -/
 theorem drawing_isValid : drawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-- Endpoint compatibility of the certified local replacement. -/
 theorem drawing_routesMatch : drawing.RoutesMatch :=

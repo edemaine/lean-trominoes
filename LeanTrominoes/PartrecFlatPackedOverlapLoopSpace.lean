@@ -607,7 +607,7 @@ theorem flatPackedOverlapAtInputUnit_le_context
   have nextColumnBound : column.castSucc.val ≤ 4 := by omega
   have currentColumnBits := listCodeEncodeNat_length_mono currentColumnBound
   have nextColumnBits := listCodeEncodeNat_length_mono nextColumnBound
-  have fourBits : (Computability.encodeNat 4).length = 3 := by native_decide
+  have fourBits : (Computability.encodeNat 4).length = 3 := by decide +kernel
   rw [fourBits] at currentColumnBits nextColumnBits
   change encodedListSpace
       (Code.flatPackedOverlapAtInput periodicStrip.motif column.succ.val
@@ -664,7 +664,7 @@ theorem flatPackedOverlapBaseArgumentsCost_le_quadratic
   have fieldCoefficient :
       4 *
           100000000000000000000000000000000000000000000000000000000000000000 ≤
-        10 ^ 80 := by native_decide
+        10 ^ 80 := by decide +kernel
   have fieldBound (field : Fin 2) :
       flatPackedTransitionCellFieldCost field periodicStrip current next valid
           processed.length ≤ (10 ^ 80) * unit ^ 2 := by
@@ -694,9 +694,9 @@ theorem flatPackedOverlapBaseArgumentsCost_le_quadratic
       _ ≤ 10000 * (2 * unit) := by gcongr
       _ = 20000 * unit := by ring
   have currentAdd : addConstCost column.succ.val [0] ≤ 1000000 := by
-    fin_cases column <;> native_decide
+    fin_cases column <;> decide +kernel
   have nextAdd : addConstCost column.castSucc.val [0] ≤ 1000000 := by
-    fin_cases column <;> native_decide
+    fin_cases column <;> decide +kernel
   have currentNumeral : numeralCost column.succ.val values ≤
       2000000 * unit := by
     simp only [numeralCost]
@@ -731,7 +731,7 @@ theorem flatPackedOverlapBaseArgumentsCost_le_quadratic
   have nextColumnBound : column.castSucc.val ≤ 4 := by omega
   have currentColumnBits := listCodeEncodeNat_length_mono currentColumnBound
   have nextColumnBits := listCodeEncodeNat_length_mono nextColumnBound
-  have fourBits : (Computability.encodeNat 4).length = 3 := by native_decide
+  have fourBits : (Computability.encodeNat 4).length = 3 := by decide +kernel
   rw [fourBits] at currentColumnBits nextColumnBits
   have currentColumnBits' :
       (Computability.encodeNat (column.val + 1)).length ≤ 3 := by
@@ -776,7 +776,7 @@ theorem flatPackedOverlapBaseAtCost_le_context_core
   have arguments := flatPackedOverlapBaseArgumentsCost_le_quadratic
     column periodicStrip current next valid processed cell remaining split
   have coefficientBound :
-      256 * (10 ^ 90) + 10 ^ 100 ≤ 10 ^ 1000 := by native_decide
+      256 * (10 ^ 90) + 10 ^ 100 ≤ 10 ^ 1000 := by decide +kernel
   change flatPackedOverlapAtCost periodicStrip.motif column.succ.val
         column.castSucc.val cell current.assignmentWord next.assignmentWord +
       flatPackedOverlapBaseArgumentsCost column periodicStrip current next valid
@@ -813,7 +813,7 @@ theorem flatPackedOverlapGetCost_le_context_core
   have unitPositive : 1 ≤ unit := by
     simp [unit, flatPackedOverlapContextUnit]
   have unitQuadratic : unit ≤ unit ^ 2 := by nlinarith
-  have coefficient : 200000 ≤ 10 ^ 1000 := by native_decide
+  have coefficient : 200000 ≤ 10 ^ 1000 := by decide +kernel
   calc
     getCost index values ≤
         (10000 * (index + 1)) * (encodedListSpace values + 1) := raw
@@ -1267,7 +1267,7 @@ theorem flatPackedOverlapBodySuccCost_le_context
         processed cell remaining.length ≤ 2011 * core := bodyBound
     _ ≤ flatPackedOverlapBodySpaceBound periodicStrip current next := by
       have coefficient : 2011 * (10 ^ 1000) ≤ 10 ^ 1100 := by
-        native_decide
+        decide +kernel
       change 2011 * ((10 ^ 1000) * unit ^ 2) ≤
         (10 ^ 1100) * unit ^ 2
       calc
@@ -1298,7 +1298,7 @@ theorem flatPackedOverlapBodyZeroCost_le_context
   have coreToBody : flatPackedOverlapContextCore periodicStrip current
       next ≤ flatPackedOverlapBodySpaceBound periodicStrip current
       next := by
-    have coefficient : 10 ^ 1000 ≤ 10 ^ 1100 := by native_decide
+    have coefficient : 10 ^ 1000 ≤ 10 ^ 1100 := by decide +kernel
     change (10 ^ 1000) * unit ^ 2 ≤ (10 ^ 1100) * unit ^ 2
     exact Nat.mul_le_mul_right (unit ^ 2) coefficient
   change zeroPrimeCost payload + encodedListSpace (0 :: payload) +

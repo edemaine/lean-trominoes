@@ -21,6 +21,38 @@ open FormulaShapeFigureNinePolarityRouteHeader
 open FormulaShapeFigureNineRoutePrefix
 open PlanarOneInThreeNoUnitsFigureNine
 
+private theorem sourceHeaderCoordinateInvariantChecks : ∀ profile : DirectedClauseProfile,
+      (sourceClauseHeaders profile).all (fun header => decide (
+        let coordinate := headerTemplateProfileCoordinate header
+        let parent : ParentProfileCoordinate :=
+          ⟨coordinate.profile, coordinate.coordinate.clauseIndex⟩
+        coordinate.profile = clauseProfile (orderedDirectedProfile profile) ∧
+        coordinate.coordinate.literalIndex =
+          (FormulaShapeFigureNineFinalClauseOrdering.reorderList
+            (List.range parent.literalCount)).getD
+              coordinate.coordinate.polarity.sourceLiteralIndex 0 ∧
+        coordinate.coordinate.polarity.sourceLiteralIndex < parent.literalCount)) = true := by
+  intro profile
+  let predicate := fun coordinate : HeaderTemplateProfileCoordinate => decide (
+    let parent : ParentProfileCoordinate :=
+      ⟨coordinate.profile, coordinate.coordinate.clauseIndex⟩
+    coordinate.profile = clauseProfile (orderedDirectedProfile profile) ∧
+    coordinate.coordinate.literalIndex =
+      (FormulaShapeFigureNineFinalClauseOrdering.reorderList
+        (List.range parent.literalCount)).getD
+          coordinate.coordinate.polarity.sourceLiteralIndex 0 ∧
+    coordinate.coordinate.polarity.sourceLiteralIndex < parent.literalCount)
+  change (sourceClauseHeaders profile).all
+    (predicate ∘ headerTemplateProfileCoordinate) = true
+  rw [← List.all_map, sourceClauseHeaders_map_headerTemplateProfileCoordinate]
+  dsimp only [predicate]
+  unfold expectedSourceClauseHeaderTemplateProfileCoordinates
+    expectedSourceClauseHeaderTemplateCoordinates
+  dsimp only
+  generalize clauseProfile (orderedDirectedProfile profile) = templateProfile
+  clear predicate profile
+  cases templateProfile <;> decide +kernel +revert
+
 /-- All finite header coordinates are checked together, including the bound
 that rules out the total lookup's fallback literal. -/
 theorem header_coordinate_invariants
@@ -35,19 +67,7 @@ theorem header_coordinate_invariants
         (List.range parent.literalCount)).getD
           coordinate.coordinate.polarity.sourceLiteralIndex 0 ∧
     coordinate.coordinate.polarity.sourceLiteralIndex < parent.literalCount := by
-  have checked : ∀ profile : DirectedClauseProfile,
-      (sourceClauseHeaders profile).all (fun header => decide (
-        let coordinate := headerTemplateProfileCoordinate header
-        let parent : ParentProfileCoordinate :=
-          ⟨coordinate.profile, coordinate.coordinate.clauseIndex⟩
-        coordinate.profile = clauseProfile (orderedDirectedProfile profile) ∧
-        coordinate.coordinate.literalIndex =
-          (FormulaShapeFigureNineFinalClauseOrdering.reorderList
-            (List.range parent.literalCount)).getD
-              coordinate.coordinate.polarity.sourceLiteralIndex 0 ∧
-        coordinate.coordinate.polarity.sourceLiteralIndex < parent.literalCount)) = true := by
-    native_decide
-  exact of_decide_eq_true ((List.all_eq_true.mp (checked profile)) header member)
+  exact of_decide_eq_true ((List.all_eq_true.mp (sourceHeaderCoordinateInvariantChecks profile)) header member)
 
 /-- Metadata keys in original source-clause order. Every generated clause
 retains its original parent, including when several parents have equal

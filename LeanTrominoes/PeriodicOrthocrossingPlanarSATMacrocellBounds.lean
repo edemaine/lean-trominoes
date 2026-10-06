@@ -126,7 +126,7 @@ local planarizer rectangle. -/
 theorem crossoverStraightIncidenceDrawing_routePoints_bounded :
     crossoverStraightIncidenceDrawing.RoutePointsSatisfy
       InStandardPlanarSATMacrocell := by
-  native_decide
+  decide +kernel
 
 /-- Every genuine route in any fixed corner template lies in the common
 local planarizer rectangle. -/
@@ -134,7 +134,7 @@ theorem cornerEqualityDrawing_routePoints_bounded
     (first second : CornerPort) :
     (cornerEqualityDrawing first second).RoutePointsSatisfy
       InStandardPlanarSATMacrocell := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- Every genuine direct route of one active duplicator arm lies in the
 common local planarizer rectangle. -/
@@ -142,7 +142,7 @@ theorem duplicatorArmStraightIncidenceDrawing_routePoints_bounded
     (arm : DuplicatorArm) :
     (duplicatorArmStraightIncidenceDrawing arm).RoutePointsSatisfy
       InStandardPlanarSATMacrocell := by
-  cases arm <;> native_decide
+  cases arm <;> decide +kernel
 
 /-- Every genuine direct source-clause ray lies in the common local
 planarizer rectangle, for any presented signed arm list. -/

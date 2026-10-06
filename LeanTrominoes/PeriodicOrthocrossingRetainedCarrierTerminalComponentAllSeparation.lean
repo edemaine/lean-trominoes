@@ -27,7 +27,7 @@ theorem
     (drawingArm boundaryArm : DuplicatorArm) :
     (duplicatorArmStraightIncidenceDrawing drawingArm).RoutePointsSatisfy
       boundaryArm.carrierPort.InsideCarrierBoundary := by
-  cases drawingArm <;> cases boundaryArm <;> native_decide
+  cases drawingArm <;> cases boundaryArm <;> decide +kernel
 
 /-- Contact of an active arm with any external fanout port is endpoint-only
 (and is vacuous when that arm does not use the port). -/

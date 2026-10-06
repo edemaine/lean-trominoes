@@ -3,8 +3,26 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.ListRangeGetD
-import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedSourcePositionSemantics
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case0
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case1
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case2
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case3
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case4
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case5
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case6
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case7
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case8
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case9
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case10
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case11
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case12
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case13
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case14
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case15
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case16
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case17
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case18
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderInheritedSourceSelectionSemanticsCertificates.Case19
 
 /-! # Inherited source selection from copied Figure 9 blocks -/
 
@@ -18,15 +36,35 @@ open PeriodicCNF.FormulaShapeDirectionOrdering
 open HorizontalRoutedRouteHeader
 open HorizontalRoutedRouteHeaderCopiedSourcePosition
 
-/-- Retain exactly the values aligned with inherited scope controls. -/
-def selectedInheritedValues {Value : Type} :
-    List AtomScopeControl → List Value → List Value
-  | [], _ => []
-  | _, [] => []
-  | .inherited _ :: scopes, value :: values =>
-      value :: selectedInheritedValues scopes values
-  | .parentLocal _ :: scopes, _ :: values =>
-      selectedInheritedValues scopes values
+private theorem inheritedSourceSelectionCheck_first_correct
+    (first : LeanTrominoes.PeriodicCNF.UnaryProgramClauseProfile.LiteralProfile)
+    (direction : AxisDirection) : firstDirectedProfileCheck inheritedSourceSelectionCheck first direction = true := by
+  rcases first with ⟨nextSlice, value⟩
+  cases nextSlice <;> cases value <;> cases direction
+  · exact inheritedSourceSelectionCheck_case0
+  · exact inheritedSourceSelectionCheck_case1
+  · exact inheritedSourceSelectionCheck_case2
+  · exact inheritedSourceSelectionCheck_case3
+  · exact inheritedSourceSelectionCheck_case4
+  · exact inheritedSourceSelectionCheck_case5
+  · exact inheritedSourceSelectionCheck_case6
+  · exact inheritedSourceSelectionCheck_case7
+  · exact inheritedSourceSelectionCheck_case8
+  · exact inheritedSourceSelectionCheck_case9
+  · exact inheritedSourceSelectionCheck_case10
+  · exact inheritedSourceSelectionCheck_case11
+  · exact inheritedSourceSelectionCheck_case12
+  · exact inheritedSourceSelectionCheck_case13
+  · exact inheritedSourceSelectionCheck_case14
+  · exact inheritedSourceSelectionCheck_case15
+  · exact inheritedSourceSelectionCheck_case16
+  · exact inheritedSourceSelectionCheck_case17
+  · exact inheritedSourceSelectionCheck_case18
+  · exact inheritedSourceSelectionCheck_case19
+
+private theorem inheritedSourceSelectionCheck_correct (profile : DirectedClauseProfile) :
+    inheritedSourceSelectionCheck profile = true :=
+  firstDirectedProfileCheck_sound inheritedSourceSelectionCheck inheritedSourceSelectionCheck_first_correct profile
 
 /-- Inherited-value selection distributes over aligned concatenation. -/
 theorem selectedInheritedValues_append
@@ -112,7 +150,9 @@ private theorem selected_clauseBlock_scopeOffsets_nodup
         (HorizontalRoutedRouteHeaderPresentationAtomScope.clauseBlock profile)
         ((HorizontalRoutedRouteHeaderPresentationAtomScope.clauseBlock
           profile).map scopeOffset)).Nodup := by
-  cases profile <;> native_decide +revert
+  have checked := inheritedSourceSelectionCheck_correct profile
+  simp only [inheritedSourceSelectionCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+  exact checked.1
 
 private theorem selected_clauseBlock_scopeOffsets_forall_lt
     (profile : DirectedClauseProfile) :
@@ -121,7 +161,9 @@ private theorem selected_clauseBlock_scopeOffsets_forall_lt
         ((HorizontalRoutedRouteHeaderPresentationAtomScope.clauseBlock
           profile).map scopeOffset)).Forall fun offset =>
       offset < sourceWordCount profile := by
-  cases profile <;> native_decide +revert
+  have checked := inheritedSourceSelectionCheck_correct profile
+  simp only [inheritedSourceSelectionCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+  exact checked.2
 
 private theorem selected_clauseBlock_positions_nodup
     (start : Nat) (profile : DirectedClauseProfile) :

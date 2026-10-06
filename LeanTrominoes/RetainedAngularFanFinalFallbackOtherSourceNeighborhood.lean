@@ -272,12 +272,12 @@ theorem
           clauseIndex literalIndex))
   have factorPositive :
       0 < retainedAngularFanSourceClearanceFactor := by
-    native_decide
+    decide +kernel
   have clearance :
       2 * 288 <
         retainedTerminalFanTotalRefinement *
           retainedAngularFanSourceClearanceFactor := by
-    native_decide
+    decide +kernel
   have rawLength : 2 ≤ rawRoute.length := by
     simpa [rawRoute] using
       finalCoordinatedSourceRoutes_length_ge_two

@@ -56,7 +56,7 @@ theorem
           retainedDirectSourceSameTargetComponentsLinearlySeparated
             first second firstSlot secondSlot
             firstComponent secondComponent := by
-  native_decide
+  decide +kernel
 
 /-- Ordered, distinct choices of one kind converging on one target have
 strictly separated complete Figure 7 routes. -/

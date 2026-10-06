@@ -118,7 +118,7 @@ theorem selectorBlock_perm_expected :
       control.IsActive →
       (groupedVariableIncidenceElementSelectorBlock control.pair).Perm
         control.expectedSelectors := by
-  native_decide
+  decide +kernel
 
 end VariableIncidenceLocalControl
 

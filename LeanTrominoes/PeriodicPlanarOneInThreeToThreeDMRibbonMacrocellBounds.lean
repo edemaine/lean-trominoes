@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicGridDrawingPointBounds
-import LeanTrominoes.OrthogonalPolylineStrictSeparation
+import LeanTrominoes.OrthogonalPolylineStrictSeparationCheck
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonMacrocells
 
 /-!
@@ -431,16 +431,15 @@ private def allOriginAdjacentRibbonMacrocellRoutesAvoid : Bool :=
       legalRibbonTurns.all fun secondTurn =>
         ribbonWireColors.all fun firstColor =>
           ribbonWireColors.all fun secondColor =>
-            decide
-              (PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+            PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.routesAvoidEachOtherCheck
                 (ribbonMacrocellRoute (0, 0)
                   firstTurn.1 firstTurn.2 firstColor)
                 (ribbonMacrocellRoute offset
-                  secondTurn.1 secondTurn.2 secondColor))
+                  secondTurn.1 secondTurn.2 secondColor)
 
 private theorem allOriginAdjacentRibbonMacrocellRoutesAvoid_eq_true :
     allOriginAdjacentRibbonMacrocellRoutesAvoid = true := by
-  native_decide
+  decide +kernel
 
 /-- At the origin, every pair of legal tiles in distinct adjacent source
 macrocells is continuously compatible. -/
@@ -466,7 +465,7 @@ theorem originAdjacentRibbonMacrocellRoutes_avoidEachOther
   have checked :=
     allOriginAdjacentRibbonMacrocellRoutesAvoid_eq_true
   simp only [allOriginAdjacentRibbonMacrocellRoutesAvoid,
-    List.all_eq_true, decide_eq_true_eq] at checked
+    List.all_eq_true, PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.routesAvoidEachOtherCheck_eq_true] at checked
   exact checked offset
     ((mem_adjacentRibbonMacrocellOffsets_iff offset).2
       offsetAdjacent)

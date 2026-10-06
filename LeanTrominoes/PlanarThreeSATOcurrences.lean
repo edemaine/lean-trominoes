@@ -337,7 +337,7 @@ theorem instantiateFamily_occurrencesAtMost_of_jointly_injective
 times. -/
 theorem crossoverFormula_occurrencesAtMostEight :
     FormulaOccurrencesAtMost 8 crossoverFormula := by
-  native_decide
+  decide +kernel
 
 /-- Each of the four external ports of Figure 8(b) occurs in two clauses. -/
 theorem crossoverFormula_boundary_count_le_two
@@ -347,13 +347,13 @@ theorem crossoverFormula_boundary_count_le_two
         sourceVariable = .bTop ∨ sourceVariable = .bBottom) :
     (embeddedVariableOccurrences crossoverFormula).count
       sourceVariable ≤ 2 := by
-  cases sourceVariable <;> simp at boundary <;> native_decide
+  cases sourceVariable <;> simp at boundary <;> decide +kernel
 
 /-- Every variable of the fixed Figure 8 duplicator occurs at most six
 times. -/
 theorem duplicatorFormula_occurrencesAtMostSix :
     FormulaOccurrencesAtMost 6 duplicatorFormula := by
-  native_decide
+  decide +kernel
 
 /-- One equality link contributes at most four occurrences of any variable,
 including the degenerate case where its endpoints coincide. -/

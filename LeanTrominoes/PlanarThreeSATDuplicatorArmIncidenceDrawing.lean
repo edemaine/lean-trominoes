@@ -35,7 +35,7 @@ theorem duplicatorArmStraightIncidenceDrawing_routesMatch
 theorem duplicatorArmStraightIncidenceDrawing_isPlanar
     (arm : DuplicatorArm) :
     (duplicatorArmStraightIncidenceDrawing arm).IsPlanar := by
-  cases arm <;> native_decide
+  cases arm <;> decide +kernel
 
 /-- Every incidence of one active arm has a compass-valid terminal ray. -/
 theorem duplicatorArmFormula_embeddedTerminalPortsValid
@@ -43,7 +43,7 @@ theorem duplicatorArmFormula_embeddedTerminalPortsValid
     EmbeddedTerminalPortsValid
       (duplicatorArmFormula arm)
       (DuplicatorArmVariable.position arm) := by
-  cases arm <;> native_decide
+  cases arm <;> decide +kernel
 
 /-- Reuse the four Figure 8(a) logical roles for the complete routed
 equality-star template. -/
@@ -77,7 +77,7 @@ def routedDuplicatorStraightIncidenceDrawing :
 separation between incidences belonging to different arms. -/
 theorem routedDuplicatorStraightIncidenceDrawing_isPlanar :
     routedDuplicatorStraightIncidenceDrawing.IsPlanar := by
-  native_decide
+  decide +kernel
 
 /-- Every incidence in the complete three-arm layout has a compass-valid
 terminal ray. -/
@@ -85,7 +85,7 @@ theorem routedDuplicatorFormula_embeddedTerminalPortsValid :
     EmbeddedTerminalPortsValid
       routedDuplicatorFormula
       routedDuplicatorVariablePosition := by
-  native_decide
+  decide +kernel
 
 end PlanarThreeSAT
 end LeanTrominoes

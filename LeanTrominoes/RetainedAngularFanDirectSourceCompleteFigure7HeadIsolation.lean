@@ -3,74 +3,67 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.OrthogonalPolylineUnitSubdivisionContacts
-import LeanTrominoes.OrthogonalPolylineUnitSubdivisionJoin
-import LeanTrominoes.RetainedAngularFanDirectSourceFirstDirections
+import LeanTrominoes.RetainedAngularFanDirectSourceHeadIsolationCertificates.Group0
+import LeanTrominoes.RetainedAngularFanDirectSourceHeadIsolationCertificates.Group1
+import LeanTrominoes.RetainedAngularFanDirectSourceHeadIsolationCertificates.Group2
+import LeanTrominoes.RetainedAngularFanDirectSourceHeadIsolationCertificates.Group3
+import LeanTrominoes.RetainedAngularFanDirectSourceHeadIsolationCertificates.Group4
+import LeanTrominoes.RetainedAngularFanDirectSourceHeadIsolationCertificates.Group5
+import LeanTrominoes.RetainedAngularFanDirectSourceHeadIsolationCertificates.Group6
+import LeanTrominoes.RetainedAngularFanDirectSourceHeadIsolationCertificates.Group7
+import LeanTrominoes.RetainedAngularFanDirectSourceHeadIsolationCertificates.Group8
 
 /-! # Source-head isolation of the finite direct-source Figure 7 atlas -/
 
 namespace LeanTrominoes
 namespace PeriodicEightOccurrenceSplit
 
-/-- Finite segment-level test that the first point is neither listed nor
-contained in any segment after the route's first segment. -/
-def routeHeadGeometricallyFresh (points : List Cell) : Bool :=
-  match points.head? with
-  | none => true
-  | some head =>
-      decide (head ∉ points.tail) &&
-        (gridPolylineSegments points.tail).all fun segment =>
-          decide (¬ segment.Contains head)
-
-/-- The compact segment-level test implies source-head isolation after unit
-subdivision, without constructing the subdivided route during finite atlas
-verification. -/
-theorem headNotInTail_unitSubdividePolyline_of_routeHeadGeometricallyFresh
-    {points : List Cell}
-    (orthogonal : PeriodicOrthocrossing.OrthogonalPolyline points)
-    (checked : routeHeadGeometricallyFresh points = true) :
-    AxisDirection.HeadNotInTail
-      (AxisDirection.unitSubdividePolyline points) := by
-  induction points using List.twoStepInduction with
-  | nil => simp [AxisDirection.HeadNotInTail]
-  | singleton point => simp [AxisDirection.HeadNotInTail]
-  | cons_cons first second rest _induction =>
-      have orthogonalParts :=
-        (List.isChain_cons_cons.mp orthogonal :
-          (GridSegment.mk first second).IsAxisAligned ∧
-            PeriodicOrthocrossing.OrthogonalPolyline (second :: rest))
-      have checkedParts :
-          decide (first ∉ second :: rest) = true ∧
-            (gridPolylineSegments (second :: rest)).all
-                (fun segment => decide (¬ segment.Contains first)) = true := by
-        simpa [routeHeadGeometricallyFresh] using
-          checked
-      have firstNotInTail : first ∉ second :: rest :=
-        of_decide_eq_true checkedParts.1
-      have firstNotInSubdividedTail :
-          first ∉
-            AxisDirection.unitSubdividePolyline (second :: rest) := by
-        intro member
-        rcases
-            AxisDirection.unitSubdividePolyline_mem_original_or_segmentInterior
-              orthogonalParts.2 member with
-          originalMember | ⟨segment, segmentMember, interior⟩
-        · exact firstNotInTail originalMember
-        · have segmentChecked :=
-            (List.all_eq_true.mp checkedParts.2)
-              segment segmentMember
-          exact (of_decide_eq_true segmentChecked)
-            (GridSegment.contains_of_interiorContains interior)
-      have firstSegmentFresh :
-          AxisDirection.HeadNotInTail
-            (AxisDirection.unitSegmentPoints first second) :=
-        AxisDirection.headNotInTail_of_nodup
-          (AxisDirection.unitSegmentPoints_nodup orthogonalParts.1)
-      rw [AxisDirection.unitSubdividePolyline]
-      apply firstSegmentFresh.joinAtEndpoint
-      · exact AxisDirection.unitSegmentPoints_head? first second
-      · intro member
-        exact firstNotInSubdividedTail (List.mem_of_mem_tail member)
+theorem directSourceHeadFreshCheck_correct (kind : RetainedDirectClauseKind) :
+    directSourceHeadFreshCheck kind = true := by
+  cases kind with
+  | crossover index =>
+    fin_cases index
+    · exact directSourceHeadFreshCheck_case0
+    · exact directSourceHeadFreshCheck_case1
+    · exact directSourceHeadFreshCheck_case2
+    · exact directSourceHeadFreshCheck_case3
+    · exact directSourceHeadFreshCheck_case4
+    · exact directSourceHeadFreshCheck_case5
+    · exact directSourceHeadFreshCheck_case6
+    · exact directSourceHeadFreshCheck_case7
+    · exact directSourceHeadFreshCheck_case8
+    · exact directSourceHeadFreshCheck_case9
+    · exact directSourceHeadFreshCheck_case10
+    · exact directSourceHeadFreshCheck_case11
+    · exact directSourceHeadFreshCheck_case12
+    · exact directSourceHeadFreshCheck_case13
+    · exact directSourceHeadFreshCheck_case14
+    · exact directSourceHeadFreshCheck_case15
+    · exact directSourceHeadFreshCheck_case16
+    · exact directSourceHeadFreshCheck_case17
+    · exact directSourceHeadFreshCheck_case18
+    · exact directSourceHeadFreshCheck_case19
+    · exact directSourceHeadFreshCheck_case20
+    · exact directSourceHeadFreshCheck_case21
+    · exact directSourceHeadFreshCheck_case22
+    · exact directSourceHeadFreshCheck_case23
+    · exact directSourceHeadFreshCheck_case24
+    · exact directSourceHeadFreshCheck_case25
+  | duplicator arm index =>
+    cases arm with
+    | left =>
+      fin_cases index
+      · exact directSourceHeadFreshCheck_case26
+      · exact directSourceHeadFreshCheck_case27
+    | middle =>
+      fin_cases index
+      · exact directSourceHeadFreshCheck_case28
+      · exact directSourceHeadFreshCheck_case29
+    | right =>
+      fin_cases index
+      · exact directSourceHeadFreshCheck_case30
+      · exact directSourceHeadFreshCheck_case31
+  | routedClause => exact directSourceHeadFreshCheck_case32
 
 /-- Every origin-zero direct-source Figure 7 route passes the compact
 segment-level source-head isolation test. -/
@@ -81,7 +74,10 @@ theorem retainedDirectSourceZeroCompleteFigure7Route_headFresh_checked :
       routeHeadGeometricallyFresh
           ((retainedDirectSourceZeroChoice kind index).completeFigure7Route
             slot) = true := by
-  native_decide
+  intro kind index slot
+  have checked := directSourceHeadFreshCheck_correct kind
+  simp only [directSourceHeadFreshCheck, finiteAll_eq_true] at checked
+  exact checked index slot
 
 /-- Every origin-zero direct-source Figure 7 route retains an isolated
 source endpoint after unit subdivision. -/

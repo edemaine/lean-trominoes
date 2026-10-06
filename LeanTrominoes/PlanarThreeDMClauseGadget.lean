@@ -80,7 +80,7 @@ exactly once precisely when the auxiliary repeats the literal value. -/
 theorem exactlyOne_not_and_iff (literal auxiliary : Bool) :
     PeriodicOneInThree.ExactlyOne [!literal, auxiliary] ↔
       auxiliary = literal := by
-  cases literal <;> cases auxiliary <;> native_decide
+  cases literal <;> cases auxiliary <;> decide +kernel
 
 /-- All degree-two complementary blue elements force the complete auxiliary
 selection to repeat the literal selection. -/

@@ -279,9 +279,9 @@ theorem
         retainedTerminalFanOuterTransverseNormal
           (retainedDirectSourceFanTerminalAt
             choice.kind choice.index).1)
-  · native_decide
-  · native_decide
-  · native_decide
+  · decide +kernel
+  · decide +kernel
+  · decide +kernel
   · exact sourceSeparated.1
   · exact sourceSeparated.2
   · intro point pointMember
@@ -352,9 +352,9 @@ theorem
         retainedTerminalFanOuterTransverseNormal
           (retainedDirectSourceFanTerminalAt
             choice.kind choice.index).1)
-  · native_decide
-  · native_decide
-  · native_decide
+  · decide +kernel
+  · decide +kernel
+  · decide +kernel
   · exact sourceSeparated.1
   · exact sourceSeparated.2
   · intro point pointMember

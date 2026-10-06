@@ -34,15 +34,15 @@ theorem spokeRoute_avoids_cycleRoute
   rcases literalIndex with _ | literalIndex
   · cases port <;>
       cases vertex with
-      | separator => native_decide
+      | separator => decide +kernel
       | port cyclePort =>
-          cases cyclePort <;> native_decide
+          cases cyclePort <;> decide +kernel
   · rcases literalIndex with _ | literalIndex
     · cases port <;>
         cases vertex with
-        | separator => native_decide
+        | separator => decide +kernel
         | port cyclePort =>
-            cases cyclePort <;> native_decide
+            cases cyclePort <;> decide +kernel
     · change RoutesAvoidEachOther (spokeRoute port) []
       simp [RoutesAvoidEachOther,
         SegmentInteriorsDisjoint, RoutePointsAvoidInteriors,
@@ -80,15 +80,15 @@ theorem spokeRoute_meets_cycleRoute_only_at_tail
   rcases literalIndex with _ | literalIndex
   · cases port <;>
       cases vertex with
-      | separator => native_decide
+      | separator => decide +kernel
       | port cyclePort =>
-          cases cyclePort <;> native_decide
+          cases cyclePort <;> decide +kernel
   · rcases literalIndex with _ | literalIndex
     · cases port <;>
         cases vertex with
-        | separator => native_decide
+        | separator => decide +kernel
         | port cyclePort =>
-            cases cyclePort <;> native_decide
+            cases cyclePort <;> decide +kernel
     · simp [cycleRoute, RoutesMeetOnlyAtFirstTail]
 
 /-- The tail-contact certificate also covers the total

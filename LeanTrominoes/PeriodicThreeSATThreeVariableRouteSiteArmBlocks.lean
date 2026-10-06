@@ -59,7 +59,7 @@ theorem currentOccurrenceVariableRouteSiteArmBlock_eq
   simp_rw [variableRouteOccurrenceNumericArmsTakeThreeAt_formula_eq
     source selected selectedMember]
   rw [offsetZero]
-  native_decide
+  decide +kernel
 
 /-- The zero-offset cycle block of a next-slice occurrence starts with three
 cycle-only sites and ends with six full sites. -/
@@ -82,7 +82,7 @@ theorem nextOccurrenceVariableRouteCycleSiteArmBlock_eq
   simp_rw [variableRouteOccurrenceNumericArmsTakeThreeAt_formula_eq
     source selected selectedMember]
   rw [offsetOne]
-  native_decide
+  decide +kernel
 
 /-- The three sites beyond a next-slice occurrence's cycle block contain
 only its copied left arm. -/
@@ -105,6 +105,6 @@ theorem nextOccurrenceVariableRouteBoundarySiteArmBlock_eq
   simp_rw [variableRouteOccurrenceNumericArmsTakeThreeAt_formula_eq
     source selected selectedMember]
   rw [offsetOne]
-  native_decide
+  decide +kernel
 
 end LeanTrominoes.PeriodicThreeSATThree

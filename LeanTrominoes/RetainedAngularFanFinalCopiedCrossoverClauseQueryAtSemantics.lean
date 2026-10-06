@@ -20,7 +20,7 @@ open PeriodicOrthocrossing
 open PlanarThreeSAT
 
 private theorem crossoverFormula_length : crossoverFormula.length = 26 := by
-  native_decide
+  decide +kernel
 
 /-- The exact final query at a canonical crossover clause is its stable
 direct query at the same local Figure 8(b) clause index. -/

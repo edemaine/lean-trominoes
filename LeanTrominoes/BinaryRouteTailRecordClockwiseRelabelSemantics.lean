@@ -100,7 +100,7 @@ theorem output_clauseRecord_pair
         (BinaryRouteTailRecordFormatter.descriptorProfile
           (carrierClauseDescriptor horizontal nextSlice true)) = true := by
   cases horizontal <;> cases nextSlice <;>
-    native_decide
+    decide +kernel
 
 @[simp] theorem profileNeedsSwap_carrier_backward
     (horizontal nextSlice : Bool) :
@@ -109,7 +109,7 @@ theorem output_clauseRecord_pair
           (carrierClauseDescriptor horizontal nextSlice false)) =
       horizontal := by
   cases horizontal <;> cases nextSlice <;>
-    native_decide
+    decide +kernel
 
 end BinaryRouteTailRecordClockwiseRelabel
 end LeanTrominoes

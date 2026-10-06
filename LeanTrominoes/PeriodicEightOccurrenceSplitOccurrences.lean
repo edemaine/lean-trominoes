@@ -82,7 +82,7 @@ theorem portIndex_injective : Function.Injective portIndex := by
 
 /-- The established clockwise compass list contains every port once. -/
 theorem ports_nodup : ports.Nodup := by
-  native_decide
+  decide +kernel
 
 /-- Fixed copies of one source atom are distinguished by their ports. -/
 theorem copy_injective {Variable : Type*} (atom : Variable) :
@@ -118,7 +118,7 @@ theorem copies_nodup {Variable : Type*} (atom : Variable) :
     (copies atom).Nodup := by
   have verticesNodup :
       OccurrenceSplitRing.cycleVertices.Nodup := by
-    native_decide
+    decide +kernel
   exact verticesNodup.map (ringCopy_injective atom)
 
 /-- Every literal in one fixed implication ring belongs to the atom whose

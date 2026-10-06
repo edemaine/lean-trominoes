@@ -75,7 +75,7 @@ theorem carrierRoute_normalized_fallback_directions_eq
   have templateOrthogonal : OrthogonalPolyline scaledTemplate := by
     exact (carrierLensTemplateRoute_orthogonal
       geometry spanLarge localClauseIndex literalIndex).scalePolyline
-        (by native_decide)
+        (by decide +kernel)
   have terminalPositive : 0 < terminal.2 := by
     exact scaleRetainedTerminalData_length_pos
       retainedAngularFanSourceClearanceFactor_pos

@@ -314,7 +314,7 @@ theorem flatPackedTargetArgumentsCost_le_native
     get3Raw.trans (by simp [localBudget]; omega)
   have zeroRaw := listCodeZeroCost_le_linear values
   have addSmall : addConstCost column.val [0] ≤ 1000000 := by
-    fin_cases column <;> native_decide
+    fin_cases column <;> decide +kernel
   have numeral : numeralCost column.val values ≤ 2 * localBudget := by
     simp only [numeralCost]
     have zero : zeroCost values ≤ localBudget :=
@@ -643,7 +643,7 @@ theorem flatPackedTargetMembershipLookupArgumentsCost_le_constructor
         _ ≤ constructorBudget := operationEnvelope))
   have zeroRaw := listCodeZeroCost_le_linear values
   have addSmall : addConstCost column.val [0] ≤ 1000000 := by
-    fin_cases column <;> native_decide
+    fin_cases column <;> decide +kernel
   have numeral : numeralCost column.val values ≤ constructorBudget := by
     simp only [numeralCost]
     have totalEnvelope :

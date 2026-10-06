@@ -425,7 +425,7 @@ theorem
           directLiteralMember fallbackLiteralMember choiceLookup
           fallbackChoiceNone directAligned relativeTranslate
           relativeTranslateNonzero centersDifferent)
-        (by native_decide) (by native_decide)
+        (by decide +kernel) (by decide +kernel)
 
 end PeriodicOrthocrossing
 end LeanTrominoes

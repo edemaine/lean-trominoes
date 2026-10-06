@@ -302,9 +302,9 @@ theorem intOffsetUnit_le_linear (amount number : Nat) :
   have final := encodeNat_add_length_le_sum
     (2 * (number + 2 * amount)) 8
   have twoBits :
-      (Computability.encodeNat 2).length = 2 := by native_decide
+      (Computability.encodeNat 2).length = 2 := by decide +kernel
   have eightBits :
-      (Computability.encodeNat 8).length = 4 := by native_decide
+      (Computability.encodeNat 8).length = 4 := by decide +kernel
   simp only [intOffsetUnit,
     encodedListSpace_cons, encodedListSpace_nil]
   omega
@@ -595,7 +595,7 @@ theorem intOffsetResultCode_length_le (offset : Int) (number : Nat) :
   have summed := encodeNat_add_length_le_sum number
     (2 * intOffsetAmount offset)
   have twoBits :
-      (Computability.encodeNat 2).length = 2 := by native_decide
+      (Computability.encodeNat 2).length = 2 := by decide +kernel
   omega
 
 /-- Every fixed encoded-integer offset uses space linear in one encoded

@@ -20,12 +20,12 @@ theorem cycleDescriptors_eq :
     cycleDescriptors =
       cycleClauseDescriptors ++
         List.replicate FormulaShapeFixedEight.copiesPerVariable .variable := by
-  native_decide
+  decide +kernel
 
 @[simp] theorem cycleClauseDescriptors_length :
     cycleClauseDescriptors.length =
       FormulaShapeFixedEight.copiesPerVariable := by
-  native_decide
+  decide +kernel
 
 private theorem localCycleFormula_clause_length
     (clause : PeriodicClause RingVertex)

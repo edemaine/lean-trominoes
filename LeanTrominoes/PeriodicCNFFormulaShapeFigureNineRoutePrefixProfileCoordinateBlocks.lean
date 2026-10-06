@@ -42,7 +42,12 @@ theorem expectedSourceClauseHeaderTemplateProfileCoordinateBlocks_flatten :
       (expectedSourceClauseHeaderTemplateProfileCoordinateBlocks
         profile).flatten =
         expectedSourceClauseHeaderTemplateProfileCoordinates profile := by
-  native_decide
+  intro profile
+  unfold expectedSourceClauseHeaderTemplateProfileCoordinateBlocks
+    expectedSourceClauseHeaderTemplateProfileCoordinates
+    expectedSourceClauseHeaderTemplateCoordinates
+  simp only [List.map_flatMap, List.map_map, Function.comp_def]
+  rw [List.flatMap_def]
 
 /-- In every generated-clause block, the coordinate's polarity field is
 exactly the polarity descriptor generated from that final clause's literal
@@ -53,7 +58,24 @@ theorem expectedSourceClauseHeaderTemplateProfileCoordinateBlocks_map_polarity :
           (List.map fun coordinate => coordinate.coordinate.polarity) =
         (finalClauseLiteralValueBlock (.clause profile)).map
           indexedDescriptors := by
-  native_decide
+  intro profile
+  unfold expectedSourceClauseHeaderTemplateProfileCoordinateBlocks
+    finalClauseLiteralValueBlock finalFigureClauseProfiles figureClauseProfiles
+  dsimp only
+  simp only [List.map_map, Function.comp_def]
+  simp_rw [descriptors_map_indexed]
+  let clauses := (templateDrawingOfClauseProfile
+    (clauseProfile (orderedDirectedProfile profile))).formula
+  let schedule := fun clause => indexedDescriptors
+    ((reorderProfile (embeddedClauseProfile clause)).literals.map
+      UnaryProgramClauseProfile.LiteralProfile.value)
+  change clauses.zipIdx.map (fun taggedClause => schedule taggedClause.1) =
+    clauses.map schedule
+  calc
+    _ = (clauses.zipIdx.map Prod.fst).map schedule := by
+      rw [List.map_map]
+      rfl
+    _ = _ := by rw [List.zipIdx_map_fst]
 
 /-- Generated-clause blocks emitted by one direction-aware source token. -/
 def expectedHeaderTemplateProfileCoordinateBlocks :

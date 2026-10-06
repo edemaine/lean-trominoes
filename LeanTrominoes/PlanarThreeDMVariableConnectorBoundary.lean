@@ -99,14 +99,14 @@ theorem variableConnectorBoundary_realizable_iff
         boundary.connector = boundary.first := by
   rcases boundary with ⟨first, second, connector⟩
   cases kind <;> cases first <;> cases second <;> cases connector <;>
-    native_decide
+    decide +kernel
 
 /-- Every connector kind realizes both canonical signal values. -/
 theorem variableConnectorBoundary_canonical_realizable
     (kind : VariableConnectorKind) (value : Bool) :
     (VariableConnectorBoundary.canonical value).Realizable kind := by
   rw [variableConnectorBoundary_realizable_iff]
-  cases value <;> native_decide
+  cases value <;> decide +kernel
 
 /-- A realizable connector has a unique boundary once its common RGB signal
 is known. -/
@@ -164,7 +164,7 @@ theorem variableConnectorBoundary_realizableFor_iff
           variableConnectorLiteralSignal boundary.first polarity := by
   rcases boundary with ⟨first, second, connector⟩
   cases kind <;> cases polarity <;> cases first <;> cases second <;>
-    cases connector <;> native_decide
+    cases connector <;> decide +kernel
 
 /-- Canonical signed boundary at one variable-cycle phase. -/
 def VariableConnectorBoundary.canonicalFor
@@ -180,7 +180,7 @@ theorem variableConnectorBoundary_canonicalFor_realizable
     (VariableConnectorBoundary.canonicalFor
       variableValue polarity).RealizableFor kind polarity := by
   rw [variableConnectorBoundary_realizableFor_iff]
-  cases variableValue <;> cases polarity <;> native_decide
+  cases variableValue <;> cases polarity <;> decide +kernel
 
 end PlanarThreeDM
 end LeanTrominoes

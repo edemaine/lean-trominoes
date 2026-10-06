@@ -26,15 +26,15 @@ theorem bendRouteCardinalTangentCertificate_north
   | west =>
       interval_cases localClauseIndex <;>
         interval_cases literalIndex <;>
-        constructor <;> native_decide
+        constructor <;> decide +kernel
   | east =>
       interval_cases localClauseIndex <;>
         interval_cases literalIndex <;>
-        constructor <;> native_decide
+        constructor <;> decide +kernel
   | south =>
       interval_cases localClauseIndex <;>
         interval_cases literalIndex <;>
-        constructor <;> native_decide
+        constructor <;> decide +kernel
   | north => exact (different rfl).elim
 
 end PeriodicEightOccurrenceSplit

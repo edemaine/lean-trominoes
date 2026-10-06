@@ -402,8 +402,8 @@ theorem flatPackedAssignmentIsCost_le_bound
       omega)
   have addSmall : addConstCost selected [0] ≤ 1000000 := by
     cases state with
-    | none => native_decide
-    | some symmetry => fin_cases symmetry <;> native_decide
+    | none => decide +kernel
+    | some symmetry => fin_cases symmetry <;> decide +kernel
   have numeralBound : numeralCost selected values ≤ 2 * budget := by
     simp only [numeralCost]
     omega
@@ -425,7 +425,7 @@ theorem flatPackedAssignmentIsCost_le_bound
   have equalityArgument : 2 * (digit + selected) + 4 ≤ 36 := by omega
   have equalityBits := encodeNat_length_mono equalityArgument
   have thirtySixBits : (Computability.encodeNat 36).length = 6 := by
-    native_decide
+    decide +kernel
   rw [thirtySixBits] at equalityBits
   have equalityBound : natEqCost digit selected ≤ budget :=
     equalityRaw.trans (by

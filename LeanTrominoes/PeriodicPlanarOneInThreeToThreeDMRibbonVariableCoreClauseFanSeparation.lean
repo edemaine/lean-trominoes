@@ -43,7 +43,7 @@ theorem routedVariableSiteRoute_points_in_inset_rectangle :
                   slot active color⟩
               color) →
         InClosedGridRectangle (1, 1) (127, 127) point := by
-  native_decide
+  decide +kernel
 
 namespace VariableRibbonFanData
 

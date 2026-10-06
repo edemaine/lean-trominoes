@@ -21,10 +21,10 @@ theorem carrierLensUpperLeftTemplateRoute_classified
   cases horizontal
   · change retainedTerminalDirectionClassify (0, 3) =
       some (.compass .south, 3)
-    native_decide
+    decide +kernel
   · change retainedTerminalDirectionClassify (3, 0) =
       some (.compass .east, 3)
-    native_decide
+    decide +kernel
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

@@ -179,7 +179,7 @@ theorem orderCanonicalRoutesByClauseDirection_ternaryClockwise_of_unitEliminatio
       (by simp [literalsEq])
   rw [direction0, direction1, direction2,
     sourceDirection2, sourceDirection0, sourceDirection1]
-  native_decide
+  decide +kernel
 
 end PositionedPeriodicCNF
 end LeanTrominoes

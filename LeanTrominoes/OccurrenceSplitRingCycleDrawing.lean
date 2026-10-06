@@ -36,7 +36,7 @@ def cycleDrawing : EmbeddedCNFIncidenceDrawing RingVertex where
 /-- The standalone implication ring has exact endpoints, orthogonal routes,
 and continuous planarity. -/
 theorem cycleDrawing_isValid : cycleDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 theorem cycleDrawing_routesMatch : cycleDrawing.RoutesMatch :=
   cycleDrawing_isValid.1

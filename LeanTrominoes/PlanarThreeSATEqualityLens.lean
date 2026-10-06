@@ -125,7 +125,7 @@ theorem horizontalEqualityLensDrawing_isOrthogonal
 private theorem horizontalEqualityLensUpperLeftRoute_isSimple :
     LocalIncidenceDrawing.RouteIsSimple
       horizontalEqualityLensUpperLeftRoute := by
-  native_decide
+  decide +kernel
 
 private theorem horizontalEqualityLensUpperRightRoute_isSimple
     (span : Int) (spanLarge : 8 ≤ span) :
@@ -142,7 +142,7 @@ private theorem horizontalEqualityLensUpperRightRoute_isSimple
 private theorem horizontalEqualityLensLowerLeftRoute_isSimple :
     LocalIncidenceDrawing.RouteIsSimple
       horizontalEqualityLensLowerLeftRoute := by
-  native_decide
+  decide +kernel
 
 private theorem horizontalEqualityLensLowerRightRoute_isSimple
     (span : Int) (spanLarge : 8 ≤ span) :

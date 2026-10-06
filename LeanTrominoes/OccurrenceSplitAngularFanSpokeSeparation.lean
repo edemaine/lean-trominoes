@@ -68,7 +68,7 @@ theorem spokeRoutes_strictlyAvoid_of_indices_ne
   interval_cases first <;>
     interval_cases second <;>
     simp_all [angularPortOfIndex] <;>
-    native_decide
+    decide +kernel
 
 /-- The common translation origin of a positioned occurrence fan. -/
 def angularFanOccurrenceOrigin

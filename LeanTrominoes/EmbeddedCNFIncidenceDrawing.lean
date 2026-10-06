@@ -13,7 +13,7 @@ The routed planar-SAT reduction is assembled from finite positioned CNF
 gadgets.  This file packages the geometric data common to those gadgets:
 one physical position per variable and one indexed polyline per literal
 occurrence.  All geometric predicates quantify through finite `Fin` types,
-so a fixed gadget can discharge them with `native_decide`.
+so a fixed gadget can discharge them with `decide +kernel`.
 
 The planarity predicate is continuous for axis-aligned segments.  It rejects
 overlapping route interiors, route points in another route's interior,

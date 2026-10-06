@@ -61,7 +61,7 @@ theorem fixedGreenTrue_core_gate_endpointSeparated :
       RoutesAvoidEachOther
           (fixedGreenTrueCoreRoute triple routeColor)
           (fixedGreenTrueGateRoute gateColor) := by
-  native_decide
+  decide +kernel
 
 /-- The endpoint-aware certificate contains the three continuous-planarity
 conditions. -/
@@ -82,21 +82,21 @@ theorem fixedGreenTrue_blue_commonPoints :
     (fixedGreenTrueCoreRoute .first .blue).filter
         (fun point => point ∈ fixedGreenTrueGateRoute .blue) =
       [(20, 76)] := by
-  native_decide
+  decide +kernel
 
 /-- The routed red incidence meets its gate only at its splice port. -/
 theorem fixedGreenTrue_red_commonPoints :
     (fixedGreenTrueCoreRoute .auxiliary .red).filter
         (fun point => point ∈ fixedGreenTrueGateRoute .red) =
       [(24, 76)] := by
-  native_decide
+  decide +kernel
 
 /-- The routed green incidence meets its gate only at its splice port. -/
 theorem fixedGreenTrue_green_commonPoints :
     (fixedGreenTrueCoreRoute .auxiliary .green).filter
         (fun point => point ∈ fixedGreenTrueGateRoute .green) =
       [(28, 76)] := by
-  native_decide
+  decide +kernel
 
 /-- The repaired normalized fixed-green table is one of the endpoint-clear
 tables admitted by the global routing interface. -/

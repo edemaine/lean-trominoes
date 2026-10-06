@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonVariableOuterFans
+import LeanTrominoes.OrthogonalPolylineSegmentBoxCheck
+import LeanTrominoes.OrthogonalPolylineStrictSeparationCheck
+import LeanTrominoes.LocalIncidenceDrawingCheck
 
 /-!
 # Complete coordinated variable-side ribbon fans
@@ -22,9 +25,49 @@ separated.
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 10000
+
 open Gadget PlanarThreeDM
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 open PeriodicOrthocrossing
+
+private theorem selectedTemplate_slot_index_lt
+    (outer : VariableOuterFanData) (compatible : outer.IsClockwiseCompatible)
+    (slot : VariableSiteSlot) (active : outer.SlotActive slot) :
+    slot.index < outer.selectedTemplate.directions.length := by
+  rw [outer.selectedTemplate_directions compatible, outer.activeDirections_length]
+  exact active
+
+private theorem localOuterAvoid_check :
+    (standardVariableOuterFanTemplates.all fun template =>
+      finiteAll fun localSlot : VariableSiteSlot => finiteAll fun outerSlot : VariableSiteSlot =>
+        guardedCheck (localSlot.index < template.directions.length ∧ outerSlot.index < template.directions.length)
+          (finiteAll fun kind : VariableConnectorKind => finiteAll fun polarity : Bool =>
+            finiteAll fun localColor : WireColor => finiteAll fun outerColor : WireColor =>
+              routesAvoidEachOtherCheck (standardVariableLocalGateRoute localSlot kind polarity localColor)
+              (template.route outerSlot outerColor))) = true := by
+  decide +kernel
+
+private theorem localOuterStrict_check :
+    (standardVariableOuterFanTemplates.all fun template =>
+      finiteAll fun localSlot : VariableSiteSlot => finiteAll fun outerSlot : VariableSiteSlot =>
+        guardedCheck (localSlot.index < template.directions.length ∧ outerSlot.index < template.directions.length)
+          (finiteAll fun kind : VariableConnectorKind => finiteAll fun polarity : Bool =>
+            finiteAll fun localColor : WireColor => finiteAll fun outerColor : WireColor =>
+              guardedCheck ((localSlot, kind.ribbonLaneForColor localColor) ≠ (outerSlot, outerColor))
+            (segmentBoxesSeparateCheck (standardVariableLocalGateRoute localSlot kind polarity localColor)
+              (template.route outerSlot outerColor)))) = true := by
+  decide +kernel
+
+private theorem joinedLocalOuterSimple_check :
+    (standardVariableOuterFanTemplates.all fun template =>
+      finiteAll fun slot : VariableSiteSlot => guardedCheck (slot.index < template.directions.length)
+        (finiteAll fun kind : VariableConnectorKind => finiteAll fun polarity : Bool =>
+          finiteAll fun color : WireColor => LocalIncidenceDrawing.routeIsSimpleCheck
+            (joinAtEndpoint (standardVariableLocalGateRoute slot kind polarity color)
+              (template.route slot (kind.ribbonLaneForColor color))))) = true := by
+  decide +kernel
 
 /-! ## Finite interface between the two route tables -/
 
@@ -41,7 +84,15 @@ theorem standardVariableLocalGateRoute_avoids_outerRoute :
             (standardVariableLocalGateRoute
               localSlot kind polarity localColor)
             (outer.outerRoute outerSlot outerColor) := by
-  native_decide
+  have checked := localOuterAvoid_check
+  simp only [List.all_eq_true, finiteAll_eq_true, guardedCheck_eq_true, routesAvoidEachOtherCheck_eq_true] at checked
+  intro outer compatible localSlot outerSlot localActive outerActive kind polarity localColor outerColor
+  have certificate := checked outer.selectedTemplate (outer.selectedTemplate_mem compatible)
+    localSlot outerSlot
+    ⟨selectedTemplate_slot_index_lt outer compatible localSlot localActive,
+      selectedTemplate_slot_index_lt outer compatible outerSlot outerActive⟩
+    kind polarity localColor outerColor
+  exact certificate
 
 /-- If the strands differ, the local and outer table pieces have no contact
 at all. -/
@@ -58,7 +109,15 @@ theorem standardVariableLocalGateRoute_strictlyAvoids_outerRoute :
             (standardVariableLocalGateRoute
               localSlot kind polarity localColor)
             (outer.outerRoute outerSlot outerColor) := by
-  native_decide
+  have checked := localOuterStrict_check
+  simp only [List.all_eq_true, finiteAll_eq_true, guardedCheck_eq_true] at checked
+  intro outer compatible localSlot outerSlot localActive outerActive kind polarity localColor outerColor different
+  have certificate := checked outer.selectedTemplate (outer.selectedTemplate_mem compatible)
+    localSlot outerSlot
+    ⟨selectedTemplate_slot_index_lt outer compatible localSlot localActive,
+      selectedTemplate_slot_index_lt outer compatible outerSlot outerActive⟩
+    kind polarity localColor outerColor different
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _ certificate
 
 /-- Each complete finite local-plus-outer route is geometrically simple. -/
 theorem joinedVariableGateOuterRoute_simple :
@@ -72,7 +131,12 @@ theorem joinedVariableGateOuterRoute_simple :
                 slot kind polarity color)
               (outer.outerRoute
                 slot (kind.ribbonLaneForColor color))) := by
-  native_decide
+  have checked := joinedLocalOuterSimple_check
+  simp only [List.all_eq_true, finiteAll_eq_true, guardedCheck_eq_true,
+    LocalIncidenceDrawing.routeIsSimpleCheck_eq_true] at checked
+  intro outer compatible slot active kind polarity color
+  exact checked outer.selectedTemplate (outer.selectedTemplate_mem compatible) slot
+    (selectedTemplate_slot_index_lt outer compatible slot active) kind polarity color
 
 namespace VariableRibbonFanData
 

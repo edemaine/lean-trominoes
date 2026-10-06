@@ -111,7 +111,19 @@ private theorem sourceClauseHeaders_map_clauseIndex :
         (expectedSourceClauseHeaderTemplateProfileCoordinateBlocks
           profile).zipIdx.flatMap fun taggedBlock =>
             List.replicate taggedBlock.1.length taggedBlock.2 := by
-  native_decide
+  intro profile
+  calc
+    _ = ((sourceClauseHeaders profile).map headerTemplateCoordinate).map
+        HeaderTemplateCoordinate.clauseIndex := by
+      simp only [List.map_map, Function.comp_def]
+    _ = _ := by
+      rw [sourceClauseHeaders_map_headerTemplateCoordinate]
+      unfold expectedSourceClauseHeaderTemplateCoordinates
+        expectedSourceClauseHeaderTemplateProfileCoordinateBlocks
+      dsimp only
+      generalize clauseProfile (orderedDirectedProfile profile) = templateProfile
+      clear profile
+      cases templateProfile <;> decide +kernel +revert
 
 private theorem sourceClauseHeaders_map_shiftedClauseIndex
     (profile : DirectedClauseProfile) (start : Nat) :

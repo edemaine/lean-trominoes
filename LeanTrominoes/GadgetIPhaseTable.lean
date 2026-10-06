@@ -94,7 +94,7 @@ set_option maxRecDepth 100000 in
 set_option maxHeartbeats 5000000 in
 /-- Exhaustive certificate for the preferred Figure 12 phase table. -/
 theorem iPreferredPhaseTableCorrect : IPreferredPhaseTableCorrect := by
-  native_decide
+  decide +kernel
 
 end Gadget
 end LeanTrominoes

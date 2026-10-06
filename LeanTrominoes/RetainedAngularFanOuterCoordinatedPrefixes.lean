@@ -57,10 +57,10 @@ theorem retainedTerminalFanOuterCoordinatedPrefix_vectors_add
   cases direction with
   | compass port =>
       cases port <;>
-        native_decide
+        decide +kernel
   | routedClause arm =>
       cases arm <;>
-        native_decide
+        decide +kernel
 
 /-- A finite route at the origin through the first two primitive blocks of
 one terminal direction.  Different incidences at a clause choose these

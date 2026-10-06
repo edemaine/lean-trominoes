@@ -95,10 +95,10 @@ theorem flatPackedCenterAssignmentArgumentsCost_le_linear
   have drop6 := flatLookupDropCost_le_linear 6 values
   have zeroBound := listCodeZeroCost_le_linear values
   have addSmall : addConstCost WindowState.center.val [0] ≤ 100000 := by
-    native_decide
+    decide +kernel
   have centerBits :
       (Computability.encodeNat WindowState.center.val).length ≤ 100 := by
-    native_decide
+    decide +kernel
   have numeralBound : numeralCost WindowState.center.val values ≤
       1000000 * unit := by
     simp only [numeralCost]
@@ -221,7 +221,7 @@ theorem flatPackedCenterAssignmentNativeInput_le_candidate
       2 * flatPackedCenterCandidateInputUnit periodicStrip packed base := by
   have centerBits :
       (Computability.encodeNat WindowState.center.val).length = 2 := by
-    native_decide
+    decide +kernel
   simp [flatPackedAssignmentLookupNativeInputSpace,
     flatPackedCenterCandidateInputUnit,
     Code.flatPackedCenterCandidateInput,
@@ -241,7 +241,7 @@ theorem flatPackedCenterTargetNativeInput_le_candidate
   have columnBits := listCodeEncodeNat_length_mono columnSmall
   have offsetBits := listCodeEncodeNat_length_mono offsetSmall
   have fourBits : (Computability.encodeNat 4).length = 3 := by
-    native_decide
+    decide +kernel
   rw [fourBits] at columnBits offsetBits
   change
     encodedListSpace
@@ -866,7 +866,7 @@ theorem flatPackedCenterAssignmentIsCost_le_quadratic
       4 *
           10000000000000000000000000000000000000000000000000000000000 +
         1000000000 ≤ flatPackedCenterAssignmentIsQuadraticCoefficient := by
-    native_decide
+    decide +kernel
   change flatPackedAssignmentPredicateSpaceBound periodicStrip.motif
       WindowState.center.val base packed.assignmentWord +
       flatPackedCenterAssignmentArgumentsCost periodicStrip packed base ≤
@@ -930,7 +930,7 @@ theorem flatPackedCenterSourceInsideCost_le_quadratic
   have coefficientBound :
       100 * flatPackedTargetMembershipPolynomialCoefficient + 1000000000 ≤
         flatPackedCenterSourceInsideQuadraticCoefficient := by
-    native_decide
+    decide +kernel
   change flatPackedTargetMembershipSpaceBound
       (Code.packedSourceColumn symmetry source) (symmetry.act source).2
       periodicStrip.period packed.phase periodicStrip.motif base.2
@@ -963,16 +963,16 @@ theorem flatPackedCenterAllSourcesInsideSpaceBound_le_quadratic
       2000000 *
           (3 * flatPackedCenterSourceInsideQuadraticCoefficient + 102) ≤
         flatPackedCenterAllSourcesInsideQuadraticCoefficient := by
-    native_decide
+    decide +kernel
   have first := flatPackedCenterSourceInsideCost_le_quadratic symmetry (0, 0)
-    periodicStrip packed base (by cases symmetry <;> native_decide)
+    periodicStrip packed base (by cases symmetry <;> decide +kernel)
   have second := flatPackedCenterSourceInsideCost_le_quadratic symmetry (1, 0)
-    periodicStrip packed base (by cases symmetry <;> native_decide)
+    periodicStrip packed base (by cases symmetry <;> decide +kernel)
   cases tromino with
   | I =>
       have third := flatPackedCenterSourceInsideCost_le_quadratic symmetry
         (2, 0) periodicStrip packed base
-        (by cases symmetry <;> native_decide)
+        (by cases symmetry <;> decide +kernel)
       simp only [flatPackedCenterAllSourcesInsideSpaceBound,
         flatPackedCenterAllSourcesInsideSpaceUnit]
       simp only [unit] at first second third unitQuadratic
@@ -990,7 +990,7 @@ theorem flatPackedCenterAllSourcesInsideSpaceBound_le_quadratic
   | L =>
       have third := flatPackedCenterSourceInsideCost_le_quadratic symmetry
         (0, 1) periodicStrip packed base
-        (by cases symmetry <;> native_decide)
+        (by cases symmetry <;> decide +kernel)
       simp only [flatPackedCenterAllSourcesInsideSpaceBound,
         flatPackedCenterAllSourcesInsideSpaceUnit]
       simp only [unit] at first second third unitQuadratic
@@ -1028,7 +1028,7 @@ theorem flatPackedCenterCandidateInsideSpaceBound_le_quadratic
           (flatPackedCenterAssignmentIsQuadraticCoefficient +
             flatPackedCenterAllSourcesInsideQuadraticCoefficient + 102) ≤
         flatPackedCenterCandidateInsideQuadraticCoefficient := by
-    native_decide
+    decide +kernel
   simp only [flatPackedCenterCandidateInsideSpaceBound,
     flatPackedCenterCandidateInsideSpaceUnit]
   calc

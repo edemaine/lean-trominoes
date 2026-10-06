@@ -242,7 +242,7 @@ theorem
         fallbackLiteralMember pointMember
   · exact
       ClosedGridRectanglesSeparated.scale_both_coordinateRadius
-        rectanglesSeparated (by native_decide) (by native_decide)
+        rectanglesSeparated (by decide +kernel) (by decide +kernel)
 
 /-- Avoiding the fully refined retained source prefix and the selected outer
 replacement suffices to avoid the actual selected fallback boundary. -/

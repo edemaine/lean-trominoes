@@ -49,11 +49,11 @@ theorem variableRouteOccurrenceEdgeIndices_subset_finalSite
     · change Cell.sub ((1, 1) : Cell)
           taggedIncidence.1.edge.offset ∈ neighborTranslations
       rw [offsetZero]
-      native_decide
+      decide +kernel
     · change Cell.sub ((1, 1) : Cell)
           taggedIncidence.1.edge.offset ∈ neighborTranslations
       rw [offsetOne]
-      native_decide
+      decide +kernel
   let finalOccurrence : CNFRouteOccurrence Variable :=
     ⟨taggedIncidence.1, taggedIncidence.2, finalTranslate⟩
   have finalOccurrenceMember : finalOccurrence ∈

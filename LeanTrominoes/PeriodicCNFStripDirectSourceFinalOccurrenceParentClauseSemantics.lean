@@ -108,7 +108,7 @@ private theorem routedClauseBlock_spec_of_arity
       routed.2.map
           HorizontalRoutedRouteHeader.descriptorOutputConnectorKind =
         HorizontalRoutedRouteHeader.clauseConnectorKinds routed.1 := by
-  cases profile <;> native_decide +revert
+  cases profile <;> decide +kernel +revert
 
 private theorem clauseConnectorKinds_eq_terminalKinds
     (profile : ClauseProfile)
@@ -118,7 +118,7 @@ private theorem clauseConnectorKinds_eq_terminalKinds
       if decide (3 ≤ profile.literals.length) then
         [.fixedRed, .fixedBlue, .fixedGreen]
       else [.fixedRed, .fixedBlue] := by
-  cases profile <;> native_decide +revert
+  cases profile <;> decide +kernel +revert
 
 private theorem indexedFrames_no_clauseFans
     (allHeaders headers : List Header) (start : Nat)
@@ -211,17 +211,17 @@ private theorem figureClauseProfiles_arity_two_or_three
       simp only [figureClauseProfiles,
         FormulaShapeFigureNineRoutePrefix.clauseProfile]
       clear direction
-      native_decide +revert
+      decide +kernel +revert
   | binary first firstDirection second secondDirection =>
       simp only [figureClauseProfiles,
         FormulaShapeFigureNineRoutePrefix.clauseProfile]
       clear firstDirection secondDirection
-      native_decide +revert
+      decide +kernel +revert
   | ternary first firstDirection second secondDirection third thirdDirection =>
       simp only [figureClauseProfiles,
         FormulaShapeFigureNineRoutePrefix.clauseProfile]
       clear firstDirection secondDirection thirdDirection
-      native_decide +revert
+      decide +kernel +revert
 
 private theorem frameBlocks_spec
     (profiles : List ClauseProfile)

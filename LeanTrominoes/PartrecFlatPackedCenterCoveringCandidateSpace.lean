@@ -196,7 +196,7 @@ theorem flatPackedCenterCoveringCandidateSpaceBound_le_quadratic
       10 *
           1000000000000000000000000000000000000000000000000000000000000 ≤
         flatPackedCenterCoveringConstructorLinearCoefficient := by
-    native_decide
+    decide +kernel
   have constructorBound : constructorBudget ≤
       flatPackedCenterCoveringConstructorLinearCoefficient * unit := by
     calc
@@ -282,7 +282,7 @@ theorem flatPackedCenterCoveringCandidateSpaceBound_le_quadratic
           (100 * flatPackedCenterCoveringConstructorLinearCoefficient +
             1000000000) ≤
         flatPackedCenterCoveringCandidateQuadraticCoefficient := by
-    native_decide
+    decide +kernel
   change flatPackedAssignmentPredicateSpaceBound periodicStrip.motif
         column.val
         (Code.packedCenterCoveringTarget periodicStrip packed base

@@ -458,7 +458,7 @@ theorem
       0 < retainedTerminalFanOuterRadialLength secondScaledTerminal := by
     have escapePositive :
         0 < retainedTerminalFanOuterSourceEscapeLength := by
-      native_decide
+      decide +kernel
     omega
   have mixedFansAvoid :
       RoutesStrictlyAvoidEachOther

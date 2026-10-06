@@ -69,7 +69,7 @@ theorem RetainedFallbackFanKind.splicedOwnFigure7Route_localized_normalized_dire
     exact List.ne_nil_of_length_pos sourcePrefixLength
   have sourcePrefixOrthogonal : OrthogonalPolyline sourcePrefix := by
     exact
-      (routeOrthogonal.scalePolyline (by native_decide)).dropLast
+      (routeOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have sourcePrefixLast : sourcePrefix.getLast? = some gate := by
     simpa [sourcePrefix, center, gate,
       retainedFallbackSourcePrefix, retainedFallbackFanCenter] using

@@ -280,7 +280,7 @@ theorem packedNormalizationAll
     (packedNormalizationLastFour periodicStrip packed)
   have columns :
       (List.finRange 5 : List (Fin 5)) = [0, 1, 2, 3, 4] := by
-    native_decide
+    decide +kernel
   rw [PackedWindowState.isNormalizedBool, columns]
   simpa [Code.packedNormalizationAllCode,
     packedNormalizationAllCost] using combined

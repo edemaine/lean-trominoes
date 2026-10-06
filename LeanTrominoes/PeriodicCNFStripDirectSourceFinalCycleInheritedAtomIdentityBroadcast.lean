@@ -58,6 +58,6 @@ theorem directSourceFinalCycleInheritedAtomIdentityIndices_eq_flatMap_replicate
         at tokenMember
       exact List.eq_of_mem_replicate tokenMember
     subst token
-    native_decide
+    decide +kernel
 
 end LeanTrominoes.PeriodicCNFStripReduction

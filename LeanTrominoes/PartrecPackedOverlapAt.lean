@@ -144,7 +144,7 @@ theorem assignmentOfDigit_eq_iff_of_lt_nine
       left = right := by
   interval_cases left <;>
     interval_cases right <;>
-    native_decide
+    decide +kernel
 
 /-- The arithmetic digit comparison is the semantic packed overlap test. -/
 theorem packedOverlapAtCode_eval_semantic

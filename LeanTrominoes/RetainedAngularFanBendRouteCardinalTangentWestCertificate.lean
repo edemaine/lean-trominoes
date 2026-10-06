@@ -27,15 +27,15 @@ theorem bendRouteCardinalTangentCertificate_west
   | east =>
       interval_cases localClauseIndex <;>
         interval_cases literalIndex <;>
-        constructor <;> native_decide
+        constructor <;> decide +kernel
   | south =>
       interval_cases localClauseIndex <;>
         interval_cases literalIndex <;>
-        constructor <;> native_decide
+        constructor <;> decide +kernel
   | north =>
       interval_cases localClauseIndex <;>
         interval_cases literalIndex <;>
-        constructor <;> native_decide
+        constructor <;> decide +kernel
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

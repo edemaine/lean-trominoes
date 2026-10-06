@@ -316,11 +316,11 @@ theorem frontierPairPolynomialSpaceUnit_le_flat_input
   have final := encodeNat_add_length_le_sum
     (16 * (periodicStrip.period + first + last + 20)) 100
   have sixteenBits : (Computability.encodeNat 16).length = 5 := by
-    native_decide
+    decide +kernel
   have twentyBits : (Computability.encodeNat 20).length = 5 := by
-    native_decide
+    decide +kernel
   have hundredBits : (Computability.encodeNat 100).length = 7 := by
-    native_decide
+    decide +kernel
   have limitEq :
       limit = 16 * (periodicStrip.period + first + last + 20) + 100 := by
     simp [limit, frontierPairPolynomialSpaceLimit]

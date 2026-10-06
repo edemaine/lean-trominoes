@@ -24,30 +24,42 @@ def CompatibleHead (direction : AxisDirection) :
   | [] => True
   | next :: _ => next ≠ direction.opposite
 
+private theorem increment_val (count : Count)
+    (notFull : count.val ≠ bufferCapacity) :
+    (count + 1).val = count.val + 1 := by
+  have bound := count.is_lt
+  rw [Fin.val_add]
+  change (count.val + 1) % (bufferCapacity + 1) = count.val + 1
+  exact Nat.mod_eq_of_lt (by omega)
+
 theorem buffered_increment
     (direction : AxisDirection) (count : Count)
     (positive : 0 < count.val)
     (notFull : count.val ≠ bufferCapacity) :
     buffered direction (count + 1) =
       buffered direction count ++ [.direction direction] := by
-  native_decide +revert
+  rw [buffered, buffered, increment_val count notFull]
+  exact List.replicate_succ'
 
 theorem direction_cons_buffered_full
     (direction : AxisDirection) (count : Count)
     (full : count.val = bufferCapacity) :
     .direction direction :: buffered direction count =
       buffered direction count ++ [.direction direction] := by
-  native_decide +revert
+  simpa only [buffered, List.replicate_succ] using
+    (List.replicate_succ' (n := count.val)
+      (a := (.direction direction : Token)))
 
 @[simp] theorem buffered_one (direction : AxisDirection) :
     buffered direction one = [.direction direction] := by
-  native_decide +revert
+  rfl
 
 theorem increment_positive
     (count : Count) (positive : 0 < count.val)
     (notFull : count.val ≠ bufferCapacity) :
     0 < (count + 1).val := by
-  native_decide +revert
+  rw [increment_val count notFull]
+  omega
 
 /-- Starting with a nonempty buffered run, a compatible nonreversing tail
 is emitted unchanged when its route delimiter arrives. -/

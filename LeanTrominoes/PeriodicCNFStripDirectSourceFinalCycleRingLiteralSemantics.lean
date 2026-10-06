@@ -33,7 +33,7 @@ theorem directSourceFinalLocalCycleRingVertexSlots_eq_literal_blocks :
         (fun tagged =>
           (clauseBlock (DirectedClauseProfile.ofClause cycleRoutes tagged.2 tagged.1)).map
             (directFinalCycleLiteralSlot tagged.1)) := by
-  native_decide
+  decide +kernel
 
 /-- Every inherited cycle scope refers to an active literal of that same
 local cycle clause, so the optional lookup never uses its fallback. -/
@@ -43,6 +43,6 @@ theorem directFinalCycleLiteralSlot_inherited_active :
         AtomScopeControl.inherited slot ∈
           clauseBlock (DirectedClauseProfile.ofClause cycleRoutes tagged.2 tagged.1) →
         sourceSlotNat slot < tagged.1.literals.length := by
-  native_decide
+  decide +kernel
 
 end LeanTrominoes.PeriodicCNFStripReduction

@@ -31,7 +31,7 @@ theorem inwardRayUnitDirections_progress_negative :
         Cell.linearValue
             (retainedFallbackRadialProgressNormal direction)
             axis.step < 0 := by
-  native_decide
+  decide +kernel
 
 /-- Repeating an inward primitive preserves strict progress. -/
 theorem radialCopies_progress_negative
@@ -63,7 +63,7 @@ def retainedFallbackRadialJoinNormal
 theorem inwardRayUnitDirections_ne_nil :
     ∀ direction : RetainedTerminalDirection,
       inwardRayUnitDirections direction ≠ [] := by
-  native_decide
+  decide +kernel
 
 theorem inwardRayUnitDirections_join_nonnegative :
     ∀ (direction : RetainedTerminalDirection)
@@ -73,7 +73,7 @@ theorem inwardRayUnitDirections_join_nonnegative :
           Cell.linearValue
             (retainedFallbackRadialJoinNormal direction)
             axis.step := by
-  native_decide
+  decide +kernel
 
 theorem inwardRayUnitDirections_join_head_positive :
     ∀ (direction : RetainedTerminalDirection)
@@ -83,7 +83,7 @@ theorem inwardRayUnitDirections_join_head_positive :
           Cell.linearValue
             (retainedFallbackRadialJoinNormal direction)
             axis.step := by
-  native_decide
+  decide +kernel
 
 theorem radialCopies_join_nonnegative
     (count : Nat)
@@ -141,7 +141,7 @@ theorem ordinaryPrefixDirections_lane_progress_negative :
         Cell.linearValue
             (retainedFallbackLaneProgressNormal direction slot)
             axis.step < 0 := by
-  native_decide
+  decide +kernel
 
 theorem ordinaryPrefixDirections_join_nonnegative :
     ∀ (direction : RetainedTerminalDirection)
@@ -152,7 +152,7 @@ theorem ordinaryPrefixDirections_join_nonnegative :
           Cell.linearValue
             (retainedFallbackRadialJoinNormal direction)
             axis.step := by
-  native_decide
+  decide +kernel
 
 /-- Any number of repeated inward primitive blocks has duplicate-free
 ordered unit subdivision. -/

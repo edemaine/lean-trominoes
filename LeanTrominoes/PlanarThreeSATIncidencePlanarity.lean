@@ -30,7 +30,7 @@ theorem crossoverStraightIncidenceDrawing_routesMatch :
 planar. -/
 theorem crossoverStraightIncidenceDrawing_isPlanar :
     crossoverStraightIncidenceDrawing.IsPlanar := by
-  native_decide
+  decide +kernel
 
 /-- The direct Figure 8(a) duplicator incidences have their advertised
 clause and variable endpoints. -/
@@ -43,7 +43,7 @@ theorem duplicatorStraightIncidenceDrawing_routesMatch :
 planar. -/
 theorem duplicatorStraightIncidenceDrawing_isPlanar :
     duplicatorStraightIncidenceDrawing.IsPlanar := by
-  native_decide
+  decide +kernel
 
 end PlanarThreeSAT
 end LeanTrominoes

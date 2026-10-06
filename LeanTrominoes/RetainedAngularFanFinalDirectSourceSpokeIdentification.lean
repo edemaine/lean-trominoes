@@ -199,7 +199,7 @@ theorem
   cases angularPortOfIndex
       (angularOccurrenceIndex order literal
         clauseIndex literalIndex) <;>
-    native_decide
+    decide +kernel
 
 end PeriodicEightOccurrenceSplit
 

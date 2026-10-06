@@ -82,7 +82,7 @@ private theorem crossoverFormula_allAtomsNodup :
       crossoverFormula.all
         (fun clause =>
           decide ((clause.literals.map Prod.fst).Nodup)) = true := by
-    native_decide
+    decide +kernel
   intro clause clauseMember
   have clauseChecked :=
     (List.all_eq_true.mp checked) clause clauseMember

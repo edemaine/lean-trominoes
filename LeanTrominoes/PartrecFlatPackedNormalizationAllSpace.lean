@@ -84,7 +84,7 @@ theorem flatPackedNormalizationAll
     (flatPackedNormalizationColumn (0 : WindowColumn) periodicStrip current next)
     (by simpa [Bool.and_assoc] using fit1234)
   have columns : (List.finRange 5 : List (Fin 5)) = [0, 1, 2, 3, 4] := by
-    native_decide
+    decide +kernel
   rw [PackedWindowState.isNormalizedBool, columns]
   simpa [Code.flatPackedNormalizationAllCode,
     flatPackedNormalizationAllCost, b0, b1, b2, b3, b4,

@@ -85,7 +85,7 @@ private theorem rotationNormalizationTemplate_unitSteps
     (active : Bool) (port : CanonicalVertexPort) :
     (rotationRoundPortAndRoute active port).2.IsChain
       AxisDirection.IsUnitAxisStep := by
-  cases active <;> cases port <;> native_decide
+  cases active <;> cases port <;> decide +kernel
 
 private theorem secondNormalizationTemplate_unitSteps
     (input : Input) (endpoint : ContractedEndpoint) :

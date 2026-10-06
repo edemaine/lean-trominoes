@@ -32,7 +32,7 @@ theorem retainedFinalDirectCrossoverClauseQueryPairs_eq :
     ThirteenMarkerPairBlocks.block
         retainedFinalDirectCrossoverClauseQueryPair =
       retainedFinalDirectCrossoverClauseQueries := by
-  native_decide
+  decide +kernel
 
 /-- Expanding the crossing markers produces exactly one stable direct query
 block per canonical oriented crossing. -/

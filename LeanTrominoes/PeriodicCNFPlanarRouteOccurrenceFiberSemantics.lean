@@ -77,7 +77,7 @@ theorem translatedIncidenceOccurrencesAt_eq
         if translate ∈ neighborTranslations then [occurrence] else []
     rw [← occurrenceSite]
     have filtered := filter_map_key_eq neighborTranslations
-      (by native_decide)
+      (by decide +kernel)
       (fun selectedTranslate =>
         (⟨taggedIncidence.1, taggedIncidence.2, selectedTranslate⟩ :
           CNFRouteOccurrence Variable))

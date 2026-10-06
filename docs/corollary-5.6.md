@@ -48,12 +48,10 @@ The target definitions are in
 successfully (9880 jobs).
 
 The public import also passed `lake env lean LeanTrominoes.lean`.
-The completion axiom audit found no `sorryAx`. The new plane upper
-bound, fixed-tile connectivity, strip compiler correctness, and arithmetic
-transition certificate use only standard axioms. Strip membership retains
-the same 12 existing arithmetic native checks. The combined completeness
-proof reports 5388 inherited native-check dependencies; no new axiom or
-`native_decide` call was introduced. To inspect current dependencies, import
+The combined completeness theorem uses only `propext`, `Classical.choice`,
+and `Quot.sound`. All finite certificates use kernel reduction, and
+[axiom regression checks](../LeanTrominoes/AxiomAudit.lean) cover the final theorem.
+To inspect current dependencies, import
 the proof module and run
 `#print axioms LeanTrominoes.ThreeTranslationPolyominoes.proved`.
 

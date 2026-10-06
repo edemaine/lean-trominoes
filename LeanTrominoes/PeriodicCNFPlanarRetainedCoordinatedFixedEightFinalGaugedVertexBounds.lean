@@ -115,7 +115,7 @@ theorem retainedOrderedFixedEightComposedRawLocalLiteralPosition_inSquare
     Cell.macrocellPosition_halfOpen_in_refined_square
       (factor := finalFigureNineMacrocellScale)
       (period := (retainedFigureNineClearancePlacement source).period)
-      (by native_decide) baseInside
+      (by decide +kernel) baseInside
       (finalFigureNineLocalAddress_position_halfOpen address)
   rw [localPositionEq]
   have periodEq :
@@ -262,12 +262,12 @@ theorem retainedOrderedFixedEightComposedRawVariablePosition_residue_inSquare
     Cell.macrocellPosition_halfOpen_in_refined_square
       (factor := finalFigureNineMacrocellScale)
       (period := (retainedFigureNineClearancePlacement source).period)
-      (by native_decide) baseInside localInside
+      (by decide +kernel) baseInside localInside
   have residueEq :=
     Cell.inMacrocellOrbit_residue_eq_macrocellPosition
       (factor := finalFigureNineMacrocellScale)
       (period := (retainedFigureNineClearancePlacement source).period)
-      (by native_decide) baseInside localInside orbit
+      (by decide +kernel) baseInside localInside orbit
   have periodEq :
       (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
         source).period =
@@ -478,7 +478,7 @@ theorem retainedOrderedFixedEightComposedRawStoredClausePosition_inSquare_of_mem
     Cell.macrocellPosition_halfOpen_in_refined_square
       (factor := finalFigureNineMacrocellScale)
       (period := (retainedFigureNineClearancePlacement source).period)
-      (by native_decide) baseInside
+      (by decide +kernel) baseInside
       (finalFigureNineLocalAddress_position_halfOpen address)
   rw [FinalFigureNineClauseSource.position_eq_macrocellPosition sourceData]
   have periodEq :

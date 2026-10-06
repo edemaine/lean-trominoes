@@ -435,7 +435,7 @@ def selectedTemplate
 theorem activeDirections_length
     (data : VariableOuterFanData) :
     data.activeDirections.length = data.count := by
-  native_decide +revert
+  decide +kernel +revert
 
 /-- Looking up an active direction by its slot recovers the direction field. -/
 theorem activeDirections_getD
@@ -444,7 +444,7 @@ theorem activeDirections_getD
     (active : data.SlotActive slot) :
     data.activeDirections.getD slot.index .invalid =
       data.direction slot := by
-  native_decide +revert
+  decide +kernel +revert
 
 /-- A compatible lookup selects one of the explicitly certified templates. -/
 theorem selectedTemplate_mem
@@ -546,7 +546,7 @@ private instance orthogonalPolylineDecidable
 theorem isValid_of_isClockwiseCompatible :
     ∀ data : VariableOuterFanData,
       data.IsClockwiseCompatible → data.IsValid := by
-  native_decide
+  decide +kernel
 
 /-- A selected route starts at its standardized RGB gate. -/
 @[simp]
@@ -558,7 +558,7 @@ theorem outerRoute_head?
     (color : WireColor) :
     (data.outerRoute slot color).head? =
       some (standardVariableOuterGate slot color) := by
-  native_decide +revert
+  decide +kernel +revert
 
 /-- A selected route ends at the matching direction-dependent ribbon exit. -/
 @[simp]
@@ -572,7 +572,7 @@ theorem outerRoute_getLast?
       some
         (standardRibbonMacrocellExit
           (data.direction slot) color) := by
-  native_decide +revert
+  decide +kernel +revert
 
 /-- Every selected outer route is rectilinear. -/
 theorem outerRoute_orthogonal
@@ -582,7 +582,7 @@ theorem outerRoute_orthogonal
     (active : data.SlotActive slot)
     (color : WireColor) :
     OrthogonalPolyline (data.outerRoute slot color) := by
-  native_decide +revert
+  decide +kernel +revert
 
 /-- Every listed outer-route point remains inside the standard macrocell. -/
 theorem outerRoute_points_bounded :
@@ -592,7 +592,7 @@ theorem outerRoute_points_bounded :
       ∀ color point,
         point ∈ data.outerRoute slot color →
         InStandardRibbonMacrocell point := by
-  native_decide
+  decide +kernel
 
 /-- Every listed outer-route point stays outside the protected variable
 gadget and local-gate rectangle. -/
@@ -603,7 +603,7 @@ theorem outerRoute_points_in_safeFrame :
       ∀ color point,
         point ∈ data.outerRoute slot color →
         InOuterSafeFrame point := by
-  native_decide
+  decide +kernel
 
 /-- Every selected outer-route segment stays in one arm of the safe frame;
 in particular, no segment shortcuts through the protected center. -/
@@ -614,7 +614,7 @@ theorem outerRoute_segments_in_safeFrame :
       ∀ color segment,
         segment ∈ gridPolylineSegments (data.outerRoute slot color) →
         OuterSafeFrameSegment segment := by
-  native_decide
+  decide +kernel
 
 /-- Distinct active RGB strands in one selected outer fan have no continuous
 or listed-point contact. -/
@@ -630,7 +630,7 @@ theorem outerRoutes_strictlyAvoidEachOther
     RoutesStrictlyAvoidEachOther
       (data.outerRoute firstSlot firstColor)
       (data.outerRoute secondSlot secondColor) := by
-  native_decide +revert
+  decide +kernel +revert
 
 end VariableOuterFanData
 end PeriodicPlanarOneInThreeToThreeDM

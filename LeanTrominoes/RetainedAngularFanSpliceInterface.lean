@@ -35,7 +35,7 @@ def retainedTerminalFanTotalRefinement : Nat :=
 @[simp]
 theorem retainedTerminalFanTotalRefinement_eq :
     retainedTerminalFanTotalRefinement = 288 := by
-  native_decide
+  decide +kernel
 
 /-- Factor-eight refinement of one fixed radius-36 direction interface. -/
 def retainedTerminalFanRefinedInterfaceOffset
@@ -58,10 +58,10 @@ theorem retainedTerminalFanRefinedInterfaceOffset_on_square
   cases direction with
   | compass port =>
       cases port <;>
-        native_decide
+        decide +kernel
   | routedClause arm =>
       cases arm <;>
-        native_decide
+        decide +kernel
 
 /-- Distinct retained directions still have distinct refined interface
 points. -/
@@ -190,7 +190,7 @@ theorem polylineLastEntrance_scalePolyline_eq_outerDemand_gate
   rw [polylineLastEntrance_eq_retainedTerminalSplicePoint
     scaledLength
     (routeTerminalVector_scale_classified
-      (by native_decide)
+      (by decide +kernel)
       classified)]
   rw [scalePolyline_getLastD]
   rfl

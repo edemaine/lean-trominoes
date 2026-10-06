@@ -60,7 +60,7 @@ theorem assignmentOfDigit_eq_none_iff
     (digit : Nat) (bound : digit < 9) :
     assignmentOfDigit digit = none ↔ digit = 0 := by
   interval_cases digit <;>
-    native_decide
+    decide +kernel
 
 /-- Project the digit returned by the complete five-column lookup. -/
 def packedAssignmentLookupDigitCode : Code :=
@@ -204,8 +204,8 @@ theorem assignmentOfDigit_eq_state_iff
       digit = assignmentDigit state := by
   interval_cases digit <;>
     cases state with
-    | none => native_decide
-    | some symmetry => cases symmetry <;> native_decide
+    | none => decide +kernel
+    | some symmetry => cases symmetry <;> decide +kernel
 
 /-- Semantic correctness of the fixed-state packed assignment predicate. -/
 theorem packedAssignmentIsCode_eval_semantic

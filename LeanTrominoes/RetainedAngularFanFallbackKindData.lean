@@ -54,7 +54,7 @@ theorem bendFallbackFanKindBlock_eq
       retainedFallbackFanKindOfRoute
         (cornerEqualityRoutes firstPort secondPort 1 1)] =
       bendFallbackFanKindBlock := by
-  cases firstPort <;> cases secondPort <;> native_decide
+  cases firstPort <;> cases secondPort <;> decide +kernel
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

@@ -40,7 +40,7 @@ theorem angularFanBoundaryOffset_eq_scale_unitVector
       Cell.scale 12
         (angularPortOfIndex index).unitVector := by
   interval_cases index <;>
-    native_decide
+    decide +kernel
 
 /-- Each valid Figure 7 boundary site lies in the closed coordinate-radius
 twelve square about the old variable center. -/

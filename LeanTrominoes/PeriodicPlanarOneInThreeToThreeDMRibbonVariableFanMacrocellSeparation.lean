@@ -26,6 +26,15 @@ open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 set_option maxHeartbeats 2500000
 set_option maxRecDepth 10000
 
+private def firstTailContactCheck (first second : List Cell) : Bool :=
+  first.all fun a => second.all fun b => guardedCheck (a = b)
+    (decide (first.getLast? = some a ∧ RoutePointIsEndpoint second b))
+
+private theorem firstTailContactCheck_eq_true (first second : List Cell) :
+    firstTailContactCheck first second = true ↔ RoutesMeetOnlyAtFirstTail first second := by
+  simp only [firstTailContactCheck, RoutesMeetOnlyAtFirstTail, List.all_eq_true,
+    guardedCheck_eq_true, decide_eq_true_eq]
+
 /-- Local connector gates avoid every legal corridor tile in an adjacent
 macrocell. -/
 theorem standardVariableLocalGateRoute_strictlyAvoids_adjacentRibbonMacrocellRoute :
@@ -38,7 +47,25 @@ theorem standardVariableLocalGateRoute_strictlyAvoids_adjacentRibbonMacrocellRou
         (ribbonMacrocellRoute
           (ribbonAdjacentMacrocellOffsets.get offsetIndex)
           incoming outgoing tileColor) := by
-  native_decide
+  have checked : (finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun slot =>
+      finiteAll fun kind =>
+      finiteAll fun polarity =>
+      finiteAll fun fanColor =>
+      finiteAll fun incoming =>
+      finiteAll fun outgoing =>
+      finiteAll fun tileColor =>
+      guardedCheck (incoming.IsGenuine ∧ outgoing.IsGenuine ∧ outgoing ≠ incoming.opposite)
+        (segmentBoxesSeparateCheck
+          (standardVariableLocalGateRoute slot kind polarity fanColor)
+        (ribbonMacrocellRoute
+          (ribbonAdjacentMacrocellOffsets.get offsetIndex)
+          incoming outgoing tileColor))) = true := by
+    decide +kernel
+  intro offsetIndex slot kind polarity fanColor incoming outgoing tileColor incomingGenuine outgoingGenuine notReverse
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked offsetIndex slot kind polarity fanColor incoming outgoing tileColor ⟨incomingGenuine, outgoingGenuine, notReverse⟩)
 
 /-- A selected outer variable route avoids an adjacent legal corridor tile
 when it is not one source step in the selected direction, or when it is that
@@ -69,7 +96,34 @@ theorem standardVariableOuterRoute_strictlyAvoids_adjacentRibbonMacrocellRoute_o
           (ribbonMacrocellRoute
             (ribbonAdjacentMacrocellOffsets.get offsetIndex)
             incoming outgoing tileColor) := by
-  native_decide
+  have checked : (finiteAll fun templateIndex : Fin standardVariableOuterFanTemplates.length =>
+      finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun slot =>
+      finiteAll fun fanLane =>
+      finiteAll fun incoming =>
+      finiteAll fun outgoing =>
+      finiteAll fun tileColor =>
+      guardedCheck (slot.index < (standardVariableOuterFanTemplates.get templateIndex).directions.length ∧ incoming.IsGenuine ∧ outgoing.IsGenuine ∧ outgoing ≠ incoming.opposite ∧ ((ribbonAdjacentMacrocellOffsets.get offsetIndex ≠
+              ((standardVariableOuterFanTemplates.get templateIndex).directions.getD
+                slot.index .invalid).step ∨
+            incoming =
+              (standardVariableOuterFanTemplates.get templateIndex).directions.getD
+                slot.index .invalid) ∧
+          (ribbonAdjacentMacrocellOffsets.get offsetIndex ≠
+              ((standardVariableOuterFanTemplates.get templateIndex).directions.getD
+                slot.index .invalid).step ∨
+            fanLane ≠ tileColor)))
+        (segmentBoxesSeparateCheck
+          ((standardVariableOuterFanTemplates.get templateIndex).route
+            slot fanLane)
+          (ribbonMacrocellRoute
+            (ribbonAdjacentMacrocellOffsets.get offsetIndex)
+            incoming outgoing tileColor))) = true := by
+    decide +kernel
+  intro templateIndex offsetIndex slot active fanLane incoming outgoing tileColor incomingGenuine outgoingGenuine notReverse separated
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked templateIndex offsetIndex slot fanLane incoming outgoing tileColor ⟨active, incomingGenuine, outgoingGenuine, notReverse, separated⟩)
 
 /-- A selected outer variable route and the matching first corridor tile
 are ordinarily separated; their advertised boundary contact is permitted. -/
@@ -88,7 +142,21 @@ theorem standardVariableOuterRoute_avoids_matchingRibbonMacrocellRoute :
           ((standardVariableOuterFanTemplates.get templateIndex).route
             slot lane)
           (ribbonMacrocellRoute direction.step direction outgoing lane) := by
-  native_decide
+  have checked : (finiteAll fun templateIndex : Fin standardVariableOuterFanTemplates.length =>
+      finiteAll fun slot =>
+      finiteAll fun lane =>
+      finiteAll fun outgoing =>
+      let direction := (standardVariableOuterFanTemplates.get templateIndex).directions.getD slot.index .invalid
+      guardedCheck (slot.index < (standardVariableOuterFanTemplates.get templateIndex).directions.length ∧ direction.IsGenuine ∧ outgoing.IsGenuine ∧ outgoing ≠ direction.opposite)
+        (routesAvoidEachOtherCheck
+          ((standardVariableOuterFanTemplates.get templateIndex).route
+            slot lane)
+          (ribbonMacrocellRoute direction.step direction outgoing lane))) = true := by
+    decide +kernel
+  intro templateIndex slot active lane outgoing direction directionGenuine outgoingGenuine notReverse
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact (routesAvoidEachOtherCheck_eq_true _ _).mp
+    (checked templateIndex slot lane outgoing ⟨active, directionGenuine, outgoingGenuine, notReverse⟩)
 
 /-- Every listed contact in the matching variable-fan interface occurs at
 the tail of the selected outer route. -/
@@ -107,7 +175,21 @@ theorem standardVariableOuterRoute_meets_matchingRibbonMacrocellRoute_onlyAtTail
           ((standardVariableOuterFanTemplates.get templateIndex).route
             slot lane)
           (ribbonMacrocellRoute direction.step direction outgoing lane) := by
-  native_decide
+  have checked : (finiteAll fun templateIndex : Fin standardVariableOuterFanTemplates.length =>
+      finiteAll fun slot =>
+      finiteAll fun lane =>
+      finiteAll fun outgoing =>
+      let direction := (standardVariableOuterFanTemplates.get templateIndex).directions.getD slot.index .invalid
+      guardedCheck (slot.index < (standardVariableOuterFanTemplates.get templateIndex).directions.length ∧ direction.IsGenuine ∧ outgoing.IsGenuine ∧ outgoing ≠ direction.opposite)
+        (firstTailContactCheck
+          ((standardVariableOuterFanTemplates.get templateIndex).route
+            slot lane)
+          (ribbonMacrocellRoute direction.step direction outgoing lane))) = true := by
+    decide +kernel
+  intro templateIndex slot active lane outgoing direction directionGenuine outgoingGenuine notReverse
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact (firstTailContactCheck_eq_true _ _).mp
+    (checked templateIndex slot lane outgoing ⟨active, directionGenuine, outgoingGenuine, notReverse⟩)
 
 /-- Complete coordinated variable fans avoid adjacent legal corridor tiles
 away from their selected first source step, and also avoid the first tile

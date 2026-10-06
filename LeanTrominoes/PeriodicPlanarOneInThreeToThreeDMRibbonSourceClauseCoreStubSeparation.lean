@@ -3,6 +3,8 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.OrthogonalPolylineStrictSeparationCheck
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentClauseFans
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMGlobalRouteSeparation
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceRouting
 
@@ -22,6 +24,15 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 open Gadget PlanarThreeDM PeriodicOrthocrossing
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
+private def firstTailContactCheck (first second : List Cell) : Bool :=
+  first.all fun a => second.all fun b => guardedCheck (a = b)
+    (decide (first.getLast? = some a ∧ RoutePointIsEndpoint second b))
+
+private theorem firstTailContactCheck_eq_true (first second : List Cell) :
+    firstTailContactCheck first second = true ↔ RoutesMeetOnlyAtFirstTail first second := by
+  simp only [firstTailContactCheck, RoutesMeetOnlyAtFirstTail, List.all_eq_true,
+    guardedCheck_eq_true, decide_eq_true_eq]
+
 /-- The finite clause-side fan can contact the checked core only at the
 fan's final advertised core port. -/
 theorem coordinatedClauseRoute_meets_clauseCore_onlyAtFirstTail :
@@ -33,7 +44,35 @@ theorem coordinatedClauseRoute_meets_clauseCore_onlyAtFirstTail :
             (data.coordinatedRoute group lane)
             (translatePolyline standardThreeStrandLayout.clauseOffset
               (X3CClauseOrthogonal.route set color)) := by
-  native_decide +revert
+  have checked : (standardVariableOuterFanTemplates.all fun template =>
+      finiteAll fun hasRight : Bool =>
+      guardedCheck (template.directions.length = (if hasRight then 3 else 2))
+        (finiteAll fun group => guardedCheck ((clauseRibbonFanShape hasRight).GroupActive group)
+          (finiteAll fun lane => finiteAll fun set => finiteAll fun color =>
+            firstTailContactCheck
+              (joinAtEndpoint (clauseOuterRouteFromTemplate template hasRight group lane)
+                ((clauseRibbonFanShape hasRight).localGateRoute group lane))
+              (translatePolyline standardThreeStrandLayout.clauseOffset
+                (X3CClauseOrthogonal.route set color))))) = true := by
+    decide +kernel
+  intro data compatible group active lane set color
+  have templateLength :
+      data.reflectedOuterData.selectedTemplate.directions.length =
+        (if data.hasRight then 3 else 2) := by
+    rw [data.reflectedOuterData.selectedTemplate_directions compatible,
+      data.reflectedOuterData.activeDirections_length]
+    cases eq : data.hasRight <;>
+      simp [ClauseRibbonFanData.reflectedOuterData, VariableOuterFanData.count, eq]
+  have shapeActive : (clauseRibbonFanShape data.hasRight).GroupActive group := by
+    rcases data with ⟨hasRight, direction⟩
+    cases hasRight <;> exact active
+  simp only [List.all_eq_true, finiteAll_eq_true, guardedCheck_eq_true,
+    firstTailContactCheck_eq_true] at checked
+  have certificate := checked data.reflectedOuterData.selectedTemplate
+    (data.reflectedOuterData.selectedTemplate_mem compatible) data.hasRight
+    templateLength group shapeActive lane set color
+  simpa only [ClauseRibbonFanData.coordinatedRoute,
+    clauseOuterRouteFromTemplate_selected, clauseRibbonFanShape_localGateRoute] using certificate
 
 /-- A route in the strict inset of one standard macrocell is contact-free
 from a route in the closed bounds of any distinct macrocell. -/

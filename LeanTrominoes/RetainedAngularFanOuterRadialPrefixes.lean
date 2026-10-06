@@ -44,7 +44,7 @@ theorem retainedTerminalFanOuterSideNormal_lanePortOffset :
           (retainedTerminalFanOuterSideNormal direction)
           (retainedTerminalFanOuterLanePortOffset direction slot) =
         288 := by
-  native_decide
+  decide +kernel
 
 /-- Every retained primitive advances strictly outward through its selected
 supporting side. -/
@@ -54,7 +54,7 @@ theorem retainedTerminalFanOuterSideNormal_primitive_positive :
         Cell.linearValue
           (retainedTerminalFanOuterSideNormal direction)
           direction.primitive := by
-  native_decide
+  decide +kernel
 
 /-- The inward raster with its last primitive block removed. -/
 def retainedTerminalFanOuterInwardPrefixRay
@@ -281,7 +281,7 @@ theorem compassInwardRay_side_ge_finish
           simp
       | succ length =>
           exact diagonalStaircase_linear_ge_finish
-            _ 1 1 (by native_decide) (by native_decide)
+            _ 1 1 (by decide +kernel) (by decide +kernel)
             (length + 1) start point
             (by simpa [compassRay, oppositePort] using pointMember)
   | north =>
@@ -305,7 +305,7 @@ theorem compassInwardRay_side_ge_finish
           simp
       | succ length =>
           exact diagonalStaircase_linear_ge_finish
-            _ (-1) 1 (by native_decide) (by native_decide)
+            _ (-1) 1 (by decide +kernel) (by decide +kernel)
             (length + 1) start point
             (by simpa [compassRay, oppositePort] using pointMember)
   | east =>
@@ -329,7 +329,7 @@ theorem compassInwardRay_side_ge_finish
           simp
       | succ length =>
           exact diagonalStaircase_linear_ge_finish
-            _ (-1) (-1) (by native_decide) (by native_decide)
+            _ (-1) (-1) (by decide +kernel) (by decide +kernel)
             (length + 1) start point
             (by simpa [compassRay, oppositePort] using pointMember)
   | south =>
@@ -353,7 +353,7 @@ theorem compassInwardRay_side_ge_finish
           simp
       | succ length =>
           exact diagonalStaircase_linear_ge_finish
-            _ 1 (-1) (by native_decide) (by native_decide)
+            _ 1 (-1) (by decide +kernel) (by decide +kernel)
             (length + 1) start point
             (by simpa [compassRay, oppositePort] using pointMember)
   | west =>
@@ -382,7 +382,7 @@ theorem routedClauseRayOffsets_side_ge_primitive :
           Cell.linearValue
             (retainedTerminalFanOuterSideNormal (.routedClause arm))
             offset := by
-  native_decide
+  decide +kernel
 
 /-- Each exceptional inward primitive moves strictly toward the selected
 supporting side's interior. -/
@@ -391,7 +391,7 @@ theorem routedClauseRayPrimitive_side_negative :
       Cell.linearValue
           (retainedTerminalFanOuterSideNormal (.routedClause arm))
           (routedClauseRayPrimitive arm) < 0 := by
-  native_decide
+  decide +kernel
 
 /-- A translated exceptional primitive block stays outward of its
 endpoint. -/

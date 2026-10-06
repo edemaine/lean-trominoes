@@ -3,13 +3,20 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.RetainedAngularFanFinalCrossClauseFallbackBoundarySeparation
-import LeanTrominoes.OccurrenceSplitAngularFanSpokeSeparation
-import LeanTrominoes.RetainedAngularFanOuterCycleSeparation
+import LeanTrominoes.RetainedAngularFanFinalOuterSpokeCertificates.Case0
+import LeanTrominoes.RetainedAngularFanFinalOuterSpokeCertificates.Case1
+import LeanTrominoes.RetainedAngularFanFinalOuterSpokeCertificates.Case2
+import LeanTrominoes.RetainedAngularFanFinalOuterSpokeCertificates.Case3
+import LeanTrominoes.RetainedAngularFanFinalOuterSpokeCertificates.Case4
+import LeanTrominoes.RetainedAngularFanFinalOuterSpokeCertificates.Case5
+import LeanTrominoes.RetainedAngularFanFinalOuterSpokeCertificates.Case6
+import LeanTrominoes.RetainedAngularFanFinalOuterSpokeCertificates.Case7
+import LeanTrominoes.RetainedAngularFanFinalOuterSpokeCertificates.Case8
+import LeanTrominoes.RetainedAngularFanFinalOuterSpokeCertificates.Case9
+import LeanTrominoes.RetainedAngularFanFinalOuterSpokeCertificates.Case10
 
 namespace LeanTrominoes
 namespace PeriodicEightOccurrenceSplit
-
 open OccurrenceSplitRing
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
@@ -20,32 +27,41 @@ private theorem map_add_zero (route : List Cell) :
   | cons point points induction =>
       simp [induction, Cell.add]
 
-/-- A Figure 7 spoke recentered at the old variable position and refined
-to the common terminal-fan grid. -/
-def retainedTerminalFanCenteredFigure7Spoke
-    (slot : RetainedTerminalSlot) : List Cell :=
-  scalePolyline retainedTerminalFanRoutingRefinement
-    ((spokeRoute (angularPortOfIndex slot.val)).map
-      (Cell.add (-12, -12)))
+private theorem outerCenteredLocalCheck_correct (direction : RetainedTerminalDirection) : outerCenteredLocalCheck direction = true := by
+  cases direction with
+  | compass port =>
+    cases port with
+    | east => exact outerCenteredLocalCheck_case0
+    | southeast => exact outerCenteredLocalCheck_case1
+    | south => exact outerCenteredLocalCheck_case2
+    | southwest => exact outerCenteredLocalCheck_case3
+    | west => exact outerCenteredLocalCheck_case4
+    | northwest => exact outerCenteredLocalCheck_case5
+    | north => exact outerCenteredLocalCheck_case6
+    | northeast => exact outerCenteredLocalCheck_case7
+  | routedClause arm =>
+    cases arm with
+    | left => exact outerCenteredLocalCheck_case8
+    | middle => exact outerCenteredLocalCheck_case9
+    | right => exact outerCenteredLocalCheck_case10
 
-/-- Translating the centered spoke gives the positioned Figure 7 spoke
-used by the final fallback construction. -/
-theorem retainedTerminalFanCenteredFigure7Spoke_map_add
-    (center : Cell)
-    (slot : RetainedTerminalSlot) :
-    (retainedTerminalFanCenteredFigure7Spoke slot).map
-        (Cell.add center) =
-      retainedTerminalFanFigure7SpokeRouteAt center slot := by
-  unfold retainedTerminalFanCenteredFigure7Spoke
-    retainedTerminalFanFigure7SpokeRouteAt
-    PeriodicOrthocrossing.translatePolyline scalePolyline
-  simp only [List.map_map]
-  apply List.map_congr_left
-  intro point _pointMember
-  rcases center with ⟨centerX, centerY⟩
-  rcases point with ⟨pointX, pointY⟩
-  simp [Cell.add, Cell.sub, Cell.scale]
-  constructor <;> ring
+private theorem outerCenteredStubCheck_correct (direction : RetainedTerminalDirection) : outerCenteredStubCheck direction = true := by
+  cases direction with
+  | compass port =>
+    cases port with
+    | east => exact outerCenteredStubCheck_case0
+    | southeast => exact outerCenteredStubCheck_case1
+    | south => exact outerCenteredStubCheck_case2
+    | southwest => exact outerCenteredStubCheck_case3
+    | west => exact outerCenteredStubCheck_case4
+    | northwest => exact outerCenteredStubCheck_case5
+    | north => exact outerCenteredStubCheck_case6
+    | northeast => exact outerCenteredStubCheck_case7
+  | routedClause arm =>
+    cases arm with
+    | left => exact outerCenteredStubCheck_case8
+    | middle => exact outerCenteredStubCheck_case9
+    | right => exact outerCenteredStubCheck_case10
 
 /-- A complete ordinary outer-fan route is contact-free from every
 different Figure 7 spoke in the same variable macrocell. -/
@@ -59,14 +75,17 @@ theorem
             direction firstSlot)
           (retainedTerminalFanCenteredFigure7Spoke
             secondSlot) := by
-  native_decide
+  intro direction firstSlot secondSlot different
+  have checked := outerCenteredLocalCheck_correct direction
+  simp only [outerCenteredLocalCheck, finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact outerCenteredPairCheck_sound _ _ (checked firstSlot secondSlot different)
 
 /-- Every centered refined Figure 7 spoke stays in the radius-96 square. -/
 theorem retainedTerminalFanCenteredFigure7Spoke_points_within :
     ∀ (slot : RetainedTerminalSlot) (point : Cell),
       point ∈ retainedTerminalFanCenteredFigure7Spoke slot →
         WithinCoordinateRadius 96 (0, 0) point := by
-  native_decide
+  decide +kernel
 
 /-- A centered Figure 7 spoke lies below the supporting line selected by
 every retained terminal direction. -/
@@ -101,7 +120,10 @@ theorem
           direction firstSlot)
         (retainedTerminalFanCenteredFigure7Spoke
           secondSlot) := by
-  native_decide
+  intro direction firstSlot secondSlot
+  have checked := outerCenteredStubCheck_correct direction
+  simp only [outerCenteredStubCheck, finiteAll_eq_true] at checked
+  exact outerCenteredPairCheck_sound _ _ (checked firstSlot secondSlot)
 
 /-- The arbitrary-length exterior part of an ordinary radial route avoids
 every centered Figure 7 spoke. -/

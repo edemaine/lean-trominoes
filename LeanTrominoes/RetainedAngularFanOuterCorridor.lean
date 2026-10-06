@@ -93,7 +93,7 @@ theorem retainedTerminalFanOuterLaneOffset_within_radius :
       WithinCoordinateRadius 56 (0, 0)
         (retainedTerminalFanOuterLaneOffset
           direction lane) := by
-  native_decide
+  decide +kernel
 
 /-- Every point of the finite gate-to-lane shift lies in the radius-65 tube
 at checkpoint zero. -/

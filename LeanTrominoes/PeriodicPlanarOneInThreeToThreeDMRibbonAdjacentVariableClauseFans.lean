@@ -26,9 +26,43 @@ open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 set_option maxHeartbeats 5000000
 set_option maxRecDepth 10000
 
+private def mixedFanSeparationCheck (first second : List Cell) : Bool :=
+  segmentBoxesSeparateCheck first second || routesStrictlyAvoidEachOtherCheck first second
+
+private theorem mixedFanSeparationCheck_sound (first second : List Cell)
+    (checked : mixedFanSeparationCheck first second = true) :
+    RoutesStrictlyAvoidEachOther first second := by
+  simp only [mixedFanSeparationCheck, Bool.or_eq_true] at checked
+  rcases checked with boxes | exactCheck
+  · exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck first second boxes
+  · exact (routesStrictlyAvoidEachOtherCheck_eq_true first second).mp exactCheck
+
 /-- A selected variable outer route and reflected clause outer route in an
 adjacent macrocell are contact-free unless the second center is the selected
 first source neighbor of the variable route. -/
+private def mixedFanCheck0 (variableIndex : Fin standardVariableOuterFanTemplates.length) : Bool :=
+  finiteAll fun clauseIndex : Fin standardVariableOuterFanTemplates.length =>
+      finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun variableSlot =>
+      finiteAll fun clauseHasRight =>
+      finiteAll fun clauseGroup =>
+      guardedCheck (variableSlot.index < (standardVariableOuterFanTemplates.get variableIndex).directions.length ∧ ((clauseRibbonFanShape clauseHasRight).variableSlotForGroup clauseGroup).index < (standardVariableOuterFanTemplates.get clauseIndex).directions.length ∧ ribbonAdjacentMacrocellOffsets.get offsetIndex ≠ ((standardVariableOuterFanTemplates.get variableIndex).directions.getD variableSlot.index .invalid).step)
+        (finiteAll fun variableLane =>
+      finiteAll fun clauseLane =>
+      mixedFanSeparationCheck
+        ((standardVariableOuterFanTemplates.get variableIndex).route
+            variableSlot variableLane)
+          (translatePolyline
+            (Cell.scale standardThreeStrandLayout.factor
+              (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+            (clauseOuterRouteFromTemplate
+              (standardVariableOuterFanTemplates.get clauseIndex)
+              clauseHasRight clauseGroup clauseLane)))
+
+private theorem mixedFanCheck0_correct (variableIndex : Fin standardVariableOuterFanTemplates.length) :
+    mixedFanCheck0 variableIndex = true := by
+  fin_cases variableIndex <;> decide +kernel
+
 theorem standardVariableClauseOuterRoutes_strictlyAvoidEachOther_of_separated :
     ∀ (variableIndex clauseIndex :
         Fin standardVariableOuterFanTemplates.length)
@@ -52,9 +86,37 @@ theorem standardVariableClauseOuterRoutes_strictlyAvoidEachOther_of_separated :
             (clauseOuterRouteFromTemplate
               (standardVariableOuterFanTemplates.get clauseIndex)
               clauseHasRight clauseGroup clauseLane)) := by
-  native_decide
+  have checked := mixedFanCheck0_correct
+  intro variableIndex clauseIndex offsetIndex variableSlot clauseHasRight clauseGroup variableActive clauseActive variableLane clauseLane notNeighbor
+  simp only [mixedFanCheck0, finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact mixedFanSeparationCheck_sound _ _
+    (checked variableIndex clauseIndex offsetIndex variableSlot clauseHasRight clauseGroup ⟨variableActive, clauseActive, notNeighbor⟩ variableLane clauseLane)
 
 /-- A variable local gate avoids every neighboring clause outer route. -/
+private def mixedFanCheck1 (clauseIndex : Fin standardVariableOuterFanTemplates.length) : Bool :=
+  finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun variableSlot =>
+      finiteAll fun clauseHasRight =>
+      finiteAll fun clauseGroup =>
+      guardedCheck (((clauseRibbonFanShape clauseHasRight).variableSlotForGroup clauseGroup).index < (standardVariableOuterFanTemplates.get clauseIndex).directions.length)
+        (finiteAll fun variableKind =>
+      finiteAll fun variablePolarity =>
+      finiteAll fun variableColor =>
+      finiteAll fun clauseLane =>
+      mixedFanSeparationCheck
+        (standardVariableLocalGateRoute
+            variableSlot variableKind variablePolarity variableColor)
+          (translatePolyline
+            (Cell.scale standardThreeStrandLayout.factor
+              (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+            (clauseOuterRouteFromTemplate
+              (standardVariableOuterFanTemplates.get clauseIndex)
+              clauseHasRight clauseGroup clauseLane)))
+
+private theorem mixedFanCheck1_correct (clauseIndex : Fin standardVariableOuterFanTemplates.length) :
+    mixedFanCheck1 clauseIndex = true := by
+  fin_cases clauseIndex <;> decide +kernel
+
 theorem standardVariableLocalGateRoute_strictlyAvoids_clauseOuterRoute_of_adjacent :
     ∀ (clauseIndex : Fin standardVariableOuterFanTemplates.length)
       (offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length)
@@ -72,9 +134,34 @@ theorem standardVariableLocalGateRoute_strictlyAvoids_clauseOuterRoute_of_adjace
             (clauseOuterRouteFromTemplate
               (standardVariableOuterFanTemplates.get clauseIndex)
               clauseHasRight clauseGroup clauseLane)) := by
-  native_decide
+  have checked := mixedFanCheck1_correct
+  intro clauseIndex offsetIndex variableSlot clauseHasRight clauseGroup active variableKind variablePolarity variableColor clauseLane
+  simp only [mixedFanCheck1, finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact mixedFanSeparationCheck_sound _ _
+    (checked clauseIndex offsetIndex variableSlot clauseHasRight clauseGroup active variableKind variablePolarity variableColor clauseLane)
 
 /-- A variable outer route avoids every neighboring clause local gate. -/
+private def mixedFanCheck2 (variableIndex : Fin standardVariableOuterFanTemplates.length) : Bool :=
+  finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun variableSlot =>
+      finiteAll fun clauseHasRight =>
+      finiteAll fun clauseGroup =>
+      guardedCheck (variableSlot.index < (standardVariableOuterFanTemplates.get variableIndex).directions.length)
+        (finiteAll fun variableLane =>
+      finiteAll fun clauseLane =>
+      mixedFanSeparationCheck
+        ((standardVariableOuterFanTemplates.get variableIndex).route
+            variableSlot variableLane)
+          (translatePolyline
+            (Cell.scale standardThreeStrandLayout.factor
+              (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+            ((clauseRibbonFanShape clauseHasRight).localGateRoute
+              clauseGroup clauseLane)))
+
+private theorem mixedFanCheck2_correct (variableIndex : Fin standardVariableOuterFanTemplates.length) :
+    mixedFanCheck2 variableIndex = true := by
+  fin_cases variableIndex <;> decide +kernel
+
 theorem standardVariableOuterRoute_strictlyAvoids_clauseLocalGateRoute_of_adjacent :
     ∀ (variableIndex : Fin standardVariableOuterFanTemplates.length)
       (offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length)
@@ -90,10 +177,35 @@ theorem standardVariableOuterRoute_strictlyAvoids_clauseLocalGateRoute_of_adjace
               (ribbonAdjacentMacrocellOffsets.get offsetIndex))
             ((clauseRibbonFanShape clauseHasRight).localGateRoute
               clauseGroup clauseLane)) := by
-  native_decide
+  have checked := mixedFanCheck2_correct
+  intro variableIndex offsetIndex variableSlot clauseHasRight clauseGroup active variableLane clauseLane
+  simp only [mixedFanCheck2, finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact mixedFanSeparationCheck_sound _ _
+    (checked variableIndex offsetIndex variableSlot clauseHasRight clauseGroup active variableLane clauseLane)
 
 /-- Variable and clause local gates in neighboring macrocells are always
 contact-free. -/
+private def mixedFanCheck3 (offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length) : Bool :=
+  finiteAll fun variableSlot =>
+      finiteAll fun clauseHasRight =>
+      finiteAll fun clauseGroup =>
+      finiteAll fun variableKind =>
+      finiteAll fun variablePolarity =>
+      finiteAll fun variableColor =>
+      finiteAll fun clauseLane =>
+      mixedFanSeparationCheck
+        (standardVariableLocalGateRoute
+          variableSlot variableKind variablePolarity variableColor)
+        (translatePolyline
+          (Cell.scale standardThreeStrandLayout.factor
+            (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+          ((clauseRibbonFanShape clauseHasRight).localGateRoute
+            clauseGroup clauseLane))
+
+private theorem mixedFanCheck3_correct (offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length) :
+    mixedFanCheck3 offsetIndex = true := by
+  fin_cases offsetIndex <;> decide +kernel
+
 theorem standardVariableLocalGateRoute_strictlyAvoids_clauseLocalGateRoute_of_adjacent :
     ∀ (offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length)
       variableSlot clauseHasRight clauseGroup
@@ -106,7 +218,11 @@ theorem standardVariableLocalGateRoute_strictlyAvoids_clauseLocalGateRoute_of_ad
             (ribbonAdjacentMacrocellOffsets.get offsetIndex))
           ((clauseRibbonFanShape clauseHasRight).localGateRoute
             clauseGroup clauseLane)) := by
-  native_decide
+  have checked := mixedFanCheck3_correct
+  intro offsetIndex variableSlot clauseHasRight clauseGroup variableKind variablePolarity variableColor clauseLane
+  simp only [mixedFanCheck3, finiteAll_eq_true] at checked
+  exact mixedFanSeparationCheck_sound _ _
+    (checked offsetIndex variableSlot clauseHasRight clauseGroup variableKind variablePolarity variableColor clauseLane)
 
 /-- Complete coordinated variable and clause routes in adjacent standard
 macrocells are contact-free whenever the clause macrocell is not the selected

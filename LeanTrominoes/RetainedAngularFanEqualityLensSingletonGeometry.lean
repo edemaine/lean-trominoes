@@ -677,7 +677,7 @@ theorem
       retainedTerminalFanTotalRefinement * factor
     have combinedPositive : 0 < combinedFactor := by
       exact Nat.mul_pos
-        (by native_decide : 0 < retainedTerminalFanTotalRefinement)
+        (by decide +kernel : 0 < retainedTerminalFanTotalRefinement)
         factorPositive
     have prefixEq :
         (scalePolyline retainedTerminalFanTotalRefinement
@@ -818,7 +818,7 @@ theorem
       retainedTerminalFanTotalRefinement * factor
     have combinedPositive : 0 < combinedFactor := by
       exact Nat.mul_pos
-        (by native_decide : 0 < retainedTerminalFanTotalRefinement)
+        (by decide +kernel : 0 < retainedTerminalFanTotalRefinement)
         factorPositive
     have prefixEq :
         (scalePolyline retainedTerminalFanTotalRefinement

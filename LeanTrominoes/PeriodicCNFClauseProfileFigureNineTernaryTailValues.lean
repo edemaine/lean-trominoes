@@ -24,7 +24,7 @@ theorem clauseProfiles_ternaryTailValuesEqual (profile : ClauseProfile) :
     ∀ generated ∈ clauseProfiles profile,
       TernaryTailValuesEqual generated := by
   unfold TernaryTailValuesEqual
-  native_decide +revert
+  decide +kernel +revert
 
 /-- The property holds throughout the complete unit-free profile stream. -/
 theorem profiles_ternaryTailValuesEqual

@@ -3,7 +3,26 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman
 -/
-import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceMetadata
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case0
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case1
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case2
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case3
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case4
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case5
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case6
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case7
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case8
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case9
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case10
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case11
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case12
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case13
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case14
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case15
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case16
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case17
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case18
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineSourceOccurrenceIdentityCertificates.Case19
 
 /-! # Equality of occurrence-local identities and global source coordinates -/
 
@@ -14,27 +33,36 @@ open FormulaShapeFigureNinePolarityRouteHeader
 open FormulaShapeFigureNineRoutePrefix
 open FormulaShapeRetainedFigureNineSourceTail
 
-private def prefixCoordinates (routePrefix : Descriptor) : Nat × Nat :=
-  let query := routePrefix.localQuery
-  let drawing := PlanarOneInThreeNoUnitsFigureNine.templateDrawingOfClauseProfile query.1
-  let incidence := drawing.incidenceAt query.2
-  let arity := ((drawing.formula[incidence.clauseIndex]?).map
-    (fun clause => clause.literals.length)).getD 0
-  (incidence.clauseIndex,
-    match arity with
-    | 2 => if incidence.literalIndex = 0 then 1 else 0
-    | 3 => if incidence.literalIndex = 0 then 1 else
-        if incidence.literalIndex = 1 then 2 else 0
-    | _ => incidence.literalIndex)
+private theorem sourcePrefixRoundtripCheck_first_correct
+    (first : UnaryProgramClauseProfile.LiteralProfile) (direction : AxisDirection) :
+    firstDirectedProfileCheck sourcePrefixRoundtripCheck first direction = true := by
+  rcases first with ⟨nextSlice, value⟩
+  cases nextSlice <;> cases value <;> cases direction
+  · exact sourcePrefixRoundtripCheck_case0
+  · exact sourcePrefixRoundtripCheck_case1
+  · exact sourcePrefixRoundtripCheck_case2
+  · exact sourcePrefixRoundtripCheck_case3
+  · exact sourcePrefixRoundtripCheck_case4
+  · exact sourcePrefixRoundtripCheck_case5
+  · exact sourcePrefixRoundtripCheck_case6
+  · exact sourcePrefixRoundtripCheck_case7
+  · exact sourcePrefixRoundtripCheck_case8
+  · exact sourcePrefixRoundtripCheck_case9
+  · exact sourcePrefixRoundtripCheck_case10
+  · exact sourcePrefixRoundtripCheck_case11
+  · exact sourcePrefixRoundtripCheck_case12
+  · exact sourcePrefixRoundtripCheck_case13
+  · exact sourcePrefixRoundtripCheck_case14
+  · exact sourcePrefixRoundtripCheck_case15
+  · exact sourcePrefixRoundtripCheck_case16
+  · exact sourcePrefixRoundtripCheck_case17
+  · exact sourcePrefixRoundtripCheck_case18
+  · exact sourcePrefixRoundtripCheck_case19
 
-private def prefixAtCoordinates (profile : DirectedClauseProfile)
-    (coordinates : Nat × Nat) : Descriptor :=
-  let ordered := orderedDirectedProfile profile
-  let profiles := figureClauseProfiles ordered
-  let skipped := ((profiles.take coordinates.1).map (fun clause => clause.literals.length)).sum
-  let count := ((profiles[coordinates.1]?).map (fun clause => clause.literals.length)).getD 0
-  (FormulaShapeFigureNineFinalClauseOrdering.reorderList
-    (((clauseDescriptors ordered).drop skipped).take count)).getD coordinates.2 default
+private theorem sourcePrefixRoundtripCheck_correct (profile : DirectedClauseProfile) :
+    sourcePrefixRoundtripCheck profile = true :=
+  firstDirectedProfileCheck_sound sourcePrefixRoundtripCheck
+    sourcePrefixRoundtripCheck_first_correct profile
 
 private theorem header_prefix_eq_iff_coordinates
     (profile : DirectedClauseProfile)
@@ -46,24 +74,19 @@ private theorem header_prefix_eq_iff_coordinates
         (headerTemplateCoordinate second).clauseIndex ∧
       first.polarity.indexed.sourceLiteralIndex =
         second.polarity.indexed.sourceLiteralIndex := by
-  have checked : ∀ profile : DirectedClauseProfile,
-      (sourceClauseHeaders profile).all (fun header => decide (
-        let coordinates := ((headerTemplateCoordinate header).clauseIndex,
-          header.polarity.indexed.sourceLiteralIndex)
-        prefixCoordinates header.figurePrefix = coordinates ∧
-          prefixAtCoordinates profile coordinates = header.figurePrefix)) = true := by
-    native_decide
+  have checked := sourcePrefixRoundtripCheck_correct profile
+  unfold sourcePrefixRoundtripCheck at checked
   have firstFields := of_decide_eq_true
-    (List.all_eq_true.mp (checked profile) first firstMember)
+    (List.all_eq_true.mp checked first firstMember)
   have secondFields := of_decide_eq_true
-    (List.all_eq_true.mp (checked profile) second secondMember)
+    (List.all_eq_true.mp checked second secondMember)
   constructor
   · intro equal
     exact Prod.mk.inj (firstFields.1.symm.trans
-      ((congrArg prefixCoordinates equal).trans secondFields.1))
+      ((congrArg sourceOccurrencePrefixCoordinates equal).trans secondFields.1))
   · intro equal
     exact firstFields.2.symm.trans
-      ((congrArg (prefixAtCoordinates profile) (Prod.ext equal.1 equal.2)).trans secondFields.2)
+      ((congrArg (sourceOccurrencePrefixAtCoordinates profile) (Prod.ext equal.1 equal.2)).trans secondFields.2)
 
 private theorem sourceOccurrencesFrom_parent_le
     (parent start : Nat) (source : List Token)

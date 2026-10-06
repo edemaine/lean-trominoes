@@ -487,11 +487,11 @@ theorem packedNormalizedAtEnvelopeUnit_le_linear
     (1024 * (period + phase + motifCode + motifCode + motifCode +
       cellCode + column + word + 100)) 1000
   have hundredBits :
-      (Computability.encodeNat 100).length = 7 := by native_decide
+      (Computability.encodeNat 100).length = 7 := by decide +kernel
   have thousandBits :
-      (Computability.encodeNat 1000).length = 10 := by native_decide
+      (Computability.encodeNat 1000).length = 10 := by decide +kernel
   have scaleBits :
-      (Computability.encodeNat 1024).length = 11 := by native_decide
+      (Computability.encodeNat 1024).length = 11 := by decide +kernel
   simp only [packedNormalizedAtInputUnit,
     encodedListSpace_cons, encodedListSpace_nil]
   omega

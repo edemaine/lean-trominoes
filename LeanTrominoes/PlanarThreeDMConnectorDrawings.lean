@@ -85,7 +85,7 @@ def drawing (variant : VariableOccurrenceVariant) :
 drawings with the advertised incidence endpoints. -/
 theorem drawing_isValid (variant : VariableOccurrenceVariant) :
     (drawing variant).IsValid := by
-  cases variant <;> native_decide
+  cases variant <;> decide +kernel
 
 /-- Rotate an ordinary module so that its continuation ports lie on one
 vertical boundary.  Positive polarity additionally reflects it so the port
@@ -127,7 +127,7 @@ theorem orientedDrawing_slotContinuationPosition
         (reference variant
           (slotContinuationTriple polarity) .red) =
       (0, -6) := by
-  cases variant <;> cases polarity <;> native_decide
+  cases variant <;> cases polarity <;> decide +kernel
 
 /-- The next-slot continuation has a fixed lower boundary position. -/
 @[simp]
@@ -137,14 +137,14 @@ theorem orientedDrawing_nextContinuationPosition
         (reference variant
           (nextContinuationTriple polarity) .red) =
       (0, 2) := by
-  cases variant <;> cases polarity <;> native_decide
+  cases variant <;> cases polarity <;> decide +kernel
 
 /-- Rotation and the polarity-dependent reflection preserve the complete
 ordinary-module drawing certificate. -/
 theorem orientedDrawing_isValid
     (variant : VariableOccurrenceVariant) (polarity : Bool) :
     (orientedDrawing variant polarity).IsValid := by
-  cases variant <;> cases polarity <;> native_decide
+  cases variant <;> cases polarity <;> decide +kernel
 
 /-! ## Outer-face boundary template -/
 
@@ -191,7 +191,7 @@ def boundaryDrawing (variant : VariableOccurrenceVariant) :
 theorem boundaryDrawing_isValid
     (variant : VariableOccurrenceVariant) :
     (boundaryDrawing variant).IsValid := by
-  cases variant <;> native_decide
+  cases variant <;> decide +kernel
 
 /-! The fixed-green connector uses the same logical occurrence tree as the
 fixed-blue module, but its three semantic colors occupy a different cyclic
@@ -244,7 +244,7 @@ def positiveFixedGreenBoundaryDrawing :
 /-- The lane-aligned fixed-green embedding is a valid local drawing. -/
 theorem positiveFixedGreenBoundaryDrawing_isValid :
     positiveFixedGreenBoundaryDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-- Reflect a negative occurrence so the continuation for the current slot
 is always the left boundary port. -/
@@ -273,7 +273,7 @@ theorem orientedBoundaryDrawing_slotContinuationPosition
         (reference variant
           (slotContinuationTriple polarity) .red) =
       (4, 0) := by
-  cases variant <;> cases polarity <;> native_decide
+  cases variant <;> cases polarity <;> decide +kernel
 
 @[simp]
 theorem orientedBoundaryDrawing_nextContinuationPosition
@@ -282,14 +282,14 @@ theorem orientedBoundaryDrawing_nextContinuationPosition
         (reference variant
           (nextContinuationTriple polarity) .red) =
       (12, 0) := by
-  cases variant <;> cases polarity <;> native_decide
+  cases variant <;> cases polarity <;> decide +kernel
 
 /-- The standardized outer-face ordinary template remains valid for either
 polarity. -/
 theorem orientedBoundaryDrawing_isValid
     (variant : VariableOccurrenceVariant) (polarity : Bool) :
     (orientedBoundaryDrawing variant polarity).IsValid := by
-  cases variant <;> cases polarity <;> native_decide
+  cases variant <;> cases polarity <;> decide +kernel
 
 end VariableOccurrence
 
@@ -361,7 +361,7 @@ def drawing :
 /-- The fixed-red detour has a certified planar orthogonal drawing with the
 advertised incidence endpoints. -/
 theorem drawing_isValid : drawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-- Reflect positive fixed-red occurrences so that the continuation incident
 to the current slot is always the upper of the two left boundary ports. -/
@@ -400,7 +400,7 @@ theorem orientedDrawing_slotContinuationPosition
         (reference
           (slotContinuationTriple polarity) .red) =
       (-2, 0) := by
-  cases polarity <;> native_decide
+  cases polarity <;> decide +kernel
 
 /-- The next-slot fixed-red continuation always occupies the lower boundary
 point. -/
@@ -411,13 +411,13 @@ theorem orientedDrawing_nextContinuationPosition
         (reference
           (nextContinuationTriple polarity) .red) =
       (-2, 4) := by
-  cases polarity <;> native_decide
+  cases polarity <;> decide +kernel
 
 /-- The polarity-normalized fixed-red template remains a certified planar
 orthogonal drawing. -/
 theorem orientedDrawing_isValid (polarity : Bool) :
     (orientedDrawing polarity).IsValid := by
-  cases polarity <;> native_decide
+  cases polarity <;> decide +kernel
 
 /-! ## Standardized outer-face boundary template -/
 
@@ -456,7 +456,7 @@ theorem boundaryDrawing_slotContinuationPosition
         (reference
           (slotContinuationTriple polarity) .red) =
       (4, 0) := by
-  cases polarity <;> native_decide
+  cases polarity <;> decide +kernel
 
 @[simp]
 theorem boundaryDrawing_nextContinuationPosition
@@ -465,13 +465,13 @@ theorem boundaryDrawing_nextContinuationPosition
         (reference
           (nextContinuationTriple polarity) .red) =
       (12, 0) := by
-  cases polarity <;> native_decide
+  cases polarity <;> decide +kernel
 
 /-- The standardized fixed-red boundary template is valid for either
 polarity. -/
 theorem boundaryDrawing_isValid (polarity : Bool) :
     (boundaryDrawing polarity).IsValid := by
-  cases polarity <;> native_decide
+  cases polarity <;> decide +kernel
 
 end FixedRedConnector
 

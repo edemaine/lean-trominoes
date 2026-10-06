@@ -18,7 +18,7 @@ open IndexedTemplateEmitter
 
 @[simp] theorem cycleCodes_decode :
     cycleCodes.flatMap decodeCycleCode = cycleClauseDescriptors := by
-  native_decide
+  decide +kernel
 
 private theorem positionTokens_map_fixed
     (tokens : List UnaryProgramTokens.Token) (position : Nat) :
@@ -173,7 +173,7 @@ private theorem decode_variableEmissions
         (fun _ => [FormulaShapeDirectionOrdering.Token.variable]) =
       List.replicate FormulaShapeFixedEight.copiesPerVariable
         FormulaShapeDirectionOrdering.Token.variable
-  native_decide
+  decide +kernel
 
 /-- The two retained-input passes and finite decoder produce exactly the
 canonical phase-major fixed-eight descriptor specification. -/

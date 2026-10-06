@@ -64,7 +64,7 @@ theorem x3cTwoClauseCoreRealizable_iff
     X3CClauseCoreRealizable first second false ↔
       PeriodicOneInThree.ExactlyOne [first, second] := by
   rw [x3cClauseCoreRealizable_iff]
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- Clause-core realizability after substituting the truth values of three
 signed source literals. -/

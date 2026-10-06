@@ -43,7 +43,7 @@ private theorem retainedDirectSourceFanEscapeAt_side_strict_lower_checked :
                 (retainedTerminalFanOuterSideNormal
                   (retainedDirectSourceFanTerminalAt kind index).1)
                 point)) = true := by
-  native_decide
+  decide +kernel
 
 /-- Every listed point of a selected direct source escape is strictly
 outside the radius-288 local fan frame. -/

@@ -155,11 +155,11 @@ theorem
         (angularOccurrenceIndex order literal
           clauseIndex literalIndex))
   have factorPositive :
-      0 < retainedAngularFanSourceClearanceFactor := by native_decide
+      0 < retainedAngularFanSourceClearanceFactor := by decide +kernel
   have clearance :
       2 * 288 <
         retainedTerminalFanTotalRefinement *
-          retainedAngularFanSourceClearanceFactor := by native_decide
+          retainedAngularFanSourceClearanceFactor := by decide +kernel
   have rawLength : 2 ≤ rawRoute.length := by
     simpa [rawRoute] using
       finalCoordinatedSourceRoutes_length_ge_two

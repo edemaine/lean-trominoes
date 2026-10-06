@@ -759,7 +759,7 @@ theorem
     retainedTerminalRefinedUnitPolyline] using
     unitSubdividedRasterizations_disjoint_of_sourceSegmentRectanglesSeparated
       (factor := retainedTerminalFanTotalRefinement)
-      (by native_decide) (by native_decide)
+      (by decide +kernel) (by decide +kernel)
       sourceRoute.dropLast referenceRoute
       sourceRetained.dropLast referenceRetained
       sourcePrefixLength referenceLength separated
@@ -795,7 +795,7 @@ theorem
     retainedTerminalRefinedUnitPolyline] using
     unitSubdividedRasterizations_disjoint_of_sourcePolylineRectanglesSeparated
       (factor := retainedTerminalFanTotalRefinement)
-      (by native_decide) (by native_decide)
+      (by decide +kernel) (by decide +kernel)
       sourceRoute.dropLast referenceRoute
       sourceRetained.dropLast referenceRetained
       prefixNonempty referenceLength separated

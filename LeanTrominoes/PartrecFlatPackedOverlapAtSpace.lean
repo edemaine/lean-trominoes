@@ -388,7 +388,7 @@ theorem flatPackedOverlapCurrentDigitCost_le_quadratic
     currentColumn nextColumn base currentWord nextWord
   have coefficient :
       flatPackedOverlapAssignmentCoefficient + 100000000 ≤ 10 ^ 70 := by
-    native_decide
+    decide +kernel
   change flatPackedAssignmentLookupDigitCost motif currentColumn base
       currentWord +
       flatPackedOverlapCurrentArgumentsCost motif currentColumn nextColumn
@@ -445,7 +445,7 @@ theorem flatPackedOverlapNextDigitCost_le_quadratic
     currentColumn nextColumn base currentWord nextWord
   have coefficient :
       flatPackedOverlapAssignmentCoefficient + 100000000 ≤ 10 ^ 70 := by
-    native_decide
+    decide +kernel
   change flatPackedAssignmentLookupDigitCost motif nextColumn base nextWord +
       flatPackedOverlapNextArgumentsCost motif currentColumn nextColumn base
         currentWord nextWord ≤ (10 ^ 70) * unit ^ 2
@@ -497,7 +497,7 @@ theorem flatPackedOverlapEqualityArgumentsCost_le_quadratic
   have currentBits := encodeNat_length_mono currentSmall
   have nextBits := encodeNat_length_mono nextSmall
   have fortyBits : (Computability.encodeNat 40).length = 6 := by
-    native_decide
+    decide +kernel
   rw [fortyBits] at currentBits nextBits
   have currentSpace : encodedListSpace [currentDigit] ≤ unit := by
     simp only [encodedListSpace_cons, encodedListSpace_nil]
@@ -511,7 +511,7 @@ theorem flatPackedOverlapEqualityArgumentsCost_le_quadratic
       encodedListSpace [currentDigit, nextDigit] + 2 ≤ 5 * unit := by
     omega
   have coefficient : 2 * (10 ^ 70) + 5 ≤ 10 ^ 80 := by
-    native_decide
+    decide +kernel
   change flatPackedOverlapCurrentDigitCost motif currentColumn nextColumn
         base currentWord nextWord +
       flatPackedOverlapNextDigitCost motif currentColumn nextColumn base
@@ -562,14 +562,14 @@ theorem flatPackedOverlapAtCost_le_quadratic
     omega
   have equalityBits := encodeNat_length_mono equalityArgument
   have oneSixtyFourBits : (Computability.encodeNat 164).length = 8 := by
-    native_decide
+    decide +kernel
   rw [oneSixtyFourBits] at equalityBits
   have equality : natEqCost currentDigit nextDigit ≤
       100000000000 * unit := equalityRaw.trans (by
         simp only [encodedListSpace_cons, encodedListSpace_nil]
         omega)
   have coefficient : 10 ^ 80 + 100000000000 ≤ 10 ^ 90 := by
-    native_decide
+    decide +kernel
   change natEqCost currentDigit nextDigit +
       flatPackedOverlapEqualityArgumentsCost motif currentColumn nextColumn
         base currentWord nextWord ≤ (10 ^ 90) * unit ^ 2

@@ -832,7 +832,7 @@ theorem flatPackedAssignmentPublicInputSpace_le_unit
           motif.flatMap PeriodicStripFlatEncoding.cellFields) ≤
       flatPackedAssignmentInputUnit motif queriedColumn target word := by
   have fortyEightBits :
-      (Computability.encodeNat 48).length = 6 := by native_decide
+      (Computability.encodeNat 48).length = 6 := by decide +kernel
   simp [flatPackedAssignmentInputUnit, flatPackedAssignmentEnvelopeFields,
     flatPackedLookupEnvelopeFields, encodedListSpace_cons, fortyEightBits]
   omega
@@ -1069,7 +1069,7 @@ theorem flatPackedAssignmentInputUnit_le_native
       3 * flatPackedAssignmentLookupNativeInputSpace motif queriedColumn
         target word := by
   have fortyEightBits :
-      (Computability.encodeNat 48).length = 6 := by native_decide
+      (Computability.encodeNat 48).length = 6 := by decide +kernel
   simp [flatPackedAssignmentInputUnit, flatPackedAssignmentEnvelopeFields,
     flatPackedLookupEnvelopeFields,
     flatPackedAssignmentLookupNativeInputSpace, encodedListSpace_cons,

@@ -185,12 +185,12 @@ theorem flatMotifIndexMultiplyCost_le_unit (values : List Nat) :
     (2 + index + 2 * index + 10)
   have final := encodeNat_add_length_le_sum
     (16 * (2 + index + 2 * index + 10)) 100
-  have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
-  have tenBits : (Computability.encodeNat 10).length = 4 := by native_decide
+  have twoBits : (Computability.encodeNat 2).length = 2 := by decide +kernel
+  have tenBits : (Computability.encodeNat 10).length = 4 := by decide +kernel
   have sixteenBits : (Computability.encodeNat 16).length = 5 := by
-    native_decide
+    decide +kernel
   have hundredBits : (Computability.encodeNat 100).length = 7 := by
-    native_decide
+    decide +kernel
   have limitBits :
       (Computability.encodeNat limit).length + 2 ≤ 100 * unit := by
     simp only [limit] at final ⊢
@@ -233,8 +233,8 @@ theorem flatMotifCellFieldAtCost_le_quadratic
     simpa [encodedListSpace_cons] using selectedUnit
   have productBits := encodeNat_mul_length_le_sum 2 index
   have offsetBitsRaw := encodeNat_add_length_le_sum 9 (2 * index)
-  have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
-  have nineBits : (Computability.encodeNat 9).length = 4 := by native_decide
+  have twoBits : (Computability.encodeNat 2).length = 2 := by decide +kernel
+  have nineBits : (Computability.encodeNat 9).length = 4 := by decide +kernel
   have productSpace : encodedListSpace [2 * index] ≤ 3 * unit := by
     simp only [encodedListSpace_cons, encodedListSpace_nil]
     omega
@@ -248,7 +248,7 @@ theorem flatMotifCellFieldAtCost_le_quadratic
   have getIndex : getCost 1 values ≤ 20000 * (unit + 1) :=
     getIndexRaw.trans (by gcongr)
   have zeroRaw := listCodeZeroCost_le_linear values
-  have addTwoSmall : addConstCost 2 [0] ≤ 1000000 := by native_decide
+  have addTwoSmall : addConstCost 2 [0] ≤ 1000000 := by decide +kernel
   have numeralTwo : numeralCost 2 values ≤ 1000000 * (unit + 1) := by
     simp only [numeralCost]
     have zeroBound := zeroRaw.trans (by gcongr)

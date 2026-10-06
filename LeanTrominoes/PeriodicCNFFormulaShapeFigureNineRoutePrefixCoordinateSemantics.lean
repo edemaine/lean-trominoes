@@ -3,12 +3,26 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineFinalClauseOrderingSemantics
-import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixLocalDirectionSemantics
-import LeanTrominoes.PeriodicCNFClauseProfilePolarityIndexedRouteOperationSemantics
-import LeanTrominoes.PeriodicCNFFormulaShapeFigureNinePolarityRouteTailPairs
-
-/-! # Presentation coordinates selected by final Figure 9 headers -/
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case0
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case1
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case2
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case3
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case4
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case5
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case6
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case7
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case8
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case9
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case10
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case11
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case12
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case13
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case14
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case15
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case16
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case17
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case18
+import LeanTrominoes.PeriodicCNFFormulaShapeFigureNineRoutePrefixCoordinateCertificates.Case19
 
 namespace LeanTrominoes
 namespace PeriodicCNF
@@ -20,35 +34,48 @@ open FormulaShapeFigureNineFinalClauseOrdering
 open FormulaShapeFigureNinePolarityRouteHeader
 open PlanarOneInThreeNoUnitsFigureNine
 
-/-- The polarity operation and original template incidence coordinates
-selected by one final Figure 9 route header. -/
-structure HeaderTemplateCoordinate where
-  polarity : IndexedDescriptor
-  clauseIndex : Nat
-  literalIndex : Nat
-  deriving DecidableEq
+private theorem firstSourceHeaderCoordinatesCheck_correct
+    (first : UnaryProgramClauseProfile.LiteralProfile) (direction : AxisDirection) :
+    firstSourceHeaderCoordinatesCheck first direction = true := by
+  rcases first with ⟨nextSlice, value⟩
+  cases nextSlice <;> cases value <;> cases direction
+  · exact firstSourceHeaderCoordinatesCheck_case0
+  · exact firstSourceHeaderCoordinatesCheck_case1
+  · exact firstSourceHeaderCoordinatesCheck_case2
+  · exact firstSourceHeaderCoordinatesCheck_case3
+  · exact firstSourceHeaderCoordinatesCheck_case4
+  · exact firstSourceHeaderCoordinatesCheck_case5
+  · exact firstSourceHeaderCoordinatesCheck_case6
+  · exact firstSourceHeaderCoordinatesCheck_case7
+  · exact firstSourceHeaderCoordinatesCheck_case8
+  · exact firstSourceHeaderCoordinatesCheck_case9
+  · exact firstSourceHeaderCoordinatesCheck_case10
+  · exact firstSourceHeaderCoordinatesCheck_case11
+  · exact firstSourceHeaderCoordinatesCheck_case12
+  · exact firstSourceHeaderCoordinatesCheck_case13
+  · exact firstSourceHeaderCoordinatesCheck_case14
+  · exact firstSourceHeaderCoordinatesCheck_case15
+  · exact firstSourceHeaderCoordinatesCheck_case16
+  · exact firstSourceHeaderCoordinatesCheck_case17
+  · exact firstSourceHeaderCoordinatesCheck_case18
+  · exact firstSourceHeaderCoordinatesCheck_case19
 
-/-- Read a header's exact clause-major, literal-minor template coordinates. -/
-def headerTemplateCoordinate (header : Header) : HeaderTemplateCoordinate :=
-  let query := header.figurePrefix.localQuery
-  let incidence :=
-    (templateDrawingOfClauseProfile query.1).incidenceAt query.2
-  ⟨header.polarity.indexed, incidence.clauseIndex, incidence.literalIndex⟩
-
-/-- The coordinate schedule obtained directly from the finite template,
-including the final within-clause clockwise permutation. -/
-def expectedSourceClauseHeaderTemplateCoordinates
-    (profile : DirectedClauseProfile) : List HeaderTemplateCoordinate :=
-  let ordered := orderedDirectedProfile profile
-  let drawing := templateDrawingOfClauseProfile (clauseProfile ordered)
-  drawing.formula.zipIdx.flatMap fun taggedClause =>
-    let generatedProfile := embeddedClauseProfile taggedClause.1
-    let sourceOrder :=
-      reorderList (List.range taggedClause.1.literals.length)
-    (ClauseProfilePolarityRouteOperation.descriptors
-      (reorderProfile generatedProfile)).map fun polarity =>
-        ⟨polarity.indexed, taggedClause.2,
-          sourceOrder.getD (sourceSlotNat polarity.sourceSlot) 0⟩
+/-- Both coordinate columns are certified for every directed profile. -/
+theorem sourceHeaderCoordinatesCheck_correct (profile : DirectedClauseProfile) :
+    sourceHeaderCoordinatesCheck profile = true := by
+  cases profile with
+  | unary first direction =>
+    have checked := firstSourceHeaderCoordinatesCheck_correct first direction
+    simp only [firstSourceHeaderCoordinatesCheck, Bool.and_eq_true, finiteAll_eq_true] at checked
+    exact checked.1
+  | binary first direction second secondDirection =>
+    have checked := firstSourceHeaderCoordinatesCheck_correct first direction
+    simp only [firstSourceHeaderCoordinatesCheck, Bool.and_eq_true, finiteAll_eq_true] at checked
+    exact (checked.2 ⟨second, secondDirection⟩).1
+  | ternary first direction second secondDirection third thirdDirection =>
+    have checked := firstSourceHeaderCoordinatesCheck_correct first direction
+    simp only [firstSourceHeaderCoordinatesCheck, Bool.and_eq_true, finiteAll_eq_true] at checked
+    exact ((checked.2 ⟨second, secondDirection⟩).2 ⟨third, thirdDirection⟩)
 
 /-- Every final header selects exactly the original finite-template
 incidence prescribed by its generated clause and reordered literal slot. -/
@@ -56,7 +83,10 @@ theorem sourceClauseHeaders_map_headerTemplateCoordinate :
     ∀ profile : DirectedClauseProfile,
       (sourceClauseHeaders profile).map headerTemplateCoordinate =
         expectedSourceClauseHeaderTemplateCoordinates profile := by
-  native_decide
+  intro profile
+  have checked := sourceHeaderCoordinatesCheck_correct profile
+  simp only [sourceHeaderCoordinatesCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+  exact checked.1
 
 /-- Coordinate block emitted by one direction-aware source token. -/
 def expectedHeaderTemplateCoordinateBlock :

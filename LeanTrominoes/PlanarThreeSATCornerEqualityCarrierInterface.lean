@@ -582,7 +582,7 @@ theorem cornerEqualityDrawing_routePoints_insideCarrierBoundaries
       fun point =>
         first.InsideCarrierBoundary point ∧
           second.InsideCarrierBoundary point := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- A canonical corner route can list the first occupied port only as one
 of that route's advertised endpoints. -/
@@ -590,7 +590,7 @@ theorem cornerEqualityDrawing_routeContactsAt_firstEndpoint
     (first second : CornerPort) :
     (cornerEqualityDrawing
       first second).RouteContactsAtEndpoint first.position := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- A canonical corner route can list the second occupied port only as one
 of that route's advertised endpoints. -/
@@ -598,7 +598,7 @@ theorem cornerEqualityDrawing_routeContactsAt_secondEndpoint
     (first second : CornerPort) :
     (cornerEqualityDrawing
       first second).RouteContactsAtEndpoint second.position := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- Translating a corner drawing to its macrocell origin preserves both
 port-side route bounds. -/

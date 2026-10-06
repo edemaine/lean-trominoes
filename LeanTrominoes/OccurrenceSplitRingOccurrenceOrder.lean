@@ -59,14 +59,14 @@ def spokeOccurrenceDirection (port : Port) : AxisDirection :=
 @[simp]
 theorem cycleOccurrenceIndicesAt_port_length (port : Port) :
     (cycleOccurrenceIndicesAt (.port port)).length = 2 := by
-  cases port <;> native_decide
+  cases port <;> decide +kernel
 
 /-- The degree-two separator also occurs exactly twice in the implication
 cycle. -/
 @[simp]
 theorem cycleOccurrenceIndicesAt_separator_length :
     (cycleOccurrenceIndicesAt .separator).length = 2 := by
-  native_decide
+  decide +kernel
 
 /-- At every real port, the source spoke followed by the two implication
 incidences in syntactic presentation order has clockwise terminal
@@ -78,7 +78,7 @@ theorem port_occurrenceDirections_inClockwiseOrder (port : Port) :
         0 .invalid)
       ((cycleOccurrenceDirectionsAt (.port port)).getD
         1 .invalid) := by
-  cases port <;> native_decide
+  cases port <;> decide +kernel
 
 end OccurrenceSplitRing
 end LeanTrominoes

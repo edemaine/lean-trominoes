@@ -45,7 +45,7 @@ theorem retainedDirectSourceLocalRouteAt_endpoints_in_routeMacrocell :
           (route.getLast?.getD (0, 0)).1 ≤ 13 ∧
           0 ≤ (route.getLast?.getD (0, 0)).2 ∧
           (route.getLast?.getD (0, 0)).2 ≤ 13) := by
-  native_decide
+  decide +kernel
 
 /-- Direct route envelopes based at different planar-SAT macrocell centers
 are separated after the final common refinement. -/

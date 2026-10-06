@@ -63,7 +63,7 @@ theorem omittedSide_spec
     omitted ∉ [first, second, third] ∧
       ∀ side, side ≠ omitted → side ∈ [first, second, third] := by
   revert nodup
-  cases first <;> cases second <;> cases third <;> native_decide
+  cases first <;> cases second <;> cases third <;> decide +kernel
 
 /-- A finite colored fan around one degree-three vertex.  The order records
 the three syntactic endpoint occurrences; only distinctness of their
@@ -187,7 +187,7 @@ theorem canonicalColoring_nodup (fan : ColoredFan)
   revert sidesNodup colorsNodup
   cases firstSide <;> cases secondSide <;> cases thirdSide <;>
     cases firstColor <;> cases secondColor <;> cases thirdColor <;>
-      native_decide
+      decide +kernel
 
 /-- A monochromatic endpoint fan induces the constant canonical coloring. -/
 theorem canonicalColoring_eq_of_monochromatic
@@ -205,7 +205,7 @@ theorem canonicalColoring_eq_of_monochromatic
   subst thirdColor
   revert sidesNodup
   cases firstSide <;> cases secondSide <;> cases thirdSide <;>
-    cases color <;> native_decide
+    cases color <;> decide +kernel
 
 end ColoredFan
 end DegreeThreeVertexNormalization

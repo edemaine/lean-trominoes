@@ -38,7 +38,7 @@ theorem all_oneVariableSiteDrawing_routePointsInMacrocellHalo :
             standardThreeStrandLayout.factor
             (Cell.add
               standardThreeStrandLayout.variableOffset point))) = true := by
-  native_decide
+  decide +kernel
 
 /-- The analogous exhaustive bound for every two-occurrence variable site. -/
 theorem all_twoVariableSiteDrawing_routePointsInMacrocellHalo :
@@ -51,7 +51,7 @@ theorem all_twoVariableSiteDrawing_routePointsInMacrocellHalo :
             standardThreeStrandLayout.factor
             (Cell.add
               standardThreeStrandLayout.variableOffset point))) = true := by
-  native_decide
+  decide +kernel
 
 /-- The analogous exhaustive bound for every three-occurrence variable
 site. -/
@@ -67,7 +67,7 @@ theorem all_threeVariableSiteDrawing_routePointsInMacrocellHalo :
             standardThreeStrandLayout.factor
             (Cell.add
               standardThreeStrandLayout.variableOffset point))) = true := by
-  native_decide
+  decide +kernel
 
 /-- Every element position in every one-occurrence variable site has the
 same macrocell-halo bound. -/
@@ -78,7 +78,7 @@ theorem all_oneVariableSiteDrawing_elementPositionsInMacrocellHalo :
         (Cell.add standardThreeStrandLayout.variableOffset
           ((oneVariableSiteDrawing kind polarity).elementPosition
             element)) := by
-  native_decide
+  decide +kernel
 
 /-- Element-position bound for all two-occurrence variable sites. -/
 theorem all_twoVariableSiteDrawing_elementPositionsInMacrocellHalo :
@@ -88,7 +88,7 @@ theorem all_twoVariableSiteDrawing_elementPositionsInMacrocellHalo :
         (Cell.add standardThreeStrandLayout.variableOffset
           ((twoVariableSiteDrawing firstKind secondKind
             firstPolarity secondPolarity).elementPosition element)) := by
-  native_decide
+  decide +kernel
 
 /-- Element-position bound for all three-occurrence variable sites. -/
 theorem all_threeVariableSiteDrawing_elementPositionsInMacrocellHalo :
@@ -100,7 +100,7 @@ theorem all_threeVariableSiteDrawing_elementPositionsInMacrocellHalo :
           ((threeVariableSiteDrawing firstKind secondKind thirdKind
             firstPolarity secondPolarity thirdPolarity)
             |>.elementPosition element)) := by
-  native_decide
+  decide +kernel
 
 /-- Every actual finite variable-site route inherits the exhaustive
 one-, two-, or three-occurrence macrocell bound. -/
@@ -318,7 +318,7 @@ theorem all_clauseRoutePointsInMacrocellHalo :
             standardThreeStrandLayout.factor
             (Cell.add
               standardThreeStrandLayout.clauseOffset point))) = true := by
-  native_decide
+  decide +kernel
 
 /-- Every translated clause-core route lies inside the standard refined
 fundamental square. -/

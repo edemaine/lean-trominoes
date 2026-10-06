@@ -111,7 +111,7 @@ theorem retainedAngularFanEscapedSplicedBoundaryPolyline_retained
   have lengthPositive : 0 < terminal.2 :=
     (retainedTerminalDirectionClassify_sound classified).1
   have scaledRetained : RetainedRayPolyline scaledRoute :=
-    retained.scale (by native_decide)
+    retained.scale (by decide +kernel)
   have replacementRetained : RetainedRayPolyline replacement :=
     RetainedRayPolyline.of_orthogonal
       (retainedTerminalFanOuterEscapedCompleteRoute_orthogonal
@@ -180,7 +180,7 @@ theorem retainedAngularFanEscapedSplicedBoundaryPolyline_orthogonal
   have scaledOrthogonal :
       PeriodicOrthocrossing.OrthogonalPolyline scaledRoute :=
     PeriodicOrthocrossing.OrthogonalPolyline.scalePolyline
-      routeOrthogonal (by native_decide)
+      routeOrthogonal (by decide +kernel)
   have replacementOrthogonal :
       PeriodicOrthocrossing.OrthogonalPolyline replacement :=
     retainedTerminalFanOuterEscapedCompleteRoute_orthogonal
@@ -299,7 +299,7 @@ theorem retainedAngularFanEscapedSplicedBoundaryRoute_valid
     replacePolylineTail_getLast? replacementLast
   have scaledRetained :
       RetainedRayPolyline scaledRoute :=
-    retained.scale (by native_decide)
+    retained.scale (by decide +kernel)
   have replacementRetained :
       RetainedRayPolyline replacement :=
     RetainedRayPolyline.of_orthogonal

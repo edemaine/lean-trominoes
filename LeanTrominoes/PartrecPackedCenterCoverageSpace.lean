@@ -459,7 +459,7 @@ theorem packedCenterCoveringCandidateList_offset_small
     exact pairMember.2
   cases tromino <;> cases symmetry <;>
     simp [TrominoAssignment.trominoCellList] at sourceMember
-  all_goals rcases sourceMember with rfl | rfl | rfl <;> native_decide
+  all_goals rcases sourceMember with rfl | rfl | rfl <;> decide +kernel
 
 theorem packedCenterCoveringCountSpaceBound_le_input
     (tromino : Tromino)
@@ -529,7 +529,7 @@ theorem packedCenterActivePlacementList_length_le
     tromino periodicStrip packed base.2] at filtered
   have candidateLength :
       (Code.packedCenterCoveringCandidateList tromino).length = 24 := by
-    cases tromino <;> native_decide
+    cases tromino <;> decide +kernel
   omega
 
 def packedCenterExactlyOneCoveringArgumentsCost
@@ -634,7 +634,7 @@ theorem packedCenterExactlyOneCoveringCost_le_linear
     omega
   have zeroBound := listCodeZeroCost_le_linear values
   have numeralAddSmall : addConstCost 1 [0] ≤ 100000 := by
-    native_decide
+    decide +kernel
   have numeralBound : numeralCost 1 values ≤ unit := by
     simp only [numeralCost]
     simp only [unit, packedCenterExactlyOneCoveringSpaceUnit,

@@ -67,7 +67,7 @@ theorem standardRibbonTurnRoute_simple
       (standardRibbonTurnRoute incoming outgoing color) := by
   cases incoming <;> cases outgoing <;> cases color <;>
     simp_all [AxisDirection.IsGenuine, AxisDirection.opposite] <;>
-    native_decide
+    decide +kernel
 
 /-- Different colors in one legal local source pattern have exact
 continuous separation. -/
@@ -84,7 +84,7 @@ theorem standardRibbonTurnRoutes_avoidEachOther
   cases incoming <;> cases outgoing <;>
     cases first <;> cases second <;>
     simp_all [AxisDirection.IsGenuine, AxisDirection.opposite] <;>
-    native_decide
+    decide +kernel
 
 /-- The complete local three-lane bundle certificate. -/
 def StandardRibbonTurnBundleIsSeparated

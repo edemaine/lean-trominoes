@@ -58,7 +58,7 @@ no target cells. -/
 def blankGadget : Gadget := paperGadget []
 
 theorem blankGadget_wellFormed : blankGadget.IsWellFormed := by
-  native_decide
+  decide +kernel
 
 /-! ## Straight wires -/
 
@@ -103,11 +103,11 @@ def wireGadget (tromino : Tromino) (axis : WireAxis)
 
 theorem wireGadget_wellFormed (tromino : Tromino) (axis : WireAxis)
     (color : WireColor) : (wireGadget tromino axis color).IsWellFormed := by
-  cases tromino <;> cases axis <;> cases color <;> native_decide
+  cases tromino <;> cases axis <;> cases color <;> decide +kernel
 
 theorem wireCells_nodup (tromino : Tromino) (axis : WireAxis)
     (color : WireColor) : (wireCells tromino axis color).Nodup := by
-  cases tromino <;> cases axis <;> cases color <;> native_decide
+  cases tromino <;> cases axis <;> cases color <;> decide +kernel
 
 theorem figure11RedWire_eq_library :
     figure11RedWire = wireGadget .L .horizontal .red := rfl
@@ -187,11 +187,11 @@ def bendGadget (tromino : Tromino) (bend : WireBend)
 
 theorem bendGadget_wellFormed (tromino : Tromino) (bend : WireBend)
     (color : WireColor) : (bendGadget tromino bend color).IsWellFormed := by
-  cases tromino <;> cases bend <;> cases color <;> native_decide
+  cases tromino <;> cases bend <;> cases color <;> decide +kernel
 
 theorem bendCells_nodup (tromino : Tromino) (bend : WireBend)
     (color : WireColor) : (bendCells tromino bend color).Nodup := by
-  cases tromino <;> cases bend <;> cases color <;> native_decide
+  cases tromino <;> cases bend <;> cases color <;> decide +kernel
 
 /-! ## Degree-three vertices -/
 
@@ -228,12 +228,12 @@ def monochromaticVertexGadget (tromino : Tromino)
 theorem monochromaticVertexGadget_wellFormed (tromino : Tromino)
     (color : WireColor) :
     (monochromaticVertexGadget tromino color).IsWellFormed := by
-  cases tromino <;> cases color <;> native_decide
+  cases tromino <;> cases color <;> decide +kernel
 
 theorem monochromaticVertexCells_nodup (tromino : Tromino)
     (color : WireColor) :
     (monochromaticVertexCells tromino color).Nodup := by
-  cases tromino <;> cases color <;> native_decide
+  cases tromino <;> cases color <;> decide +kernel
 
 /-- Pixel masks for the two normalized trichromatic 0-or-3-in-3 vertices.
 The order names list the west, north, and east port colors. -/
@@ -266,12 +266,12 @@ def trichromaticVertexGadget (tromino : Tromino)
 theorem trichromaticVertexGadget_wellFormed (tromino : Tromino)
     (order : TrichromaticOrder) :
     (trichromaticVertexGadget tromino order).IsWellFormed := by
-  cases tromino <;> cases order <;> native_decide
+  cases tromino <;> cases order <;> decide +kernel
 
 theorem trichromaticVertexCells_nodup (tromino : Tromino)
     (order : TrichromaticOrder) :
     (trichromaticVertexCells tromino order).Nodup := by
-  cases tromino <;> cases order <;> native_decide
+  cases tromino <;> cases order <;> decide +kernel
 
 /-! ## Complete local drawing alphabet -/
 
@@ -345,11 +345,11 @@ theorem orthogonalCellPixels_corners_absent (tromino : Tromino)
       (5, 5) ∉ (orthogonalCellPixels tromino cellType).toFinset := by
   cases tromino <;>
     cases cellType with
-    | blank => native_decide
-    | wire axis color => cases axis <;> cases color <;> native_decide
-    | bend bend color => cases bend <;> cases color <;> native_decide
-    | monochromaticVertex color => cases color <;> native_decide
-    | trichromaticVertex order => cases order <;> native_decide
+    | blank => decide +kernel
+    | wire axis color => cases axis <;> cases color <;> decide +kernel
+    | bend bend color => cases bend <;> cases color <;> decide +kernel
+    | monochromaticVertex color => cases color <;> decide +kernel
+    | trichromaticVertex order => cases order <;> decide +kernel
 
 theorem orthogonalCellGadget_wellFormed (tromino : Tromino)
     (cellType : OrthogonalCellType) :

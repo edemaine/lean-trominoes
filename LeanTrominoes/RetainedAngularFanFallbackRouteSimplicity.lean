@@ -23,7 +23,7 @@ theorem retainedFallbackSourcePrefix_isSimple
   have refinedSimple :
       LocalIncidenceDrawing.RouteIsSimple
         (scalePolyline retainedTerminalFanTotalRefinement route) :=
-    routeIsSimple_scalePolyline (by native_decide) simple
+    routeIsSimple_scalePolyline (by decide +kernel) simple
   have reversed := refinedSimple.reverse.tail.reverse
   rw [← List.dropLast_reverse
     (l := (scalePolyline

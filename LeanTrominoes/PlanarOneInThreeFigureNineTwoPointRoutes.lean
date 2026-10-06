@@ -46,23 +46,23 @@ theorem figureNineDrawingFor_twoPointAuxiliaryRoutesVertical
     (first second third : Bool) :
     (figureNineDrawingFor first second third).TwoPointRoutesVerticalOn
       FigureNineVariable.IsAuxiliary := by
-  cases first <;> cases second <;> cases third <;> native_decide
+  cases first <;> cases second <;> cases third <;> decide +kernel
 
 theorem figureNineTwoDrawingFor_twoPointAuxiliaryRoutesVertical
     (first second : Bool) :
     (figureNineTwoDrawingFor first second).TwoPointRoutesVerticalOn
       FigureNineVariable.IsAuxiliary := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 theorem figureNineOneDrawingFor_twoPointAuxiliaryRoutesVertical
     (first : Bool) :
     (figureNineOneDrawingFor first).TwoPointRoutesVerticalOn
       FigureNineVariable.IsAuxiliary := by
-  cases first <;> native_decide
+  cases first <;> decide +kernel
 
 theorem figureNineZeroDrawing_twoPointRoutesVertical :
     figureNineZeroDrawing.TwoPointRoutesVertical := by
-  native_decide
+  decide +kernel
 
 theorem instantiatedThreeDrawing_twoPointAuxiliaryRoutesVertical
     {Variable : Type*} [DecidableEq Variable]

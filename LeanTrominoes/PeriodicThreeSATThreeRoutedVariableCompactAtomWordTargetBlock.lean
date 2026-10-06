@@ -103,9 +103,9 @@ theorem routedVariableCompactAtomWordBlockAtTarget_eq_finalSite
         neighborTranslations := by
     rcases offsetCases with offsetZero | offsetOne
     · rw [offsetZero]
-      native_decide
+      decide +kernel
     · rw [offsetOne]
-      native_decide
+      decide +kernel
   by_cases atomEq : taggedIncidence.1.literal.atom = atom
   · have selected :
         descriptor.targetPortRank ∈ routedVariableCompactTargetRanks ∧

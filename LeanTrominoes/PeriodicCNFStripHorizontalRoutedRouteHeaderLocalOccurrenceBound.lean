@@ -3,7 +3,26 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderCopiedLocalAtomCodeCompiler
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case0
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case1
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case2
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case3
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case4
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case5
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case6
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case7
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case8
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case9
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case10
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case11
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case12
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case13
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case14
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case15
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case16
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case17
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case18
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderLocalOccurrenceBoundCertificates.Case19
 
 /-! # Local final-atom occurrence bounds in one routed parent block -/
 
@@ -14,27 +33,52 @@ namespace HorizontalRoutedRouteHeaderPresentationAtomScope
 open PeriodicCNF.FormulaShapeDirectionOrdering
 open HorizontalRoutedRouteHeader
 
+private theorem localOccurrenceBoundsCheck_first_correct
+    (first : LeanTrominoes.PeriodicCNF.UnaryProgramClauseProfile.LiteralProfile)
+    (direction : AxisDirection) : firstDirectedProfileCheck localOccurrenceBoundsCheck first direction = true := by
+  rcases first with ⟨nextSlice, value⟩
+  cases nextSlice <;> cases value <;> cases direction
+  · exact localOccurrenceBoundsCheck_case0
+  · exact localOccurrenceBoundsCheck_case1
+  · exact localOccurrenceBoundsCheck_case2
+  · exact localOccurrenceBoundsCheck_case3
+  · exact localOccurrenceBoundsCheck_case4
+  · exact localOccurrenceBoundsCheck_case5
+  · exact localOccurrenceBoundsCheck_case6
+  · exact localOccurrenceBoundsCheck_case7
+  · exact localOccurrenceBoundsCheck_case8
+  · exact localOccurrenceBoundsCheck_case9
+  · exact localOccurrenceBoundsCheck_case10
+  · exact localOccurrenceBoundsCheck_case11
+  · exact localOccurrenceBoundsCheck_case12
+  · exact localOccurrenceBoundsCheck_case13
+  · exact localOccurrenceBoundsCheck_case14
+  · exact localOccurrenceBoundsCheck_case15
+  · exact localOccurrenceBoundsCheck_case16
+  · exact localOccurrenceBoundsCheck_case17
+  · exact localOccurrenceBoundsCheck_case18
+  · exact localOccurrenceBoundsCheck_case19
+
+private theorem localOccurrenceBoundsCheck_correct (profile : DirectedClauseProfile) :
+    localOccurrenceBoundsCheck profile = true :=
+  firstDirectedProfileCheck_sound localOccurrenceBoundsCheck localOccurrenceBoundsCheck_first_correct profile
+
 /-- Every genuine clause descriptor expands to a nonempty final occurrence
 block, so the parent-index prefix sum advances exactly once per clause. -/
 theorem clauseBlock_length_pos (profile : DirectedClauseProfile) :
     0 < (clauseBlock profile).length := by
-  cases profile <;> native_decide +revert
-
-/-- Represented parent-relative atoms at the parent-local positions of one
-final routed block. -/
-def parentLocalAtoms (profile : DirectedClauseProfile) :
-    List ParentRelativeAtom :=
-  (clauseBlock profile).filterMap fun scope =>
-    match scope with
-    | .inherited _ => none
-    | .parentLocal control => some control.representedAtom
+  have checked := localOccurrenceBoundsCheck_correct profile
+  simp only [localOccurrenceBoundsCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+  exact checked.1.1
 
 /-- As above, the checker scans only atoms that occur in its finite block. -/
 private theorem parentLocalAtoms_count_check
     (profile : DirectedClauseProfile) :
     (parentLocalAtoms profile).all fun atom =>
       decide ((parentLocalAtoms profile).count atom <= 3) := by
-  cases profile <;> native_decide +revert
+  have checked := localOccurrenceBoundsCheck_correct profile
+  simp only [localOccurrenceBoundsCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+  exact checked.1.2
 
 /-- Quotienting the several descriptors that can represent the same local
 atom still leaves multiplicity at most three. -/
@@ -106,7 +150,9 @@ private theorem clauseBlock_local_count_check
       | .parentLocal control =>
           decide
             ((clauseBlock profile).count (.parentLocal control) <= 3) := by
-  cases profile <;> native_decide +revert
+  have checked := localOccurrenceBoundsCheck_correct profile
+  simp only [localOccurrenceBoundsCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+  exact checked.2
 
 /-- Every parent-local Figure 9 or polarity-normalization atom occurs at most
 three times in the final routed block generated by one source clause. -/

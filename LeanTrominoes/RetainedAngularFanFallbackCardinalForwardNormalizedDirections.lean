@@ -132,7 +132,7 @@ theorem scaledSplicedOwnFigure7Route_forwardCardinalTangent_normalized_direction
       LocalIncidenceDrawing.RouteIsSimple sourcePrefix :=
     retainedFallbackSourcePrefix_isSimple scaledRoute scaledSimple
   have sourcePrefixOrthogonal : OrthogonalPolyline sourcePrefix :=
-    (scaledOrthogonal.scalePolyline (by native_decide)).dropLast
+    (scaledOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have sourcePrefixLength : 2 ≤ sourcePrefix.length := by
     dsimp [sourcePrefix, retainedFallbackSourcePrefix]
     rw [List.length_dropLast]

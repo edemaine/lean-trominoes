@@ -26,7 +26,7 @@ theorem carrierLensUpperRightTemplateRoute_classified
         Cell.sub]]
     change retainedTerminalDirectionClassify (2, 0) =
       some (.compass .east, 2)
-    native_decide
+    decide +kernel
   · rw [show PeriodicThreeSATThree.routeTerminalVector
         (carrierLensRawTemplateRoute true span 0 1) = (0, -2) by
       simp [carrierLensRawTemplateRoute,
@@ -34,7 +34,7 @@ theorem carrierLensUpperRightTemplateRoute_classified
         Cell.sub]]
     change retainedTerminalDirectionClassify (0, -2) =
       some (.compass .north, 2)
-    native_decide
+    decide +kernel
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

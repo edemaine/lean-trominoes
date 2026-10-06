@@ -23,7 +23,7 @@ private theorem cyclicRoute_withinCoordinateRadius
     (active : Bool) (oldPort : CanonicalVertexPort) :
     ∀ point ∈ (rotationRoundPortAndRoute active oldPort).2,
       WithinCoordinateRadius 3 center point := by
-  cases active <;> cases oldPort <;> native_decide
+  cases active <;> cases oldPort <;> decide +kernel
 
 /-- An anchored selected cyclic-round route at an old band point lies in the
 enlarged open vertical halo. -/

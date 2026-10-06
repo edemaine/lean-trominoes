@@ -62,7 +62,7 @@ source-index/operation schedule of its literal-value list. -/
 theorem descriptors_map_indexed (profile : ClauseProfile) :
     (descriptors profile).map Descriptor.indexed =
       indexedDescriptors (profile.literals.map LiteralProfile.value) := by
-  cases profile <;> native_decide +revert
+  cases profile <;> decide +kernel +revert
 
 end ClauseProfilePolarityRouteOperation
 end PeriodicCNF

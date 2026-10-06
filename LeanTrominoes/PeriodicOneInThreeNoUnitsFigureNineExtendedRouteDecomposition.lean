@@ -49,7 +49,7 @@ theorem route_isSimple :
       data.IsValid →
       ∀ slot, data.SlotActive slot →
         LocalIncidenceDrawing.RouteIsSimple (data.route slot) := by
-  native_decide
+  decide +kernel
 
 /-- Pointwise translation preserves simplicity of an active connector. -/
 theorem translatedRoute_isSimple
@@ -73,7 +73,7 @@ theorem radialExtension_orthogonal :
         OrthogonalPolyline
           [sourceExit (data.direction slot),
             outerSourceExit (data.direction slot)] := by
-  native_decide
+  decide +kernel
 
 /-- Every active two-point radial extension is geometrically simple. -/
 theorem radialExtension_isSimple :
@@ -83,7 +83,7 @@ theorem radialExtension_isSimple :
         LocalIncidenceDrawing.RouteIsSimple
           [sourceExit (data.direction slot),
             outerSourceExit (data.direction slot)] := by
-  native_decide
+  decide +kernel
 
 /-- Translation preserves orthogonality of the radial extension. -/
 theorem translatedRadialExtension_orthogonal

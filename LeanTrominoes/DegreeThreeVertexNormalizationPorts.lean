@@ -153,7 +153,7 @@ theorem normalizeTrichromaticColoring_shape
         (normalizeTrichromaticColoring coloring .west = .green ∧
           normalizeTrichromaticColoring coloring .east = .blue)) := by
   revert coloring
-  native_decide
+  decide +kernel
 
 /-- The chosen `OrthogonalCellType` exposes exactly the normalized RGB port
 colors, with no south port. -/
@@ -169,7 +169,7 @@ theorem trichromaticVertex_portColors
       cellType.portColor .east = some (normalized .east) ∧
       cellType.portColor .south = none := by
   revert coloring
-  native_decide
+  decide +kernel
 
 /-- A monochromatic normalized vertex exposes its color on west, north, and
 east and has no south port. -/
@@ -179,7 +179,7 @@ theorem monochromaticVertex_portColors (color : WireColor) :
       cellType.portColor .north = some color ∧
       cellType.portColor .east = some color ∧
       cellType.portColor .south = none := by
-  cases color <;> native_decide
+  cases color <;> decide +kernel
 
 end DegreeThreeVertexNormalization
 end LeanTrominoes

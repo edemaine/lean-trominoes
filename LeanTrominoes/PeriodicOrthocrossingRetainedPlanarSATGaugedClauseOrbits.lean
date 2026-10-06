@@ -79,7 +79,7 @@ theorem routedVariableClauseLocalOffset_mem_noncarrier
     routedVariableClauseLocalOffset (arm, index) ∈
       noncarrierClauseLocalPositions := by
   fin_cases index <;> cases arm <;>
-    native_decide
+    decide +kernel
 
 theorem noncarrierClause_exists_localOffset_mem
     {Variable : Type*} [DecidableEq Variable]
@@ -410,7 +410,7 @@ theorem carrier_noncarrier_localOffset_emod_ne :
               noncarrierOffset.1 % planarMacroScale ∧
             carrierOffset.2 % planarMacroScale =
               noncarrierOffset.2 % planarMacroScale) := by
-  native_decide
+  decide +kernel
 
 theorem carrier_clauseResidue_ne_noncarrier_clauseResidue
     {Variable : Type*} [DecidableEq Variable]

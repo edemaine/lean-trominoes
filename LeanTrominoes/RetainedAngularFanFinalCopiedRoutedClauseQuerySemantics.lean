@@ -133,7 +133,7 @@ theorem retainedFinalRoutedClauseQueries_formula_eq
       (taggedClause, (0, 0)) ∈
         formula.clauses.zipIdx.product neighborTranslations := by
     apply List.mem_product.mpr
-    exact ⟨taggedClauseMember, by native_decide⟩
+    exact ⟨taggedClauseMember, by decide +kernel⟩
   have routedClauseMember :
       normalizedClause ∈
         routedClauseMetadataNormalizedClauses formula := by

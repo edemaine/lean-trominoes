@@ -177,7 +177,7 @@ theorem retainedFallbackSourcePrefix_dropLast_strictlyAvoids_suffix
       (reference := finalSegment)
       (factor := retainedTerminalFanTotalRefinement * factor)
       (radius := 288)
-      (Nat.mul_pos (by native_decide) factorPositive) clearance
+      (Nat.mul_pos (by decide +kernel) factorPositive) clearance
       finalAligned sourceAvoids
       (fun point pointMember => by
         simpa [finalSegment] using

@@ -564,7 +564,7 @@ theorem
       0 < retainedTerminalFanOuterRadialLength terminal := by
     have escapePositive :
         0 < retainedTerminalFanOuterSourceEscapeLength := by
-      native_decide
+      decide +kernel
     omega
   have spokeEqual :
       retainedTerminalFanFigure7SpokeRouteAt center slot =

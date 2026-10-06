@@ -27,6 +27,7 @@ theorem inheritedSlot_present : ∀ (profile : DirectedClauseProfile) (slot : So
   cases profile with
   | unary a d => revert a d slot; decide +kernel
   | binary a d b e => revert a d b e slot; decide +kernel
-  | ternary a d b e c f => revert a d b e c f slot; decide +kernel
+  | ternary a d b e c f =>
+      cases d <;> cases e <;> revert a b c f slot <;> decide +kernel
 
 end LeanTrominoes.PeriodicCNF.OrdinarySourceProjection

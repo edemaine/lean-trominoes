@@ -17,6 +17,9 @@ outer classifier gives the same `notFacing` interface for complete coordinated
 variable stubs.
 -/
 
+set_option maxRecDepth 10000
+set_option maxHeartbeats 3000000
+
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
@@ -39,7 +42,28 @@ theorem standardVariableLocalGateRoutes_strictlyAvoidEachOther_of_adjacent :
             (ribbonAdjacentMacrocellOffsets.get offsetIndex))
           (standardVariableLocalGateRoute
             secondSlot secondKind secondPolarity secondColor)) := by
-  native_decide
+  have checked : (finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun firstSlot =>
+      finiteAll fun secondSlot =>
+      finiteAll fun firstKind =>
+      finiteAll fun secondKind =>
+      finiteAll fun firstPolarity =>
+      finiteAll fun secondPolarity =>
+      finiteAll fun firstColor =>
+      finiteAll fun secondColor =>
+      segmentBoxesSeparateCheck
+          (standardVariableLocalGateRoute
+          firstSlot firstKind firstPolarity firstColor)
+        (translatePolyline
+          (Cell.scale standardThreeStrandLayout.factor
+            (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+          (standardVariableLocalGateRoute
+            secondSlot secondKind secondPolarity secondColor))) = true := by
+    decide +kernel
+  intro offsetIndex firstSlot secondSlot firstKind secondKind firstPolarity secondPolarity firstColor secondColor
+  simp only [finiteAll_eq_true] at checked
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked offsetIndex firstSlot secondSlot firstKind secondKind firstPolarity secondPolarity firstColor secondColor)
 
 /-- A local variable-gate piece strictly avoids every selected outer-fan
 piece in an adjacent macrocell. -/
@@ -58,7 +82,28 @@ theorem standardVariableLocalGateRoute_strictlyAvoids_outerRoute_of_adjacent :
               (ribbonAdjacentMacrocellOffsets.get offsetIndex))
             ((standardVariableOuterFanTemplates.get outerIndex).route
               outerSlot outerColor)) := by
-  native_decide
+  have checked : (finiteAll fun outerIndex : Fin standardVariableOuterFanTemplates.length =>
+      finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun localSlot =>
+      finiteAll fun outerSlot =>
+      finiteAll fun kind =>
+      finiteAll fun polarity =>
+      finiteAll fun localColor =>
+      finiteAll fun outerColor =>
+      guardedCheck (outerSlot.index < (standardVariableOuterFanTemplates.get outerIndex).directions.length)
+        (segmentBoxesSeparateCheck
+          (standardVariableLocalGateRoute
+            localSlot kind polarity localColor)
+          (translatePolyline
+            (Cell.scale standardThreeStrandLayout.factor
+              (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+            ((standardVariableOuterFanTemplates.get outerIndex).route
+              outerSlot outerColor)))) = true := by
+    decide +kernel
+  intro outerIndex offsetIndex localSlot outerSlot active kind polarity localColor outerColor
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked outerIndex offsetIndex localSlot outerSlot kind polarity localColor outerColor active)
 
 /-- Every selected outer-fan piece strictly avoids a local variable-gate
 piece in an adjacent macrocell. -/
@@ -77,7 +122,28 @@ theorem standardVariableOuterRoute_strictlyAvoids_localGateRoute_of_adjacent :
               (ribbonAdjacentMacrocellOffsets.get offsetIndex))
             (standardVariableLocalGateRoute
               localSlot kind polarity localColor)) := by
-  native_decide
+  have checked : (finiteAll fun outerIndex : Fin standardVariableOuterFanTemplates.length =>
+      finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+      finiteAll fun outerSlot =>
+      finiteAll fun localSlot =>
+      finiteAll fun outerColor =>
+      finiteAll fun kind =>
+      finiteAll fun polarity =>
+      finiteAll fun localColor =>
+      guardedCheck (outerSlot.index < (standardVariableOuterFanTemplates.get outerIndex).directions.length)
+        (segmentBoxesSeparateCheck
+          ((standardVariableOuterFanTemplates.get outerIndex).route
+            outerSlot outerColor)
+          (translatePolyline
+            (Cell.scale standardThreeStrandLayout.factor
+              (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+            (standardVariableLocalGateRoute
+              localSlot kind polarity localColor)))) = true := by
+    decide +kernel
+  intro outerIndex offsetIndex outerSlot localSlot active outerColor kind polarity localColor
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked outerIndex offsetIndex outerSlot localSlot outerColor kind polarity localColor active)
 
 /-- Two complete coordinated variable-fan routes in adjacent standard
 macrocells are strictly separated unless their selected incidence directions

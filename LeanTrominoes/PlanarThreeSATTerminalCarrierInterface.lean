@@ -42,7 +42,7 @@ theorem
     (duplicatorArmStraightIncidenceDrawing arm).RoutePointsSatisfy
       arm.carrierPort.InsideCarrierBoundary := by
   cases arm <;>
-    native_decide
+    decide +kernel
 
 /-- Contact with the external fanout port is endpoint-only in every route
 of one active duplicator arm. -/

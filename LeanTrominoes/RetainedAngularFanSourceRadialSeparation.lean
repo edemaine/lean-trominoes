@@ -209,7 +209,7 @@ theorem
       referenceRoute.getLastD (0, 0)⟩
   have combinedPositive : 0 < combinedFactor := by
     dsimp [combinedFactor]
-    exact Nat.mul_pos (by native_decide) factorPositive
+    exact Nat.mul_pos (by decide +kernel) factorPositive
   have radiusLt : 65 < combinedFactor := by
     dsimp [combinedFactor]
     rw [retainedTerminalFanTotalRefinement_eq]
@@ -288,7 +288,7 @@ theorem
       referenceRoute.getLastD (0, 0)⟩
   have combinedPositive : 0 < combinedFactor := by
     dsimp [combinedFactor]
-    exact Nat.mul_pos (by native_decide) factorPositive
+    exact Nat.mul_pos (by decide +kernel) factorPositive
   have radiusLt : 65 < combinedFactor := by
     dsimp [combinedFactor]
     rw [retainedTerminalFanTotalRefinement_eq]

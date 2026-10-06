@@ -53,7 +53,7 @@ theorem retainedFinalDirectRoutedVariableQueryBlock_descriptor_eq
     retainedFinalDirectRoutedVariableQueryBlock
         (routedVariableClauseDescriptor arm false forward) =
       [retainedFinalDirectRoutedVariableClauseQuery arm false forward] := by
-  cases arm <;> cases forward <;> native_decide
+  cases arm <;> cases forward <;> decide +kernel
 
 /-- Elementwise replacement sends one normalized metadata site block to the
 six stable direct queries in the same clause order. -/
@@ -61,7 +61,7 @@ theorem routedVariableFullSiteBlock_finalQueryBlock_eq :
     routedVariableFullSiteBlock.flatMap
         retainedFinalDirectRoutedVariableQueryBlock =
       retainedFinalDirectRoutedVariableFullSiteQueries := by
-  native_decide
+  decide +kernel
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

@@ -20,7 +20,7 @@ private theorem routedBlock_literalIndices (profile : ClauseProfile) :
     ∀ routed ∈ clauseRouteBlocks profile,
       routed.2.map HorizontalRoutedRouteHeader.descriptorOutputLiteralIndex =
         List.range routed.2.length := by
-  cases profile <;> native_decide +revert
+  cases profile <;> decide +kernel +revert
 
 private theorem frameBlock_literalIndices (headers : List Header) :
     (frameBlock headers).map

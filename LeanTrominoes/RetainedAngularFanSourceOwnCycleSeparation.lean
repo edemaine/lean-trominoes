@@ -95,8 +95,8 @@ theorem
           vertex literalIndex)
       (factor := retainedTerminalFanTotalRefinement)
       (radius := 48)
-      (by native_decide)
-      (by native_decide)
+      (by decide +kernel)
+      (by decide +kernel)
       clearance.1 clearance.2
       (fun point pointMember =>
         retainedTerminalFanInnerCycleRouteAt_points_within_inner_square

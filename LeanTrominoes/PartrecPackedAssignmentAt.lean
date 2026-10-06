@@ -617,7 +617,7 @@ theorem assignmentKeys_idxOf_eq
   have columns :
       (List.finRange 5 : List (Fin 5)) =
         [0, 1, 2, 3, 4] := by
-    native_decide
+    decide +kernel
   rw [assignmentKeys, columns]
   fin_cases column <;>
     simp [motifCells, member, idxOf_pair_map,

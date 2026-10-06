@@ -28,9 +28,9 @@ theorem cycleClausePosition_inClosedGridRectangle
     InClosedGridRectangle (6, 6) (18, 18)
       (cycleClausePosition vertex) := by
   cases vertex with
-  | separator => native_decide
+  | separator => decide +kernel
   | port port =>
-      cases port <;> native_decide
+      cases port <;> decide +kernel
 
 /-- Every implication clause in the local Figure 7 presentation has its
 vertex in the inner square. -/
@@ -50,9 +50,9 @@ theorem ringVariablePosition_inClosedGridRectangle
     InClosedGridRectangle (6, 6) (18, 18)
       (ringVariablePosition vertex) := by
   cases vertex with
-  | separator => native_decide
+  | separator => decide +kernel
   | port port =>
-      cases port <;> native_decide
+      cases port <;> decide +kernel
 
 /-- Both endpoints of every local implication route lie in the inner
 square; invalid literal indices select the empty route. -/

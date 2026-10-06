@@ -111,7 +111,7 @@ def figureNineDrawing :
 exact continuous planarity. -/
 theorem figureNineDrawing_isValid :
     figureNineDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-- Endpoint compatibility of the certified local Figure 9 replacement. -/
 theorem figureNineDrawing_routesMatch :
@@ -173,7 +173,7 @@ def figureNineTwoDrawing :
 orthogonal drawing. -/
 theorem figureNineTwoDrawing_isValid :
     figureNineTwoDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-- The Figure 9 replacement of a one-literal source clause, including the
 two padding variables and their forced-false unit clauses. -/
@@ -218,7 +218,7 @@ def figureNineOneDrawing :
 orthogonal drawing. -/
 theorem figureNineOneDrawing_isValid :
     figureNineOneDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-- The Figure 9 replacement of an empty source clause, including all three
 padding variables and their forced-false unit clauses. -/
@@ -265,7 +265,7 @@ def figureNineZeroDrawing :
 orthogonal drawing. -/
 theorem figureNineZeroDrawing_isValid :
     figureNineZeroDrawing.IsValid := by
-  native_decide
+  decide +kernel
 
 /-! ## Source-polarity-independent certificates -/
 
@@ -298,7 +298,7 @@ theorem figureNineDrawingFor_isValid
     (first second third : Bool) :
     (figureNineDrawingFor first second third).IsValid := by
   cases first <;> cases second <;> cases third <;>
-    native_decide
+    decide +kernel
 
 /-- The padded binary formula with arbitrary present-source polarities. -/
 def figureNineTwoFormulaFor
@@ -328,7 +328,7 @@ source polarity pattern. -/
 theorem figureNineTwoDrawingFor_isValid
     (first second : Bool) :
     (figureNineTwoDrawingFor first second).IsValid := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- The padded unit formula with arbitrary source literal polarity. -/
 def figureNineOneFormulaFor
@@ -359,7 +359,7 @@ source polarities. -/
 theorem figureNineOneDrawingFor_isValid
     (first : Bool) :
     (figureNineOneDrawingFor first).IsValid := by
-  cases first <;> native_decide
+  cases first <;> decide +kernel
 
 @[simp]
 theorem figureNineFormulaFor_true :
@@ -440,28 +440,28 @@ replacement of a canonical ternary source clause. -/
 theorem generatedFigureNineTemplate_three :
     generatedFigureNineTemplate [.first, .second, .third] =
       figureNineFormula := by
-  native_decide
+  decide +kernel
 
 /-- The padded binary drawing formula is exactly the corresponding
 positioned semantic replacement. -/
 theorem generatedFigureNineTemplate_two :
     generatedFigureNineTemplate [.first, .second] =
       figureNineTwoFormula := by
-  native_decide
+  decide +kernel
 
 /-- The padded unit drawing formula is exactly the corresponding positioned
 semantic replacement. -/
 theorem generatedFigureNineTemplate_one :
     generatedFigureNineTemplate [.first] =
       figureNineOneFormula := by
-  native_decide
+  decide +kernel
 
 /-- The padded empty drawing formula is exactly the corresponding positioned
 semantic replacement. -/
 theorem generatedFigureNineTemplate_zero :
     generatedFigureNineTemplate [] =
       figureNineZeroFormula := by
-  native_decide
+  decide +kernel
 
 /-- The arbitrary-polarity full template is exactly the corresponding
 positioned semantic replacement. -/
@@ -471,7 +471,7 @@ theorem generatedFigureNineTemplateFor_three
         [(.first, first), (.second, second), (.third, third)] =
       figureNineFormulaFor first second third := by
   cases first <;> cases second <;> cases third <;>
-    native_decide
+    decide +kernel
 
 /-- The arbitrary-polarity binary template is exactly the corresponding
 positioned semantic replacement. -/
@@ -480,7 +480,7 @@ theorem generatedFigureNineTemplateFor_two
     generatedFigureNineTemplateFor
         [(.first, first), (.second, second)] =
       figureNineTwoFormulaFor first second := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- The arbitrary-polarity unit template is exactly the corresponding
 positioned semantic replacement. -/
@@ -488,7 +488,7 @@ theorem generatedFigureNineTemplateFor_one
     (first : Bool) :
     generatedFigureNineTemplateFor [(.first, first)] =
       figureNineOneFormulaFor first := by
-  cases first <;> native_decide
+  cases first <;> decide +kernel
 
 end PlanarOneInThree
 end LeanTrominoes

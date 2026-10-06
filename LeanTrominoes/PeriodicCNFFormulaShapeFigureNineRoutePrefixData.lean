@@ -39,7 +39,7 @@ def orderedDirectedProfile (profile : DirectedClauseProfile) :
     ∀ profile : DirectedClauseProfile,
       (orderedDirectedProfile profile).taggedLiterals =
         profile.taggedLiterals.insertionSort directionLE := by
-  native_decide
+  decide +kernel
 
 /-- Forgetting the directions after the paired sort is exactly the existing
 clockwise ordered literal profile. -/
@@ -47,7 +47,7 @@ clockwise ordered literal profile. -/
     ∀ profile : DirectedClauseProfile,
       clauseProfile (orderedDirectedProfile profile) =
         profile.orderedProfile := by
-  native_decide
+  decide +kernel
 
 /-- Reconstruct the finite composed exit-fan lookup from a directed clause
 profile.  Inactive slots use the harmless `invalid` fallback. -/
@@ -87,7 +87,7 @@ inductive Descriptor
 instance : Inhabited Descriptor :=
   ⟨.local
     ⟨.unary default,
-      ⟨0, by native_decide⟩⟩⟩
+      ⟨0, by decide +kernel⟩⟩⟩
 
 /-- Classify one finite template incidence and package its exact local query. -/
 def descriptorAt (profile : DirectedClauseProfile)

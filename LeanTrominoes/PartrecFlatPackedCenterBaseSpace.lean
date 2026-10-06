@@ -246,10 +246,10 @@ theorem flatPackedCenterBaseCoordinateArgumentsCost_le_linear
   have zeroBound := listCodeZeroCost_le_linear values
   have addSmall :
       addConstCost WindowState.center.val [0] ≤ 100000 := by
-    native_decide
+    decide +kernel
   have centerBits :
       (Computability.encodeNat WindowState.center.val).length ≤ 100 := by
-    native_decide
+    decide +kernel
   have numeralBound :
       numeralCost WindowState.center.val values ≤
         1000000 * unit := by
@@ -427,7 +427,7 @@ theorem flatPackedCenterBasePhaseEqualSpaceBound_le_input
   have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
   have centerBits :
       (Computability.encodeNat WindowState.center.val).length = 2 := by
-    native_decide
+    decide +kernel
   have pairBits := encodeNat_pair_length_le
     (Encodable.encode base.1) (Encodable.encode base.2)
   have baseEncoding : Encodable.encode base =

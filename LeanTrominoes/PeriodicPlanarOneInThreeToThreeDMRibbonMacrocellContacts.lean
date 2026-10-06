@@ -133,7 +133,7 @@ private def allOriginAdjacentEndpointContactsExact : Bool :=
 
 private theorem allOriginAdjacentEndpointContactsExact_eq_true :
     allOriginAdjacentEndpointContactsExact = true := by
-  native_decide
+  decide +kernel
 
 /-- The endpoint-contact classification at the origin. -/
 theorem originAdjacentRibbonMacrocellEndpoints_eq_iff

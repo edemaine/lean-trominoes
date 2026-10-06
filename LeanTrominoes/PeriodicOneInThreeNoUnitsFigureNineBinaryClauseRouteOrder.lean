@@ -116,22 +116,22 @@ theorem fullDrawingFor_binaryRoutesInUnitEliminationOrder
     (first second third : Bool) :
     (fullDrawingFor first second third)
       |>.BinaryRoutesInUnitEliminationOrder := by
-  cases first <;> cases second <;> cases third <;> native_decide
+  cases first <;> cases second <;> cases third <;> decide +kernel
 
 theorem twoDrawingFor_binaryRoutesInUnitEliminationOrder
     (first second : Bool) :
     (twoDrawingFor first second)
       |>.BinaryRoutesInUnitEliminationOrder := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 theorem oneDrawingFor_binaryRoutesInUnitEliminationOrder
     (first : Bool) :
     (oneDrawingFor first).BinaryRoutesInUnitEliminationOrder := by
-  cases first <;> native_decide
+  cases first <;> decide +kernel
 
 theorem zeroDrawing_binaryRoutesInUnitEliminationOrder :
     zeroDrawing.BinaryRoutesInUnitEliminationOrder := by
-  native_decide
+  decide +kernel
 
 /-- Every arity-selected finite template has the west/east binary exit
 order. -/

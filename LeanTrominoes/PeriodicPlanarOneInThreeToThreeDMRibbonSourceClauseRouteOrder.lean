@@ -285,7 +285,7 @@ theorem sourceClauseRibbonFanData_clockwise_of_unitEliminationOrder
         rw [candidateDirection rightEntry rightMember 2 rightIndex]
         rfl
   rw [topDirection, leftDirection, rightDirection]
-  native_decide
+  decide +kernel
 
 /-- A positioned binary clause has no active right terminal in its source
 clause fan. -/

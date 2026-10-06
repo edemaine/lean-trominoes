@@ -32,7 +32,7 @@ private theorem retainedDirectSourceLocalSegment_terminalClassify :
         some
           ((retainedDirectSourceFanTerminalAt kind index).1,
             (retainedDirectSourceLocalTerminalAt kind index).2) := by
-  native_decide
+  decide +kernel
 
 /-- Translating a selected direct incidence preserves the exact terminal
 classification of its represented source segment. -/

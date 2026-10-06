@@ -27,7 +27,7 @@ the nine ring vertices. -/
 theorem directSourceFinalLocalCycleSelectedInheritedRingVertexSlotValues_eq :
     directSourceFinalLocalCycleSelectedInheritedRingVertexSlotValues =
       [8, 0, 0, 1, 1, 2, 2, 3, 4, 3, 5, 4, 6, 5, 7, 6, 7, 8] := by
-  native_decide
+  decide +kernel
 
 /-- Consequently every genuine base-nine slot occurs exactly twice in one
 complete implication-cycle block. -/
@@ -35,13 +35,13 @@ theorem directSourceFinalLocalCycleSelectedInheritedRingVertexSlot_count_eq_two 
     ∀ slot : DirectFinalCycleRingVertexSlot,
       directSourceFinalLocalCycleSelectedInheritedRingVertexSlotValues.count
         slot.val = 2 := by
-  native_decide
+  decide +kernel
 
 /-- Every selected local value is a genuine slot in the base-nine ring
 namespace. -/
 theorem directSourceFinalLocalCycleSelectedInheritedRingVertexSlotValues_forall_lt :
     directSourceFinalLocalCycleSelectedInheritedRingVertexSlotValues.Forall
       fun slot => slot < fixedEightRingVertexCount := by
-  native_decide
+  decide +kernel
 
 end LeanTrominoes.PeriodicCNFStripReduction

@@ -16,11 +16,11 @@ namespace CarrierRankDatumCompiledFields
 
 private theorem all_getElem?_index (field : Field) :
     all[field.index]? = some field := by
-  cases field <;> native_decide
+  cases field <;> decide +kernel
 
 private theorem range_getElem?_index (field : Field) :
     (List.range 50)[field.index]? = some field.index := by
-  cases field <;> native_decide
+  cases field <;> decide +kernel
 
 /-- On valid numeric routes, every named compiler field is the corresponding
 field of every compact carrier rank datum in presentation order. -/

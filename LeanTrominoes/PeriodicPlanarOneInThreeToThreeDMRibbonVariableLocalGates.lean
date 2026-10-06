@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonVariableFanFinite
+import LeanTrominoes.OrthogonalPolylineSegmentBoxCheck
+import LeanTrominoes.OrthogonalPolylineStrictSeparationCheck
 
 /-!
 # Coordinated variable-port gates
@@ -28,6 +30,9 @@ ribbon-macrocell boundary.
 
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
+
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 10000
 
 open Gadget PlanarThreeDM
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
@@ -141,7 +146,7 @@ theorem standardVariableLocalGateRoute_getLast?
           (standardVariableOuterGate
             slot (kind.ribbonLaneForColor color)) := by
   cases slot <;> cases kind <;> cases polarity <;> cases color <;>
-    native_decide
+    decide +kernel
 
 /-- Every local gate table is rectilinear. -/
 theorem standardVariableLocalGateRoute_orthogonal
@@ -164,7 +169,26 @@ theorem standardVariableLocalGateRoute_points_bounded :
       point ∈ standardVariableLocalGateRoute
         slot kind polarity color →
       InStandardRibbonMacrocell point := by
-  native_decide
+  have checked : (finiteAll fun slot : VariableSiteSlot =>
+      finiteAll fun kind : VariableConnectorKind => finiteAll fun polarity : Bool =>
+      finiteAll fun color : WireColor =>
+        (standardVariableLocalGateRoute slot kind polarity color).all
+          fun point => decide (InStandardRibbonMacrocell point)) = true := by
+    decide +kernel
+  simpa only [finiteAll_eq_true, List.all_eq_true, decide_eq_true_eq] using checked
+
+/-- Only the patterns selected at the two slots matter to separation. -/
+private theorem localGatePair_check :
+    (finiteAll fun firstSlot : VariableSiteSlot => finiteAll fun secondSlot : VariableSiteSlot =>
+      finiteAll fun firstKind : VariableConnectorKind => finiteAll fun secondKind : VariableConnectorKind =>
+      finiteAll fun firstPolarity : Bool => finiteAll fun secondPolarity : Bool =>
+      finiteAll fun firstColor : WireColor => finiteAll fun secondColor : WireColor =>
+        guardedCheck ((firstSlot, firstColor) ≠ (secondSlot, secondColor) ∧
+          (firstSlot = secondSlot → firstKind = secondKind ∧ firstPolarity = secondPolarity))
+          (segmentBoxesSeparateCheck
+            (standardVariableLocalGateRoute firstSlot firstKind firstPolarity firstColor)
+            (standardVariableLocalGateRoute secondSlot secondKind secondPolarity secondColor))) = true := by
+  decide +kernel
 
 /-- Selecting one pattern independently in every slot still gives a
 pairwise contact-free family of local gate routes. -/
@@ -180,7 +204,16 @@ theorem standardVariableLocalGateRoutes_strictlyAvoidEachOther :
         (standardVariableLocalGateRoute
           secondSlot (kind secondSlot)
           (polarity secondSlot) secondColor) := by
-  native_decide
+  have checked := localGatePair_check
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  intro kind polarity firstSlot firstColor secondSlot secondColor different
+  apply routesStrictlyAvoidEachOther_of_segmentBoxesCheck
+  apply checked firstSlot secondSlot (kind firstSlot) (kind secondSlot)
+    (polarity firstSlot) (polarity secondSlot) firstColor secondColor
+  refine ⟨different, ?_⟩
+  intro equal
+  subst secondSlot
+  exact ⟨rfl, rfl⟩
 
 /-- The first point of the selected gate table is exactly the finite-gadget
 port in every active finite variable configuration. -/
@@ -192,7 +225,25 @@ theorem VariableRibbonFanData.localGateRoute_head?
     (standardVariableLocalGateRoute
       slot (data.kind slot) (data.polarity slot) color).head? =
         some (data.port slot active color) := by
-  native_decide +revert
+  cases kindEq : data.kind slot <;> cases polarityEq : data.polarity slot <;>
+    cases color <;> cases slot <;>
+    simp [standardVariableLocalGateRoute, standardVariableLocalGateRouteAtFirst,
+      VariableRibbonFanData.port, VariableRibbonFanData.activeRoutedTriple,
+      VariableRibbonFanData.routedTriple, variableSiteDrawing, variableSiteReference,
+      variableSiteReferenceBase, ordinaryVariableSiteElement, fixedRedVariableSiteElement,
+      variableSiteElementPosition, VariableOccurrence.reference,
+      FixedRedConnector.reference, VariableOccurrenceTriple.references,
+      FixedRedConnectorTriple.references, kindEq, polarityEq,
+      translatePolyline, placeVariableModulePoint, variableModuleOrigin, VariableSiteSlot.index,
+      VariableOccurrence.orientedBoundaryDrawing, VariableOccurrence.boundaryDrawing,
+      VariableOccurrence.boundaryElementPosition, VariableOccurrence.positiveFixedGreenBoundaryDrawing,
+      VariableOccurrence.positiveFixedGreenElementPosition, FixedRedConnector.boundaryDrawing,
+      FixedRedConnector.drawing, FixedRedConnectorElement.position,
+      FixedRedConnectorRed.position, FixedRedConnectorGreen.position, FixedRedConnectorBlue.position,
+      LocalIncidenceDrawing.mapPoints, FixedRedConnector.normalizeFixedRedBoundary,
+      rotateClockwise, reflectAcrossVertical, reflectAcrossHorizontal,
+      standardThreeStrandLayout, Cell.add]
+
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes

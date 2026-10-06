@@ -71,7 +71,7 @@ private def allOriginSameCenterEndpointColorsExact : Bool :=
 
 private theorem allOriginSameCenterEndpointColorsExact_eq_true :
     allOriginSameCenterEndpointColorsExact = true := by
-  native_decide
+  decide +kernel
 
 /-- At one center and for one legal turn, equality of two selected
 macrocell endpoints forces equality of their colors. -/

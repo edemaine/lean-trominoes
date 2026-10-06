@@ -23,7 +23,7 @@ private theorem retainedTerminalFanOuterRadialFinalStubAt_zero_directions :
           (retainedTerminalFanOuterRadialFinalStubAt
             (0, 0) direction slot) =
         inwardRayUnitDirections direction := by
-  native_decide
+  decide +kernel
 
 /-- Every positioned final radial primitive has the common one-block inward
 direction word selected by its terminal direction. -/

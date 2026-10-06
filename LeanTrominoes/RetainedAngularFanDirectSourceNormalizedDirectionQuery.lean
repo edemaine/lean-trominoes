@@ -23,7 +23,7 @@ structure RetainedDirectSourceNormalizedDirectionQuery where
 theorem retainedDirectSourcePrefixChoices_length_le_three :
     ∀ kind : RetainedDirectClauseKind,
       (retainedDirectSourcePrefixChoices kind).length ≤ 3 := by
-  native_decide
+  decide +kernel
 
 /-- Embed a genuine dependent atlas index into the fixed-width query
 alphabet. -/

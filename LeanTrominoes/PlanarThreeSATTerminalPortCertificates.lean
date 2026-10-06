@@ -212,14 +212,14 @@ variables intentionally have repeated collinear rays; those are retained as
 same-ray angular ties. -/
 theorem crossoverStraightIncidenceDrawing_terminalPortsValid :
     crossoverStraightIncidenceDrawing.TerminalPortsValid := by
-  native_decide
+  decide +kernel
 
 /-- Membership-style compass certificate for the fixed Figure 8(b)
 crossover, ready for affine instantiation. -/
 theorem crossoverFormula_embeddedTerminalPortsValid :
     EmbeddedTerminalPortsValid
       crossoverFormula CrossoverVariable.position := by
-  native_decide
+  decide +kernel
 
 /-- Direct terminal rays of the fixed Figure 8(a) duplicator. -/
 def duplicatorStraightIncidenceDrawing :
@@ -230,14 +230,14 @@ def duplicatorStraightIncidenceDrawing :
 /-- All Figure 8(a) incidences use the eight compass ray classes. -/
 theorem duplicatorStraightIncidenceDrawing_terminalPortsValid :
     duplicatorStraightIncidenceDrawing.TerminalPortsValid := by
-  native_decide
+  decide +kernel
 
 /-- Membership-style compass certificate for the fixed Figure 8(a)
 duplicator, ready for affine instantiation. -/
 theorem duplicatorFormula_embeddedTerminalPortsValid :
     EmbeddedTerminalPortsValid
       duplicatorFormula DuplicatorVariable.position := by
-  native_decide
+  decide +kernel
 
 /-- It is enough to check the four displayed clause-to-endpoint rays of one
 positioned equality link. -/

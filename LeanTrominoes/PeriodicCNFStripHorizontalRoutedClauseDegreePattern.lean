@@ -3,8 +3,26 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFFormulaShapeFinalExactOneData
-import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderClauseFrameData
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case0
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case1
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case2
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case3
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case4
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case5
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case6
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case7
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case8
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case9
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case10
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case11
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case12
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case13
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case14
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case15
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case16
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case17
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case18
+import LeanTrominoes.PeriodicCNFStripHorizontalRoutedClauseDegreePatternCertificates.Case19
 
 /-! # Clause-degree pattern of finite routed headers -/
 
@@ -17,6 +35,36 @@ open PeriodicCNF.UnaryProgramClauseProfile
 open PeriodicPlanarOneInThreeToThreeDM
 open PlanarThreeDM
 
+private theorem routedClauseDegreeCheck_first_correct
+    (first : LeanTrominoes.PeriodicCNF.UnaryProgramClauseProfile.LiteralProfile)
+    (direction : AxisDirection) : firstDirectedProfileCheck routedClauseDegreeCheck first direction = true := by
+  rcases first with ⟨nextSlice, value⟩
+  cases nextSlice <;> cases value <;> cases direction
+  · exact routedClauseDegreeCheck_case0
+  · exact routedClauseDegreeCheck_case1
+  · exact routedClauseDegreeCheck_case2
+  · exact routedClauseDegreeCheck_case3
+  · exact routedClauseDegreeCheck_case4
+  · exact routedClauseDegreeCheck_case5
+  · exact routedClauseDegreeCheck_case6
+  · exact routedClauseDegreeCheck_case7
+  · exact routedClauseDegreeCheck_case8
+  · exact routedClauseDegreeCheck_case9
+  · exact routedClauseDegreeCheck_case10
+  · exact routedClauseDegreeCheck_case11
+  · exact routedClauseDegreeCheck_case12
+  · exact routedClauseDegreeCheck_case13
+  · exact routedClauseDegreeCheck_case14
+  · exact routedClauseDegreeCheck_case15
+  · exact routedClauseDegreeCheck_case16
+  · exact routedClauseDegreeCheck_case17
+  · exact routedClauseDegreeCheck_case18
+  · exact routedClauseDegreeCheck_case19
+
+private theorem routedClauseDegreeCheck_correct (profile : DirectedClauseProfile) :
+    routedClauseDegreeCheck profile = true :=
+  firstDirectedProfileCheck_sound routedClauseDegreeCheck routedClauseDegreeCheck_first_correct profile
+
 private theorem tokenClauseFans_hasRight_eq_finalClauseProfiles
     (token : FormulaShapeDirectionOrdering.Token) :
     (tokenClauseFans token).map ClauseRibbonFanData.hasRight =
@@ -27,7 +75,9 @@ private theorem tokenClauseFans_hasRight_eq_finalClauseProfiles
   cases token with
   | «variable» => rfl
   | clause profile =>
-      cases profile <;> native_decide +revert
+      have checked := routedClauseDegreeCheck_correct profile
+      simp only [routedClauseDegreeCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+      exact checked.1
 
 private theorem tokenBlockLengths_eq_finalClauseProfileLengths
     (token : FormulaShapeDirectionOrdering.Token) :
@@ -39,7 +89,9 @@ private theorem tokenBlockLengths_eq_finalClauseProfileLengths
   cases token with
   | «variable» => rfl
   | clause profile =>
-      cases profile <;> native_decide +revert
+      have checked := routedClauseDegreeCheck_correct profile
+      simp only [routedClauseDegreeCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+      exact checked.2
 
 /-- The boundary-preserving routed-header blocks have exactly the clause
 arities of the complete finite Figure 9, unit-elimination, and polarity

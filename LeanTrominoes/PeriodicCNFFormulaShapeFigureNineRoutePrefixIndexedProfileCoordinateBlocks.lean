@@ -41,7 +41,15 @@ theorem expectedSourceClauseIndexedProfileCoordinateBlocks_map_parent :
           IndexedProfileCoordinateBlock.parent =
         expectedParentProfileCoordinates
           (clauseProfile (orderedDirectedProfile profile)) := by
-  native_decide
+  intro profile
+  unfold expectedSourceClauseIndexedProfileCoordinateBlocks
+    expectedParentProfileCoordinates
+    expectedSourceClauseHeaderTemplateProfileCoordinateBlocks
+  dsimp only
+  apply List.ext_getElem
+  · simp only [List.length_map, List.length_zipWith, min_self]
+  · intro index leftLt rightLt
+    simp only [List.getElem_map, List.getElem_zipWith]
 
 /-- The indexed finite blocks project to the exact routed coordinate block
 schedule. -/
@@ -51,7 +59,15 @@ theorem expectedSourceClauseIndexedProfileCoordinateBlocks_map_coordinates :
           IndexedProfileCoordinateBlock.coordinates =
         expectedSourceClauseHeaderTemplateProfileCoordinateBlocks
           profile := by
-  native_decide
+  intro profile
+  unfold expectedSourceClauseIndexedProfileCoordinateBlocks
+    expectedParentProfileCoordinates
+    expectedSourceClauseHeaderTemplateProfileCoordinateBlocks
+  dsimp only
+  apply List.ext_getElem
+  · simp only [List.length_map, List.length_zipWith, min_self]
+  · intro index leftLt rightLt
+    simp only [List.getElem_map, List.getElem_zipWith]
 
 /-- Every routed coordinate inside an indexed block carries that block's
 parent profile and local generated-clause index. -/
@@ -62,7 +78,15 @@ theorem coordinate_parent_of_mem_expectedSourceClauseIndexedProfileCoordinateBlo
       ∀ coordinate ∈ block.coordinates,
         coordinate.profile = block.parent.profile ∧
         coordinate.coordinate.clauseIndex = block.parent.clauseIndex := by
-  native_decide
+  intro profile block blockMember coordinate coordinateMember
+  rcases List.mem_iff_getElem.mp blockMember with ⟨index, bound, rfl⟩
+  unfold expectedSourceClauseIndexedProfileCoordinateBlocks
+    expectedParentProfileCoordinates
+    expectedSourceClauseHeaderTemplateProfileCoordinateBlocks at coordinateMember ⊢
+  dsimp only at coordinateMember ⊢
+  simp only [List.getElem_zipWith, List.getElem_map] at coordinateMember ⊢
+  rcases List.mem_map.mp coordinateMember with ⟨polarity, _, rfl⟩
+  exact ⟨rfl, rfl⟩
 
 /-- Parent-indexed generated-clause blocks emitted by one source token. -/
 def expectedIndexedProfileCoordinateBlocks :

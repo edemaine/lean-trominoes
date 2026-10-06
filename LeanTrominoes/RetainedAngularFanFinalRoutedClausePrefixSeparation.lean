@@ -88,7 +88,7 @@ theorem
   simp only [lowerEq, upperEq] at startBound finishBound ⊢
   have factorPositive :
       (0 : Int) < retainedTerminalFanTotalRefinement * 4 := by
-    native_decide
+    decide +kernel
   simp only [GridSegment.coordinateLower,
     GridSegment.coordinateUpper, coordinateRadiusLower,
     coordinateRadiusUpper, Cell.scale,
@@ -162,7 +162,7 @@ theorem
     simp only [InClosedGridRectangle] at bounded
     have factorPositive :
         (0 : Int) < retainedTerminalFanTotalRefinement * 4 := by
-      native_decide
+      decide +kernel
     simp only [coordinateRadiusLower, coordinateRadiusUpper,
       Cell.scale, InClosedGridRectangle]
     norm_num [retainedTerminalFanTotalRefinement_eq]
@@ -172,7 +172,7 @@ theorem
   · exact
       ClosedGridRectanglesSeparated.scale_both_coordinateRadius
         rectanglesSeparated
-        (by native_decide) (by native_decide)
+        (by decide +kernel) (by decide +kernel)
 
 /-- Flat-component analysis reduces routed-clause source-prefix separation to
 the equal-macrocell residue.  A direct carrier is impossible by obliqueness;

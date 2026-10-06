@@ -3,9 +3,26 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRouteHeaderPresentationAtomScopeCompiler
-import LeanTrominoes.FiniteUnaryFieldMapCompiler
-import LeanTrominoes.SignedUnaryCoordinateRefinementCompiler
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case0
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case1
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case2
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case3
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case4
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case5
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case6
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case7
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case8
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case9
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case10
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case11
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case12
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case13
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case14
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case15
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case16
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case17
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case18
+import LeanTrominoes.FirstParentInheritedRouteCompilerCertificates.Case19
 
 /-! # One inherited first-literal route per parent clause -/
 
@@ -16,28 +33,50 @@ open PeriodicCNF.FormulaShapeDirectionOrdering
 open PeriodicCNF.FormulaShapeFigureNinePolarityRouteHeader
 open HorizontalRoutedRouteHeader HorizontalRoutedRouteHeaderPresentationAtomScope
 
-/-- The same row must carry both the inherited atom and its source route. -/
-def eligible (profile : DirectedClauseProfile) (header : Header) : Bool :=
-  match header.figurePrefix with
-  | .local _ => false
-  | .inherited slot _ =>
-    decide (presentationSlotAt profile slot = .first) &&
-      decide (remapScopeControl profile (outputAtomScopeControl header) = .inherited .first)
+private theorem firstParentSelectorCheck_first_correct
+    (first : LeanTrominoes.PeriodicCNF.UnaryProgramClauseProfile.LiteralProfile)
+    (direction : AxisDirection) : firstDirectedProfileCheck firstParentSelectorCheck first direction = true := by
+  rcases first with ⟨nextSlice, value⟩
+  cases nextSlice <;> cases value <;> cases direction
+  · exact firstParentSelectorCheck_case0
+  · exact firstParentSelectorCheck_case1
+  · exact firstParentSelectorCheck_case2
+  · exact firstParentSelectorCheck_case3
+  · exact firstParentSelectorCheck_case4
+  · exact firstParentSelectorCheck_case5
+  · exact firstParentSelectorCheck_case6
+  · exact firstParentSelectorCheck_case7
+  · exact firstParentSelectorCheck_case8
+  · exact firstParentSelectorCheck_case9
+  · exact firstParentSelectorCheck_case10
+  · exact firstParentSelectorCheck_case11
+  · exact firstParentSelectorCheck_case12
+  · exact firstParentSelectorCheck_case13
+  · exact firstParentSelectorCheck_case14
+  · exact firstParentSelectorCheck_case15
+  · exact firstParentSelectorCheck_case16
+  · exact firstParentSelectorCheck_case17
+  · exact firstParentSelectorCheck_case18
+  · exact firstParentSelectorCheck_case19
 
-def index (profile : DirectedClauseProfile) : Nat :=
-  (sourceClauseHeaders profile).findIdx (eligible profile)
-
-def selectedHeader (profile : DirectedClauseProfile) : Header :=
-  (sourceClauseHeaders profile).getD (index profile) default
+private theorem firstParentSelectorCheck_correct (profile : DirectedClauseProfile) :
+    firstParentSelectorCheck profile = true :=
+  firstDirectedProfileCheck_sound firstParentSelectorCheck firstParentSelectorCheck_first_correct profile
 
 /-- Every finite parent profile has an actual eligible route row. -/
 theorem index_lt : ∀ profile : DirectedClauseProfile,
     index profile < (sourceClauseHeaders profile).length := by
-  native_decide
+  intro profile
+  have checked := firstParentSelectorCheck_correct profile
+  simp only [firstParentSelectorCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+  exact checked.1
 
 theorem selectedHeader_eligible : ∀ profile : DirectedClauseProfile,
     eligible profile (selectedHeader profile) = true := by
-  native_decide
+  intro profile
+  have checked := firstParentSelectorCheck_correct profile
+  simp only [firstParentSelectorCheck, Bool.and_eq_true, decide_eq_true_eq] at checked
+  exact checked.2
 
 /-- Exactly one selector bit per final occurrence row, at the first eligible row. -/
 def controls (profile : DirectedClauseProfile) : List Bool :=

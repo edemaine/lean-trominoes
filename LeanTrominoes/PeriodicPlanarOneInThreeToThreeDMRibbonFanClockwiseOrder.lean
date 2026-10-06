@@ -60,7 +60,7 @@ theorem isValid_iff_activeDirections
       (∀ direction ∈ data.activeDirections,
           direction.IsGenuine) ∧
         data.activeDirections.Nodup := by
-  native_decide +revert
+  decide +kernel +revert
 
 /-- Membership in the 28-entry variable-fan table is exactly validity plus
 the one cyclic-order condition needed in the three-slot case. -/
@@ -73,7 +73,7 @@ theorem isClockwiseCompatible_iff
             (data.direction .first)
             (data.direction .second)
             (data.direction .third)) := by
-  native_decide +revert
+  decide +kernel +revert
 
 /-- A valid one- or two-slot variable fan is automatically supported by the
 finite routing table. -/
@@ -121,7 +121,7 @@ theorem isClockwiseCompatible_iff
             (data.direction .top)
             (data.direction .left)
             (data.direction .right)) := by
-  native_decide +revert
+  decide +kernel +revert
 
 /-- A valid binary clause fan is automatically supported by the finite
 routing table. -/

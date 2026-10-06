@@ -157,7 +157,7 @@ theorem packedNormalizationAllCode_eval
     lastFour
   have columns :
       (List.finRange 5 : List (Fin 5)) = [0, 1, 2, 3, 4] := by
-    native_decide
+    decide +kernel
   rw [PackedWindowState.isNormalizedBool, columns]
   simpa [packedNormalizationAllCode, values] using all
 

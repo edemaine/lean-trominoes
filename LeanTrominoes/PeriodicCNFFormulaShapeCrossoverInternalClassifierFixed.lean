@@ -20,7 +20,7 @@ theorem crossoverFormula_all_hasInternalRole :
     crossoverFormula.all (fun clause =>
       clause.literals.any fun literal =>
         crossoverRoleIsInternal literal.1) = true := by
-  native_decide
+  decide +kernel
 
 /-- Consequently, every canonical wrapped normalized crossover clause
 contains a crossover-internal periodic atom. -/

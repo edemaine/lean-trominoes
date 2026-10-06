@@ -106,56 +106,25 @@ def IInwardPatternFits (cellType : OrthogonalCellType)
         | none => True
         | some inward => iInwardPattern cellType mask side = inward
 
+private def specifiedInwardDecidable (inward : Bool) :
+    (specified : Option Bool) → Decidable
+      (match specified with
+      | none => True
+      | some requested => inward = requested)
+  | none => isTrue True.intro
+  | some requested => inferInstanceAs (Decidable (inward = requested))
+
 instance (cellType : OrthogonalCellType)
     (configuration : PortConfiguration) (mask : Nat) :
     Decidable (IInwardPatternFits cellType configuration mask) := by
   unfold IInwardPatternFits
-  letI : Decidable (∀ side color,
-      cellType.portColor side = some color →
-        cellType.iVectorSideRelevant side →
-          match iPortSpecifiedInward color side
-              (configuration.get side) with
-          | none => True
-          | some inward => iInwardPattern cellType mask side = inward) := by
-    let sideDecidable (side : Side) : Decidable (∀ color,
-        cellType.portColor side = some color →
-          cellType.iVectorSideRelevant side →
-            match iPortSpecifiedInward color side
-                (configuration.get side) with
-            | none => True
-            | some inward => iInwardPattern cellType mask side = inward) := by
-      letI : ∀ color, Decidable
-          (cellType.portColor side = some color →
-            cellType.iVectorSideRelevant side →
-              match iPortSpecifiedInward color side
-                  (configuration.get side) with
-              | none => True
-              | some inward => iInwardPattern cellType mask side = inward) :=
-        fun color => by
-          by_cases colorMatch : cellType.portColor side = some color
-          · simp only [colorMatch, true_implies]
-            by_cases relevant : cellType.iVectorSideRelevant side
-            · simp only [relevant, true_implies]
-              cases specified :
-                  iPortSpecifiedInward color side
-                    (configuration.get side) with
-              | none => exact isTrue trivial
-              | some inward =>
-                  infer_instance
-            · exact isTrue fun contradiction =>
-                (relevant contradiction).elim
-          · exact isTrue fun contradiction =>
-              (colorMatch contradiction).elim
-      exact Fintype.decidableForallFintype
-    letI : ∀ side, Decidable (∀ color,
-        cellType.portColor side = some color →
-          cellType.iVectorSideRelevant side →
-            match iPortSpecifiedInward color side
-                (configuration.get side) with
-            | none => True
-            | some inward => iInwardPattern cellType mask side = inward) :=
-      sideDecidable
-    exact Fintype.decidableForallFintype
+  letI : ∀ side color, Decidable
+      (match iPortSpecifiedInward color side (configuration.get side) with
+      | none => True
+      | some inward => iInwardPattern cellType mask side = inward) :=
+    fun side color => specifiedInwardDecidable
+      (iInwardPattern cellType mask side)
+      (iPortSpecifiedInward color side (configuration.get side))
   infer_instance
 
 /-- The first locally legal completion of the partial vector directions,
@@ -247,7 +216,7 @@ set_option maxHeartbeats 1000000 in
 geometric port. -/
 theorem iGlobalCellPortTable_unused :
     TableUnusedPortsEmpty (globalCellPortTable .I) := by
-  native_decide
+  decide +kernel
 
 /-- The finite local properties needed from the Figure 12 I-tromino gadget
 library. -/
@@ -267,7 +236,7 @@ set_option maxHeartbeats 5000000 in
 /-- Exhaustive certificate for all Figure 12 local states and their geometric
 center-to-marker vectors. -/
 theorem iLocalOrientationTableCorrect : ILocalOrientationTableCorrect := by
-  native_decide
+  decide +kernel
 
 /-- Every state selected by a compatible assignment on a vertex-separated
 drawing belongs to the viable Figure 12 table. -/

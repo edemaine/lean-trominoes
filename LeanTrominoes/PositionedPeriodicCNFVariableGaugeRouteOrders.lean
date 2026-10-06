@@ -129,7 +129,7 @@ theorem InClockwiseOrder.opposite_of_opposites_genuine
     (secondGenuine : second.opposite.IsGenuine)
     (thirdGenuine : third.opposite.IsGenuine) :
     InClockwiseOrder first.opposite second.opposite third.opposite := by
-  native_decide +revert
+  decide +kernel +revert
 
 end AxisDirection
 

@@ -102,7 +102,7 @@ theorem
       referenceSlot
   have combinedPositive : 0 < combinedFactor := by
     dsimp [combinedFactor]
-    exact Nat.mul_pos (by native_decide) factorPositive
+    exact Nat.mul_pos (by decide +kernel) factorPositive
   have rectangleClearance : 65 < combinedFactor := by
     dsimp [combinedFactor]
     rw [retainedTerminalFanTotalRefinement_eq]

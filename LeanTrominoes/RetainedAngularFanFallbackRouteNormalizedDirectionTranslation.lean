@@ -139,7 +139,7 @@ theorem RetainedFallbackFanKind.splicedOwnFigure7Route_translate_normalized_dire
     unfold joinAtEndpoint at empty
     exact sourcePrefixNonempty (List.append_eq_nil_iff.mp empty).1
   have sourcePrefixOrthogonal : OrthogonalPolyline sourcePrefix := by
-    exact (routeOrthogonal.scalePolyline (by native_decide)).dropLast
+    exact (routeOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have suffixOrthogonal : OrthogonalPolyline suffix := by
     exact retainedFallbackFanSuffixRouteAt_orthogonal
       kind center terminal slot terminalLengthPositive valid

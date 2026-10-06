@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanOuterCoordinatedPrefixes
+import LeanTrominoes.OrthogonalPolylineHeadSeparationCheck
 import LeanTrominoes.OrthogonalPolylineTailReplacementSeparation
 import LeanTrominoes.RetainedRayRasterizationTranslation
 
@@ -24,6 +25,9 @@ with their common origin as the only permitted listed contact.
 
 namespace LeanTrominoes
 namespace PeriodicEightOccurrenceSplit
+
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 10000
 
 open OccurrenceSplitRing
 open PlanarThreeSAT
@@ -311,7 +315,15 @@ theorem retainedDirectSourcePrefixChoices_valid :
     ∀ kind : RetainedDirectClauseKind,
       ∀ choice ∈ retainedDirectSourcePrefixChoices kind,
         choice.Valid := by
-  native_decide
+  have checked : (finiteAll fun kind : RetainedDirectClauseKind =>
+      (retainedDirectSourcePrefixChoices kind).all fun choice =>
+        decide (choice.route.head? = some (0, 0)) &&
+          decide (choice.route.getLast? = some (retainedTerminalFanOuterCoordinatedPrefixVector choice.direction)) &&
+          (gridPolylineSegments choice.route).all fun segment => decide segment.IsAxisAligned) = true := by
+    decide +kernel
+  simpa only [finiteAll_eq_true, List.all_eq_true, Bool.and_eq_true, decide_eq_true_eq,
+    ← PeriodicOrthocrossing.orthogonalPolyline_iff_segments,
+    RetainedDirectSourcePrefixChoice.Valid, and_assoc] using checked
 
 /-- Turn a checked atlas entry into the generic coordinated-prefix
 certificate. -/
@@ -414,7 +426,17 @@ instance (kind : RetainedDirectClauseKind) :
 theorem retainedDirectSourcePrefixChoices_sourceEscapes_separated :
     ∀ kind : RetainedDirectClauseKind,
       kind.SourceEscapesSeparated := by
-  native_decide
+  have checked : (finiteAll fun kind : RetainedDirectClauseKind =>
+      finiteAll fun firstIndex : Fin (retainedDirectSourcePrefixChoices kind).length =>
+      finiteAll fun secondIndex : Fin (retainedDirectSourcePrefixChoices kind).length =>
+        guardedCheck (firstIndex ≠ secondIndex)
+          (routesAvoidAtHeadsCheck
+            ((retainedDirectSourcePrefixChoices kind).get firstIndex).sourceEscapeRoute
+            ((retainedDirectSourcePrefixChoices kind).get secondIndex).sourceEscapeRoute)) = true := by
+    decide +kernel
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  intro kind firstIndex secondIndex different
+  exact routesAvoidAtHeadsCheck_sound _ _ (checked kind firstIndex secondIndex different)
 
 /-- Typed selection of one finite atlas entry. -/
 def retainedDirectSourcePrefixChoiceAt

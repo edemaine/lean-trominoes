@@ -89,7 +89,7 @@ theorem normalizedFormula_presentationSize_le (source : PeriodicCNF Nat) :
 
 theorem fallbackFormula_presentationSize :
     PeriodicCNF.presentationSize fallbackFormula = 4 := by
-  native_decide
+  decide +kernel
 
 /-- The total guarded normalization is quadratically bounded for both the
 admissible and fixed-fallback branches. -/

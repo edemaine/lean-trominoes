@@ -313,7 +313,7 @@ def all : List Field :=
   prefixFields ++ firstCrossingFields ++ secondCrossingFields ++ suffixFields
 
 @[simp] theorem all_indices : all.map Field.index = List.range 50 := by
-  native_decide
+  decide +kernel
 
 /-- Selected-value columns for an arbitrary fixed compiled-field list. -/
 def columnsFor (fields : List Field)

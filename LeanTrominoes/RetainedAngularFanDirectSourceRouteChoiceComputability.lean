@@ -59,7 +59,7 @@ noncomputable instance :
 private theorem retainedDirectSourcePrefixChoices_length_le_three_computability :
     ∀ kind : RetainedDirectClauseKind,
       (retainedDirectSourcePrefixChoices kind).length ≤ 3 := by
-  native_decide
+  decide +kernel
 
 noncomputable instance : Finite RetainedDirectSourceAtlasIndexData := by
   apply Finite.of_injective (fun data =>
@@ -187,7 +187,7 @@ theorem retainedDirectSourceRouteChoiceRawData_valid_primrec :
 theorem retainedDirectSourcePrefixChoices_length_pos :
     ∀ kind : RetainedDirectClauseKind,
       0 < (retainedDirectSourcePrefixChoices kind).length := by
-  native_decide
+  decide +kernel
 
 /-- Total version of checked construction, reducing an arbitrary natural
 index modulo the nonempty selected atlas profile. -/

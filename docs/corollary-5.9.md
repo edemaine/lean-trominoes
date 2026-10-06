@@ -48,14 +48,10 @@ connectivity checker to prove co-r.e. membership.
 
 `lake build +LeanTrominoes.ThreeTranslationPolycubesProof:olean` passed
 (4738 jobs). The public import passed `lake env lean LeanTrominoes.lean`.
-The completion axiom audit passed with no `sorryAx`. The upper bounds, orientation equivalence,
-fixed-tile properties, and restricted forward constructions use only
-`propext`, `Classical.choice`, and `Quot.sound`.
-
-The combined completeness proof reports 4435 inherited native-check
-dependencies, exactly those already present in the two-connected-polycube
-space/slab completeness proofs. No new axiom or `native_decide` call was
-introduced. To inspect current dependencies, import the proof module and run
+The combined completeness theorem uses only `propext`, `Classical.choice`,
+and `Quot.sound`. All finite certificates use kernel reduction, and
+[axiom regression checks](../LeanTrominoes/AxiomAudit.lean) cover the final theorem.
+To inspect current dependencies, import the proof module and run
 `#print axioms LeanTrominoes.ThreeTranslationPolycubes.proved`.
 
 See [README](../README.md) for current paper coverage.

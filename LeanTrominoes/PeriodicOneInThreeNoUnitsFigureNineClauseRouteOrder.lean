@@ -549,7 +549,7 @@ theorem fullDrawingFor_ternaryRoutesInUnitEliminationOrder
     (first second third : Bool) :
     (fullDrawingFor first second third)
       |>.TernaryRoutesInUnitEliminationOrder := by
-  cases first <;> cases second <;> cases third <;> native_decide
+  cases first <;> cases second <;> cases third <;> decide +kernel
 
 /-- The binary-source composed template has the canonical route order for
 all four source-polarity patterns. -/
@@ -557,19 +557,19 @@ theorem twoDrawingFor_ternaryRoutesInUnitEliminationOrder
     (first second : Bool) :
     (twoDrawingFor first second)
       |>.TernaryRoutesInUnitEliminationOrder := by
-  cases first <;> cases second <;> native_decide
+  cases first <;> cases second <;> decide +kernel
 
 /-- The unit-source composed template has the canonical route order for
 both source polarities. -/
 theorem oneDrawingFor_ternaryRoutesInUnitEliminationOrder
     (first : Bool) :
     (oneDrawingFor first).TernaryRoutesInUnitEliminationOrder := by
-  cases first <;> native_decide
+  cases first <;> decide +kernel
 
 /-- The empty-source composed template has the canonical route order. -/
 theorem zeroDrawing_ternaryRoutesInUnitEliminationOrder :
     zeroDrawing.TernaryRoutesInUnitEliminationOrder := by
-  native_decide
+  decide +kernel
 
 /-- The arity-selected finite template always has the canonical ternary
 route order. -/

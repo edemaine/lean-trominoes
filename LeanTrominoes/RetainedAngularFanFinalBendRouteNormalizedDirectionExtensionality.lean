@@ -74,7 +74,7 @@ theorem bendRoute_normalized_fallback_directions_eq
     exact routeTerminalVector_scale_classified
       retainedAngularFanSourceClearanceFactor_pos certificate.classified
   have templateOrthogonal : OrthogonalPolyline template := by
-    exact certificate.routeOrthogonal.scalePolyline (by native_decide)
+    exact certificate.routeOrthogonal.scalePolyline (by decide +kernel)
   have terminalPositive : 0 < terminal.2 := by
     exact scaleRetainedTerminalData_length_pos
       retainedAngularFanSourceClearanceFactor_pos

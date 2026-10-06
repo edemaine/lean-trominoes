@@ -4,8 +4,13 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderData
+import LeanTrominoes.FiniteBoolCheck
 
 /-! # Finite semantics of the final Figure 9 clause ordering -/
+
+
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 10000
 
 namespace LeanTrominoes
 namespace PeriodicCNF
@@ -60,13 +65,28 @@ def figureClauseSourceOrders (profile : DirectedClauseProfile) :
   let drawing := templateDrawingOfClauseProfile (clauseProfile profile)
   drawing.formula.zipIdx.map (embeddedClauseSourceOrder drawing)
 
+private def directionFreeProfile : ClauseProfile → DirectedClauseProfile
+  | .unary first => .unary first .invalid
+  | .binary first second => .binary first .invalid second .invalid
+  | .ternary first second third => .ternary first .invalid second .invalid third .invalid
+
 /-- Forgetting route directions recovers the original generated profile
 column exactly. -/
 theorem figureDirectedClauseProfiles_map_clauseProfile :
     ∀ profile : DirectedClauseProfile,
       (figureDirectedClauseProfiles profile).map clauseProfile =
         figureClauseProfiles profile := by
-  native_decide
+  have checked : (finiteAll fun profile : ClauseProfile => decide ((figureDirectedClauseProfiles (directionFreeProfile profile)).map clauseProfile =
+        figureClauseProfiles (directionFreeProfile profile))) = true := by
+    decide +kernel
+  have casesChecked := (finiteAll_eq_true _).mp checked
+  simp only [decide_eq_true_eq] at casesChecked
+  intro profile
+  cases profile with
+  | unary first direction => exact casesChecked (.unary first)
+  | binary first firstDirection second secondDirection => exact casesChecked (.binary first second)
+  | ternary first firstDirection second secondDirection third thirdDirection =>
+      exact casesChecked (.ternary first second third)
 
 /-- Sorting every finite template clause by its route's first direction is
 exactly the explicit final permutation: binary clauses use `1,0`, and ternary
@@ -76,7 +96,18 @@ theorem figureDirectedClauseProfiles_map_orderedProfile :
       (figureDirectedClauseProfiles profile).map
           DirectedClauseProfile.orderedProfile =
         finalFigureClauseProfiles profile := by
-  native_decide
+  have checked : (finiteAll fun profile : ClauseProfile => decide ((figureDirectedClauseProfiles (directionFreeProfile profile)).map
+          DirectedClauseProfile.orderedProfile =
+        finalFigureClauseProfiles (directionFreeProfile profile))) = true := by
+    decide +kernel
+  have casesChecked := (finiteAll_eq_true _).mp checked
+  simp only [decide_eq_true_eq] at casesChecked
+  intro profile
+  cases profile with
+  | unary first direction => exact casesChecked (.unary first)
+  | binary first firstDirection second secondDirection => exact casesChecked (.binary first second)
+  | ternary first firstDirection second secondDirection third thirdDirection =>
+      exact casesChecked (.ternary first second third)
 
 /-- The stable sort selects old indices `1,0` in every binary generated
 clause and `2,0,1` in every ternary generated clause.  This index-level form
@@ -88,7 +119,20 @@ theorem figureClauseSourceOrders_eq_reorderList_range :
           templateDrawingOfClauseProfile (clauseProfile profile)
         drawing.formula.map fun clause =>
           reorderList (List.range clause.literals.length) := by
-  native_decide
+  have checked : (finiteAll fun profile : ClauseProfile => decide (figureClauseSourceOrders (directionFreeProfile profile) =
+        let drawing :=
+          templateDrawingOfClauseProfile (clauseProfile (directionFreeProfile profile))
+        drawing.formula.map fun clause =>
+          reorderList (List.range clause.literals.length))) = true := by
+    decide +kernel
+  have casesChecked := (finiteAll_eq_true _).mp checked
+  simp only [decide_eq_true_eq] at casesChecked
+  intro profile
+  cases profile with
+  | unary first direction => exact casesChecked (.unary first)
+  | binary first firstDirection second secondDirection => exact casesChecked (.binary first second)
+  | ternary first firstDirection second secondDirection third thirdDirection =>
+      exact casesChecked (.ternary first second third)
 
 end FormulaShapeFigureNineFinalClauseOrdering
 end PeriodicCNF

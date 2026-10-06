@@ -66,8 +66,8 @@ theorem
         (segment := choice.sourceSegment) outside)
       (factor := retainedTerminalFanTotalRefinement * 4)
       (radius := 288)
-      (by native_decide)
-      (by native_decide)
+      (by decide +kernel)
+      (by decide +kernel)
   norm_num [retainedTerminalFanTotalRefinement,
     PeriodicEightOccurrenceSplitPositioned.refinementScale,
     retainedTerminalFanRoutingRefinement] at separated ⊢

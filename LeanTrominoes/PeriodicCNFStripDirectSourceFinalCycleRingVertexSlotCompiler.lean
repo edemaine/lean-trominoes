@@ -94,7 +94,7 @@ arity. -/
     directSourceFinalLocalCycleRingVertexSlots.length =
       (HorizontalRoutedRouteHeaderOccurrenceBlock.output
         FormulaShapeFixedEightDirection.cycleClauseDescriptors).length := by
-  native_decide
+  decide +kernel
 
 theorem directSourceFinalCycleRingVertexSlotBlock_length
     (token : FormulaShapeDirectionOrdering.Token) :

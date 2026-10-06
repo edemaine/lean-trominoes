@@ -87,6 +87,77 @@ def localGateRoute
   | true, .right, .blue =>
       [(100, 108), (100, 80), (78, 80)]
 
+/-- The local gate tables depend only on whether the right group is present. -/
+private def canonicalLocalGateData (hasRight : Bool) : ClauseRibbonFanData :=
+  ⟨hasRight, fun _ => .east⟩
+
+private theorem canonicalLocalGateCertificate0 :
+    ∀ (hasRight : Bool) group,
+      (canonicalLocalGateData hasRight).GroupActive group →
+      ∀ lane,
+        ((canonicalLocalGateData hasRight).localGateRoute group lane).head? =
+          some ((canonicalLocalGateData hasRight).outerGate group lane) := by
+  intro hasRight
+  cases hasRight <;> decide +kernel
+
+private theorem canonicalLocalGateCertificate1 :
+    ∀ (hasRight : Bool) group,
+      (canonicalLocalGateData hasRight).GroupActive group →
+      ∀ lane,
+        ((canonicalLocalGateData hasRight).localGateRoute group lane).getLast? =
+          some (lanePort group lane) := by
+  intro hasRight
+  cases hasRight <;> decide +kernel
+
+private theorem canonicalLocalGateCertificate2 :
+    ∀ (hasRight : Bool) group,
+      (canonicalLocalGateData hasRight).GroupActive group →
+      ∀ lane, OrthogonalPolyline ((canonicalLocalGateData hasRight).localGateRoute group lane) := by
+  intro hasRight
+  cases hasRight <;> decide +kernel
+
+private theorem canonicalLocalGateCertificate3 :
+    ∀ (hasRight : Bool) group,
+      (canonicalLocalGateData hasRight).GroupActive group →
+      ∀ lane,
+        LocalIncidenceDrawing.RouteIsSimple
+          ((canonicalLocalGateData hasRight).localGateRoute group lane) := by
+  intro hasRight
+  cases hasRight <;> decide +kernel
+
+private theorem canonicalLocalGateCertificate4 :
+    ∀ (hasRight : Bool) group,
+      (canonicalLocalGateData hasRight).GroupActive group →
+      ∀ lane point,
+        point ∈ (canonicalLocalGateData hasRight).localGateRoute group lane →
+        InStandardRibbonMacrocell point := by
+  intro hasRight
+  cases hasRight <;> decide +kernel
+
+private theorem canonicalLocalGateCertificate5 :
+    ∀ (hasRight : Bool) group,
+      (canonicalLocalGateData hasRight).GroupActive group →
+      ∀ lane set color,
+        RoutesAvoidEachOther
+          ((canonicalLocalGateData hasRight).localGateRoute group lane)
+          (translatePolyline standardThreeStrandLayout.clauseOffset
+            (X3CClauseOrthogonal.route set color)) := by
+  intro hasRight
+  cases hasRight <;> decide +kernel
+
+private theorem canonicalLocalGateCertificate6 :
+    ∀ (hasRight : Bool)
+      firstGroup secondGroup,
+      (canonicalLocalGateData hasRight).GroupActive firstGroup →
+      (canonicalLocalGateData hasRight).GroupActive secondGroup →
+      ∀ firstLane secondLane,
+        (firstGroup, firstLane) ≠ (secondGroup, secondLane) →
+        RoutesStrictlyAvoidEachOther
+          ((canonicalLocalGateData hasRight).localGateRoute firstGroup firstLane)
+          ((canonicalLocalGateData hasRight).localGateRoute secondGroup secondLane) := by
+  intro hasRight
+  cases hasRight <;> decide +kernel
+
 /-- Every active local route starts at its reflected physical-lane gate. -/
 @[simp]
 theorem localGateRoute_head? :
@@ -96,7 +167,7 @@ theorem localGateRoute_head? :
         (data.localGateRoute group lane).head? =
           some (data.outerGate group lane) := by
   rintro ⟨hasRight, direction⟩
-  cases hasRight <;> native_decide +revert
+  exact canonicalLocalGateCertificate0 hasRight
 
 /-- Every active local route ends at its exact physical-lane clause port. -/
 @[simp]
@@ -107,7 +178,7 @@ theorem localGateRoute_getLast? :
         (data.localGateRoute group lane).getLast? =
           some (lanePort group lane) := by
   rintro ⟨hasRight, direction⟩
-  cases hasRight <;> native_decide +revert
+  exact canonicalLocalGateCertificate1 hasRight
 
 /-- Every active local gate route is rectilinear. -/
 theorem localGateRoute_orthogonal :
@@ -115,7 +186,7 @@ theorem localGateRoute_orthogonal :
       data.GroupActive group →
       ∀ lane, OrthogonalPolyline (data.localGateRoute group lane) := by
   rintro ⟨hasRight, direction⟩
-  cases hasRight <;> native_decide +revert
+  exact canonicalLocalGateCertificate2 hasRight
 
 /-- Every active local gate route is geometrically simple. -/
 theorem localGateRoute_simple :
@@ -125,7 +196,7 @@ theorem localGateRoute_simple :
         LocalIncidenceDrawing.RouteIsSimple
           (data.localGateRoute group lane) := by
   rintro ⟨hasRight, direction⟩
-  cases hasRight <;> native_decide +revert
+  exact canonicalLocalGateCertificate3 hasRight
 
 /-- Every local gate-route point remains in the standard ribbon macrocell. -/
 theorem localGateRoute_points_bounded :
@@ -135,7 +206,7 @@ theorem localGateRoute_points_bounded :
         point ∈ data.localGateRoute group lane →
         InStandardRibbonMacrocell point := by
   rintro ⟨hasRight, direction⟩
-  cases hasRight <;> native_decide +revert
+  exact canonicalLocalGateCertificate4 hasRight
 
 /-- Local clause routes meet the finite clause-core drawing only at
 advertised common route endpoints. -/
@@ -148,7 +219,7 @@ theorem localGateRoute_avoids_clauseCore :
           (translatePolyline standardThreeStrandLayout.clauseOffset
             (X3CClauseOrthogonal.route set color)) := by
   rintro ⟨hasRight, direction⟩
-  cases hasRight <;> native_decide +revert
+  exact canonicalLocalGateCertificate5 hasRight
 
 /-- Distinct active local clause strands are strictly separated. -/
 theorem localGateRoutes_strictlyAvoidEachOther :
@@ -162,7 +233,7 @@ theorem localGateRoutes_strictlyAvoidEachOther :
           (data.localGateRoute firstGroup firstLane)
           (data.localGateRoute secondGroup secondLane) := by
   rintro ⟨hasRight, direction⟩
-  cases hasRight <;> native_decide +revert
+  exact canonicalLocalGateCertificate6 hasRight
 
 end ClauseRibbonFanData
 end PeriodicPlanarOneInThreeToThreeDM

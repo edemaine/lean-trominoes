@@ -60,7 +60,7 @@ theorem mem_carrierCrossingRetentionShifts_iff
 /-- The fixed retention window contains each common shift exactly once. -/
 theorem carrierCrossingRetentionShifts_nodup :
     carrierCrossingRetentionShifts.Nodup := by
-  native_decide
+  decide +kernel
 
 /-- The bounded physical orbit of every canonical oriented crossing. -/
 def retainedCrossings

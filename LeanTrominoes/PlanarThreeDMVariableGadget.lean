@@ -194,7 +194,7 @@ private theorem variableAssignment_holds_iff
           bottomRight = true ∧ bottomLeft = false ∧ leftMiddle = true) := by
   cases topLeft <;> cases topRight <;> cases rightMiddle <;>
     cases bottomRight <;> cases bottomLeft <;> cases leftMiddle <;>
-    native_decide
+    decide +kernel
 
 /-- The selected state can be read directly at the six interface ports. -/
 theorem variableGadgetHolds_port_pattern
@@ -232,7 +232,7 @@ theorem variableGadgetHolds_iff
     · right
       funext triple
       cases triple <;> simp_all [variableSelection]
-  · rintro (rfl | rfl) <;> native_decide
+  · rintro (rfl | rfl) <;> decide +kernel
 
 /-- Every internal red element has degree two inside the variable gadget. -/
 theorem variableRed_degree_two (red : VariableRed) :

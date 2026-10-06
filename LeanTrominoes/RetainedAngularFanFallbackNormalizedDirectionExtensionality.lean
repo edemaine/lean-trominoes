@@ -78,9 +78,9 @@ theorem RetainedFallbackFanKind.splicedOwnFigure7Route_normalized_directions_eq_
   have secondPrefixNonempty : secondPrefix ≠ [] :=
     List.ne_nil_of_length_pos secondPrefixLength
   have firstPrefixOrthogonal : OrthogonalPolyline firstPrefix := by
-    exact (firstOrthogonal.scalePolyline (by native_decide)).dropLast
+    exact (firstOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have secondPrefixOrthogonal : OrthogonalPolyline secondPrefix := by
-    exact (secondOrthogonal.scalePolyline (by native_decide)).dropLast
+    exact (secondOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have firstSuffixOrthogonal : OrthogonalPolyline firstSuffix := by
     exact retainedFallbackFanSuffixRouteAt_orthogonal
       kind firstCenter terminal slot terminalLengthPositive valid

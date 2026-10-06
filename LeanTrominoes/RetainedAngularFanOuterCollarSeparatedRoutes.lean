@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanOuterCollarRoutes
+import LeanTrominoes.RetainedAngularFanOuterCollarRouteTable
+import LeanTrominoes.OrthogonalPolylineStrictSeparationCheck
+import LeanTrominoes.OrthogonalPolylineSegmentBoxCheck
 
 /-!
 # Coordinated separation in the outer fan collar
@@ -21,6 +24,9 @@ terminals have the same direction.
 
 namespace LeanTrominoes
 namespace PeriodicEightOccurrenceSplit
+
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 10000
 
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
@@ -207,14 +213,15 @@ def retainedTerminalFanConnectOuterCollarSeparatedSamples
     (slot : RetainedTerminalSlot) :
     Nat → List Cell → List Cell
   | _, [] => []
-  | _, [point] => [point]
-  | depth, first :: second :: rest =>
-      joinAtEndpoint
-        (retainedTerminalFanOuterCollarSeparatedStep
-          direction slot depth first second)
-        (retainedTerminalFanConnectOuterCollarSeparatedSamples
-          direction slot (depth + 1) (second :: rest))
-termination_by _ points => points.length
+  | depth, first :: rest =>
+      match rest with
+      | [] => [first]
+      | second :: _ =>
+          joinAtEndpoint
+            (retainedTerminalFanOuterCollarSeparatedStep
+              direction slot depth first second)
+            (retainedTerminalFanConnectOuterCollarSeparatedSamples
+              direction slot (depth + 1) rest)
 
 /-- Interpolated coordinated collar route used away from the two sharpest
 corner turns. -/
@@ -291,7 +298,7 @@ def retainedTerminalFanOuterCollarSouthwestRoute
 /-- Final coordinated collar route.  Two corner-heavy direction families
 use explicit nested-track certificates; all other directions use the
 interpolated construction. -/
-def retainedTerminalFanOuterCollarSeparatedRoute
+def retainedTerminalFanOuterCollarComputedRoute
     (direction : RetainedTerminalDirection)
     (slot : RetainedTerminalSlot) : List Cell :=
   match direction with
@@ -301,6 +308,606 @@ def retainedTerminalFanOuterCollarSeparatedRoute
       retainedTerminalFanOuterCollarSouthwestRoute slot
   | _ =>
       retainedTerminalFanOuterCollarInterpolatedRoute direction slot
+
+/-- Coordinated routes with their verified interpolation already evaluated. -/
+def retainedTerminalFanOuterCollarSeparatedRoute
+    (direction : RetainedTerminalDirection) (slot : RetainedTerminalSlot) : List Cell :=
+  (retainedTerminalFanCachedOuterCollarRoutes direction).getD slot.val []
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case0 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.east)) 0 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.east)) 0 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case1 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.east)) 1 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.east)) 1 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case2 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.east)) 2 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.east)) 2 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case3 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.east)) 3 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.east)) 3 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case4 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.east)) 4 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.east)) 4 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case5 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.east)) 5 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.east)) 5 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case6 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.east)) 6 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.east)) 6 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case7 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.east)) 7 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.east)) 7 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case8 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.left)) 0 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.left)) 0 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case9 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.left)) 1 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.left)) 1 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case10 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.left)) 2 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.left)) 2 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case11 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.left)) 3 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.left)) 3 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case12 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.left)) 4 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.left)) 4 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case13 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.left)) 5 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.left)) 5 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case14 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.left)) 6 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.left)) 6 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case15 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.left)) 7 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.left)) 7 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case16 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southeast)) 0 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southeast)) 0 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case17 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southeast)) 1 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southeast)) 1 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case18 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southeast)) 2 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southeast)) 2 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case19 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southeast)) 3 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southeast)) 3 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case20 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southeast)) 4 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southeast)) 4 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case21 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southeast)) 5 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southeast)) 5 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case22 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southeast)) 6 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southeast)) 6 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case23 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southeast)) 7 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southeast)) 7 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case24 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.south)) 0 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.south)) 0 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case25 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.south)) 1 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.south)) 1 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case26 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.south)) 2 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.south)) 2 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case27 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.south)) 3 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.south)) 3 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case28 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.south)) 4 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.south)) 4 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case29 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.south)) 5 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.south)) 5 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case30 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.south)) 6 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.south)) 6 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case31 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.south)) 7 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.south)) 7 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case32 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.right)) 0 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.right)) 0 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case33 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.right)) 1 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.right)) 1 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case34 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.right)) 2 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.right)) 2 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case35 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.right)) 3 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.right)) 3 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case36 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.right)) 4 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.right)) 4 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case37 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.right)) 5 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.right)) 5 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case38 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.right)) 6 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.right)) 6 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case39 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.right)) 7 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.right)) 7 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case40 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southwest)) 0 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southwest)) 0 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case41 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southwest)) 1 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southwest)) 1 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case42 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southwest)) 2 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southwest)) 2 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case43 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southwest)) 3 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southwest)) 3 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case44 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southwest)) 4 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southwest)) 4 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case45 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southwest)) 5 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southwest)) 5 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case46 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southwest)) 6 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southwest)) 6 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case47 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southwest)) 7 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.southwest)) 7 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case48 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.west)) 0 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.west)) 0 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case49 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.west)) 1 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.west)) 1 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case50 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.west)) 2 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.west)) 2 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case51 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.west)) 3 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.west)) 3 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case52 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.west)) 4 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.west)) 4 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case53 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.west)) 5 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.west)) 5 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case54 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.west)) 6 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.west)) 6 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case55 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.west)) 7 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.west)) 7 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case56 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northwest)) 0 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northwest)) 0 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case57 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northwest)) 1 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northwest)) 1 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case58 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northwest)) 2 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northwest)) 2 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case59 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northwest)) 3 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northwest)) 3 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case60 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northwest)) 4 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northwest)) 4 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case61 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northwest)) 5 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northwest)) 5 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case62 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northwest)) 6 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northwest)) 6 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case63 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northwest)) 7 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northwest)) 7 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case64 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.north)) 0 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.north)) 0 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case65 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.north)) 1 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.north)) 1 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case66 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.north)) 2 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.north)) 2 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case67 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.north)) 3 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.north)) 3 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case68 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.north)) 4 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.north)) 4 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case69 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.north)) 5 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.north)) 5 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case70 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.north)) 6 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.north)) 6 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case71 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.north)) 7 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.north)) 7 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case72 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northeast)) 0 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northeast)) 0 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case73 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northeast)) 1 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northeast)) 1 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case74 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northeast)) 2 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northeast)) 2 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case75 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northeast)) 3 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northeast)) 3 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case76 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northeast)) 4 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northeast)) 4 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case77 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northeast)) 5 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northeast)) 5 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case78 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northeast)) 6 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northeast)) 6 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case79 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northeast)) 7 =
+      retainedTerminalFanOuterCollarComputedRoute (.compass (.northeast)) 7 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case80 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.middle)) 0 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.middle)) 0 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case81 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.middle)) 1 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.middle)) 1 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case82 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.middle)) 2 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.middle)) 2 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case83 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.middle)) 3 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.middle)) 3 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case84 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.middle)) 4 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.middle)) 4 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case85 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.middle)) 5 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.middle)) 5 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case86 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.middle)) 6 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.middle)) 6 := by
+  decide +kernel
+
+private theorem retainedTerminalFanCachedOuterCollarRoute_case87 :
+    retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.middle)) 7 =
+      retainedTerminalFanOuterCollarComputedRoute (.routedClause (.middle)) 7 := by
+  decide +kernel
+
+/-- Every stored route is exactly the original interpolated orthogonal route. -/
+theorem retainedTerminalFanOuterCollarSeparatedRoute_eq_computed
+    (direction : RetainedTerminalDirection) (slot : RetainedTerminalSlot) :
+    retainedTerminalFanOuterCollarSeparatedRoute direction slot =
+      retainedTerminalFanOuterCollarComputedRoute direction slot := by
+  have cases : slot.val = 0 ∨ slot.val = 1 ∨ slot.val = 2 ∨ slot.val = 3 ∨
+      slot.val = 4 ∨ slot.val = 5 ∨ slot.val = 6 ∨ slot.val = 7 := by
+    have bound := slot.is_lt
+    omega
+  rcases cases with h | h | h | h | h | h | h | h
+  · have slotEq : slot = 0 := Fin.ext h
+    subst slot
+    cases direction with
+    | compass port =>
+        cases port with
+        | east => exact retainedTerminalFanCachedOuterCollarRoute_case0
+        | southeast => exact retainedTerminalFanCachedOuterCollarRoute_case16
+        | south => exact retainedTerminalFanCachedOuterCollarRoute_case24
+        | southwest => exact retainedTerminalFanCachedOuterCollarRoute_case40
+        | west => exact retainedTerminalFanCachedOuterCollarRoute_case48
+        | northwest => exact retainedTerminalFanCachedOuterCollarRoute_case56
+        | north => exact retainedTerminalFanCachedOuterCollarRoute_case64
+        | northeast => exact retainedTerminalFanCachedOuterCollarRoute_case72
+    | routedClause arm =>
+        cases arm with
+        | left => exact retainedTerminalFanCachedOuterCollarRoute_case8
+        | right => exact retainedTerminalFanCachedOuterCollarRoute_case32
+        | middle => exact retainedTerminalFanCachedOuterCollarRoute_case80
+  · have slotEq : slot = 1 := Fin.ext h
+    subst slot
+    cases direction with
+    | compass port =>
+        cases port with
+        | east => exact retainedTerminalFanCachedOuterCollarRoute_case1
+        | southeast => exact retainedTerminalFanCachedOuterCollarRoute_case17
+        | south => exact retainedTerminalFanCachedOuterCollarRoute_case25
+        | southwest => exact retainedTerminalFanCachedOuterCollarRoute_case41
+        | west => exact retainedTerminalFanCachedOuterCollarRoute_case49
+        | northwest => exact retainedTerminalFanCachedOuterCollarRoute_case57
+        | north => exact retainedTerminalFanCachedOuterCollarRoute_case65
+        | northeast => exact retainedTerminalFanCachedOuterCollarRoute_case73
+    | routedClause arm =>
+        cases arm with
+        | left => exact retainedTerminalFanCachedOuterCollarRoute_case9
+        | right => exact retainedTerminalFanCachedOuterCollarRoute_case33
+        | middle => exact retainedTerminalFanCachedOuterCollarRoute_case81
+  · have slotEq : slot = 2 := Fin.ext h
+    subst slot
+    cases direction with
+    | compass port =>
+        cases port with
+        | east => exact retainedTerminalFanCachedOuterCollarRoute_case2
+        | southeast => exact retainedTerminalFanCachedOuterCollarRoute_case18
+        | south => exact retainedTerminalFanCachedOuterCollarRoute_case26
+        | southwest => exact retainedTerminalFanCachedOuterCollarRoute_case42
+        | west => exact retainedTerminalFanCachedOuterCollarRoute_case50
+        | northwest => exact retainedTerminalFanCachedOuterCollarRoute_case58
+        | north => exact retainedTerminalFanCachedOuterCollarRoute_case66
+        | northeast => exact retainedTerminalFanCachedOuterCollarRoute_case74
+    | routedClause arm =>
+        cases arm with
+        | left => exact retainedTerminalFanCachedOuterCollarRoute_case10
+        | right => exact retainedTerminalFanCachedOuterCollarRoute_case34
+        | middle => exact retainedTerminalFanCachedOuterCollarRoute_case82
+  · have slotEq : slot = 3 := Fin.ext h
+    subst slot
+    cases direction with
+    | compass port =>
+        cases port with
+        | east => exact retainedTerminalFanCachedOuterCollarRoute_case3
+        | southeast => exact retainedTerminalFanCachedOuterCollarRoute_case19
+        | south => exact retainedTerminalFanCachedOuterCollarRoute_case27
+        | southwest => exact retainedTerminalFanCachedOuterCollarRoute_case43
+        | west => exact retainedTerminalFanCachedOuterCollarRoute_case51
+        | northwest => exact retainedTerminalFanCachedOuterCollarRoute_case59
+        | north => exact retainedTerminalFanCachedOuterCollarRoute_case67
+        | northeast => exact retainedTerminalFanCachedOuterCollarRoute_case75
+    | routedClause arm =>
+        cases arm with
+        | left => exact retainedTerminalFanCachedOuterCollarRoute_case11
+        | right => exact retainedTerminalFanCachedOuterCollarRoute_case35
+        | middle => exact retainedTerminalFanCachedOuterCollarRoute_case83
+  · have slotEq : slot = 4 := Fin.ext h
+    subst slot
+    cases direction with
+    | compass port =>
+        cases port with
+        | east => exact retainedTerminalFanCachedOuterCollarRoute_case4
+        | southeast => exact retainedTerminalFanCachedOuterCollarRoute_case20
+        | south => exact retainedTerminalFanCachedOuterCollarRoute_case28
+        | southwest => exact retainedTerminalFanCachedOuterCollarRoute_case44
+        | west => exact retainedTerminalFanCachedOuterCollarRoute_case52
+        | northwest => exact retainedTerminalFanCachedOuterCollarRoute_case60
+        | north => exact retainedTerminalFanCachedOuterCollarRoute_case68
+        | northeast => exact retainedTerminalFanCachedOuterCollarRoute_case76
+    | routedClause arm =>
+        cases arm with
+        | left => exact retainedTerminalFanCachedOuterCollarRoute_case12
+        | right => exact retainedTerminalFanCachedOuterCollarRoute_case36
+        | middle => exact retainedTerminalFanCachedOuterCollarRoute_case84
+  · have slotEq : slot = 5 := Fin.ext h
+    subst slot
+    cases direction with
+    | compass port =>
+        cases port with
+        | east => exact retainedTerminalFanCachedOuterCollarRoute_case5
+        | southeast => exact retainedTerminalFanCachedOuterCollarRoute_case21
+        | south => exact retainedTerminalFanCachedOuterCollarRoute_case29
+        | southwest => exact retainedTerminalFanCachedOuterCollarRoute_case45
+        | west => exact retainedTerminalFanCachedOuterCollarRoute_case53
+        | northwest => exact retainedTerminalFanCachedOuterCollarRoute_case61
+        | north => exact retainedTerminalFanCachedOuterCollarRoute_case69
+        | northeast => exact retainedTerminalFanCachedOuterCollarRoute_case77
+    | routedClause arm =>
+        cases arm with
+        | left => exact retainedTerminalFanCachedOuterCollarRoute_case13
+        | right => exact retainedTerminalFanCachedOuterCollarRoute_case37
+        | middle => exact retainedTerminalFanCachedOuterCollarRoute_case85
+  · have slotEq : slot = 6 := Fin.ext h
+    subst slot
+    cases direction with
+    | compass port =>
+        cases port with
+        | east => exact retainedTerminalFanCachedOuterCollarRoute_case6
+        | southeast => exact retainedTerminalFanCachedOuterCollarRoute_case22
+        | south => exact retainedTerminalFanCachedOuterCollarRoute_case30
+        | southwest => exact retainedTerminalFanCachedOuterCollarRoute_case46
+        | west => exact retainedTerminalFanCachedOuterCollarRoute_case54
+        | northwest => exact retainedTerminalFanCachedOuterCollarRoute_case62
+        | north => exact retainedTerminalFanCachedOuterCollarRoute_case70
+        | northeast => exact retainedTerminalFanCachedOuterCollarRoute_case78
+    | routedClause arm =>
+        cases arm with
+        | left => exact retainedTerminalFanCachedOuterCollarRoute_case14
+        | right => exact retainedTerminalFanCachedOuterCollarRoute_case38
+        | middle => exact retainedTerminalFanCachedOuterCollarRoute_case86
+  · have slotEq : slot = 7 := Fin.ext h
+    subst slot
+    cases direction with
+    | compass port =>
+        cases port with
+        | east => exact retainedTerminalFanCachedOuterCollarRoute_case7
+        | southeast => exact retainedTerminalFanCachedOuterCollarRoute_case23
+        | south => exact retainedTerminalFanCachedOuterCollarRoute_case31
+        | southwest => exact retainedTerminalFanCachedOuterCollarRoute_case47
+        | west => exact retainedTerminalFanCachedOuterCollarRoute_case55
+        | northwest => exact retainedTerminalFanCachedOuterCollarRoute_case63
+        | north => exact retainedTerminalFanCachedOuterCollarRoute_case71
+        | northeast => exact retainedTerminalFanCachedOuterCollarRoute_case79
+    | routedClause arm =>
+        cases arm with
+        | left => exact retainedTerminalFanCachedOuterCollarRoute_case15
+        | right => exact retainedTerminalFanCachedOuterCollarRoute_case39
+        | middle => exact retainedTerminalFanCachedOuterCollarRoute_case87
 
 private instance orthogonalPolylineDecidable
     (points : List Cell) :
@@ -320,7 +927,11 @@ theorem retainedTerminalFanOuterCollarSeparatedRoute_head? :
           some
             (retainedTerminalFanOuterLanePortOffset
               direction slot) := by
-  native_decide
+  have checked : (finiteAll fun direction : RetainedTerminalDirection => finiteAll fun slot : RetainedTerminalSlot =>
+      decide ((retainedTerminalFanOuterCollarSeparatedRoute direction slot).head? =
+        some (retainedTerminalFanOuterLanePortOffset direction slot))) = true := by
+    decide +kernel
+  simpa only [finiteAll_eq_true, List.all_eq_true, decide_eq_true_eq] using checked
 
 /-- Every coordinated collar route ends at its exact radius-264 fan-facing
 port. -/
@@ -334,7 +945,12 @@ theorem retainedTerminalFanOuterCollarSeparatedRoute_getLast? :
             (Cell.scale retainedTerminalFanRoutingRefinement
               (retainedTerminalFanPortOffset
                 (retainedTerminalFanPort direction slot))) := by
-  native_decide
+  have checked : (finiteAll fun direction : RetainedTerminalDirection => finiteAll fun slot : RetainedTerminalSlot =>
+      decide ((retainedTerminalFanOuterCollarSeparatedRoute direction slot).getLast? =
+        some (Cell.scale retainedTerminalFanRoutingRefinement
+          (retainedTerminalFanPortOffset (retainedTerminalFanPort direction slot))))) = true := by
+    decide +kernel
+  simpa only [finiteAll_eq_true, List.all_eq_true, decide_eq_true_eq] using checked
 
 /-- Every coordinated collar route is orthogonal. -/
 theorem retainedTerminalFanOuterCollarSeparatedRoute_orthogonal :
@@ -343,7 +959,12 @@ theorem retainedTerminalFanOuterCollarSeparatedRoute_orthogonal :
       PeriodicOrthocrossing.OrthogonalPolyline
         (retainedTerminalFanOuterCollarSeparatedRoute
           direction slot) := by
-  native_decide
+  have checked : (finiteAll fun direction : RetainedTerminalDirection => finiteAll fun slot : RetainedTerminalSlot =>
+      (gridPolylineSegments (retainedTerminalFanOuterCollarSeparatedRoute direction slot)).all
+        fun segment => decide segment.IsAxisAligned) = true := by
+    decide +kernel
+  simpa only [finiteAll_eq_true, List.all_eq_true, decide_eq_true_eq,
+    ← PeriodicOrthocrossing.orthogonalPolyline_iff_segments] using checked
 
 /-- Every coordinated route remains in the closed radius-288, open
 radius-263 collar. -/
@@ -354,10 +975,125 @@ theorem retainedTerminalFanOuterCollarSeparatedRoute_points_in_shell :
           retainedTerminalFanOuterCollarSeparatedRoute direction slot →
         WithinCoordinateRadius 288 (0, 0) point ∧
           ¬ WithinCoordinateRadius 263 (0, 0) point := by
-  native_decide
+  have checked : (finiteAll fun direction : RetainedTerminalDirection => finiteAll fun slot : RetainedTerminalSlot =>
+      (retainedTerminalFanOuterCollarSeparatedRoute direction slot).all fun point =>
+        decide (WithinCoordinateRadius 288 (0, 0) point ∧
+          ¬ WithinCoordinateRadius 263 (0, 0) point)) = true := by
+    decide +kernel
+  simpa only [finiteAll_eq_true, List.all_eq_true, decide_eq_true_eq] using checked
 
-/-- Every order-compatible pair of coordinated collar routes is completely
-separated, including segment interiors and listed points. -/
+private theorem outerCollarSegmentBoxes_case0 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot =>
+      finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.east) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧ firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.east)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem outerCollarSegmentBoxes_case1 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot =>
+      finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.left) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧ firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.left)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem outerCollarSegmentBoxes_case2 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot =>
+      finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.southeast) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧ firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southeast)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem outerCollarSegmentBoxes_case3 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot =>
+      finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.south) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧ firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.south)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem outerCollarSegmentBoxes_case4 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot =>
+      finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.right) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧ firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.right)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem outerCollarSegmentBoxes_case5 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot =>
+      finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.southwest) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧ firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southwest)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem outerCollarSegmentBoxes_case6 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot =>
+      finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.west) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧ firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.west)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem outerCollarSegmentBoxes_case7 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot =>
+      finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.northwest) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧ firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northwest)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem outerCollarSegmentBoxes_case8 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot =>
+      finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.north) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧ firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.north)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem outerCollarSegmentBoxes_case9 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot =>
+      finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.northeast) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧ firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northeast)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem outerCollarSegmentBoxes_case10 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot =>
+      finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.middle) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧ firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.middle)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+/-- Two routes whose outer directions and inner slots occur in the same
+strict clockwise order have complete continuous separation. -/
 theorem retainedTerminalFanOuterCollarSeparatedRoutes_strictlyAvoid :
     ∀ (firstDirection secondDirection :
         RetainedTerminalDirection)
@@ -369,7 +1105,33 @@ theorem retainedTerminalFanOuterCollarSeparatedRoutes_strictlyAvoid :
             firstDirection firstSlot)
           (retainedTerminalFanOuterCollarSeparatedRoute
             secondDirection secondSlot) := by
-  native_decide
+  intro firstDirection secondDirection firstSlot secondSlot directionsLe slotsLt
+  have checked :
+      ∀ secondDirection firstSlot secondSlot,
+        firstDirection.angularRank ≤ secondDirection.angularRank →
+        firstSlot.val < secondSlot.val →
+          segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute firstDirection firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot) = true := by
+    cases firstDirection with
+    | compass port =>
+      cases port with
+      | east => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using outerCollarSegmentBoxes_case0
+      | southeast => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using outerCollarSegmentBoxes_case2
+      | south => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using outerCollarSegmentBoxes_case3
+      | southwest => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using outerCollarSegmentBoxes_case5
+      | west => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using outerCollarSegmentBoxes_case6
+      | northwest => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using outerCollarSegmentBoxes_case7
+      | north => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using outerCollarSegmentBoxes_case8
+      | northeast => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using outerCollarSegmentBoxes_case9
+    | routedClause arm =>
+      cases arm with
+      | left => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using outerCollarSegmentBoxes_case1
+      | right => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using outerCollarSegmentBoxes_case4
+      | middle => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using outerCollarSegmentBoxes_case10
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked secondDirection firstSlot secondSlot directionsLe slotsLt)
+
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

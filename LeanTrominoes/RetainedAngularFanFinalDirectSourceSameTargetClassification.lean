@@ -42,7 +42,7 @@ theorem retainedDirectSourceLocalRouteAt_headD_eq_of_sameKind :
           kind firstIndex).headD (0, 0) =
         (retainedDirectSourceLocalRouteAt
           kind secondIndex).headD (0, 0) := by
-  native_decide
+  decide +kernel
 
 def RetainedDirectClauseKind.SameFamily
     (first second : RetainedDirectClauseKind) : Prop :=

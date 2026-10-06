@@ -76,7 +76,7 @@ theorem duplicatorArmStraightIncidenceDrawing_routesAvoidEachOther_of_ne
       interval_cases secondClauseIndex <;>
         interval_cases firstLiteralIndex <;>
           interval_cases secondLiteralIndex <;>
-            native_decide
+            decide +kernel
 
 end PlanarThreeSAT
 end LeanTrominoes

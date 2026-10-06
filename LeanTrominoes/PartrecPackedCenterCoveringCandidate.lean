@@ -44,7 +44,7 @@ theorem packedCoveringColumn_displacement
       -(symmetry.act source).1 := by
   cases tromino <;> cases symmetry <;>
     simp [TrominoAssignment.trominoCellList] at sourceMember
-  all_goals rcases sourceMember with rfl | rfl | rfl <;> native_decide
+  all_goals rcases sourceMember with rfl | rfl | rfl <;> decide +kernel
 
 /-- Canonical motif coordinate queried for one covering-placement base. -/
 def packedCenterCoveringTarget

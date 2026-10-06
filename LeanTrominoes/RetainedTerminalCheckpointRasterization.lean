@@ -931,7 +931,7 @@ theorem retainedRayClassify_refinedTerminalForwardVector
   have productPositive :
       0 <
         retainedTerminalFanTotalRefinement * terminal.2 :=
-    Nat.mul_pos (by native_decide) lengthPositive
+    Nat.mul_pos (by decide +kernel) lengthPositive
   rcases terminal with ⟨direction, length⟩
   simp only at lengthPositive productPositive
   cases direction with
@@ -1148,7 +1148,7 @@ theorem scaledSourcePoint_mem_retainedTerminalRefinedUnitPolyline
   unfold retainedTerminalRefinedUnitPolyline
   apply
     sourcePoint_mem_unitSubdividedRasterizeRetainedPolyline
-      (retained.scale (by native_decide))
+      (retained.scale (by decide +kernel))
       (by simpa [scalePolyline] using routeLength)
   simpa [scalePolyline] using
     List.mem_map_of_mem pointMember
@@ -1167,7 +1167,7 @@ theorem
   unfold retainedTerminalRefinedUnitPrefixPolyline
   apply
     sourcePoint_mem_unitSubdividedRasterizeRetainedPolyline_of_ne_nil
-      ((retained.dropLast).scale (by native_decide))
+      ((retained.dropLast).scale (by decide +kernel))
   · intro empty
     have emptyLength :=
       congrArg List.length empty
@@ -1204,7 +1204,7 @@ theorem
   unfold retainedTerminalRefinedUnitPrefixPolyline
   exact
     axisSegmentPoint_mem_unitSubdividedRasterizeRetainedPolyline
-      ((retained.dropLast).scale (by native_decide))
+      ((retained.dropLast).scale (by decide +kernel))
       scaledMember contains
 
 /-- Every refined checkpoint of a classified route's discarded terminal is
@@ -1241,7 +1241,7 @@ theorem
   unfold retainedTerminalRefinedUnitPolyline
   apply
     unitSubdividedRasterizeRetainedSegment_point_mem_whole
-      (retained.scale (by native_decide))
+      (retained.scale (by decide +kernel))
       scaledFinalMember
   simpa [finalSegment, GridSegment.scale] using
     retainedTerminalRefinedCheckpoint_mem_unitSubdividedFinalRasterization
@@ -1306,7 +1306,7 @@ theorem
     · unfold retainedTerminalRefinedUnitPolyline
       exact
         axisSegmentPoint_mem_unitSubdividedRasterizeRetainedPolyline
-          (sourceRetained.scale (by native_decide))
+          (sourceRetained.scale (by decide +kernel))
           sourceScaledMember sourceContains
     · apply
         retainedTerminalRefinedCheckpoint_mem_retainedTerminalRefinedUnitPolyline

@@ -3,6 +3,9 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.OrthogonalPolylineSegmentBoxCheck
+import LeanTrominoes.OrthogonalPolylineStrictSeparationCheck
+import LeanTrominoes.LocalIncidenceDrawingCheck
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonClauseLocalGates
 
 /-!
@@ -23,9 +26,85 @@ disjoint from the clause core except at their advertised terminal ports.
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 10000
+
 open Gadget PlanarThreeDM
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 open PeriodicOrthocrossing
+
+private def clauseGatePattern (hasRight : Bool) : ClauseRibbonFanData :=
+  ⟨hasRight, fun _ => .east⟩
+
+private def templateClauseOuterRoute (template : VariableOuterFanTemplate)
+    (hasRight : Bool) (group : X3CClauseTerminalGroup) (lane : WireColor) : List Cell :=
+  (template.route ((clauseGatePattern hasRight).variableSlotForGroup group) lane).reverse.map ClauseRibbonFanData.reflectCell
+
+private def templateClauseRoute (template : VariableOuterFanTemplate)
+    (hasRight : Bool) (group : X3CClauseTerminalGroup) (lane : WireColor) : List Cell :=
+  joinAtEndpoint (templateClauseOuterRoute template hasRight group lane)
+    ((clauseGatePattern hasRight).localGateRoute group lane)
+
+private theorem clauseTemplate_length (data : ClauseRibbonFanData)
+    (compatible : data.IsClockwiseCompatible) :
+    data.reflectedOuterData.selectedTemplate.directions.length = (if data.hasRight then 3 else 2) := by
+  rw [data.reflectedOuterData.selectedTemplate_directions compatible,
+    data.reflectedOuterData.activeDirections_length]
+  cases eq : data.hasRight <;>
+    simp [ClauseRibbonFanData.reflectedOuterData, VariableOuterFanData.count, eq]
+
+private theorem clausePiecesAvoid_check :
+    (standardVariableOuterFanTemplates.all fun template =>
+      finiteAll fun hasRight : Bool => guardedCheck
+        (template.directions.length = (if hasRight then 3 else 2))
+        (finiteAll fun outerGroup : X3CClauseTerminalGroup => finiteAll fun localGroup : X3CClauseTerminalGroup =>
+          guardedCheck ((clauseGatePattern hasRight).GroupActive outerGroup ∧
+            (clauseGatePattern hasRight).GroupActive localGroup)
+            (finiteAll fun outerLane : WireColor => finiteAll fun localLane : WireColor =>
+routesAvoidEachOtherCheck (templateClauseOuterRoute template hasRight outerGroup outerLane)
+                ((clauseGatePattern hasRight).localGateRoute localGroup localLane)))) = true := by
+  decide +kernel
+
+private theorem clausePiecesStrict_check :
+    (standardVariableOuterFanTemplates.all fun template =>
+      finiteAll fun hasRight : Bool => guardedCheck
+        (template.directions.length = (if hasRight then 3 else 2))
+        (finiteAll fun outerGroup : X3CClauseTerminalGroup => finiteAll fun localGroup : X3CClauseTerminalGroup =>
+          guardedCheck ((clauseGatePattern hasRight).GroupActive outerGroup ∧
+            (clauseGatePattern hasRight).GroupActive localGroup)
+            (finiteAll fun outerLane : WireColor => finiteAll fun localLane : WireColor =>
+guardedCheck ((outerGroup, outerLane) ≠ (localGroup, localLane))
+              (segmentBoxesSeparateCheck (templateClauseOuterRoute template hasRight outerGroup outerLane)
+                ((clauseGatePattern hasRight).localGateRoute localGroup localLane))))) = true := by
+  decide +kernel
+
+private theorem joinedClauseSimple_check :
+    (standardVariableOuterFanTemplates.all fun template => finiteAll fun hasRight : Bool =>
+      guardedCheck (template.directions.length = (if hasRight then 3 else 2))
+        (finiteAll fun group : X3CClauseTerminalGroup => guardedCheck ((clauseGatePattern hasRight).GroupActive group)
+          (finiteAll fun lane : WireColor => LocalIncidenceDrawing.routeIsSimpleCheck
+            (templateClauseRoute template hasRight group lane)))) = true := by
+  decide +kernel
+
+private theorem joinedClauseCore_check :
+    (standardVariableOuterFanTemplates.all fun template => finiteAll fun hasRight : Bool =>
+      guardedCheck (template.directions.length = (if hasRight then 3 else 2))
+        (finiteAll fun group : X3CClauseTerminalGroup => guardedCheck ((clauseGatePattern hasRight).GroupActive group)
+          (finiteAll fun lane : WireColor => finiteAll fun set : X3CClauseSet => finiteAll fun color : WireColor =>
+            routesAvoidEachOtherCheck (templateClauseRoute template hasRight group lane)
+              (translatePolyline standardThreeStrandLayout.clauseOffset (X3CClauseOrthogonal.route set color))))) = true := by
+  decide +kernel
+
+private theorem joinedClauseDistinct_check :
+    (standardVariableOuterFanTemplates.all fun template => finiteAll fun hasRight : Bool =>
+      guardedCheck (template.directions.length = (if hasRight then 3 else 2))
+        (finiteAll fun firstGroup : X3CClauseTerminalGroup => finiteAll fun secondGroup : X3CClauseTerminalGroup =>
+          guardedCheck ((clauseGatePattern hasRight).GroupActive firstGroup ∧ (clauseGatePattern hasRight).GroupActive secondGroup)
+            (finiteAll fun firstLane : WireColor => finiteAll fun secondLane : WireColor =>
+              guardedCheck ((firstGroup, firstLane) ≠ (secondGroup, secondLane))
+                (segmentBoxesSeparateCheck (templateClauseRoute template hasRight firstGroup firstLane)
+                  (templateClauseRoute template hasRight secondGroup secondLane))))) = true := by
+  decide +kernel
 
 /-! ## Finite interface between the two route tables -/
 
@@ -41,7 +120,14 @@ theorem clauseOuterRoute_avoids_localGateRoute :
           RoutesAvoidEachOther
             (data.outerRoute outerGroup outerLane)
             (data.localGateRoute localGroup localLane) := by
-  native_decide
+  have checked := clausePiecesAvoid_check
+  simp only [List.all_eq_true, finiteAll_eq_true, guardedCheck_eq_true, routesAvoidEachOtherCheck_eq_true] at checked
+  intro data compatible outerGroup localGroup outerActive localActive outerLane localLane
+  have certificate := checked data.reflectedOuterData.selectedTemplate
+    (data.reflectedOuterData.selectedTemplate_mem compatible) data.hasRight
+    (clauseTemplate_length data compatible) outerGroup localGroup ⟨outerActive, localActive⟩
+    outerLane localLane
+  exact certificate
 
 /-- Outer and local table pieces belonging to distinct physical strands
 have no contact at all. -/
@@ -56,7 +142,14 @@ theorem clauseOuterRoute_strictlyAvoids_localGateRoute :
           RoutesStrictlyAvoidEachOther
             (data.outerRoute outerGroup outerLane)
             (data.localGateRoute localGroup localLane) := by
-  native_decide
+  have checked := clausePiecesStrict_check
+  simp only [List.all_eq_true, finiteAll_eq_true, guardedCheck_eq_true] at checked
+  intro data compatible outerGroup localGroup outerActive localActive outerLane localLane different
+  have certificate := checked data.reflectedOuterData.selectedTemplate
+    (data.reflectedOuterData.selectedTemplate_mem compatible) data.hasRight
+    (clauseTemplate_length data compatible) outerGroup localGroup ⟨outerActive, localActive⟩
+    outerLane localLane different
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _ certificate
 
 /-- Each complete finite outer-plus-local clause route is geometrically
 simple. -/
@@ -69,7 +162,13 @@ theorem joinedClauseOuterGateRoute_simple :
             (joinAtEndpoint
               (data.outerRoute group lane)
               (data.localGateRoute group lane)) := by
-  native_decide
+  have checked := joinedClauseSimple_check
+  simp only [List.all_eq_true, finiteAll_eq_true, guardedCheck_eq_true,
+    LocalIncidenceDrawing.routeIsSimpleCheck_eq_true] at checked
+  intro data compatible group active lane
+  exact checked data.reflectedOuterData.selectedTemplate
+    (data.reflectedOuterData.selectedTemplate_mem compatible) data.hasRight
+    (clauseTemplate_length data compatible) group active lane
 
 namespace ClauseRibbonFanData
 
@@ -170,7 +269,12 @@ theorem coordinatedRoute_avoids_clauseCore
       (data.coordinatedRoute group lane)
       (translatePolyline standardThreeStrandLayout.clauseOffset
         (X3CClauseOrthogonal.route set color)) := by
-  native_decide +revert
+  have checked := joinedClauseCore_check
+  simp only [List.all_eq_true, finiteAll_eq_true, guardedCheck_eq_true, routesAvoidEachOtherCheck_eq_true] at checked
+  have certificate := checked data.reflectedOuterData.selectedTemplate
+    (data.reflectedOuterData.selectedTemplate_mem compatible) data.hasRight
+    (clauseTemplate_length data compatible) group active lane set color
+  exact certificate
 
 /-- Distinct active physical strands in a complete coordinated clause fan
 have no continuous or listed-point contact. -/
@@ -186,7 +290,12 @@ theorem coordinatedRoutes_strictlyAvoidEachOther
     RoutesStrictlyAvoidEachOther
       (data.coordinatedRoute firstGroup firstLane)
       (data.coordinatedRoute secondGroup secondLane) := by
-  native_decide +revert
+  have checked := joinedClauseDistinct_check
+  simp only [List.all_eq_true, finiteAll_eq_true, guardedCheck_eq_true] at checked
+  have certificate := checked data.reflectedOuterData.selectedTemplate
+    (data.reflectedOuterData.selectedTemplate_mem compatible) data.hasRight
+    (clauseTemplate_length data compatible) firstGroup secondGroup ⟨firstActive, secondActive⟩ firstLane secondLane different
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _ certificate
 
 end ClauseRibbonFanData
 end PeriodicPlanarOneInThreeToThreeDM

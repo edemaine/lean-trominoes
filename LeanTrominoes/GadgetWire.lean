@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.Gadget
+import LeanTrominoes.GadgetGeometricSearch
 import Lean.Elab.Tactic.Omega
 
 /-!
@@ -64,8 +64,33 @@ def portTransition (tromino : Tromino) (gadget : Gadget)
 /-- All local port transitions, computed by verified exact-cover search. -/
 def exactPortTransitions (tromino : Tromino) (gadget : Gadget)
     (regionCells : List Cell) : Finset (PortState × PortState) :=
-  ((exactWindowTilings tromino gadget regionCells).map
-    (portTransition tromino gadget)).toFinset
+  (geometricBoundarySignatures tromino gadget regionCells).image
+    (fun signature =>
+      (leftPortState signature, rightPortState gadget.width signature))
+
+/-- Searching geometric tiles preserves the original placement transfer relation. -/
+theorem exactPortTransitions_eq_raw (tromino : Tromino) (gadget : Gadget)
+    (wellFormed : gadget.IsWellFormed) (regionCells : List Cell)
+    (regionEquality : regionCells.toFinset = gadget.region) :
+    exactPortTransitions tromino gadget regionCells =
+      ((exactWindowTilings tromino gadget regionCells).map
+        (portTransition tromino gadget)).toFinset := by
+  have signatures : geometricBoundarySignatures tromino gadget regionCells =
+      exactBoundarySignatures tromino gadget regionCells := by
+    rw [geometricBoundarySignatures_eq tromino gadget wellFormed
+        regionCells regionEquality,
+      exactBoundarySignatures_eq tromino gadget wellFormed
+        regionCells regionEquality]
+  rw [exactPortTransitions, signatures]
+  ext transition
+  simp only [Finset.mem_image, exactBoundarySignatures, List.mem_toFinset,
+    List.mem_map, portTransition]
+  constructor
+  · rintro ⟨signature, ⟨placements, member, rfl⟩, equality⟩
+    exact ⟨placements, member, equality⟩
+  · rintro ⟨placements, member, equality⟩
+    exact ⟨boundarySignature tromino gadget.window placements,
+      ⟨placements, member, rfl⟩, equality⟩
 
 /-- Keep only transitions having both some predecessor and some successor in
 the current finite relation. -/
@@ -157,21 +182,21 @@ def figure12RedWireTransitions : Finset (PortState × PortState) :=
 
 theorem figure11RedWireTransitions_card :
     figure11RedWireTransitions.card = 2 := by
-  native_decide
+  decide +kernel
 
 theorem figure11RedWireTransitions_selfLoops :
     ∀ transition ∈ figure11RedWireTransitions,
       transition.1 = transition.2 := by
-  native_decide
+  decide +kernel
 
 theorem figure12RedWireTransitions_card :
     figure12RedWireTransitions.card = 2 := by
-  native_decide
+  decide +kernel
 
 theorem figure12RedWireTransitions_selfLoops :
     ∀ transition ∈ figure12RedWireTransitions,
       transition.1 = transition.2 := by
-  native_decide
+  decide +kernel
 
 set_option maxRecDepth 2000 in
 theorem figure11RedWire_biInfinite_iff

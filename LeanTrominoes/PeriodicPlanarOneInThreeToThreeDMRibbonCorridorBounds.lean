@@ -28,7 +28,7 @@ theorem ribbonMacrocellExit_bounded
       (ribbonMacrocellExit center direction color) := by
   apply inRibbonMacrocell_add_origin
   cases direction <;> cases color <;>
-    native_decide
+    decide +kernel
 
 /-- Every point of a corridor core belongs to the owning block of some
 listed source-route point. -/

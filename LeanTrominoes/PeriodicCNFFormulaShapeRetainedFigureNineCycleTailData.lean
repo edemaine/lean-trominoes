@@ -271,7 +271,7 @@ private theorem localTailTables_length_eq_clauseCount :
       FormulaShapeFigureNinePolarityRouteTailRecord.sourceClauseCount
         FormulaShapeFixedEightDirection.cycleClauseDescriptors := by
   rw [localTailTables_length]
-  native_decide
+  decide +kernel
 
 /-- Pairing the repeated finite descriptor and tail-table streams commutes
 with their shared variable-block boundary. -/

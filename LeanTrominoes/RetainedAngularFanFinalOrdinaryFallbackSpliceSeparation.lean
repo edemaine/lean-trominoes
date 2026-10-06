@@ -581,7 +581,7 @@ theorem
       retainedFinalOuterCompleteRoutes_strictlyAvoid_of_axisAligned_of_not_both_singletonPrefixes
         formula wellFormed degree isLocal retainedClausesNonempty
         retainedAngularFanSourceClearanceFactor_pos
-        (by native_decide)
+        (by decide +kernel)
         firstRawRouteMember secondRawRouteMember
         firstLength secondLength routeIndicesDifferent
         firstEndpoints.1 secondEndpoints.1
@@ -728,7 +728,7 @@ theorem
     simpa [firstRoute, firstTerminal, firstFinalSegment] using
       retainedAngularFanSourceScaledSplicedBoundaryPolyline_strictlyAvoids_pointNeighborhood
         retainedAngularFanSourceClearanceFactor_pos
-        (by native_decide)
+        (by decide +kernel)
         firstRawRoute firstRawTerminal firstSlot
         firstLength firstClassified
         (PositionedPeriodicCNF.canonicalLiteralPosition
@@ -751,7 +751,7 @@ theorem
     have secondSpliceAvoidsFirstSuffix :=
       retainedAngularFanSourceScaledSplicedBoundaryPolyline_strictlyAvoids_pointNeighborhood
         retainedAngularFanSourceClearanceFactor_pos
-        (by native_decide)
+        (by decide +kernel)
         secondRawRoute secondRawTerminal secondSlot
         secondLength secondClassified
         (PositionedPeriodicCNF.canonicalLiteralPosition

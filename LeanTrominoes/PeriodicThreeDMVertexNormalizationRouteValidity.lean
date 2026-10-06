@@ -656,7 +656,7 @@ theorem rotationRoundPortAndRoute_getLast?
     (rotationRoundPortAndRoute active oldPort).2.getLast? =
       some (Cell.add center
         (Cell.scale 3 oldPort.direction.step)) := by
-  cases active <;> cases oldPort <;> native_decide
+  cases active <;> cases oldPort <;> decide +kernel
 
 /-- The first normalization template ends three steps along its endpoint's
 actual old side. -/
@@ -1235,7 +1235,7 @@ theorem ContractedEndpoint.firstNormalizationTemplate_geometry
   unfold ContractedEndpoint.firstNormalizationTemplate
     ContractedEndpoint.firstNormalizedPort
   cases omittedSideAt presentation endpoint.vertex <;>
-    cases endpoint.outwardSide presentation <;> native_decide
+    cases endpoint.outwardSide presentation <;> decide +kernel
 
 /-- Any nondegenerate orthogonal route leaves at least seven points after
 the normalization clearance trim. -/
@@ -1597,7 +1597,7 @@ theorem firstNormalizationRoute_lastDirection
     (omitted : VertexSide) (port : CanonicalVertexPort) :
     AxisDirection.polylineLastDirection (route omitted port) =
       (boundarySide omitted port).direction := by
-  cases omitted <;> cases port <;> native_decide
+  cases omitted <;> cases port <;> decide +kernel
 
 /-- Either cyclic-rotation template finishes in the incoming old port's
 direction. -/
@@ -1606,7 +1606,7 @@ theorem rotationRoundPortAndRoute_lastDirection
     AxisDirection.polylineLastDirection
         (rotationRoundPortAndRoute active oldPort).2 =
       oldPort.direction := by
-  cases active <;> cases oldPort <;> native_decide
+  cases active <;> cases oldPort <;> decide +kernel
 
 /-- Every selected first-round endpoint template avoids an immediate
 reversal. -/

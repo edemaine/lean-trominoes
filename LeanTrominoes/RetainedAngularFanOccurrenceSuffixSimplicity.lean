@@ -27,7 +27,7 @@ open PeriodicThreeSATThree
 simple. -/
 theorem spokeRoute_isSimple (port : Port) :
     LocalIncidenceDrawing.RouteIsSimple (spokeRoute port) := by
-  cases port <;> native_decide
+  cases port <;> decide +kernel
 
 /-- Positioning a local Figure 7 spoke at its variable macrocell preserves
 simplicity. -/

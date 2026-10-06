@@ -98,7 +98,7 @@ theorem boundedCancellation_backwardCardinalFallback
     rw [scaleRetainedTerminalData_length]
     exact Nat.mul_pos factorPositive terminalLengthPositive
   have sourcePrefixOrthogonal : OrthogonalPolyline sourcePrefix :=
-    (scaledOrthogonal.scalePolyline (by native_decide)).dropLast
+    (scaledOrthogonal.scalePolyline (by decide +kernel)).dropLast
   have sourcePrefixLength : 2 ≤ sourcePrefix.length := by
     dsimp [sourcePrefix, retainedFallbackSourcePrefix]
     rw [List.length_dropLast]

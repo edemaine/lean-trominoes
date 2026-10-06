@@ -3,40 +3,43 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.OrthogonalPolylineStrictDirectionNodup
-import LeanTrominoes.RetainedAngularFanFallbackEscapedRadialPrefixEndpoint
-import LeanTrominoes.RetainedAngularFanFallbackExteriorRadialJoinNodup
+import LeanTrominoes.RetainedAngularFanFallbackEscapedPrefixNodupCertificates.Case0
+import LeanTrominoes.RetainedAngularFanFallbackEscapedPrefixNodupCertificates.Case1
+import LeanTrominoes.RetainedAngularFanFallbackEscapedPrefixNodupCertificates.Case2
+import LeanTrominoes.RetainedAngularFanFallbackEscapedPrefixNodupCertificates.Case3
+import LeanTrominoes.RetainedAngularFanFallbackEscapedPrefixNodupCertificates.Case4
+import LeanTrominoes.RetainedAngularFanFallbackEscapedPrefixNodupCertificates.Case5
+import LeanTrominoes.RetainedAngularFanFallbackEscapedPrefixNodupCertificates.Case6
+import LeanTrominoes.RetainedAngularFanFallbackEscapedPrefixNodupCertificates.Case7
+import LeanTrominoes.RetainedAngularFanFallbackEscapedPrefixNodupCertificates.Case8
+import LeanTrominoes.RetainedAngularFanFallbackEscapedPrefixNodupCertificates.Case9
+import LeanTrominoes.RetainedAngularFanFallbackEscapedPrefixNodupCertificates.Case10
 
 /-! # Duplicate-freeness of escaped fallback radial prefixes -/
 
 namespace LeanTrominoes
-
-namespace Gadget
-
-/-- Rebuilding a direction word commutes with translation of its start. -/
-theorem rebuildRoute_add
-    (offset start : Cell) (directions : List AxisDirection) :
-    rebuildRoute (Cell.add offset start) directions =
-      (rebuildRoute start directions).map (Cell.add offset) := by
-  induction directions generalizing start with
-  | nil => simp [rebuildRoute]
-  | cons direction directions induction =>
-      simp only [rebuildRoute, List.map_cons]
-      congr 1
-      rw [← induction (Cell.add start direction.step)]
-      congr 1
-      rcases offset with ⟨offsetX, offsetY⟩
-      rcases start with ⟨startX, startY⟩
-      rcases direction.step with ⟨stepX, stepY⟩
-      simp [Cell.add]
-      constructor <;> ring
-
-end Gadget
-
 namespace PeriodicEightOccurrenceSplit
 namespace FallbackSuffixDirectionCompiler
-
 open PeriodicOrthocrossing
+
+private theorem escapedFixedPrefixNodupCheck_correct (direction : RetainedTerminalDirection) :
+    escapedFixedPrefixNodupCheck direction = true := by
+  cases direction with
+  | compass port =>
+    cases port with
+    | east => exact escapedFixedPrefixNodupCheck_case0
+    | southeast => exact escapedFixedPrefixNodupCheck_case1
+    | south => exact escapedFixedPrefixNodupCheck_case2
+    | southwest => exact escapedFixedPrefixNodupCheck_case3
+    | west => exact escapedFixedPrefixNodupCheck_case4
+    | northwest => exact escapedFixedPrefixNodupCheck_case5
+    | north => exact escapedFixedPrefixNodupCheck_case6
+    | northeast => exact escapedFixedPrefixNodupCheck_case7
+  | routedClause arm =>
+    cases arm with
+    | left => exact escapedFixedPrefixNodupCheck_case8
+    | middle => exact escapedFixedPrefixNodupCheck_case9
+    | right => exact escapedFixedPrefixNodupCheck_case10
 
 /-- The fixed source-escape-and-lane-shift table has no repeated rebuilt
 point at the origin. -/
@@ -45,7 +48,10 @@ private theorem escapedFixedPrefixDirections_rebuild_zero_nodup :
       (slot : RetainedTerminalSlot),
       (Gadget.rebuildRoute (0, 0)
         (prefixDirections .escaped direction slot)).Nodup := by
-  native_decide
+  intro direction slot
+  apply listNodupCheck_sound
+  have checked := escapedFixedPrefixNodupCheck_correct direction
+  exact (finiteAll_eq_true _).mp checked slot
 
 /-- Translating the start of the fixed escaped word preserves its
 duplicate-freeness. -/
@@ -110,7 +116,13 @@ theorem escapedPrefixDirections_join_nonnegative :
       axis ∈ prefixDirections .escaped direction slot →
         0 ≤ Cell.linearValue
           (retainedFallbackRadialJoinNormal direction) axis.step := by
-  native_decide
+  intro direction slot axis member
+  unfold prefixDirections at member
+  unfold retainedTerminalFanOuterSourceEscapeRay at member
+  rw [retainedTerminalFanOuterInwardRayOfLength_directions] at member
+  rcases List.mem_append.mp member with radial | lane
+  · exact radialCopies_join_nonnegative _ direction axis radial
+  · exact ordinaryPrefixDirections_join_nonnegative direction slot axis lane
 
 /-- Every subdivided fixed escaped-prefix point lies no farther inward than
 its shifted endpoint. -/

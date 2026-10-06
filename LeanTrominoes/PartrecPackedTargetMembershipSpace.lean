@@ -416,7 +416,7 @@ theorem packedTargetMembershipUnit_le_linear
       (Computability.encodeNat targetCode).length ≤
         100 * bitUnit := by
     have twoBits :
-        (Computability.encodeNat 2).length = 2 := by native_decide
+        (Computability.encodeNat 2).length = 2 := by decide +kernel
     have targetEq : targetCode = Nat.pair (2 * x) yCode := by
       change Encodable.encode
           ((Int.ofNat x, row + verticalOffset) : Cell) =
@@ -459,7 +459,7 @@ theorem packedTargetMembershipUnit_le_linear
           column.val + targetCode + 100)).length ≤
         1000 * bitUnit := by
     have hundredBits :
-        (Computability.encodeNat 100).length = 7 := by native_decide
+        (Computability.encodeNat 100).length = 7 := by decide +kernel
     simp only [motifCode, rowCode] at limit1 limit2 limit3
     simp only [motifCode, rowCode] at limit4 limit5 limit6 limit7
     simp only [bitUnit, packedTargetMembershipBitUnit,
@@ -656,7 +656,7 @@ theorem packedTargetMembershipCost_le_linear
       numeralCost column.val values ≤ 1000000000 * localUnit := by
     have zeroBound := listCodeZeroCost_le_linear values
     have addSmall : addConstCost column.val [0] ≤ 100000 := by
-      fin_cases column <;> native_decide
+      fin_cases column <;> decide +kernel
     simp only [numeralCost]
     omega
   have inputSpaceExplicit :

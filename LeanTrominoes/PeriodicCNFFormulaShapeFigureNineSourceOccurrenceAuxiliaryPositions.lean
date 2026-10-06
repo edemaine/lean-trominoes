@@ -25,7 +25,7 @@ local instance occurrenceAuxiliaryPositionVariableDecidableEq
 private theorem localQuery_role_mem : ∀ query : LocalDirectionQuery,
     ((templateDrawingOfClauseProfile query.1).incidenceAt query.2).literal.1 ∈
       (templateDrawingOfClauseProfile query.1).variableVertices := by
-  native_decide
+  decide +kernel
 
 /-- The exact header role gives the auxiliary's natural representative,
 including the final canonical variable gauge. -/

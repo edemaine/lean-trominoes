@@ -305,9 +305,9 @@ ownership proofs extract the required circuit behavior from any plane
 completion. The [completion compiler](LeanTrominoes/FiniteProgramCompletionCompiler.lean)
 evaluates signed-coordinate palette queries, emits the prescribed placements,
 and computes their exact canonical radius before listing the bounding box.
-The final finite NP-completeness theorems have no source-emitter assumptions or
-`sorryAx`; they inherit the existing native-evaluation certificates of the
-source and runtime pipeline.
+The final finite NP-completeness theorems use only `propext`, `Classical.choice`,
+and `Quot.sound`. All finite certificates are checked by Lean's kernel; the
+[axiom regression checks](LeanTrominoes/AxiomAudit.lean) reject additional assumptions.
 
 
 The [domino results](LeanTrominoes/DominoTheorems.lean) use exact covers by
@@ -443,9 +443,8 @@ proved hardness. The shared [finite-obstruction proof](LeanTrominoes/PeriodicCNF
 and [effective finite search](LeanTrominoes/PeriodicCNFCoRE.lean) now supply
 co-r.e. membership for arbitrary periodic CNF presentations.
 [Locality, width, and occurrence checks](LeanTrominoes/PeriodicCNFSyntaxComputability.lean)
-allow invalid restricted presentations to be rejected. These upper bounds
-use only Lean's standard axioms; completeness retains the assumptions of the
-existing Wang hardness theorem.
+allow invalid restricted presentations to be rejected. The membership and completeness theorems
+use only `propext`, `Classical.choice`, and `Quot.sound`.
 
 For tromino completion, extending a valid prefill is proved
 equivalent to tiling the uncovered region, with a
@@ -500,11 +499,10 @@ the entire prefill in unary. Every output is a
 [valid partial tiling](LeanTrominoes/CompletionStripPrefillValidity.lean),
 including outputs for unsatisfiable inputs. Completing tilings need not be periodic.
 
-The completion geometry and generic serialization proofs use only standard
-Lean axioms. The final completeness theorems inherit existing native-evaluation
-certificates from the source reductions and strip decider. Their audits contain
-no `sorryAx`; the strip theorem adds no axioms beyond its verified source
-semantics, source runtime, and membership proofs.
+The completion geometry, serialization, and final completeness theorems use
+only `propext`, `Classical.choice`, and `Quot.sound`. Their finite certificates
+are checked by Lean's kernel, and the [axiom regression checks](LeanTrominoes/AxiomAudit.lean)
+reject native-evaluation assumptions and unfinished proofs.
 
 [Periodic prefills admitting only aperiodic completions](LeanTrominoes/CompletionAperiodic.lean)
 are proved to exist for both trominoes. A
@@ -546,6 +544,14 @@ the default build automatically. To build one module and its dependencies:
 
 ```sh
 lake build +LeanTrominoes.Theorem52:olean
+```
+
+Check the final theorems' axiom dependencies and replay imported proofs
+in a fresh kernel environment:
+
+```sh
+lake env lean LeanTrominoes/AxiomAudit.lean
+lake env leanchecker --fresh LeanTrominoes
 ```
 
 The project uses Lean 4.31.0 and depends on

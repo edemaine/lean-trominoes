@@ -14,7 +14,7 @@ open PlanarThreeSAT
 open PeriodicCNF
 
 private theorem crossoverFormula_length : crossoverFormula.length = 26 := by
-  native_decide
+  decide +kernel
 
 /-- The fixed crossover block contains only direct query fields. -/
 theorem retainedFinalDirectCrossoverClauseQueries_allDirect :

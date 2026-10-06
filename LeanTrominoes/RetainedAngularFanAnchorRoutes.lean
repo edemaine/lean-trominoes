@@ -58,7 +58,7 @@ theorem retainedTerminalFanAnchorPortOffset_eq_scale_unitVector :
           (retainedTerminalFanAnchorPort slot) =
         Cell.scale retainedTerminalAdapterFrameRadius
           (angularPortOfIndex slot.val).unitVector := by
-  native_decide
+  decide +kernel
 
 /-- Fixed orthogonal route from a radius-22 frame anchor inward to the
 corresponding radius-12 Figure 7 boundary point. -/
@@ -86,7 +86,7 @@ theorem retainedTerminalFanAnchorRoute_getLast? :
     ∀ slot : RetainedTerminalSlot,
       (retainedTerminalFanAnchorRoute slot).getLast? =
         some (angularFanBoundaryOffset slot.val) := by
-  native_decide
+  decide +kernel
 
 /-- Every fixed inward anchor route is orthogonal. -/
 theorem retainedTerminalFanAnchorRoute_orthogonal

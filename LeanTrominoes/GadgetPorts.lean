@@ -79,14 +79,19 @@ def PortConfiguration.get (configuration : PortConfiguration) :
   | .south => configuration.south
   | .west => configuration.west
 
-/-- Package every normalized side state of a local tiling. -/
-def portConfiguration (tromino : Tromino) (gadget : Gadget)
-    (placements : Finset (Placement Unit)) : PortConfiguration :=
-  let signature := boundarySignature tromino gadget.window placements
+/-- Package the four normalized sides of one geometric boundary signature. -/
+def signaturePortConfiguration (gadget : Gadget)
+    (signature : PortState) : PortConfiguration :=
   { north := northPortState signature
     east := rightPortState gadget.width signature
     south := southPortState gadget.height signature
     west := leftPortState signature }
+
+/-- Package every normalized side state of a local tiling. -/
+def portConfiguration (tromino : Tromino) (gadget : Gadget)
+    (placements : Finset (Placement Unit)) : PortConfiguration :=
+  signaturePortConfiguration gadget
+    (boundarySignature tromino gadget.window placements)
 
 theorem portConfiguration_get (tromino : Tromino) (gadget : Gadget)
     (placements : Finset (Placement Unit)) (side : Side) :
@@ -98,8 +103,8 @@ theorem portConfiguration_get (tromino : Tromino) (gadget : Gadget)
 /-- All four-port configurations produced by verified exact-cover search. -/
 def exactPortConfigurations (tromino : Tromino) (gadget : Gadget)
     (regionCells : List Cell) : Finset PortConfiguration :=
-  ((exactWindowTilings tromino gadget regionCells).map
-    (portConfiguration tromino gadget)).toFinset
+  (geometricBoundarySignatures tromino gadget regionCells).image
+    (signaturePortConfiguration gadget)
 
 theorem mem_exactPortConfigurations_iff (tromino : Tromino)
     (gadget : Gadget) (wellFormed : gadget.IsWellFormed)
@@ -108,18 +113,18 @@ theorem mem_exactPortConfigurations_iff (tromino : Tromino)
     configuration ∈ exactPortConfigurations tromino gadget regionCells ↔
       ∃ placements, IsWindowTiling tromino gadget.window gadget.region placements ∧
         portConfiguration tromino gadget placements = configuration := by
-  simp only [exactPortConfigurations, List.mem_toFinset, List.mem_map]
+  rw [exactPortConfigurations, geometricBoundarySignatures_eq tromino
+    gadget wellFormed regionCells regionEquality]
+  simp only [Finset.mem_image, mem_boundarySignatures_iff]
   constructor
-  · rintro ⟨placements, member, equality⟩
-    exact ⟨placements,
-      (mem_exactWindowTilings_iff tromino gadget wellFormed
-        regionCells regionEquality placements).mp member,
-      equality⟩
-  · rintro ⟨placements, tiling, equality⟩
-    exact ⟨placements,
-      (mem_exactWindowTilings_iff tromino gadget wellFormed
-        regionCells regionEquality placements).mpr tiling,
-      equality⟩
+  · rintro ⟨signature, ⟨placements, tiled, signatureEq⟩, configurationEq⟩
+    refine ⟨placements, tiled, ?_⟩
+    unfold portConfiguration
+    rw [signatureEq]
+    exact configurationEq
+  · rintro ⟨placements, tiled, configurationEq⟩
+    exact ⟨boundarySignature tromino gadget.window placements,
+      ⟨placements, tiled, rfl⟩, configurationEq⟩
 
 /-- Horizontal neighbors agree on their shared geometric trominoes. -/
 def HorizontallyCompatible (left right : PortConfiguration) : Prop :=

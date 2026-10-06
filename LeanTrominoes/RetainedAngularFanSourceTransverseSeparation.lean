@@ -152,7 +152,7 @@ theorem
       referenceSlot
   have combinedPositive : 0 < combinedFactor := by
     dsimp [combinedFactor]
-    exact Nat.mul_pos (by native_decide) factorPositive
+    exact Nat.mul_pos (by decide +kernel) factorPositive
   have clearance' : 845 < combinedFactor := by
     simpa [combinedFactor] using clearance
   have combinedPositiveInt :
@@ -245,7 +245,7 @@ theorem
 the eleven retained transverse normals. -/
 theorem retainedTerminalFanTotalRefinement_mul_four_gt_transverseBand :
     845 < retainedTerminalFanTotalRefinement * 4 := by
-  native_decide
+  decide +kernel
 
 /-- In the final retained drawing, transverse separation is the only new
 hypothesis needed to clear another route's complete radial-plus-local fan;

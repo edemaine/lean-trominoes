@@ -220,7 +220,7 @@ theorem retainedTerminalFanOuterInwardPrefixRay_unit_tail_cardinal_side_lt_start
         Cell.scale (-1)
           (retainedTerminalFanOuterSideNormal terminal.1) := by
     dsimp [terminal]
-    rcases cardinal with rfl | rfl | rfl | rfl <;> native_decide
+    rcases cardinal with rfl | rfl | rfl | rfl <;> decide +kernel
   rw [normalEq] at progressed
   rcases start with ⟨startX, startY⟩
   rcases point with ⟨pointX, pointY⟩

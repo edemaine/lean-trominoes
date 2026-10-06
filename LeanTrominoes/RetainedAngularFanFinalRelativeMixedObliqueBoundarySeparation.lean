@@ -137,7 +137,7 @@ theorem
           directLiteralMember fallbackLiteralMember choiceLookup
           fallbackChoiceNone directOblique relativeTranslate
           centersDifferent)
-        (by native_decide) (by native_decide)
+        (by decide +kernel) (by decide +kernel)
 
 /-- The complete oblique direct replacement strictly avoids the translated
 failed-choice boundary prefix at nonzero shift and distinct physical target

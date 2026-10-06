@@ -3,39 +3,24 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.BoundedDelimitedDirectionCancellationNoReversal
+import LeanTrominoes.BoundedDelimitedDirectionCancellationOppositeRunCertificates.East
+import LeanTrominoes.BoundedDelimitedDirectionCancellationOppositeRunCertificates.North
+import LeanTrominoes.BoundedDelimitedDirectionCancellationOppositeRunCertificates.West
+import LeanTrominoes.BoundedDelimitedDirectionCancellationOppositeRunCertificates.South
 
 /-! # Cancelling one bounded opposite-direction run -/
 
 namespace LeanTrominoes
 namespace BoundedDelimitedDirectionCancellation
 
-def directionBlock (direction : AxisDirection) (amount : Count) :
-    List Token :=
-  List.replicate amount.val (.direction direction)
-
-def overflow (count amount : Count) : Nat :=
-  count.val + amount.val - bufferCapacity
-
-def residual (count amount : Count) : Nat :=
-  Nat.min bufferCapacity (count.val + amount.val) - amount.val
-
-def residualCount (count amount : Count) : Count :=
-  ⟨residual count amount,
-    Nat.lt_succ_of_le
-      (le_trans (Nat.sub_le _ _)
-        (Nat.min_le_left _ _))⟩
-
-def overflowBlock (direction : AxisDirection)
-    (count amount : Count) : List Token :=
-  List.replicate (overflow count amount) (.direction direction)
-
-def afterCancellation (direction : AxisDirection)
-    (count amount : Count) : Control :=
-  if residual count amount = 0 then
-    .empty
-  else
-    .run direction (residualCount count amount)
+private theorem oppositeRunCheck_correct (direction : AxisDirection) :
+    oppositeRunCheck direction = true := by
+  cases direction with
+  | east => exact oppositeRunCheck_east
+  | north => exact oppositeRunCheck_north
+  | west => exact oppositeRunCheck_west
+  | south => exact oppositeRunCheck_south
+  | invalid => rfl
 
 /-- The bounded finite calculation for extending a pending run and then
 reading the same number of opposite directions. -/
@@ -48,7 +33,11 @@ theorem scan_directionBlock_opposite
           directionBlock direction.opposite amount) =
       (afterCancellation direction count amount,
         overflowBlock direction count amount) := by
-  native_decide +revert
+  have checked := oppositeRunCheck_correct direction
+  rw [oppositeRunCheck, if_pos genuine] at checked
+  have countChecked := (finiteAll_eq_true _).mp checked count
+  rw [if_pos positive] at countChecked
+  exact of_decide_eq_true ((finiteAll_eq_true _).mp countChecked amount)
 
 /-- Output already emitted before the cancellation together with its
 residual pending run is exactly the original pending run. -/
@@ -58,7 +47,15 @@ theorem overflowBlock_append_residual
     overflowBlock direction count amount ++
         buffered direction (residualCount count amount) =
       buffered direction count := by
-  native_decide +revert
+  unfold overflowBlock buffered residualCount overflow residual
+  rw [List.replicate_append_replicate]
+  congr 1
+  change count.val + amount.val - bufferCapacity +
+    (Nat.min bufferCapacity (count.val + amount.val) - amount.val) = count.val
+  have countBound := count.is_lt
+  have amountBound := amount.is_lt
+  rw [Nat.min_eq_min, Nat.min_def]
+  split <;> omega
 
 theorem residualCount_positive
     (count amount : Count)

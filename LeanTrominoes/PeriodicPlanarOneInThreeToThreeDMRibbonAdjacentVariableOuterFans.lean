@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.OrthogonalPolylineSegmentBoxCheck
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoordinatedFans
 
 /-!
@@ -18,6 +19,9 @@ are strictly separated.
 
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
+
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 10000
 
 open Gadget PlanarThreeDM PeriodicOrthocrossing
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
@@ -68,7 +72,31 @@ theorem standardVariableOuterFanRoutes_strictlyAvoidEachOther_of_notFacing :
                 (ribbonAdjacentMacrocellOffsets.get offsetIndex))
               ((standardVariableOuterFanTemplates.get secondIndex).route
                 secondSlot secondColor)) := by
-  native_decide
+  have checked :
+      (finiteAll fun firstIndex : Fin standardVariableOuterFanTemplates.length =>
+       finiteAll fun secondIndex : Fin standardVariableOuterFanTemplates.length =>
+       finiteAll fun offsetIndex : Fin ribbonAdjacentMacrocellOffsets.length =>
+       finiteAll fun firstSlot : VariableSiteSlot => finiteAll fun secondSlot : VariableSiteSlot =>
+         guardedCheck
+           (firstSlot.index < (standardVariableOuterFanTemplates.get firstIndex).directions.length ∧
+            secondSlot.index < (standardVariableOuterFanTemplates.get secondIndex).directions.length)
+           (finiteAll fun firstColor : WireColor => finiteAll fun secondColor : WireColor =>
+             guardedCheck
+               (∀ direction : AxisDirection, direction.IsGenuine →
+                 ribbonAdjacentMacrocellOffsets.get offsetIndex ≠ direction.step ∨
+                   (standardVariableOuterFanTemplates.get firstIndex).directions.getD firstSlot.index .invalid ≠ direction ∨
+                   (standardVariableOuterFanTemplates.get secondIndex).directions.getD secondSlot.index .invalid ≠ direction.opposite)
+               (segmentBoxesSeparateCheck
+                 ((standardVariableOuterFanTemplates.get firstIndex).route firstSlot firstColor)
+                 (translatePolyline (Cell.scale standardThreeStrandLayout.factor
+                     (ribbonAdjacentMacrocellOffsets.get offsetIndex))
+                   ((standardVariableOuterFanTemplates.get secondIndex).route secondSlot secondColor))))) = true := by
+    decide +kernel
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  intro firstIndex secondIndex offsetIndex firstSlot secondSlot firstActive secondActive firstColor secondColor notFacing
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked firstIndex secondIndex offsetIndex firstSlot secondSlot ⟨firstActive, secondActive⟩
+      firstColor secondColor notFacing)
 
 /-- Data-level form of the finite adjacent-contact classifier. -/
 theorem VariableOuterFanData.outerRoutes_strictlyAvoidEachOther_of_adjacent_notFacing

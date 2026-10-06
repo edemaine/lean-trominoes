@@ -6,6 +6,8 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.RetainedAngularFanFinalFallbackCycleSeparation
 import LeanTrominoes.RetainedAngularFanFinalDirectSourceOwnCycleSeparation
 import LeanTrominoes.RetainedFinalSourceRouteOtherVertexFinalSegmentSeparation
+import LeanTrominoes.RetainedAngularFanDirectSourceRectangleHull
+import Mathlib.Tactic.FinCases
 
 /-!
 # Final direct occurrences avoid cycles at other source centers
@@ -26,6 +28,312 @@ open PeriodicOrthocrossing
 
 set_option maxRecDepth 8192
 set_option maxHeartbeats 8000000
+
+private def sourceRectangleCheck (kind : RetainedDirectClauseKind) (isSpoke : Bool) : Bool :=
+  finiteAll fun index : Fin (retainedDirectSourcePrefixChoices kind).length =>
+    finiteAll fun slot : RetainedTerminalSlot =>
+      let localSegment : GridSegment :=
+        ⟨(retainedDirectSourceLocalRouteAt kind index).headD (0, 0),
+          (retainedDirectSourceLocalRouteAt kind index).getLastD (0, 0)⟩
+      let route := if isSpoke then retainedDirectSourceFigure7SpokeAt kind index slot
+        else retainedDirectSourceCompleteRouteHull kind index slot
+      route.all fun point => decide (InClosedGridRectangle
+        (coordinateRadiusLower 288 (Cell.scale (retainedTerminalFanTotalRefinement * 4)
+          localSegment.coordinateLower))
+        (coordinateRadiusUpper 288 (Cell.scale (retainedTerminalFanTotalRefinement * 4)
+          localSegment.coordinateUpper)) point)
+
+private theorem sourceRectangle_full_case0 : sourceRectangleCheck (.crossover 0) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case1 : sourceRectangleCheck (.crossover 1) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case2 : sourceRectangleCheck (.crossover 2) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case3 : sourceRectangleCheck (.crossover 3) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case4 : sourceRectangleCheck (.crossover 4) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case5 : sourceRectangleCheck (.crossover 5) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case6 : sourceRectangleCheck (.crossover 6) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case7 : sourceRectangleCheck (.crossover 7) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case8 : sourceRectangleCheck (.crossover 8) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case9 : sourceRectangleCheck (.crossover 9) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case10 : sourceRectangleCheck (.crossover 10) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case11 : sourceRectangleCheck (.crossover 11) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case12 : sourceRectangleCheck (.crossover 12) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case13 : sourceRectangleCheck (.crossover 13) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case14 : sourceRectangleCheck (.crossover 14) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case15 : sourceRectangleCheck (.crossover 15) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case16 : sourceRectangleCheck (.crossover 16) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case17 : sourceRectangleCheck (.crossover 17) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case18 : sourceRectangleCheck (.crossover 18) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case19 : sourceRectangleCheck (.crossover 19) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case20 : sourceRectangleCheck (.crossover 20) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case21 : sourceRectangleCheck (.crossover 21) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case22 : sourceRectangleCheck (.crossover 22) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case23 : sourceRectangleCheck (.crossover 23) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case24 : sourceRectangleCheck (.crossover 24) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case25 : sourceRectangleCheck (.crossover 25) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case26 : sourceRectangleCheck (.duplicator .left 0) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case27 : sourceRectangleCheck (.duplicator .left 1) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case28 : sourceRectangleCheck (.duplicator .middle 0) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case29 : sourceRectangleCheck (.duplicator .middle 1) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case30 : sourceRectangleCheck (.duplicator .right 0) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case31 : sourceRectangleCheck (.duplicator .right 1) false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_case32 : sourceRectangleCheck .routedClause false = true := by
+  decide +kernel
+
+private theorem sourceRectangle_full_correct (kind : RetainedDirectClauseKind) :
+    sourceRectangleCheck kind false = true := by
+  cases kind with
+  | crossover index =>
+    fin_cases index
+    · exact sourceRectangle_full_case0
+    · exact sourceRectangle_full_case1
+    · exact sourceRectangle_full_case2
+    · exact sourceRectangle_full_case3
+    · exact sourceRectangle_full_case4
+    · exact sourceRectangle_full_case5
+    · exact sourceRectangle_full_case6
+    · exact sourceRectangle_full_case7
+    · exact sourceRectangle_full_case8
+    · exact sourceRectangle_full_case9
+    · exact sourceRectangle_full_case10
+    · exact sourceRectangle_full_case11
+    · exact sourceRectangle_full_case12
+    · exact sourceRectangle_full_case13
+    · exact sourceRectangle_full_case14
+    · exact sourceRectangle_full_case15
+    · exact sourceRectangle_full_case16
+    · exact sourceRectangle_full_case17
+    · exact sourceRectangle_full_case18
+    · exact sourceRectangle_full_case19
+    · exact sourceRectangle_full_case20
+    · exact sourceRectangle_full_case21
+    · exact sourceRectangle_full_case22
+    · exact sourceRectangle_full_case23
+    · exact sourceRectangle_full_case24
+    · exact sourceRectangle_full_case25
+  | duplicator arm index =>
+    cases arm with
+    | left =>
+      fin_cases index
+      · exact sourceRectangle_full_case26
+      · exact sourceRectangle_full_case27
+    | middle =>
+      fin_cases index
+      · exact sourceRectangle_full_case28
+      · exact sourceRectangle_full_case29
+    | right =>
+      fin_cases index
+      · exact sourceRectangle_full_case30
+      · exact sourceRectangle_full_case31
+  | routedClause => exact sourceRectangle_full_case32
+
+private theorem sourceRectangle_spoke_case0 : sourceRectangleCheck (.crossover 0) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case1 : sourceRectangleCheck (.crossover 1) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case2 : sourceRectangleCheck (.crossover 2) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case3 : sourceRectangleCheck (.crossover 3) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case4 : sourceRectangleCheck (.crossover 4) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case5 : sourceRectangleCheck (.crossover 5) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case6 : sourceRectangleCheck (.crossover 6) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case7 : sourceRectangleCheck (.crossover 7) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case8 : sourceRectangleCheck (.crossover 8) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case9 : sourceRectangleCheck (.crossover 9) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case10 : sourceRectangleCheck (.crossover 10) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case11 : sourceRectangleCheck (.crossover 11) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case12 : sourceRectangleCheck (.crossover 12) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case13 : sourceRectangleCheck (.crossover 13) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case14 : sourceRectangleCheck (.crossover 14) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case15 : sourceRectangleCheck (.crossover 15) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case16 : sourceRectangleCheck (.crossover 16) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case17 : sourceRectangleCheck (.crossover 17) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case18 : sourceRectangleCheck (.crossover 18) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case19 : sourceRectangleCheck (.crossover 19) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case20 : sourceRectangleCheck (.crossover 20) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case21 : sourceRectangleCheck (.crossover 21) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case22 : sourceRectangleCheck (.crossover 22) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case23 : sourceRectangleCheck (.crossover 23) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case24 : sourceRectangleCheck (.crossover 24) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case25 : sourceRectangleCheck (.crossover 25) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case26 : sourceRectangleCheck (.duplicator .left 0) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case27 : sourceRectangleCheck (.duplicator .left 1) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case28 : sourceRectangleCheck (.duplicator .middle 0) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case29 : sourceRectangleCheck (.duplicator .middle 1) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case30 : sourceRectangleCheck (.duplicator .right 0) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case31 : sourceRectangleCheck (.duplicator .right 1) true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_case32 : sourceRectangleCheck .routedClause true = true := by
+  decide +kernel
+
+private theorem sourceRectangle_spoke_correct (kind : RetainedDirectClauseKind) :
+    sourceRectangleCheck kind true = true := by
+  cases kind with
+  | crossover index =>
+    fin_cases index
+    · exact sourceRectangle_spoke_case0
+    · exact sourceRectangle_spoke_case1
+    · exact sourceRectangle_spoke_case2
+    · exact sourceRectangle_spoke_case3
+    · exact sourceRectangle_spoke_case4
+    · exact sourceRectangle_spoke_case5
+    · exact sourceRectangle_spoke_case6
+    · exact sourceRectangle_spoke_case7
+    · exact sourceRectangle_spoke_case8
+    · exact sourceRectangle_spoke_case9
+    · exact sourceRectangle_spoke_case10
+    · exact sourceRectangle_spoke_case11
+    · exact sourceRectangle_spoke_case12
+    · exact sourceRectangle_spoke_case13
+    · exact sourceRectangle_spoke_case14
+    · exact sourceRectangle_spoke_case15
+    · exact sourceRectangle_spoke_case16
+    · exact sourceRectangle_spoke_case17
+    · exact sourceRectangle_spoke_case18
+    · exact sourceRectangle_spoke_case19
+    · exact sourceRectangle_spoke_case20
+    · exact sourceRectangle_spoke_case21
+    · exact sourceRectangle_spoke_case22
+    · exact sourceRectangle_spoke_case23
+    · exact sourceRectangle_spoke_case24
+    · exact sourceRectangle_spoke_case25
+  | duplicator arm index =>
+    cases arm with
+    | left =>
+      fin_cases index
+      · exact sourceRectangle_spoke_case26
+      · exact sourceRectangle_spoke_case27
+    | middle =>
+      fin_cases index
+      · exact sourceRectangle_spoke_case28
+      · exact sourceRectangle_spoke_case29
+    | right =>
+      fin_cases index
+      · exact sourceRectangle_spoke_case30
+      · exact sourceRectangle_spoke_case31
+  | routedClause => exact sourceRectangle_spoke_case32
 
 /-- Every finite direct-source atlas route stays within the radius-288
 expansion of its fully refined two-point local source segment. -/
@@ -49,7 +357,12 @@ theorem
               (retainedTerminalFanTotalRefinement * 4)
               localSegment.coordinateUpper))
           point := by
-  native_decide
+  intro kind index slot point member
+  have checked := sourceRectangle_full_correct kind
+  simp only [sourceRectangleCheck, finiteAll_eq_true, Bool.false_eq_true,
+    ite_false, List.all_eq_true, decide_eq_true_eq] at checked
+  exact retainedDirectSourceCompleteRouteHull_rectangleBounds kind index slot _ _
+    (checked index slot) member
 
 /-- The original positioned two-point source segment represented by a
 successful direct-source choice. -/
@@ -77,7 +390,7 @@ theorem retainedDirectSourceLocalRouteAt_endpoints_in_macrocell :
           (route.getLastD (0, 0)).1 < planarMacroScale ∧
           0 ≤ (route.getLastD (0, 0)).2 ∧
           (route.getLastD (0, 0)).2 < planarMacroScale) := by
-  native_decide
+  decide +kernel
 
 /-- Local variable-coordinate families compatible with the macrocell named
 by each direct atlas kind. -/
@@ -132,23 +445,23 @@ theorem
       · rcases carrierPort with
           left | right | top | bottom <;>
           subst position <;>
-          native_decide +revert
+          decide +kernel +revert
       · rcases internal with ⟨internal, rfl⟩
         cases internal <;>
-          native_decide +revert
+          decide +kernel +revert
   | duplicator arm clauseIndex =>
       rcases compatible with carrierPort | center
       · rcases carrierPort with
           left | right | top | bottom <;>
           subst position <;>
-          native_decide +revert
+          decide +kernel +revert
       · subst position
-        native_decide +revert
+        decide +kernel +revert
   | routedClause =>
       rcases compatible with
         left | right | top | bottom <;>
         subst position <;>
-        native_decide +revert
+        decide +kernel +revert
 
 /-- A point written in two half-open `20 × 20` macrocell coordinate systems
 has the same macrocell center.  Membership in a translated endpoint
@@ -1253,7 +1566,11 @@ theorem
               (retainedTerminalFanTotalRefinement * 4)
               localSegment.coordinateUpper))
           point := by
-  native_decide
+  intro kind index slot point member
+  have checked := sourceRectangle_spoke_correct kind
+  simp only [sourceRectangleCheck, finiteAll_eq_true,
+    ite_true, List.all_eq_true, decide_eq_true_eq] at checked
+  exact checked index slot point member
 
 /-- The positioned direct Figure 7 spoke inherits the same source-segment
 rectangle. -/
@@ -1365,8 +1682,8 @@ theorem
         (segment := choice.sourceSegment) outside)
       (factor := retainedTerminalFanTotalRefinement * 4)
       (radius := 288)
-      (by native_decide)
-      (by native_decide)
+      (by decide +kernel)
+      (by decide +kernel)
   norm_num [retainedTerminalFanTotalRefinement,
     PeriodicEightOccurrenceSplitPositioned.refinementScale,
     retainedTerminalFanRoutingRefinement] at separated ⊢

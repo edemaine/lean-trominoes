@@ -142,7 +142,7 @@ theorem variableOccurrence_reference_colors
     (triple.references variant).red.color variant = .red ∧
       (triple.references variant).green.color variant = .green ∧
       (triple.references variant).blue.color variant = .blue := by
-  cases variant <;> cases triple <;> native_decide
+  cases variant <;> cases triple <;> decide +kernel
 
 /-- Red reference fields agree with the local incidence lists. -/
 theorem variableOccurrence_mem_red_neighbors_iff
@@ -220,7 +220,7 @@ private theorem variableOccurrenceAssignment_holds_iff
         (variableOccurrenceAssignment first second auxiliary) ↔
       (first = true ∧ second = false ∧ auxiliary = true) ∨
         (first = false ∧ second = true ∧ auxiliary = false) := by
-  cases first <;> cases second <;> cases auxiliary <;> native_decide
+  cases first <;> cases second <;> cases auxiliary <;> decide +kernel
 
 /-- Read the two satisfying bit patterns from an arbitrary selection. -/
 theorem variableOccurrenceHolds_port_pattern
@@ -255,7 +255,7 @@ theorem variableOccurrenceHolds_iff
     · right
       funext triple
       cases triple <;> simp_all [variableOccurrenceSelection]
-  · rintro (rfl | rfl) <;> native_decide
+  · rintro (rfl | rfl) <;> decide +kernel
 
 /-- The two continuation ports are complementary and every colored connector
 port has the same internally-covered state. -/
@@ -265,7 +265,7 @@ theorem variableOccurrence_port_behavior
     selected .first = !selected .second ∧
       selected .first = selected .auxiliary := by
   rcases (variableOccurrenceHolds_iff selected).mp holds with
-    rfl | rfl <;> native_decide
+    rfl | rfl <;> decide +kernel
 
 /-- Both internal elements have degree two; all five ports have one local
 incidence and gain their remaining incidences during assembly. -/
@@ -284,7 +284,7 @@ theorem variableOccurrence_local_degrees
         variant .connectorGreen).length = 1 ∧
       (VariableOccurrenceElement.neighbors
         variant .connectorBlue).length = 1 := by
-  cases variant <;> native_decide
+  cases variant <;> decide +kernel
 
 end PlanarThreeDM
 end LeanTrominoes

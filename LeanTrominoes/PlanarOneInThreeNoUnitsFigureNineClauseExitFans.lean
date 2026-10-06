@@ -3,7 +3,8 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.OrthogonalPolylineStrictSeparation
+import LeanTrominoes.OrthogonalPolylineStrictSeparationCheck
+import LeanTrominoes.OrthogonalPolylineSegmentBoxCheck
 import LeanTrominoes.PlanarOneInThreeNoUnitsFigureNineSelector
 import LeanTrominoes.PositionedPeriodicCNFClauseDirectionOrdering
 import LeanTrominoes.RetainedRayRasterizationCorridor
@@ -122,7 +123,7 @@ theorem extendedRoute_head? :
       ∀ slot, data.SlotActive slot →
         (data.extendedRoute slot).head? =
           some (sourceLocalPosition slot.val) := by
-  native_decide
+  decide +kernel
 
 /-- Every active extended connector ends at the factor-two-refined outer
 source exit. -/
@@ -133,7 +134,7 @@ theorem extendedRoute_getLast? :
       ∀ slot, data.SlotActive slot →
         (data.extendedRoute slot).getLast? =
           some (outerSourceExit (data.direction slot)) := by
-  native_decide
+  decide +kernel
 
 /-- Every active radially extended connector remains rectilinear. -/
 theorem extendedRoute_orthogonal :
@@ -141,7 +142,7 @@ theorem extendedRoute_orthogonal :
       data.IsValid →
       ∀ slot, data.SlotActive slot →
         OrthogonalPolyline (data.extendedRoute slot) := by
-  native_decide
+  decide +kernel
 
 /-- Every active route begins at its index-selected composed source port. -/
 @[simp]
@@ -151,7 +152,7 @@ theorem route_head? :
       ∀ slot, data.SlotActive slot →
         (data.route slot).head? =
           some (sourceLocalPosition slot.val) := by
-  native_decide
+  decide +kernel
 
 /-- Every active route ends at its direction-selected scaled source exit. -/
 @[simp]
@@ -161,7 +162,7 @@ theorem route_getLast? :
       ∀ slot, data.SlotActive slot →
         (data.route slot).getLast? =
           some (sourceExit (data.direction slot)) := by
-  native_decide
+  decide +kernel
 
 /-- Every active connector is rectilinear. -/
 theorem route_orthogonal :
@@ -169,7 +170,7 @@ theorem route_orthogonal :
       data.IsValid →
       ∀ slot, data.SlotActive slot →
         OrthogonalPolyline (data.route slot) := by
-  native_decide
+  decide +kernel
 
 /-- Every listed connector point stays outside the open composed-gadget
 rectangle. -/
@@ -178,7 +179,7 @@ theorem route_points_inOuterFrame :
       data.IsValid →
       ∀ slot, data.SlotActive slot →
         ∀ point ∈ data.route slot, InOuterFrame point := by
-  native_decide
+  decide +kernel
 
 /-- Every active connector stays in the closed radius-`73` square around
 the source-clause origin.  This includes the one-cell outer clearance used
@@ -189,7 +190,7 @@ theorem route_points_within_sourceNeighborhood :
       ∀ slot, data.SlotActive slot →
         ∀ point ∈ data.route slot,
           WithinCoordinateRadius 73 (0, 0) point := by
-  native_decide
+  decide +kernel
 
 /-- Adding the factor-two radial extension enlarges the connector's
 coordinate neighborhood from radius `73` to exactly radius `144`. -/
@@ -199,7 +200,7 @@ theorem extendedRoute_points_within_sourceNeighborhood :
       ∀ slot, data.SlotActive slot →
         ∀ point ∈ data.extendedRoute slot,
           WithinCoordinateRadius 144 (0, 0) point := by
-  native_decide
+  decide +kernel
 
 /-- Distinct active connectors have no continuous or listed-point contact. -/
 theorem routes_strictlyAvoidEachOther :
@@ -210,7 +211,7 @@ theorem routes_strictlyAvoidEachOther :
       first ≠ second →
       RoutesStrictlyAvoidEachOther
         (data.route first) (data.route second) := by
-  native_decide
+  decide +kernel
 
 /-- Distinct active connectors remain contact-free after extending each one
 along the first half of its factor-two-refined source edge. -/
@@ -222,7 +223,7 @@ theorem extendedRoutes_strictlyAvoidEachOther :
       first ≠ second →
       RoutesStrictlyAvoidEachOther
         (data.extendedRoute first) (data.extendedRoute second) := by
-  native_decide
+  decide +kernel
 
 /-- A connector strictly avoids the radial extension belonging to every
 other active slot. -/
@@ -236,9 +237,20 @@ theorem route_strictlyAvoids_otherRadialExtension :
         (data.route first)
         [sourceExit (data.direction second),
           outerSourceExit (data.direction second)] := by
-  native_decide
+  decide +kernel
 
 /-! ## Isolation from the finite composed local drawings -/
+
+private def localFanSeparationCheck (first second : List Cell) : Bool :=
+  segmentBoxesSeparateCheck first second || routesStrictlyAvoidEachOtherCheck first second
+
+private theorem localFanSeparationCheck_sound (first second : List Cell)
+    (checked : localFanSeparationCheck first second = true) :
+    RoutesStrictlyAvoidEachOther first second := by
+  simp only [localFanSeparationCheck, Bool.or_eq_true] at checked
+  rcases checked with boxes | exactCheck
+  · exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck first second boxes
+  · exact (routesStrictlyAvoidEachOtherCheck_eq_true first second).mp exactCheck
 
 /-- In every ternary-source template, a local route and an active exit-fan
 connector are strictly separated unless their variable/source-port
@@ -259,7 +271,23 @@ theorem fullDrawingFor_routeAt_strictlyAvoids_route :
           ((fullDrawingFor first second third).incidenceAt
             localIndex))
         (data.route slot) := by
-  native_decide
+  have checked : ∀ first second third : Bool,
+      (finiteAll fun data : ComposedClauseExitFanData =>
+      finiteAll fun slot : Fin 3 =>
+      guardedCheck (data.IsValid ∧ data.SlotActive slot)
+        (finiteAll fun localIndex : Fin (fullDrawingFor first second third).incidences.length =>
+          guardedCheck (((fullDrawingFor first second third).routeAt ((fullDrawingFor first second third).incidenceAt localIndex)).getLast? ≠ (data.route slot).head?)
+            (localFanSeparationCheck
+              ((fullDrawingFor first second third).routeAt
+          ((fullDrawingFor first second third).incidenceAt
+            localIndex))
+        (data.route slot)))) = true := by
+    intro first second third
+    cases first <;> cases second <;> cases third <;> decide +kernel
+  intro first second third data localIndex slot valid active endpointsDifferent
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact localFanSeparationCheck_sound _ _
+    (checked first second third data slot ⟨valid, active⟩ localIndex endpointsDifferent)
 
 /-- Binary-source version of
 `fullDrawingFor_routeAt_strictlyAvoids_route`. -/
@@ -279,7 +307,23 @@ theorem twoDrawingFor_routeAt_strictlyAvoids_route :
           ((twoDrawingFor first second).incidenceAt
             localIndex))
         (data.route slot) := by
-  native_decide
+  have checked : ∀ first second : Bool,
+      (finiteAll fun data : ComposedClauseExitFanData =>
+      finiteAll fun slot : Fin 3 =>
+      guardedCheck (data.IsValid ∧ data.SlotActive slot)
+        (finiteAll fun localIndex : Fin (twoDrawingFor first second).incidences.length =>
+          guardedCheck (((twoDrawingFor first second).routeAt ((twoDrawingFor first second).incidenceAt localIndex)).getLast? ≠ (data.route slot).head?)
+            (localFanSeparationCheck
+              ((twoDrawingFor first second).routeAt
+          ((twoDrawingFor first second).incidenceAt
+            localIndex))
+        (data.route slot)))) = true := by
+    intro first second
+    cases first <;> cases second <;> decide +kernel
+  intro first second data localIndex slot valid active endpointsDifferent
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact localFanSeparationCheck_sound _ _
+    (checked first second data slot ⟨valid, active⟩ localIndex endpointsDifferent)
 
 /-- Unit-source version of
 `fullDrawingFor_routeAt_strictlyAvoids_route`. -/
@@ -299,7 +343,23 @@ theorem oneDrawingFor_routeAt_strictlyAvoids_route :
           ((oneDrawingFor first).incidenceAt
             localIndex))
         (data.route slot) := by
-  native_decide
+  have checked : ∀ first : Bool,
+      (finiteAll fun data : ComposedClauseExitFanData =>
+      finiteAll fun slot : Fin 3 =>
+      guardedCheck (data.IsValid ∧ data.SlotActive slot)
+        (finiteAll fun localIndex : Fin (oneDrawingFor first).incidences.length =>
+          guardedCheck (((oneDrawingFor first).routeAt ((oneDrawingFor first).incidenceAt localIndex)).getLast? ≠ (data.route slot).head?)
+            (localFanSeparationCheck
+              ((oneDrawingFor first).routeAt
+          ((oneDrawingFor first).incidenceAt
+            localIndex))
+        (data.route slot)))) = true := by
+    intro first
+    cases first <;> decide +kernel
+  intro first data localIndex slot valid active endpointsDifferent
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact localFanSeparationCheck_sound _ _
+    (checked first data slot ⟨valid, active⟩ localIndex endpointsDifferent)
 
 /-- Empty-source version of
 `fullDrawingFor_routeAt_strictlyAvoids_route`. -/
@@ -315,7 +375,20 @@ theorem zeroDrawing_routeAt_strictlyAvoids_route :
         (zeroDrawing.routeAt
           (zeroDrawing.incidenceAt localIndex))
         (data.route slot) := by
-  native_decide
+  have checked : (finiteAll fun data : ComposedClauseExitFanData =>
+      finiteAll fun slot : Fin 3 =>
+      guardedCheck (data.IsValid ∧ data.SlotActive slot)
+        (finiteAll fun localIndex : Fin zeroDrawing.incidences.length =>
+          guardedCheck ((zeroDrawing.routeAt (zeroDrawing.incidenceAt localIndex)).getLast? ≠ (data.route slot).head?)
+            (localFanSeparationCheck
+              (zeroDrawing.routeAt
+          (zeroDrawing.incidenceAt localIndex))
+        (data.route slot)))) = true := by
+    decide +kernel
+  intro data localIndex slot valid active endpointsDifferent
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact localFanSeparationCheck_sound _ _
+    (checked data slot ⟨valid, active⟩ localIndex endpointsDifferent)
 
 /-- Uniform selector form of the four finite local-route/exit-connector
 checks. -/
@@ -377,7 +450,23 @@ theorem fullDrawingFor_routeAt_strictlyAvoids_extendedRoute :
           ((fullDrawingFor first second third).incidenceAt
             localIndex))
         (data.extendedRoute slot) := by
-  native_decide
+  have checked : ∀ first second third : Bool,
+      (finiteAll fun data : ComposedClauseExitFanData =>
+      finiteAll fun slot : Fin 3 =>
+      guardedCheck (data.IsValid ∧ data.SlotActive slot)
+        (finiteAll fun localIndex : Fin (fullDrawingFor first second third).incidences.length =>
+          guardedCheck (((fullDrawingFor first second third).routeAt ((fullDrawingFor first second third).incidenceAt localIndex)).getLast? ≠ (data.route slot).head?)
+            (localFanSeparationCheck
+              ((fullDrawingFor first second third).routeAt
+          ((fullDrawingFor first second third).incidenceAt
+            localIndex))
+        (data.extendedRoute slot)))) = true := by
+    intro first second third
+    cases first <;> cases second <;> cases third <;> decide +kernel
+  intro first second third data localIndex slot valid active endpointsDifferent
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact localFanSeparationCheck_sound _ _
+    (checked first second third data slot ⟨valid, active⟩ localIndex endpointsDifferent)
 
 /-- Binary-source version of the extended-connector finite check. -/
 theorem twoDrawingFor_routeAt_strictlyAvoids_extendedRoute :
@@ -396,7 +485,23 @@ theorem twoDrawingFor_routeAt_strictlyAvoids_extendedRoute :
           ((twoDrawingFor first second).incidenceAt
             localIndex))
         (data.extendedRoute slot) := by
-  native_decide
+  have checked : ∀ first second : Bool,
+      (finiteAll fun data : ComposedClauseExitFanData =>
+      finiteAll fun slot : Fin 3 =>
+      guardedCheck (data.IsValid ∧ data.SlotActive slot)
+        (finiteAll fun localIndex : Fin (twoDrawingFor first second).incidences.length =>
+          guardedCheck (((twoDrawingFor first second).routeAt ((twoDrawingFor first second).incidenceAt localIndex)).getLast? ≠ (data.route slot).head?)
+            (localFanSeparationCheck
+              ((twoDrawingFor first second).routeAt
+          ((twoDrawingFor first second).incidenceAt
+            localIndex))
+        (data.extendedRoute slot)))) = true := by
+    intro first second
+    cases first <;> cases second <;> decide +kernel
+  intro first second data localIndex slot valid active endpointsDifferent
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact localFanSeparationCheck_sound _ _
+    (checked first second data slot ⟨valid, active⟩ localIndex endpointsDifferent)
 
 /-- Unit-source version of the extended-connector finite check. -/
 theorem oneDrawingFor_routeAt_strictlyAvoids_extendedRoute :
@@ -415,7 +520,23 @@ theorem oneDrawingFor_routeAt_strictlyAvoids_extendedRoute :
           ((oneDrawingFor first).incidenceAt
             localIndex))
         (data.extendedRoute slot) := by
-  native_decide
+  have checked : ∀ first : Bool,
+      (finiteAll fun data : ComposedClauseExitFanData =>
+      finiteAll fun slot : Fin 3 =>
+      guardedCheck (data.IsValid ∧ data.SlotActive slot)
+        (finiteAll fun localIndex : Fin (oneDrawingFor first).incidences.length =>
+          guardedCheck (((oneDrawingFor first).routeAt ((oneDrawingFor first).incidenceAt localIndex)).getLast? ≠ (data.route slot).head?)
+            (localFanSeparationCheck
+              ((oneDrawingFor first).routeAt
+          ((oneDrawingFor first).incidenceAt
+            localIndex))
+        (data.extendedRoute slot)))) = true := by
+    intro first
+    cases first <;> decide +kernel
+  intro first data localIndex slot valid active endpointsDifferent
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact localFanSeparationCheck_sound _ _
+    (checked first data slot ⟨valid, active⟩ localIndex endpointsDifferent)
 
 /-- Empty-source version of the extended-connector finite check. -/
 theorem zeroDrawing_routeAt_strictlyAvoids_extendedRoute :
@@ -430,7 +551,20 @@ theorem zeroDrawing_routeAt_strictlyAvoids_extendedRoute :
         (zeroDrawing.routeAt
           (zeroDrawing.incidenceAt localIndex))
         (data.extendedRoute slot) := by
-  native_decide
+  have checked : (finiteAll fun data : ComposedClauseExitFanData =>
+      finiteAll fun slot : Fin 3 =>
+      guardedCheck (data.IsValid ∧ data.SlotActive slot)
+        (finiteAll fun localIndex : Fin zeroDrawing.incidences.length =>
+          guardedCheck ((zeroDrawing.routeAt (zeroDrawing.incidenceAt localIndex)).getLast? ≠ (data.route slot).head?)
+            (localFanSeparationCheck
+              (zeroDrawing.routeAt
+          (zeroDrawing.incidenceAt localIndex))
+        (data.extendedRoute slot)))) = true := by
+    decide +kernel
+  intro data localIndex slot valid active endpointsDifferent
+  simp only [finiteAll_eq_true, guardedCheck_eq_true] at checked
+  exact localFanSeparationCheck_sound _ _
+    (checked data slot ⟨valid, active⟩ localIndex endpointsDifferent)
 
 /-- Uniform selector form of the four radially extended connector checks. -/
 theorem templateDrawing_routeAt_strictlyAvoids_extendedRoute

@@ -1179,11 +1179,11 @@ theorem packedAssignmentLookupEnvelopeUnit_le_linear
     (32 * (motifCode + motifCode + motifCode + targetCode +
       queriedColumn + word + 40 + 32)) 200
   have fortyBits :
-      (Computability.encodeNat 40).length = 6 := by native_decide
+      (Computability.encodeNat 40).length = 6 := by decide +kernel
   have thirtyTwoBits :
-      (Computability.encodeNat 32).length = 6 := by native_decide
+      (Computability.encodeNat 32).length = 6 := by decide +kernel
   have twoHundredBits :
-      (Computability.encodeNat 200).length = 8 := by native_decide
+      (Computability.encodeNat 200).length = 8 := by decide +kernel
   simp only [packedAssignmentLookupInputUnit,
     encodedListSpace_cons, encodedListSpace_nil]
   omega

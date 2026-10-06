@@ -56,7 +56,7 @@ theorem
     simp only [retainedFinalCopiedSourceDirectionOfQuery]
     rw [AxisDirection.polylineFirstDirection_scalePolyline
       retainedAngularFanSourceClearanceFactor
-      (by native_decide)]
+      (by decide +kernel)]
     exact
       (incidenceRoutes_firstDirection_eq_representativeRoute
           formula clauseIndex taggedLiteral.2).trans

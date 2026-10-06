@@ -74,14 +74,14 @@ theorem retainedTerminalFanOuterLanePortOffset_on_square :
         ¬ WithinCoordinateRadius 287 (0, 0)
           (retainedTerminalFanOuterLanePortOffset
             direction lane) := by
-  native_decide
+  decide +kernel
 
 /-- The 88 refined outer lane ports are pairwise distinct. -/
 theorem retainedTerminalFanOuterLanePortOffset_injective :
     Function.Injective fun pair :
         RetainedTerminalDirection × RetainedTerminalSlot =>
       retainedTerminalFanOuterLanePortOffset pair.1 pair.2 := by
-  native_decide
+  decide +kernel
 
 /-- Positioned outer lane port around an arbitrary retained source center. -/
 def retainedTerminalFanOuterLanePort
@@ -127,7 +127,7 @@ theorem retainedTerminalFanOuterLaneShiftRoute_head? :
       (lane : RetainedTerminalSlot),
       (retainedTerminalFanOuterLaneShiftRoute
         direction lane).head? = some (0, 0) := by
-  native_decide
+  decide +kernel
 
 @[simp]
 theorem retainedTerminalFanOuterLaneShiftRoute_getLast? :
@@ -138,7 +138,7 @@ theorem retainedTerminalFanOuterLaneShiftRoute_getLast? :
           some
             (retainedTerminalFanOuterLaneOffset
               direction lane) := by
-  native_decide
+  decide +kernel
 
 /-- Every finite lane shift is orthogonal. -/
 theorem retainedTerminalFanOuterLaneShiftRoute_orthogonal :
@@ -147,7 +147,7 @@ theorem retainedTerminalFanOuterLaneShiftRoute_orthogonal :
       PeriodicOrthocrossing.OrthogonalPolyline
         (retainedTerminalFanOuterLaneShiftRoute
           direction lane) := by
-  native_decide
+  decide +kernel
 
 /-- Position the finite lane shift at a scaled source gate. -/
 def retainedTerminalFanOuterLaneShiftRouteAt

@@ -339,16 +339,16 @@ theorem terminalVectorAngleLE_primitive
       cases firstPort <;>
         cases second with
         | compass secondPort =>
-            cases secondPort <;> native_decide
+            cases secondPort <;> decide +kernel
         | routedClause secondArm =>
-            cases secondArm <;> native_decide
+            cases secondArm <;> decide +kernel
   | routedClause firstArm =>
       cases firstArm <;>
         cases second with
         | compass secondPort =>
-            cases secondPort <;> native_decide
+            cases secondPort <;> decide +kernel
         | routedClause secondArm =>
-            cases secondArm <;> native_decide
+            cases secondArm <;> decide +kernel
 
 /-- Positive multiples of the eleven primitives are compared exactly by
 their finite east-first ranks. -/
@@ -461,10 +461,10 @@ theorem occurrenceAngleLE_iff_length_le_of_same_direction_classified
     cases direction with
     | compass port =>
         cases port <;>
-          native_decide
+          decide +kernel
     | routedClause arm =>
         cases arm <;>
-          native_decide
+          decide +kernel
   constructor
   · intro scaledSquares
     have squares :

@@ -103,7 +103,7 @@ theorem finalClauseCoreTerminalElementCodeBlock_perm_canonical
   cases fan with
   | mk hasRight directions =>
       cases hasRight <;>
-        native_decide +revert
+        decide +kernel +revert
 
 private theorem zipWith_flatten_perm_of_pointwise
     {First Second Element : Type*}

@@ -23,7 +23,7 @@ private theorem localQuery_unitAux_bound : ∀ query : LocalDirectionQuery,
       (match ((templateDrawingOfClauseProfile query.1).incidenceAt query.2).literal.1 with
       | .unitAux index _ => decide (index < 6 - query.1.literals.length)
       | .inherited _ => true) = true := by
-    native_decide
+    decide +kernel
   intro query
   have bound := checked query
   cases selected : ((templateDrawingOfClauseProfile query.1).incidenceAt query.2).literal.1 with

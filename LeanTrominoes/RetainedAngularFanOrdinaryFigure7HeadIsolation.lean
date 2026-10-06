@@ -81,12 +81,12 @@ theorem retainedAngularFanSplicedOwnFigure7Route_headNotInTail
       prefixNonempty]
     exact refinedHead
   have refinedOrthogonal : OrthogonalPolyline refinedRoute :=
-    routeOrthogonal.scalePolyline (by native_decide)
+    routeOrthogonal.scalePolyline (by decide +kernel)
   have prefixOrthogonal : OrthogonalPolyline sourcePrefix := by
     exact refinedOrthogonal.dropLast
   have refinedSimple :
       LocalIncidenceDrawing.RouteIsSimple refinedRoute := by
-    exact routeIsSimple_scalePolyline (by native_decide) simple
+    exact routeIsSimple_scalePolyline (by decide +kernel) simple
   have prefixSimple :
       LocalIncidenceDrawing.RouteIsSimple sourcePrefix := by
     have reversed := refinedSimple.reverse.tail.reverse

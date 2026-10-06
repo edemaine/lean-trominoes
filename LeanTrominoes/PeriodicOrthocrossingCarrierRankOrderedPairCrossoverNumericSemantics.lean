@@ -138,7 +138,7 @@ private theorem fieldValuesEqual_eq_all
 private theorem crossingPayloadFieldIndices :
     (.crossingFirstRoute :: crossingPayloadTail).map Field.index =
       List.range' 14 32 := by
-  native_decide
+  decide +kernel
 
 private theorem fieldValuesEqual_crossingPayload
     (first second : CarrierNodeRankDatum)

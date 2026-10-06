@@ -258,7 +258,7 @@ theorem
   · exact
       ClosedGridRectanglesSeparated.scale_both_coordinateRadius
         (by simpa [firstRoute, translatedSecondRoute] using rectanglesSeparated)
-        (by native_decide) (by native_decide)
+        (by decide +kernel) (by decide +kernel)
 
 /-- At distinct physical targets, the two selected fallback boundaries are
 strictly separated across a nonzero period shift. -/

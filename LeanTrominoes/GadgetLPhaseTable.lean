@@ -4,12 +4,13 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.GadgetPortRefinement
+import LeanTrominoes.GadgetSupportedPortTable
 
 /-!
 # Verified geometric phase laws for the Figure 11 L gadgets
 
 Boolean port values forget which supported geometric boundary state crosses
-an interface.  Exhaustive native certificates in this file establish the
+an interface.  Exhaustive kernel-checked certificates in this file establish the
 closure properties needed to recover those phases globally: route-end phases
 can be recombined, one side of any local state can be spliced independently,
 and complementary same-color half-edges always admit matching exact ports.
@@ -17,6 +18,8 @@ and complementary same-color half-edges always admit matching exact ports.
 
 namespace LeanTrominoes
 namespace Gadget
+
+set_option synthInstance.maxSize 65536
 
 /-- Ordered incident sides of a degree-two routing cell. -/
 def OrthogonalCellType.routingSides :
@@ -78,8 +81,39 @@ instance : Decidable LRoutingPhaseRectangular := by
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 1000000 in
+private theorem lRoutingPhaseRectangular_fiber :
+    ∀ cellType first second,
+      cellType.routingSides = some (first, second) →
+        ∀ inward (left right : LSupportedConfiguration cellType),
+          LEntryRealizes (cellType, left.val) inward →
+          LEntryRealizes (cellType, right.val) inward →
+            ∃ combined : LSupportedConfiguration cellType,
+              LEntryRealizes (cellType, combined.val) inward ∧
+                combined.val.get first = left.val.get first ∧
+                combined.val.get second = right.val.get second := by
+  decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 1000000 in
 theorem lRoutingPhaseRectangular : LRoutingPhaseRectangular := by
-  native_decide
+  intro comparison routing leftType rightType leftReal rightReal
+  have leftPair : comparison.left.val =
+      (comparison.cellType, comparison.left.val.2) := Prod.ext leftType rfl
+  have rightPair : comparison.right.val =
+      (comparison.cellType, comparison.right.val.2) := Prod.ext rightType rfl
+  have leftMember := comparison.left.property
+  have rightMember := comparison.right.property
+  rw [leftPair] at leftMember leftReal
+  rw [rightPair] at rightMember rightReal
+  let left : LSupportedConfiguration comparison.cellType :=
+    ⟨comparison.left.val.2, leftMember⟩
+  let right : LSupportedConfiguration comparison.cellType :=
+    ⟨comparison.right.val.2, rightMember⟩
+  obtain ⟨combined, realizes, first, second⟩ :=
+    lRoutingPhaseRectangular_fiber comparison.cellType comparison.first
+      comparison.second routing comparison.inward left right leftReal rightReal
+  exact ⟨⟨(comparison.cellType, combined.val), combined.property⟩,
+    rfl, realizes, first, second⟩
 
 /-- One port phase can be taken from one realization and spliced into all
 the other port phases of another realization of the same local Boolean
@@ -105,8 +139,37 @@ instance : Decidable LCellPhaseSplice := by
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 1000000 in
+private theorem lCellPhaseSplice_fiber :
+    ∀ cellType first inward (left right : LSupportedConfiguration cellType),
+      LEntryRealizes (cellType, left.val) inward →
+      LEntryRealizes (cellType, right.val) inward →
+        ∃ combined : LSupportedConfiguration cellType,
+          LEntryRealizes (cellType, combined.val) inward ∧
+            combined.val.get first = left.val.get first ∧
+              ∀ side, side ≠ first → combined.val.get side = right.val.get side := by
+  decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 1000000 in
 theorem lCellPhaseSplice : LCellPhaseSplice := by
-  native_decide
+  intro comparison leftType rightType leftReal rightReal
+  have leftPair : comparison.left.val =
+      (comparison.cellType, comparison.left.val.2) := Prod.ext leftType rfl
+  have rightPair : comparison.right.val =
+      (comparison.cellType, comparison.right.val.2) := Prod.ext rightType rfl
+  have leftMember := comparison.left.property
+  have rightMember := comparison.right.property
+  rw [leftPair] at leftMember leftReal
+  rw [rightPair] at rightMember rightReal
+  let left : LSupportedConfiguration comparison.cellType :=
+    ⟨comparison.left.val.2, leftMember⟩
+  let right : LSupportedConfiguration comparison.cellType :=
+    ⟨comparison.right.val.2, rightMember⟩
+  obtain ⟨combined, realizes, first, other⟩ :=
+    lCellPhaseSplice_fiber comparison.cellType comparison.first comparison.inward
+      left right leftReal rightReal
+  exact ⟨⟨(comparison.cellType, combined.val), combined.property⟩,
+    rfl, realizes, first, other⟩
 
 structure LEdgePhaseCase where
   leftType : OrthogonalCellType
@@ -144,8 +207,32 @@ instance : Decidable LEdgePhaseMatchable := by
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 5000000 in
+private theorem lEdgePhaseMatchable_fiber :
+    ∀ leftType leftInward,
+      PeriodicOrthogonalDrawing.satisfiesOrientation leftType leftInward →
+        ∀ rightType side,
+          leftType.portColor side = rightType.portColor side.opposite →
+          (leftType.portColor side).isSome →
+            ∀ rightInward,
+              PeriodicOrthogonalDrawing.satisfiesOrientation rightType rightInward →
+              leftInward side = !(rightInward side.opposite) →
+                ∃ (left : LSupportedConfiguration leftType)
+                  (right : LSupportedConfiguration rightType),
+                  LEntryRealizes (leftType, left.val) leftInward ∧
+                    LEntryRealizes (rightType, right.val) rightInward ∧
+                      left.val.get side = right.val.get side.opposite := by
+  decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 5000000 in
 theorem lEdgePhaseMatchable : LEdgePhaseMatchable := by
-  native_decide
+  intro edge leftValid rightValid colorEq active complementary
+  obtain ⟨left, right, leftReal, rightReal, portsEq⟩ :=
+    lEdgePhaseMatchable_fiber edge.leftType edge.leftInward leftValid
+      edge.rightType edge.side colorEq active edge.rightInward rightValid complementary
+  exact ⟨⟨(edge.leftType, left.val), left.property⟩,
+    ⟨(edge.rightType, right.val), right.property⟩,
+    rfl, rfl, leftReal, rightReal, portsEq⟩
 
 end Gadget
 end LeanTrominoes

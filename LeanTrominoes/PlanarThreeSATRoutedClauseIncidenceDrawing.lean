@@ -59,12 +59,12 @@ theorem routedClausePortStraightIncidenceDrawing_isPlanar
     exact bound
   cases literals with
   | nil =>
-      native_decide
+      decide +kernel
   | cons first rest =>
       cases rest with
       | nil =>
           rcases first with ⟨firstArm, firstPolarity⟩
-          cases firstArm <;> cases firstPolarity <;> native_decide
+          cases firstArm <;> cases firstPolarity <;> decide +kernel
       | cons second rest =>
           cases rest with
           | nil =>
@@ -72,7 +72,7 @@ theorem routedClausePortStraightIncidenceDrawing_isPlanar
               rcases second with ⟨secondArm, secondPolarity⟩
               cases firstArm <;> cases firstPolarity <;>
                 cases secondArm <;> cases secondPolarity <;>
-                simp_all <;> native_decide
+                simp_all <;> decide +kernel
           | cons third rest =>
               cases rest with
               | nil =>
@@ -82,7 +82,7 @@ theorem routedClausePortStraightIncidenceDrawing_isPlanar
                   cases firstArm <;> cases firstPolarity <;>
                     cases secondArm <;> cases secondPolarity <;>
                     cases thirdArm <;> cases thirdPolarity <;>
-                    simp_all <;> native_decide
+                    simp_all <;> decide +kernel
               | cons fourth rest =>
                   simp at lengthLe
                   omega

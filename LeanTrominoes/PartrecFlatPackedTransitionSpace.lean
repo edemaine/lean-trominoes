@@ -418,8 +418,8 @@ private theorem flatPackedTransitionDivisionCost_le_linear
     (current.phase + 1 + periodicStrip.period)
   have finalBits := encodeNat_add_length_le_sum
     (8 * (current.phase + 1 + periodicStrip.period)) 16
-  have eightBits : (Computability.encodeNat 8).length = 4 := by native_decide
-  have sixteenBits : (Computability.encodeNat 16).length = 5 := by native_decide
+  have eightBits : (Computability.encodeNat 8).length = 4 := by decide +kernel
+  have sixteenBits : (Computability.encodeNat 16).length = 5 := by decide +kernel
   have unitLarge : 10 ≤ unit := by
     simp [unit, flatPackedTransitionContextUnit]
   simp only [divisionSpaceBound, encodedListSpace_cons,
@@ -559,8 +559,8 @@ theorem flatPackedTransitionPhaseCost_le_bound
   have scaledBits := encodeNat_mul_length_le_sum 2 (next.phase + remainder)
   have finalBits := encodeNat_add_length_le_sum
     (2 * (next.phase + remainder)) 4
-  have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
-  have fourBits : (Computability.encodeNat 4).length = 3 := by native_decide
+  have twoBits : (Computability.encodeNat 2).length = 2 := by decide +kernel
+  have fourBits : (Computability.encodeNat 4).length = 3 := by decide +kernel
   have unitLarge : 10 ≤ unit := by
     simp [unit, flatPackedTransitionContextUnit]
   have equality : natEqCost next.phase remainder ≤

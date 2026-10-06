@@ -51,7 +51,7 @@ theorem retainedDirectSourceLocalRouteAt_length :
     ∀ (kind : RetainedDirectClauseKind)
       (index : Fin (retainedDirectSourcePrefixChoices kind).length),
       (retainedDirectSourceLocalRouteAt kind index).length = 2 := by
-  native_decide
+  decide +kernel
 
 /-- The retained terminal datum classified from one unscaled local direct
 incidence. -/
@@ -92,7 +92,7 @@ theorem retainedDirectSourceFanTerminalAt_eq_scale :
       retainedDirectSourceFanTerminalAt kind index =
         scaleRetainedTerminalData 4
           (retainedDirectSourceLocalTerminalAt kind index) := by
-  native_decide
+  decide +kernel
 
 /-- Every direct local incidence has a positive classified terminal
 length. -/
@@ -100,7 +100,7 @@ theorem retainedDirectSourceLocalTerminalAt_length_positive :
     ∀ (kind : RetainedDirectClauseKind)
       (index : Fin (retainedDirectSourcePrefixChoices kind).length),
       0 < (retainedDirectSourceLocalTerminalAt kind index).2 := by
-  native_decide
+  decide +kernel
 
 /-- Consequently every concrete factor-four fan terminal is positive. -/
 theorem retainedDirectSourceFanTerminalAt_length_positive
@@ -178,7 +178,7 @@ theorem retainedDirectSourceFanDemand_gates_eq :
         (retainedDirectSourceFanCenterAt kind secondIndex)
         (retainedDirectSourceFanTerminalAt kind secondIndex)
         secondSlot).gate := by
-  native_decide
+  decide +kernel
 
 /-- For every finite direct-source atlas entry, the common outer gate is
 exactly the fully refined clause endpoint of its factor-four local route. -/
@@ -194,7 +194,7 @@ theorem retainedDirectSourceFanDemand_gate_eq_scaledLocalHead :
         (Cell.scale 4
           ((retainedDirectSourceLocalRouteAt kind index).headD
             (0, 0))) := by
-  native_decide
+  decide +kernel
 
 /-- A genuine metadata-selected literal pair needs only the three concrete
 strict tail interactions; all centers, terminal data, escapes, and the

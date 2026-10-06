@@ -22,6 +22,9 @@ direction; duplicate-free terminal profiles rule those combinations out.
 namespace LeanTrominoes
 namespace PeriodicEightOccurrenceSplit
 
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 10000
+
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
 /-- A positive terminal has no radial blocks exactly when it is a
@@ -50,7 +53,7 @@ theorem retainedTerminalFanOuterRadialLength_eq_zero_iff_of_positive
       · rintro ⟨otherPort, equal⟩
         simp only [Prod.mk.injEq] at equal
         rcases equal with ⟨_, rfl⟩
-        cases port <;> native_decide
+        cases port <;> decide +kernel
   | routedClause arm =>
       constructor
       · intro radialZero
@@ -114,6 +117,116 @@ theorem retainedTerminalFanOuterRadialRoute_eq_zeroRadialRouteAt
     constructor <;>
     omega
 
+private def zeroRouteSeparationCheck (first second : List Cell) : Bool :=
+  segmentBoxesSeparateCheck first second || routesStrictlyAvoidEachOtherCheck first second
+
+private theorem zeroRouteSeparationCheck_sound (first second : List Cell)
+    (checked : zeroRouteSeparationCheck first second = true) :
+    RoutesStrictlyAvoidEachOther first second := by
+  simp only [zeroRouteSeparationCheck, Bool.or_eq_true] at checked
+  rcases checked with boxes | exactCheck
+  · exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck first second boxes
+  · exact (routesStrictlyAvoidEachOtherCheck_eq_true first second).mp exactCheck
+
+private theorem zeroLocalBoxes_case0 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.east) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterZeroRadialRoute (.compass (.east)) firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem zeroLocalBoxes_case1 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.left) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterZeroRadialRoute (.routedClause (.left)) firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem zeroLocalBoxes_case2 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.southeast) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterZeroRadialRoute (.compass (.southeast)) firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem zeroLocalBoxes_case3 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.south) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterZeroRadialRoute (.compass (.south)) firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem zeroLocalBoxes_case4 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.right) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterZeroRadialRoute (.routedClause (.right)) firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem zeroLocalBoxes_case5 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.southwest) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterZeroRadialRoute (.compass (.southwest)) firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem zeroLocalBoxes_case6 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.west) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterZeroRadialRoute (.compass (.west)) firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem zeroLocalBoxes_case7 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.northwest) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterZeroRadialRoute (.compass (.northwest)) firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem zeroLocalBoxes_case8 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.north) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterZeroRadialRoute (.compass (.north)) firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem zeroLocalBoxes_case9 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.northeast) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterZeroRadialRoute (.compass (.northeast)) firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem zeroLocalBoxes_case10 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.middle) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterZeroRadialRoute (.routedClause (.middle)) firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
 /-- An earlier zero-block radial route avoids every later
 order-compatible local fan route. -/
 theorem retainedTerminalFanOuterZeroRadialRoute_strictlyAvoid_laterLocal :
@@ -127,7 +240,131 @@ theorem retainedTerminalFanOuterZeroRadialRoute_strictlyAvoid_laterLocal :
           firstDirection firstSlot)
         (retainedTerminalFanOuterLocalRoute
           secondDirection secondSlot) := by
-  native_decide
+  intro firstDirection secondDirection firstSlot secondSlot directionsLe slotsLt
+  have checked :
+      ∀ secondDirection firstSlot secondSlot,
+        firstDirection.angularRank ≤ secondDirection.angularRank →
+        firstSlot.val < secondSlot.val →
+          zeroRouteSeparationCheck
+            (retainedTerminalFanOuterZeroRadialRoute firstDirection firstSlot)
+            (retainedTerminalFanOuterLocalRoute secondDirection secondSlot) = true := by
+    cases firstDirection with
+    | compass port =>
+      cases port with
+      | east => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using zeroLocalBoxes_case0
+      | southeast => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using zeroLocalBoxes_case2
+      | south => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using zeroLocalBoxes_case3
+      | southwest => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using zeroLocalBoxes_case5
+      | west => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using zeroLocalBoxes_case6
+      | northwest => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using zeroLocalBoxes_case7
+      | north => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using zeroLocalBoxes_case8
+      | northeast => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using zeroLocalBoxes_case9
+    | routedClause arm =>
+      cases arm with
+      | left => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using zeroLocalBoxes_case1
+      | right => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using zeroLocalBoxes_case4
+      | middle => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using zeroLocalBoxes_case10
+  exact zeroRouteSeparationCheck_sound _ _
+    (checked secondDirection firstSlot secondSlot directionsLe slotsLt)
+
+private theorem localZeroBoxes_case0 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.east) : RetainedTerminalDirection) ≠ secondDirection ∧ (.compass (.east) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterLocalRoute (.compass (.east)) firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem localZeroBoxes_case1 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.left) : RetainedTerminalDirection) ≠ secondDirection ∧ (.routedClause (.left) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterLocalRoute (.routedClause (.left)) firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem localZeroBoxes_case2 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.southeast) : RetainedTerminalDirection) ≠ secondDirection ∧ (.compass (.southeast) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterLocalRoute (.compass (.southeast)) firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem localZeroBoxes_case3 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.south) : RetainedTerminalDirection) ≠ secondDirection ∧ (.compass (.south) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterLocalRoute (.compass (.south)) firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem localZeroBoxes_case4 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.right) : RetainedTerminalDirection) ≠ secondDirection ∧ (.routedClause (.right) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterLocalRoute (.routedClause (.right)) firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem localZeroBoxes_case5 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.southwest) : RetainedTerminalDirection) ≠ secondDirection ∧ (.compass (.southwest) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterLocalRoute (.compass (.southwest)) firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem localZeroBoxes_case6 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.west) : RetainedTerminalDirection) ≠ secondDirection ∧ (.compass (.west) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterLocalRoute (.compass (.west)) firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem localZeroBoxes_case7 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.northwest) : RetainedTerminalDirection) ≠ secondDirection ∧ (.compass (.northwest) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterLocalRoute (.compass (.northwest)) firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem localZeroBoxes_case8 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.north) : RetainedTerminalDirection) ≠ secondDirection ∧ (.compass (.north) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterLocalRoute (.compass (.north)) firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem localZeroBoxes_case9 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.northeast) : RetainedTerminalDirection) ≠ secondDirection ∧ (.compass (.northeast) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterLocalRoute (.compass (.northeast)) firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem localZeroBoxes_case10 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.middle) : RetainedTerminalDirection) ≠ secondDirection ∧ (.routedClause (.middle) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (zeroRouteSeparationCheck (retainedTerminalFanOuterLocalRoute (.routedClause (.middle)) firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot))) = true := by
+  decide +kernel
 
 /-- An earlier local route avoids a later zero-block radial route whenever
 their directions differ.  Equal directions are the sole finite obstruction
@@ -144,7 +381,33 @@ theorem retainedTerminalFanOuterLocalRoute_strictlyAvoid_laterZeroRadialRoute :
           firstDirection firstSlot)
         (retainedTerminalFanOuterZeroRadialRoute
           secondDirection secondSlot) := by
-  native_decide
+  intro firstDirection secondDirection firstSlot secondSlot directionsNe directionsLe slotsLt
+  have checked :
+      ∀ secondDirection firstSlot secondSlot,
+        firstDirection ≠ secondDirection →
+        firstDirection.angularRank ≤ secondDirection.angularRank →
+        firstSlot.val < secondSlot.val →
+          zeroRouteSeparationCheck
+            (retainedTerminalFanOuterLocalRoute firstDirection firstSlot)
+            (retainedTerminalFanOuterZeroRadialRoute secondDirection secondSlot) = true := by
+    cases firstDirection with
+    | compass port =>
+      cases port with
+      | east => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using localZeroBoxes_case0
+      | southeast => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using localZeroBoxes_case2
+      | south => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using localZeroBoxes_case3
+      | southwest => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using localZeroBoxes_case5
+      | west => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using localZeroBoxes_case6
+      | northwest => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using localZeroBoxes_case7
+      | north => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using localZeroBoxes_case8
+      | northeast => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using localZeroBoxes_case9
+    | routedClause arm =>
+      cases arm with
+      | left => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using localZeroBoxes_case1
+      | right => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using localZeroBoxes_case4
+      | middle => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using localZeroBoxes_case10
+  exact zeroRouteSeparationCheck_sound _ _
+    (checked secondDirection firstSlot secondSlot directionsNe directionsLe slotsLt)
 
 /-- Positioned earlier zero-block radial routes avoid positioned later local
 routes. -/

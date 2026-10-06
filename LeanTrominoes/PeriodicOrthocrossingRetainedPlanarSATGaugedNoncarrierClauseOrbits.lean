@@ -811,7 +811,7 @@ def crossoverClauseLocalPositions : List Cell :=
 
 theorem crossoverClauseLocalPositions_nodup :
     crossoverClauseLocalPositions.Nodup := by
-  native_decide
+  decide +kernel
 
 theorem crossoverClause_localOffset_eq
     {Variable : Type*}
@@ -984,7 +984,7 @@ def routedVariableClauseLocalOffset
 
 theorem routedVariableClauseLocalOffset_injective :
     Function.Injective routedVariableClauseLocalOffset := by
-  native_decide
+  decide +kernel
 
 theorem equalityInstance_clausePosition_and_index
     {Variable : Type*}
