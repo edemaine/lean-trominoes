@@ -16,6 +16,7 @@ import LeanTrominoes.ThreeTranslationProof
 import LeanTrominoes.ThreeTranslationPolycubesProof
 import LeanTrominoes.FinitePolyominoCompletionCoRE
 import LeanTrominoes.FixedWangSeedPlaneHardness
+import LeanTrominoes.FixedThreeSATThreeSeedCompleteness
 import LeanTrominoes.BumpySeedRefinement
 import LeanTrominoes.PeriodicCNFDimensions
 import LeanTrominoes.PeriodicThreeDMLocalPlaneCompleteness
@@ -48,6 +49,8 @@ run_cmd do
       ``LeanTrominoes.Theorem55.stripProved,
       ``LeanTrominoes.FinitePolyominoCompletion.coRE,
       ``LeanTrominoes.FixedMachineWangSeed.PlaneExtension.universalPlanePalette_coREHard,
+      ``LeanTrominoes.FixedThreeSATThreeSeed.coREComplete,
+      ``LeanTrominoes.PeriodicCNF.SignedDecoder.local_clause,
       ``LeanTrominoes.PlusRefinement.seeded_refinement_iff,
       ``LeanTrominoes.PeriodicCNFDimensions.satisfiable_coREComplete,
       ``LeanTrominoes.PeriodicThreeDM.localPlaneProblem_coREComplete,
