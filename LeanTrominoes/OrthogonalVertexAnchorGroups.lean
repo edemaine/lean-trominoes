@@ -91,4 +91,3 @@ theorem AnchorProfile.left_anchor_ordinates (profile : AnchorProfile) (first sec
     fin_cases first <;> fin_cases second <;> decide +kernel
 
 end LeanTrominoes.OrthogonalDrawingRefinement
-

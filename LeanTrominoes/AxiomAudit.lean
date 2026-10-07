@@ -42,6 +42,8 @@ import LeanTrominoes.PeriodicGridDrawingStraightAnchorGeometry
 import LeanTrominoes.OrthogonalSlabRouteBounds
 import LeanTrominoes.OrthogonalSlabRouteWord
 import LeanTrominoes.OrthogonalSlabPeriodicOverlap
+import LeanTrominoes.OrthogonalBoundaryMatchingCorrect
+import LeanTrominoes.OrthogonalBoundaryCellSeparation
 import LeanTrominoes.PeriodicGridDrawingAnchorBoundaryOrder
 import LeanTrominoes.PeriodicGridDrawingPeriodicColumnRefinement
 import LeanTrominoes.PeriodicGridDrawingPeriodicCrossingBars
@@ -187,6 +189,17 @@ run_cmd do
       ``LeanTrominoes.OrthogonalSlabRouting.SlabRoute.compose_valid,
       ``LeanTrominoes.OrthogonalSlabRouting.SlabRoute.compose_image,
       ``LeanTrominoes.OrthogonalSlabRouting.periodic_vertical_track_overlap,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.route_isRealOpenSimple,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.inner_boundaries_disjoint,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.normal_innerArc_real_contact_between,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.distinctNestingDepth_injective,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.distinctNestingDepth_le_card,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.distinctNestingDepth_strict,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.matchingRoute_orthogonal,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.matchingRoute_isRealOpenSimple,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.matchingRoutes_disjoint,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.route_boundary_contact_ports,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.distinct_cells_contact_first_endpoint,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingCopies_height_injective,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingHeights_card_eq,
       ``LeanTrominoes.OrthogonalDrawingRefinement.height_brackets_same_or_separated,

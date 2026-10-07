@@ -136,7 +136,10 @@ connectors from the 41 possible degree-four rectangle profiles, with boundary
 heights following the original slope order. The complete
 planar refinement construction remains open. A dogleg spanning more than
 one period overlaps its translated copy, so the global construction must
-handle row seams explicitly.
+handle row seams explicitly. The replacement rectangle router is proved:
+noninterlacing boundary chords have simple, disjoint orthogonal routes,
+using distinct inward depths bounded by the chord count. Translated cells
+can meet only at boundary ports. Its input crossing assembly remains open.
 
 `PeriodicTrominoPrefill.planeProblem_coREComplete` proves co-r.e. completeness
 of periodic L- and I-tromino completion in the plane. `compileDrawing_valid`
