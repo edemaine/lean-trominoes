@@ -22,6 +22,8 @@ import LeanTrominoes.FixedRetainedExactOneSeedCompleteness
 import LeanTrominoes.FixedPlanarThreeDMSeedCompleteness
 import LeanTrominoes.FixedNormalizedOrientationSeedCompleteness
 import LeanTrominoes.GadgetIPreferredSelection
+import LeanTrominoes.GadgetICanonicalSeedComputability
+import LeanTrominoes.FixedPolyominoSeedQuarterSoundness
 import LeanTrominoes.PeriodicCNFPlanarRetainedPolaritySeed
 import LeanTrominoes.BumpySeedRefinement
 import LeanTrominoes.PeriodicCNFDimensions
@@ -68,6 +70,12 @@ run_cmd do
       ``LeanTrominoes.FixedNormalizedOrientationSeed.fixedDrawing_verticesSeparated,
       ``LeanTrominoes.Gadget.PreferredISelection.assignment_compatible,
       ``LeanTrominoes.Gadget.PreferredISelection.pattern_eq_of_active_eq,
+      ``LeanTrominoes.Gadget.CanonicalISelection.seeded_tiling_iff,
+      ``LeanTrominoes.Gadget.CanonicalISelection.refinedSeedPlacements_primrec,
+      ``LeanTrominoes.FixedWangNormalizedSeedDecoder.uniform_window,
+      ``LeanTrominoes.FixedPolyominoSeed.quarter_satisfies,
+      ``LeanTrominoes.FixedMachineWangSeed.PlaneExtension.quarter_of_seeded_quarter,
+      ``LeanTrominoes.KeyedPeriodicComplement.PartialGadgetReadout.readout_eq_of_deep_pins,
       ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.encodedSeedFactor,
       ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.totalSeedReduction_correct,
       ``LeanTrominoes.PeriodicOrthocrossing.retainedPolaritySeedFactor,
