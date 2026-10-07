@@ -36,6 +36,7 @@ import LeanTrominoes.OrthogonalDrawingRefinementBounds
 import LeanTrominoes.PeriodicGraphDrawingCardinality
 import LeanTrominoes.GridSegmentCollinearRectangleSeparation
 import LeanTrominoes.DegreeThreeVertexNormalizationSelectedPort
+import LeanTrominoes.GeneralVertexNormalizationFanAssignment
 import LeanTrominoes.PeriodicOrthocrossingGeneralLocal
 import LeanTrominoes.PeriodicOrthocrossingGeneralCoreOccurrenceCrossings
 import LeanTrominoes.PeriodicOrthocrossingGeneralFanContacts
@@ -132,6 +133,19 @@ run_cmd do
       ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.local_orthogonal_orthocrossing_drawing,
       ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.drawing_crossings_integral,
       ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.route_occurrences_no_triple,
+      ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplate_isRealOpenSimple,
+      ``LeanTrominoes.DegreeThreeVertexNormalization.selectedCanonicalPort_chosen,
+      ``LeanTrominoes.GeneralVertexNormalization.portDirection_genuine,
+      ``LeanTrominoes.GeneralVertexNormalization.fanAssignment_last,
+      ``LeanTrominoes.GeneralVertexNormalization.fanAssignment_chosen_west,
+      ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplate_real_contacts_center,
+      ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplateAt_contacts_same_position,
+      ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplateAt_trimmedRoute_contact,
+      ``LeanTrominoes.GridPolyline.IsRealSimple.scale,
+      ``LeanTrominoes.GridPolyline.IsRealSimple.translate,
+      ``LeanTrominoes.GridPolyline.clippedScaledRoute_isRealOpenSimple,
+      ``LeanTrominoes.GridPolyline.clippedScaledRoute_neighborhood_contact,
+      ``LeanTrominoes.GridSegment.scaled_neighborhood_contact_implies_incident,
       ``LeanTrominoes.GridPolyline.IsRealOpenSimple.head_contact_index,
       ``LeanTrominoes.GridPolyline.IsRealOpenSimple.last_contact_index,
       ``LeanTrominoes.KeyedPeriodicComplement.recoveredCoarse_windowTiling,

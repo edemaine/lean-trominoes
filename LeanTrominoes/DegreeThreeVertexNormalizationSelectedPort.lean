@@ -54,4 +54,32 @@ theorem selectedBoundarySide_ne_omitted (omitted selected : VertexSide) (port : 
   cases omitted <;> cases selected <;> cases port <;>
     decide +kernel
 
+def selectedCanonicalPort (omitted selected side : VertexSide) : CanonicalVertexPort :=
+  if selectedBoundarySide omitted selected .west = side then .west
+  else if selectedBoundarySide omitted selected .north = side then .north
+  else .east
+
+theorem selectedBoundarySide_selectedCanonicalPort (omitted selected side : VertexSide)
+    (used : side ≠ omitted) :
+    selectedBoundarySide omitted selected (selectedCanonicalPort omitted selected side) = side := by
+  revert used
+  cases omitted <;> cases selected <;> cases side <;> decide +kernel
+
+theorem selectedCanonicalPort_selectedBoundarySide (omitted selected : VertexSide) (port : CanonicalVertexPort) :
+    selectedCanonicalPort omitted selected (selectedBoundarySide omitted selected port) = port := by
+  cases omitted <;> cases selected <;> cases port <;> decide +kernel
+
+theorem selectedCanonicalPort_chosen (omitted selected : VertexSide) (used : selected ≠ omitted) :
+    selectedCanonicalPort omitted selected selected = .west := by
+  unfold selectedCanonicalPort
+  rw [selectedBoundarySide_west omitted selected used]
+  simp
+
+theorem selectedCanonicalPort_injective_on_used (omitted selected : VertexSide) {first second : VertexSide}
+    (firstUsed : first ≠ omitted) (secondUsed : second ≠ omitted)
+    (equal : selectedCanonicalPort omitted selected first = selectedCanonicalPort omitted selected second) : first = second := by
+  have boundaries := congrArg (selectedBoundarySide omitted selected) equal
+  simpa only [selectedBoundarySide_selectedCanonicalPort omitted selected first firstUsed,
+    selectedBoundarySide_selectedCanonicalPort omitted selected second secondUsed] using boundaries
+
 end LeanTrominoes.DegreeThreeVertexNormalization
