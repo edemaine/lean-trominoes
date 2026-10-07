@@ -127,6 +127,12 @@ It preserves rational vertex positions and locality, multiplies the grid
 size by 32, and makes the selected incidence point west at every
 degree-three vertex, whose outward directions are west, north, east.
 
+Theorem 2.2 has checked crossing enumeration and ranks, rectangle isolation,
+and simple, disjoint slab routes. Straight planar drawings have distinct
+rational incidence rays; their clockwise order assigns disjoint orthogonal
+connectors from the 41 possible degree-four rectangle profiles. The complete
+planar refinement construction remains open.
+
 `PeriodicTrominoPrefill.planeProblem_coREComplete` proves co-r.e. completeness
 of periodic L- and I-tromino completion in the plane. `compileDrawing_valid`
 in `CompletionPattern.LBricks` and `CompletionPattern.IBricks` proves that

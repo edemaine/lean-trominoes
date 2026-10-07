@@ -38,6 +38,8 @@ import LeanTrominoes.PeriodicGridDrawingStraightCopyWindow
 import LeanTrominoes.PeriodicGridDrawingVerticalCrossings
 import LeanTrominoes.PeriodicGridDrawingVerticalCrossingEnumeration
 import LeanTrominoes.FiniteCrossingRanks
+import LeanTrominoes.PeriodicGridDrawingStraightAnchorGeometry
+import LeanTrominoes.OrthogonalSlabRouteBounds
 import LeanTrominoes.PeriodicGraphDrawingCardinality
 import LeanTrominoes.GridSegmentCollinearRectangleSeparation
 import LeanTrominoes.DegreeThreeVertexNormalizationSelectedPort
@@ -159,6 +161,23 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingCopies_complete,
       ``LeanTrominoes.OrthogonalDrawingRefinement.crossingRank_strictMonoOn,
       ``LeanTrominoes.OrthogonalDrawingRefinement.ranked_crossingCoordinate_outside_rectangles,
+      ``LeanTrominoes.GridSegment.realContains_straightRay_halfStep,
+      ``LeanTrominoes.PeriodicGridDrawing.distinctPortRayKeys_of_planar_straight,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.rectangleTemplate_isRealOpenSimple,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.rectangleTemplate_contacts_center,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.rectangleTemplate_boundary_contact,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.AnchorProfile.initialDirections_clockwise,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.incidenceAnchorIndex_injective,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.incidenceTemplates_contact,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.orderedIncidences_strict,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.incidenceTemplate_firstDirection_injective,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.incidenceTemplateAt_avoids_nonincident_segment,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.refinementFactor_isolates_rectangles,
+      ``LeanTrominoes.OrthogonalSlabRouting.route_isRealOpenSimple,
+      ``LeanTrominoes.OrthogonalSlabRouting.routes_disjoint,
+      ``LeanTrominoes.OrthogonalSlabRouting.route_left_boundary,
+      ``LeanTrominoes.OrthogonalSlabRouting.route_right_boundary,
+      ``LeanTrominoes.OrthogonalSlabRouting.consecutive_routes_contact_joint,
       ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplate_real_contacts_center,
       ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplateAt_contacts_same_position,
       ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplateAt_trimmedRoute_contact,
