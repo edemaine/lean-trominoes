@@ -72,6 +72,8 @@ import LeanTrominoes.Theorem52Proof
 import LeanTrominoes.TwoTranslationTrominoes
 import LeanTrominoes.PeriodicCNFPolySpaceHardness
 import LeanTrominoes.PeriodicSATPlaneCompleteness
+import LeanTrominoes.PeriodicCNFDimensions
+import LeanTrominoes.FinitePolyominoCompletionCoRE
 import LeanTrominoes.PeriodicOneInThreeCompleteness
 import LeanTrominoes.PeriodicThreeDMPlaneCompleteness
 import LeanTrominoes.NormalizedOrientationCompleteness

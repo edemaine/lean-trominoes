@@ -86,6 +86,7 @@ otherwise.
 | Local 1D exact-one SAT, executable decisions for unrestricted, width-three, and occurrence-three variants; linear state and encoding-size bounds | `PeriodicExactOneCNF.check_correct`, `checkThree_correct`, `checkThreeThree_correct`, `state_bits_le_encoding`, `flatEncoding_length_le` | [PeriodicExactOneCNFLocality](LeanTrominoes/PeriodicExactOneCNFLocality.lean), [PeriodicExactOneCNFFlatSize](LeanTrominoes/PeriodicExactOneCNFFlatSize.lean) |
 | Local 1D periodic CNF, executable decision procedure and linear state-bit bound | `PeriodicCNF.LineWindow.check_localPeriodicCNF1DSAT`, `state_bits_le_encoding` | [PeriodicCNFLineSearch](LeanTrominoes/PeriodicCNFLineSearch.lean) |
 | Theorem 3.2, 2D periodic CNF SAT co-r.e. completeness | `WangPeriodicCNF.coREComplete`, `WangPeriodicCNF.localCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
+| Theorem 3.2, periodic CNF SAT in every dimension ≥ 2 | `PeriodicCNFDimensions.satisfiable_coREComplete`, `PeriodicCNFDimensions.localProblem_coREComplete` | [PeriodicCNFDimensions](LeanTrominoes/PeriodicCNFDimensions.lean) |
 | Theorem 3.3, local 2D periodic 3SAT co-r.e. completeness | `PeriodicThreeCNF.localThreeCNFCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
 | Theorem 3.4, local 2D periodic 3SAT-3 co-r.e. completeness | `PeriodicThreeSATThree.localThreeSATThreeCoREComplete` | [PeriodicSATPlaneCompleteness](LeanTrominoes/PeriodicSATPlaneCompleteness.lean) |
 | Local 2D periodic 1-in-3SAT-3 co-r.e. completeness (without a planarity restriction) | `PeriodicOneInThree.localOneInThreeSATThreeCoREComplete` | [PeriodicOneInThreeCompleteness](LeanTrominoes/PeriodicOneInThreeCompleteness.lean) |
@@ -207,7 +208,7 @@ paper theorem being complete; the entries below distinguish these cases.
 | Paper results | Current coverage |
 | --- | --- |
 | Theorem 3.1 | Imported Wang tiling theorem |
-| Theorem 3.2 | 2D CNF SAT co-r.e. completeness, including the local restriction, proved; local 1D PSPACE completeness proved; remaining dimensional clauses open |
+| Theorem 3.2 | Complete: local 1D PSPACE completeness, and unrestricted and local co-r.e. completeness in every dimension ≥ 2 |
 | Theorems 3.3–3.4 | Local 1D 3SAT and 3SAT-3 PSPACE-completeness proved; local 2D 3SAT and 3SAT-3 co-r.e. completeness proved |
 | Theorem 5.2 | Fully proved |
 | Corollary 5.3 | Translation-only plane co-r.e. completeness and strip PSPACE completeness proved |
