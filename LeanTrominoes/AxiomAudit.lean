@@ -55,6 +55,7 @@ import LeanTrominoes.RectangleBoundaryMatchingTransport
 import LeanTrominoes.OrthogonalBoundarySlabSeparation
 import LeanTrominoes.PeriodicGridDrawingVirtualHorizontalPortOrder
 import LeanTrominoes.PeriodicGridDrawingColumnPortTransport
+import LeanTrominoes.PeriodicGridDrawingRectangleInputRoutes
 import LeanTrominoes.PeriodicGridDrawingAnchorBoundaryOrder
 import LeanTrominoes.PeriodicGridDrawingPeriodicColumnRefinement
 import LeanTrominoes.PeriodicGridDrawingPeriodicCrossingBars
@@ -293,6 +294,24 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.columnPort_integral_inside,
       ``LeanTrominoes.PeriodicGridDrawing.paddedFanSlabPort_point,
       ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_last_anchor,
+      ``LeanTrominoes.PeriodicGridDrawing.perturbedColumnHeight_translate,
+      ``LeanTrominoes.PeriodicGridDrawing.periodic_perturbedColumnHeight_row_bounds,
+      ``LeanTrominoes.PeriodicGridDrawing.periodicVirtualVerticalPort_inside,
+      ``LeanTrominoes.PeriodicGridDrawing.periodic_columnPort_coordinate_order,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_preserves_before,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_integral_inside,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_parent_realInteriorContains,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_input_noninterlacing,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_virtual_before_iff,
+      ``LeanTrominoes.PeriodicGridDrawing.mem_rectanglePortCandidates,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleParentPorts_cover,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleParentPorts_length_le_two,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleChordFamily_card_bound,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleChordFamily_noninterlacing,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleInputRoute_isRealOpenSimple,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleInputRoute_orthogonal,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleInputRoutes_disjoint,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleInputRoute_boundary_contact,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingCopies_height_injective,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingHeights_card_eq,
       ``LeanTrominoes.OrthogonalDrawingRefinement.height_brackets_same_or_separated,

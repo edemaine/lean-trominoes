@@ -127,37 +127,20 @@ It preserves rational vertex positions and locality, multiplies the grid
 size by 32, and makes the selected incidence point west at every
 degree-three vertex, whose outward directions are west, north, east.
 
-Theorem 2.2 has checked crossing enumeration and ranks, rectangle isolation,
-and simple, disjoint slab routes that compose through any finite slab sequence.
-Crossing redistribution preserves height order and row cells in every period.
-Straight planar drawings have distinct
-rational incidence rays; their clockwise order assigns disjoint orthogonal
-connectors from the 41 possible degree-four rectangle profiles, with boundary
-heights following the original slope order. The complete
-planar refinement construction remains open. A dogleg spanning more than
-one period overlaps its translated copy, so the global construction must
-handle row seams explicitly. The replacement rectangle router is proved:
-noninterlacing boundary chords have simple, disjoint orthogonal routes,
-using distinct inward depths bounded by the chord count. Translated cells
-can meet only at boundary ports. Its input crossing assembly remains open.
-Disjoint straight boundary chords are proved noninterlacing, horizontal
-seam tables cover every translated crossing, and padded redistribution
-reserves margins linear in the crossing count on a grid of size ≤3300M³.
-Padded crossing bars avoid every enlarged vertex connector in every period.
-Integral row-seam ports preserve crossing order, commute with translations,
-and stay inside the original column cell. At integer columns, the proved
-slope rule assigns rising crossings to the left slab and falling crossings
-to the right slab. These crossing ports meet the rectangle router's margin
-requirements, and their endpoints agree with the crossing bars and row seams.
-A single rational row-seam shift realizes all slope-biased slab choices in
-every period while keeping crossings inside their original straight segments.
-Disjoint chords in rectangles with arbitrary real origins remain disjoint
-after routing whenever the boundary-port map preserves their order.
-The row shift keeps every proper column crossing in its original row.
-A uniform rational column-cut width gives proper virtual crossing and
-vertex-incidence ports; their integral ports satisfy the router margins.
-Crossing, fan, and mixed vertical-face comparisons all preserve order,
-and enlarged fan endpoints agree with the adjacent slab ports.
+Theorem 2.2 has checked finite crossing tables and a rectangle router
+for straight local planar inputs of degree at most four. Rational row and
+column cuts give proper ports of the original edge occurrences, preserve
+crossing and incidence order in every period, and reserve margins for
+enlarged vertex connectors. The computable port enumeration groups ports
+by their parent edge and has at most two ordered ports per parent. Its
+assembled chord family has at most 18M² members and is noninterlacing;
+the resulting orthogonal routes are simple, pairwise disjoint, confined
+to their rectangles, and meet the boundary only at their own ports.
+The proposed grid has size ≤3300M³. Crossing bars avoid every enlarged
+vertex connector, and connector endpoints agree with adjacent slab ports.
+Edge-clip coverage, global periodic route assembly, and polygonal bends
+remain open. A checked example shows why row seams matter: a dogleg
+spanning more than one period can overlap its translated copy.
 
 `PeriodicTrominoPrefill.planeProblem_coREComplete` proves co-r.e. completeness
 of periodic L- and I-tromino completion in the plane. `compileDrawing_valid`
