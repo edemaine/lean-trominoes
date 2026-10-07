@@ -215,7 +215,7 @@ paper theorem being complete; the entries below distinguish these cases.
 | Corollary 5.3 | Translation-only plane co-r.e. completeness and strip PSPACE completeness proved |
 | Theorem 5.5 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Corollary 5.6 | Plane co-r.e. completeness and strip PSPACE completeness proved |
-| Corollary 5.7 | Finite-seed completion is co-r.e. for any two fixed polyominoes. Completion with a fixed Wang palette and finite prescribed tiles is co-r.e. hard. Refinement preserves pins, and a prescribed Q recovers exact I-gadget window tilings deep inside its forced quadrant in the original tiling. The pinned computation conversion remains open |
+| Corollary 5.7 | Finite-seed completion is co-r.e. for any two fixed polyominoes. Completion with a fixed Wang palette and finite prescribed tiles is co-r.e. hard. Refinement preserves pins; a prescribed Q recovers valid I-gadget orientations deep inside its forced quadrant in the original tiling, and finite P prescriptions fix their readouts. Transporting the Wang input pins through the intermediate formula and drawing reductions remains open |
 | Two connected polycubes | Full 3D and every fixed slab height > 1 proved |
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
 | Tromino completion | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |

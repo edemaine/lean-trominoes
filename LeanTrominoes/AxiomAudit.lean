@@ -22,6 +22,7 @@ import LeanTrominoes.PeriodicThreeDMLocalPlaneCompleteness
 import LeanTrominoes.FiniteOrientationNPComplete
 import LeanTrominoes.TrichromaticGraphOrientationCompleteness
 import LeanTrominoes.KeyedComplementRecoveredWindowTilings
+import LeanTrominoes.KeyedComplementGadgetPins
 import Lean.Util.CollectAxioms
 
 /-!
@@ -52,7 +53,9 @@ run_cmd do
       ``LeanTrominoes.PeriodicThreeDM.localPlaneProblem_coREComplete,
       ``LeanTrominoes.Gadget.FiniteOrientation.npComplete,
       ``LeanTrominoes.TrichromaticGraphOrientation.problem_coREComplete,
-      ``LeanTrominoes.KeyedPeriodicComplement.recoveredCoarse_windowTiling] do
+      ``LeanTrominoes.KeyedPeriodicComplement.recoveredCoarse_windowTiling,
+      ``LeanTrominoes.KeyedPeriodicComplement.PartialGadgetReadout.vertex_sound,
+      ``LeanTrominoes.KeyedPeriodicComplement.PartialGadgetReadout.readout_eq_of_pins] do
     let axioms ← Lean.collectAxioms name
     let extra := axioms.filter fun ax =>
       ax != ``propext && ax != ``Classical.choice && ax != ``Quot.sound
