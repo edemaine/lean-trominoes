@@ -31,6 +31,11 @@ import LeanTrominoes.PeriodicCNFDimensions
 import LeanTrominoes.PeriodicThreeDMLocalPlaneCompleteness
 import LeanTrominoes.FiniteOrientationNPComplete
 import LeanTrominoes.TrichromaticGraphOrientationCompleteness
+import LeanTrominoes.TrichromaticOrientationForcedSinkDrawing
+import LeanTrominoes.OrthogonalDrawingRefinementBounds
+import LeanTrominoes.PeriodicGraphDrawingCardinality
+import LeanTrominoes.GridSegmentCollinearRectangleSeparation
+import LeanTrominoes.DegreeThreeVertexNormalizationSelectedPort
 import LeanTrominoes.KeyedComplementRecoveredWindowTilings
 import LeanTrominoes.KeyedComplementGadgetPins
 import Lean.Util.CollectAxioms
@@ -89,6 +94,14 @@ run_cmd do
       ``LeanTrominoes.PeriodicThreeDM.localPlaneProblem_coREComplete,
       ``LeanTrominoes.Gadget.FiniteOrientation.npComplete,
       ``LeanTrominoes.TrichromaticGraphOrientation.problem_coREComplete,
+      ``LeanTrominoes.TrichromaticGraphOrientation.ForcedSink.internal_orientation_forces_boundary,
+      ``LeanTrominoes.TrichromaticGraphOrientation.ForcedSink.drawing_planar,
+      ``LeanTrominoes.TrichromaticGraphOrientation.ForcedSink.drawing_orthogonal,
+      ``LeanTrominoes.OrthogonalSlabRouting.real_tracks_disjoint,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.gridSize_cubic,
+      ``LeanTrominoes.GridSegment.vertex_rectangle_avoids_nonincident_segment,
+      ``LeanTrominoes.PeriodicGridDrawing.compatible_edge_count_bound,
+      ``LeanTrominoes.DegreeThreeVertexNormalization.selectedBoundarySide_west,
       ``LeanTrominoes.KeyedPeriodicComplement.recoveredCoarse_windowTiling,
       ``LeanTrominoes.KeyedPeriodicComplement.PartialGadgetReadout.vertex_sound,
       ``LeanTrominoes.KeyedPeriodicComplement.PartialGadgetReadout.readout_eq_of_pins] do
