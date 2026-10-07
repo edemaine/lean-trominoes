@@ -36,6 +36,8 @@ import LeanTrominoes.OrthogonalDrawingRefinementBounds
 import LeanTrominoes.PeriodicGraphDrawingCardinality
 import LeanTrominoes.GridSegmentCollinearRectangleSeparation
 import LeanTrominoes.DegreeThreeVertexNormalizationSelectedPort
+import LeanTrominoes.PeriodicOrthocrossingGeneralLocal
+import LeanTrominoes.GridPolylineRealAlgebra
 import LeanTrominoes.KeyedComplementRecoveredWindowTilings
 import LeanTrominoes.KeyedComplementGadgetPins
 import Lean.Util.CollectAxioms
@@ -102,6 +104,12 @@ run_cmd do
       ``LeanTrominoes.GridSegment.vertex_rectangle_avoids_nonincident_segment,
       ``LeanTrominoes.PeriodicGridDrawing.compatible_edge_count_bound,
       ``LeanTrominoes.DegreeThreeVertexNormalization.selectedBoundarySide_west,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.portX_injective,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.drawing_isCompatible,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.drawing_isOrthogonal,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.drawing_isRealLocal,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.drawing_gridSize_linear,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.degreeFourFan_meet_only_at_center,
       ``LeanTrominoes.KeyedPeriodicComplement.recoveredCoarse_windowTiling,
       ``LeanTrominoes.KeyedPeriodicComplement.PartialGadgetReadout.vertex_sound,
       ``LeanTrominoes.KeyedPeriodicComplement.PartialGadgetReadout.readout_eq_of_pins] do
