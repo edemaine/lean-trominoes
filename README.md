@@ -213,6 +213,7 @@ paper theorem being complete; the entries below distinguish these cases.
 | Corollary 5.3 | Translation-only plane co-r.e. completeness and strip PSPACE completeness proved |
 | Theorem 5.5 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Corollary 5.6 | Plane co-r.e. completeness and strip PSPACE completeness proved |
+| Corollary 5.7 | Finite-seed completion is co-r.e. for any two fixed polyominoes; fixed-palette hardness remains open |
 | Two connected polycubes | Full 3D and every fixed slab height > 1 proved |
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
 | Tromino completion | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |
@@ -232,6 +233,15 @@ paper theorem being complete; the entries below distinguish these cases.
 | Corollary 5.15 | Executable decision from cell representatives and arbitrary nonsingular integer period matrices; quadratic operation budget in the number of representatives for each fixed dimension, in the unit-cost arithmetic RAM model |
 | Corollary 5.4 | Proved for both trominoes under the explicit unary coordinate encoding: `Tromino.FiniteCoordinateColumns.region_npComplete` |
 | Other results 5.7–5.11 except those listed above | Open |
+
+The [finite-seed polyomino search](LeanTrominoes/FinitePolyominoCompletionSearch.lean)
+keeps every prescribed placement at every finite stage, including placements
+outside the inspected box. Its compactness theorem characterizes plane
+completion exactly by success at all stages. The
+[primitive-recursive verifier](LeanTrominoes/FinitePolyominoCompletionCoRE.lean)
+proves co-r.e. membership when both shapes are fixed and only the seed varies.
+[Boundary examples](LeanTrominoes/FinitePolyominoCompletionExamples.lean)
+check overlapping seeds outside the initial box and reject extra proof axioms.
 
 [Cook–Levin](LeanTrominoes/FiniteSATNPHard.lean) is proved for the
 [verifier-based NP definition](LeanTrominoes/NP.lean): every NP language reduces
