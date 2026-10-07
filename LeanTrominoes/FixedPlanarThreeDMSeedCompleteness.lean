@@ -28,7 +28,7 @@ def fixedFormula : PeriodicCNF Variable :=
 def fixedInstance : PeriodicThreeDM := PeriodicPlanarOneInThreeToThreeDM.encodedProblem fixedFormula
 def Problem := Prescribed fixedInstance.Satisfies
 
-private theorem source_occurrences :
+theorem source_occurrences :
     @PeriodicCNF.OccurrencesAtMost SourceVariable instBEqOfDecidableEq (by infer_instance) 3 source :=
   PeriodicCNF.occurrencesAtMost_congr_beq _ _ (by infer_instance) (by infer_instance) 3 source
     FixedThreeSATThreeSeed.fixedFormula_occurrencesAtMostThree
@@ -105,9 +105,8 @@ theorem fixedInstance_eq : fixedInstance =
     FixedThreeSATThreeSeed.fixedFormula_widthAtMostThree source_occurrences
     FixedThreeSATThreeSeed.fixedFormula_clausesNonempty
 
-def fixedPresentation : fixedInstance.ContinuousPlanarPresentation := by
-  rw [fixedInstance_eq]
-  exact retainedOrderedFixedEightPolarityNormalizedPaddedContinuousPlanarPresentation source
+def fixedPresentation : fixedInstance.ContinuousPlanarPresentation :=
+  fixedInstance_eq.symm ▸ retainedOrderedFixedEightPolarityNormalizedPaddedContinuousPlanarPresentation source
     FixedThreeSATThreeSeed.fixedFormula_isLocal
     FixedThreeSATThreeSeed.fixedFormula_widthAtMostThree source_occurrences
     FixedThreeSATThreeSeed.fixedFormula_clausesNonempty
