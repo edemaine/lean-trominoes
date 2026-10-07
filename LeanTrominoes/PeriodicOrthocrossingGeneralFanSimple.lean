@@ -14,12 +14,30 @@ theorem degreeFourFan_translated_simple (center : Int) (rank : Fin 4) :
     simp [degreeFourFan,translatePolyline,Cell.add,GridPolyline.SimpleBoxCertificate,
       gridPolylineSegments,GridSegment.BoxIntersectionIsPoint] <;> omega
 
-theorem fan_isRealSimple {Vertex : Type*} [DecidableEq Vertex] (graph : PeriodicGraph Vertex)
-    (orthogonal : Bool) (port : GraphPort Vertex) : GridPolyline.IsRealSimple (fan graph orthogonal port) := by
-  apply GridPolyline.isRealSimple_of_box_certificate
+theorem fan_simple_box_certificate {Vertex : Type*} [DecidableEq Vertex] (graph : PeriodicGraph Vertex)
+    (orthogonal : Bool) (port : GraphPort Vertex) : GridPolyline.SimpleBoxCertificate (fan graph orthogonal port) := by
   cases orthogonal
   · simp [fan,GridPolyline.SimpleBoxCertificate,gridPolylineSegments]
   · exact degreeFourFan_translated_simple (vertexX graph port.vertex)
+      ⟨portRank graph port % 4,Nat.mod_lt _ (by decide)⟩
+
+theorem fan_isRealSimple {Vertex : Type*} [DecidableEq Vertex] (graph : PeriodicGraph Vertex)
+    (orthogonal : Bool) (port : GraphPort Vertex) : GridPolyline.IsRealSimple (fan graph orthogonal port) :=
+  GridPolyline.isRealSimple_of_box_certificate (fan_simple_box_certificate graph orthogonal port)
+
+theorem degreeFourFan_reverse_translated_simple (offset : Cell) (center : Int) (rank : Fin 4) :
+    GridPolyline.SimpleBoxCertificate
+      (translatePolyline offset (translatePolyline (center,0) (degreeFourFan rank)).reverse) := by
+  fin_cases rank <;>
+    simp [degreeFourFan,translatePolyline,Cell.add,GridPolyline.SimpleBoxCertificate,
+      gridPolylineSegments,GridSegment.BoxIntersectionIsPoint] <;> omega
+
+theorem fan_reverse_translated_simple {Vertex : Type*} [DecidableEq Vertex] (graph : PeriodicGraph Vertex)
+    (orthogonal : Bool) (port : GraphPort Vertex) (offset : Cell) : GridPolyline.SimpleBoxCertificate
+      (translatePolyline offset (fan graph orthogonal port).reverse) := by
+  cases orthogonal
+  · simp [fan,translatePolyline,Cell.add,GridPolyline.SimpleBoxCertificate,gridPolylineSegments]
+  · exact degreeFourFan_reverse_translated_simple offset (vertexX graph port.vertex)
       ⟨portRank graph port % 4,Nat.mod_lt _ (by decide)⟩
 
 theorem degreeFourFan_top_contact (rank : Fin 4) {point : ℝ × ℝ}

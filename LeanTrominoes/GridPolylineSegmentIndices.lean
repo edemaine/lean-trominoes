@@ -39,4 +39,21 @@ theorem indexed_gridPolylineSegments_consecutive {route : List Cell} {first seco
   rw [adjacent,secondEnds.1] at firstEnds
   exact Option.some.inj firstEnds.2.symm
 
+theorem indexed_gridPolylineSegment_head {route : List Cell} {tagged : GridSegment × Nat}
+    (member : tagged ∈ (gridPolylineSegments route).zipIdx) (firstIndex : tagged.2 = 0) :
+    route.head? = some tagged.1.start := by
+  have ends := indexed_gridPolylineSegment_endpoints member
+  rw [firstIndex] at ends
+  have zeroGet : route[0]? = route.head? := by cases route <;> rfl
+  simpa only [zeroGet] using ends.1
+
+theorem indexed_gridPolylineSegment_last {route : List Cell} {tagged : GridSegment × Nat}
+    (member : tagged ∈ (gridPolylineSegments route).zipIdx)
+    (lastIndex : tagged.2+1 = (gridPolylineSegments route).length) :
+    route.getLast? = some tagged.1.finish := by
+  have ends := indexed_gridPolylineSegment_endpoints member
+  have endpointIndex : route.length-1 = tagged.2+1 := by rw [lastIndex,gridPolylineSegments_length]
+  rw [List.getLast?_eq_getElem?,endpointIndex]
+  exact ends.2
+
 end LeanTrominoes

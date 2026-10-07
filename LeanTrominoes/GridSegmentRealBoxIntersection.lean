@@ -53,4 +53,24 @@ theorem real_intersection_eq_of_box_certificate {first second : GridSegment} {ce
   rw [yh] at yhi
   exact Prod.ext (le_antisymm xhi xlo) (le_antisymm yhi ylo)
 
+theorem real_boxes_overlap_of_real_contacts {first second : GridSegment} {point : ℝ × ℝ}
+    (firstContains : first.RealContains point) (secondContains : second.RealContains point) :
+    max (min first.start.1 first.finish.1) (min second.start.1 second.finish.1) ≤
+        min (max first.start.1 first.finish.1) (max second.start.1 second.finish.1) ∧
+      max (min first.start.2 first.finish.2) (min second.start.2 second.finish.2) ≤
+        min (max first.start.2 first.finish.2) (max second.start.2 second.finish.2) := by
+  have firstBox := realBoxContains_of_realContains firstContains
+  have secondBox := realBoxContains_of_realContains secondContains
+  constructor
+  · apply max_le <;> apply le_min
+    · exact_mod_cast le_trans firstBox.1 firstBox.2.1
+    · exact_mod_cast le_trans firstBox.1 secondBox.2.1
+    · exact_mod_cast le_trans secondBox.1 firstBox.2.1
+    · exact_mod_cast le_trans secondBox.1 secondBox.2.1
+  · apply max_le <;> apply le_min
+    · exact_mod_cast le_trans firstBox.2.2.1 firstBox.2.2.2
+    · exact_mod_cast le_trans firstBox.2.2.1 secondBox.2.2.2
+    · exact_mod_cast le_trans secondBox.2.2.1 firstBox.2.2.2
+    · exact_mod_cast le_trans secondBox.2.2.1 secondBox.2.2.2
+
 end LeanTrominoes.GridSegment

@@ -114,6 +114,13 @@ import LeanTrominoes.PeriodicExactOneLineReduction
 /-!
 # Main theorem interface
 
+`PeriodicOrthocrossing.GeneralPorts.local_orthocrossing_drawing` proves
+Theorem 2.1 for every well-formed local periodic graph, including loops and
+isolated vertices. The grid size is at most `16(V+E+1)`, or `32(V+E)` for
+nonempty graphs. `local_orthogonal_orthocrossing_drawing` adds orthogonality
+for maximum degree four. Real crossings lie on the grid, and three distinct
+route occurrences cannot cross at one point away from their endpoints.
+
 `PeriodicTrominoPrefill.planeProblem_coREComplete` proves co-r.e. completeness
 of periodic L- and I-tromino completion in the plane. `compileDrawing_valid`
 in `CompletionPattern.LBricks` and `CompletionPattern.IBricks` proves that
