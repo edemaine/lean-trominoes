@@ -19,6 +19,7 @@ import LeanTrominoes.FixedWangSeedPlaneHardness
 import LeanTrominoes.FixedThreeSATThreeSeedCompleteness
 import LeanTrominoes.FixedPlanarSATSeedCompleteness
 import LeanTrominoes.FixedRetainedExactOneSeedCompleteness
+import LeanTrominoes.FixedPlanarThreeDMSeedCompleteness
 import LeanTrominoes.PeriodicCNFPlanarRetainedPolaritySeed
 import LeanTrominoes.BumpySeedRefinement
 import LeanTrominoes.PeriodicCNFDimensions
@@ -58,6 +59,10 @@ run_cmd do
       ``LeanTrominoes.FixedRetainedExactOneSeed.coREComplete,
       ``LeanTrominoes.FixedRetainedExactOneSeed.fixedDrawing_planar,
       ``LeanTrominoes.FixedRetainedExactOneSeed.fixedDrawing_compatible,
+      ``LeanTrominoes.FixedPlanarThreeDMSeed.coREComplete,
+      ``LeanTrominoes.FixedPlanarThreeDMSeed.fixedPresentation,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.encodedSeedFactor,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.totalSeedReduction_correct,
       ``LeanTrominoes.PeriodicOrthocrossing.retainedPolaritySeedFactor,
       ``LeanTrominoes.PeriodicCNF.SignedDecoder.local_clause,
       ``LeanTrominoes.PlusRefinement.seeded_refinement_iff,

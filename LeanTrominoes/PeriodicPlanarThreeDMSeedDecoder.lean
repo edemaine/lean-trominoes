@@ -48,4 +48,54 @@ theorem typedSeedFactor (source : PeriodicCNF V) (occurrences : source.Occurrenc
     intro v _ c
     simpa [decode,typedSeedRead,Cell.add] using canonical_seed_inverse source a v c
 
+theorem seedTriple_mem (source : PeriodicCNF V) (v : V)
+    (member : v ∈ occurringVariables source) : seedTriple source v ∈ (problem source).triples := by
+  have firstMember : (.first : OccurrenceSlot) ∈ usedSlots source v := by
+    rcases usedSlots_cases_of_atom_mem source v member with one | two | three <;>
+      simp_all
+  apply List.mem_append_left
+  apply List.mem_flatMap.mpr
+  refine ⟨v,member,List.mem_flatMap.mpr ⟨.first,firstMember,?_⟩⟩
+  cases kind : occurrenceConnectorKind source v .first <;>
+    cases polarity : occurrencePolarity source v .first <;>
+    simp [seedTriple,occurrenceTriples,kind,polarity,allFixedRedTriples,allOrdinaryTriples]
+
+def encodedSeedRead (source : PeriodicCNF V) (v : V) : PeriodicLiteral Nat :=
+  ⟨(problem source).triples.idxOf (seedTriple source v),(0,0),true⟩
+
+theorem encodedSeed_decode (source : PeriodicCNF V)
+    (a : (encodedProblem source).MatchingAssignment) :
+    decode (encodedSeedRead source) a =
+      assignmentOfMatching source ((problem source).decodeAssignment a) := by
+  rw [← typedSeed_decode]
+  funext v c
+  simp [decode,encodedSeedRead,typedSeedRead,TypedProblem.decodeAssignment,Cell.add]
+
+theorem encodedSeedFactor (source : PeriodicCNF V) (occurrences : source.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source) :
+    LogicalFactor (PeriodicOneInThree.Satisfies source) (encodedProblem source).Satisfies
+      (encodedSeedRead source) {v | v ∈ occurringVariables source} := by
+  constructor
+  · intro a ha
+    rw [encodedSeed_decode]
+    exact assignmentOfMatching_satisfies source occurrences arity _
+      (typed_satisfies_of_encoded_satisfies source a ha)
+  · intro a ha
+    let matching := matchingOfAssignment source a
+    refine ⟨(problem source).encodeAssignment matching,
+      encoded_satisfies_of_typed_satisfies source matching
+        (matchingOfAssignment_satisfies source occurrences arity a ha),?_⟩
+    intro v hv c
+    change (problem source).encodeAssignment matching
+      ((problem source).triples.idxOf (seedTriple source v)) (Cell.add c (0,0)) = a v c
+    rw [(problem source).encodeAssignment_idxOf matching _ (seedTriple_mem source v hv)]
+    simpa [Cell.add,matching] using canonical_seed_inverse source a v c
+
+theorem encodedSeeded_iff (source : PeriodicCNF V) (occurrences : source.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source) (seed : PeriodicCNF.Seed V)
+    (supported : SupportedSeed {v | v ∈ occurringVariables source} seed) :
+    Prescribed (PeriodicOneInThree.Satisfies source) seed ↔
+      Prescribed (encodedProblem source).Satisfies (transportSeed (encodedSeedRead source) seed) :=
+  (encodedSeedFactor source occurrences arity).seeded_iff seed supported
+
 end LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM
