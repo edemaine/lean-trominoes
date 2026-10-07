@@ -37,6 +37,10 @@ import LeanTrominoes.PeriodicGraphDrawingCardinality
 import LeanTrominoes.GridSegmentCollinearRectangleSeparation
 import LeanTrominoes.DegreeThreeVertexNormalizationSelectedPort
 import LeanTrominoes.PeriodicOrthocrossingGeneralLocal
+import LeanTrominoes.PeriodicOrthocrossingGeneralCoreOccurrenceCrossings
+import LeanTrominoes.PeriodicOrthocrossingGeneralFanContacts
+import LeanTrominoes.PeriodicOrthocrossingGeneralFanCoreContacts
+import LeanTrominoes.PeriodicOrthocrossingGeneralRouteFanCoreSeparation
 import LeanTrominoes.GridPolylineRealAlgebra
 import LeanTrominoes.KeyedComplementRecoveredWindowTilings
 import LeanTrominoes.KeyedComplementGadgetPins
@@ -110,6 +114,15 @@ run_cmd do
       ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.drawing_isRealLocal,
       ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.drawing_gridSize_linear,
       ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.degreeFourFan_meet_only_at_center,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.core_isRealSimple,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.core_contacts_distinct_occurrences_are_proper,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.fan_periodic_contacts_center,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.fan_isRealSimple,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.fan_top_contact,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.fan_core_contacts_only_at_joint,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.route_realContains_parts,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.source_fan_core_contacts_same_occurrence,
+      ``LeanTrominoes.PeriodicOrthocrossing.GeneralPorts.target_fan_core_contacts_same_occurrence,
       ``LeanTrominoes.KeyedPeriodicComplement.recoveredCoarse_windowTiling,
       ``LeanTrominoes.KeyedPeriodicComplement.PartialGadgetReadout.vertex_sound,
       ``LeanTrominoes.KeyedPeriodicComplement.PartialGadgetReadout.readout_eq_of_pins] do
