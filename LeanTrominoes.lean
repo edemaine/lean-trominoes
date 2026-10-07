@@ -153,6 +153,11 @@ A single rational row-seam shift realizes all slope-biased slab choices in
 every period while keeping crossings inside their original straight segments.
 Disjoint chords in rectangles with arbitrary real origins remain disjoint
 after routing whenever the boundary-port map preserves their order.
+The row shift keeps every proper column crossing in its original row.
+A uniform rational column-cut width gives proper virtual crossing and
+vertex-incidence ports; their integral ports satisfy the router margins.
+Crossing, fan, and mixed vertical-face comparisons all preserve order,
+and enlarged fan endpoints agree with the adjacent slab ports.
 
 `PeriodicTrominoPrefill.planeProblem_coREComplete` proves co-r.e. completeness
 of periodic L- and I-tromino completion in the plane. `compileDrawing_valid`

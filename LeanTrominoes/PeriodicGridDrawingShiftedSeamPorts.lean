@@ -4,15 +4,16 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LeanTrominoes.PeriodicGridDrawingSeamCrossingCoordinates
 import LeanTrominoes.GridSegmentRationalSeamPerturbation
+import LeanTrominoes.PeriodicGridDrawingSeamRowConstraints
 
 /-! # A single rational row-seam shift realizes all finite-table port choices -/
 namespace LeanTrominoes.PeriodicGridDrawing
 open OrthogonalDrawingRefinement
 
 def seamPerturbationValues {Vertex : Type*} (graph : PeriodicGraph Vertex) (drawing : PeriodicGridDrawing) : List (ℚ × ℚ) :=
-  (seamCrossingCopies graph drawing 0).map fun key =>
+  ((seamCrossingCopies graph drawing 0).map fun key =>
     ((drawing.liftedStraightSegment key.1 key.2).rationalLineAbscissa 0,
-      (drawing.liftedStraightSegment key.1 key.2).horizontalSeamVelocity)
+      (drawing.liftedStraightSegment key.1 key.2).horizontalSeamVelocity)) ++ seamRowConstraintValues graph drawing
 
 def seamPerturbation {Vertex : Type*} (graph : PeriodicGraph Vertex) (drawing : PeriodicGridDrawing) : ℚ :=
   RationalPerturbation.slabPerturbation (seamPerturbationValues graph drawing)
@@ -23,11 +24,17 @@ def shiftedSeamAbscissa {Vertex : Type*} (graph : PeriodicGraph Vertex) (drawing
 theorem seamPerturbation_positive {Vertex : Type*} (graph : PeriodicGraph Vertex) (drawing : PeriodicGridDrawing) :
     0 < seamPerturbation graph drawing := RationalPerturbation.slabPerturbation_positive _
 
+theorem seamPerturbation_le_pairBound {Vertex : Type*} {graph : PeriodicGraph Vertex} {drawing : PeriodicGridDrawing}
+    {first second : ℚ × ℚ} (firstMember : first ∈ seamPerturbationValues graph drawing)
+    (secondMember : second ∈ seamPerturbationValues graph drawing) :
+    seamPerturbation graph drawing ≤ RationalPerturbation.pairBound first second :=
+  (RationalPerturbation.slabPerturbation_le_margin _).trans (RationalPerturbation.margin_le_pairBound firstMember secondMember)
+
 theorem mem_seamPerturbationValues {Vertex : Type*} {graph : PeriodicGraph Vertex} {drawing : PeriodicGridDrawing}
     {key : Nat × Cell} (member : key ∈ seamCrossingCopies graph drawing 0) :
     ((drawing.liftedStraightSegment key.1 key.2).rationalLineAbscissa 0,
       (drawing.liftedStraightSegment key.1 key.2).horizontalSeamVelocity) ∈ seamPerturbationValues graph drawing :=
-  List.mem_map.mpr ⟨key,member,rfl⟩
+  List.mem_append.mpr (Or.inl (List.mem_map.mpr ⟨key,member,rfl⟩))
 
 theorem shiftedSeamAbscissa_eq_evaluate {Vertex : Type*} (graph : PeriodicGraph Vertex) (drawing : PeriodicGridDrawing) (key : Nat × Cell) :
     shiftedSeamAbscissa graph drawing key = RationalPerturbation.evaluate (seamPerturbation graph drawing)

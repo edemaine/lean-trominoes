@@ -54,6 +54,7 @@ import LeanTrominoes.PeriodicGridDrawingShiftedSeamBounds
 import LeanTrominoes.RectangleBoundaryMatchingTransport
 import LeanTrominoes.OrthogonalBoundarySlabSeparation
 import LeanTrominoes.PeriodicGridDrawingVirtualHorizontalPortOrder
+import LeanTrominoes.PeriodicGridDrawingColumnPortTransport
 import LeanTrominoes.PeriodicGridDrawingAnchorBoundaryOrder
 import LeanTrominoes.PeriodicGridDrawingPeriodicColumnRefinement
 import LeanTrominoes.PeriodicGridDrawingPeriodicCrossingBars
@@ -275,6 +276,23 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.virtualHorizontalPort_inside,
       ``LeanTrominoes.PeriodicGridDrawing.virtualHorizontalPort_realInteriorContains,
       ``LeanTrominoes.PeriodicGridDrawing.virtualHorizontalPort_before,
+      ``LeanTrominoes.RationalPerturbation.evaluate_lt_iff,
+      ``LeanTrominoes.RationalPerturbation.evaluate_injective_on,
+      ``LeanTrominoes.PeriodicGridDrawing.shifted_row_bounds_for_column_crossing,
+      ``LeanTrominoes.PeriodicGridDrawing.columnPerturbation_preserves_order,
+      ``LeanTrominoes.PeriodicGridDrawing.virtualVerticalPort_inside,
+      ``LeanTrominoes.PeriodicGridDrawing.virtualVerticalPort_point,
+      ``LeanTrominoes.PeriodicGridDrawing.virtualIncidencePort_inside,
+      ``LeanTrominoes.PeriodicGridDrawing.virtualIncidencePort_realInteriorContains,
+      ``LeanTrominoes.PeriodicGridDrawing.virtualVerticalPort_before,
+      ``LeanTrominoes.PeriodicGridDrawing.crossing_fan_coordinate_order,
+      ``LeanTrominoes.PeriodicGridDrawing.fan_crossing_coordinate_order,
+      ``LeanTrominoes.PeriodicGridDrawing.virtualIncidencePort_coordinate_order,
+      ``LeanTrominoes.PeriodicGridDrawing.columnPort_coordinate_order,
+      ``LeanTrominoes.PeriodicGridDrawing.columnPort_virtual_inside,
+      ``LeanTrominoes.PeriodicGridDrawing.columnPort_integral_inside,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedFanSlabPort_point,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_last_anchor,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingCopies_height_injective,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingHeights_card_eq,
       ``LeanTrominoes.OrthogonalDrawingRefinement.height_brackets_same_or_separated,
