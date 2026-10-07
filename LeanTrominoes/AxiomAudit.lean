@@ -36,7 +36,7 @@ import LeanTrominoes.OrthogonalDrawingRefinementBounds
 import LeanTrominoes.PeriodicGraphDrawingCardinality
 import LeanTrominoes.GridSegmentCollinearRectangleSeparation
 import LeanTrominoes.DegreeThreeVertexNormalizationSelectedPort
-import LeanTrominoes.GeneralVertexNormalizationFanAssignment
+import LeanTrominoes.GeneralVertexNormalization
 import LeanTrominoes.PeriodicOrthocrossingGeneralLocal
 import LeanTrominoes.PeriodicOrthocrossingGeneralCoreOccurrenceCrossings
 import LeanTrominoes.PeriodicOrthocrossingGeneralFanContacts
@@ -138,6 +138,12 @@ run_cmd do
       ``LeanTrominoes.GeneralVertexNormalization.portDirection_genuine,
       ``LeanTrominoes.GeneralVertexNormalization.fanAssignment_last,
       ``LeanTrominoes.GeneralVertexNormalization.fanAssignment_chosen_west,
+      ``LeanTrominoes.GeneralVertexNormalization.distinctPortSides_of_planar_orthogonal,
+      ``LeanTrominoes.GeneralVertexNormalization.normalizedRoute_simple,
+      ``LeanTrominoes.GeneralVertexNormalization.normalizedDrawing_isRealPlanarDrawing,
+      ``LeanTrominoes.GeneralVertexNormalization.normalizedDrawing_isRealLocal,
+      ``LeanTrominoes.GeneralVertexNormalization.normalizedDrawing_chosen_west,
+      ``LeanTrominoes.GeneralVertexNormalization.lemma23,
       ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplate_real_contacts_center,
       ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplateAt_contacts_same_position,
       ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplateAt_trimmedRoute_contact,

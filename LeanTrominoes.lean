@@ -121,6 +121,12 @@ nonempty graphs. `local_orthogonal_orthocrossing_drawing` adds orthogonality
 for maximum degree four. Real crossings lie on the grid, and three distinct
 route occurrences cannot cross at one point away from their endpoints.
 
+`GeneralVertexNormalization.lemma23` proves whole-drawing vertex
+normalization for any real planar orthogonal drawing, including loops.
+It preserves rational vertex positions and locality, multiplies the grid
+size by 32, and makes the selected incidence point west at every
+degree-three vertex, whose outward directions are west, north, east.
+
 `PeriodicTrominoPrefill.planeProblem_coREComplete` proves co-r.e. completeness
 of periodic L- and I-tromino completion in the plane. `compileDrawing_valid`
 in `CompletionPattern.LBricks` and `CompletionPattern.IBricks` proves that
