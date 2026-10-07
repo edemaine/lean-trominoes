@@ -76,6 +76,7 @@ import LeanTrominoes.PeriodicCNFDimensions
 import LeanTrominoes.FinitePolyominoCompletionCoRE
 import LeanTrominoes.PeriodicOneInThreeCompleteness
 import LeanTrominoes.PeriodicThreeDMPlaneCompleteness
+import LeanTrominoes.PeriodicThreeDMLocalPlaneCompleteness
 import LeanTrominoes.NormalizedOrientationCompleteness
 import LeanTrominoes.Theorem55Proof
 import LeanTrominoes.Theorem55StripProof
