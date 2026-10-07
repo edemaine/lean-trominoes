@@ -44,6 +44,9 @@ import LeanTrominoes.OrthogonalSlabRouteWord
 import LeanTrominoes.OrthogonalSlabPeriodicOverlap
 import LeanTrominoes.OrthogonalBoundaryMatchingCorrect
 import LeanTrominoes.OrthogonalBoundaryCellSeparation
+import LeanTrominoes.RealRectangleBoundaryNoninterlacing
+import LeanTrominoes.PeriodicGridDrawingPeriodicHorizontalCrossingTable
+import LeanTrominoes.FiniteHeightPaddedRedistribution
 import LeanTrominoes.PeriodicGridDrawingAnchorBoundaryOrder
 import LeanTrominoes.PeriodicGridDrawingPeriodicColumnRefinement
 import LeanTrominoes.PeriodicGridDrawingPeriodicCrossingBars
@@ -200,6 +203,18 @@ run_cmd do
       ``LeanTrominoes.OrthogonalBoundaryRouting.matchingRoutes_disjoint,
       ``LeanTrominoes.OrthogonalBoundaryRouting.route_boundary_contact_ports,
       ``LeanTrominoes.OrthogonalBoundaryRouting.distinct_cells_contact_first_endpoint,
+      ``LeanTrominoes.GridSegment.RealContains.interpolate_interior,
+      ``LeanTrominoes.GridSegment.real_interior_contact_of_opposite_sides,
+      ``LeanTrominoes.RealRectangleBoundary.orientedArea_positive_between,
+      ``LeanTrominoes.RealRectangleBoundary.alternating_chords_interior_contact,
+      ``LeanTrominoes.RealRectangleBoundary.noninterlacing_of_disjoint_interiors,
+      ``LeanTrominoes.PeriodicGridDrawing.horizontalCrossingAbscissae_card_bound,
+      ``LeanTrominoes.PeriodicGridDrawing.horizontalCrossingCopies_complete,
+      ``LeanTrominoes.PeriodicGridDrawing.horizontal_crossing_abscissae_ne,
+      ``LeanTrominoes.PeriodicGridDrawing.periodic_horizontal_crossing_residue_mem,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.paddedGridSize_cubic,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.paddedRedistributedHeight_strictMonoOn,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.paddedRedistributedHeight_bounds,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingCopies_height_injective,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingHeights_card_eq,
       ``LeanTrominoes.OrthogonalDrawingRefinement.height_brackets_same_or_separated,

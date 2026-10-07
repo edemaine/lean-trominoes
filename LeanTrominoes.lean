@@ -140,6 +140,9 @@ handle row seams explicitly. The replacement rectangle router is proved:
 noninterlacing boundary chords have simple, disjoint orthogonal routes,
 using distinct inward depths bounded by the chord count. Translated cells
 can meet only at boundary ports. Its input crossing assembly remains open.
+Disjoint straight boundary chords are proved noninterlacing, horizontal
+seam tables cover every translated crossing, and padded redistribution
+reserves margins linear in the crossing count on a grid of size ≤3300M³.
 
 `PeriodicTrominoPrefill.planeProblem_coREComplete` proves co-r.e. completeness
 of periodic L- and I-tromino completion in the plane. `compileDrawing_valid`
