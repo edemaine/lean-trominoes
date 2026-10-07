@@ -47,6 +47,9 @@ import LeanTrominoes.OrthogonalBoundaryCellSeparation
 import LeanTrominoes.RealRectangleBoundaryNoninterlacing
 import LeanTrominoes.PeriodicGridDrawingPeriodicHorizontalCrossingTable
 import LeanTrominoes.FiniteHeightPaddedRedistribution
+import LeanTrominoes.PeriodicGridDrawingPaddedCrossingBars
+import LeanTrominoes.PeriodicGridDrawingPaddedSlabPorts
+import LeanTrominoes.FiniteRationalPerturbation
 import LeanTrominoes.PeriodicGridDrawingAnchorBoundaryOrder
 import LeanTrominoes.PeriodicGridDrawingPeriodicColumnRefinement
 import LeanTrominoes.PeriodicGridDrawingPeriodicCrossingBars
@@ -215,6 +218,37 @@ run_cmd do
       ``LeanTrominoes.OrthogonalDrawingRefinement.paddedGridSize_cubic,
       ``LeanTrominoes.OrthogonalDrawingRefinement.paddedRedistributedHeight_strictMonoOn,
       ``LeanTrominoes.OrthogonalDrawingRefinement.paddedRedistributedHeight_bounds,
+      ``LeanTrominoes.GridPolyline.IsRealOpenSimple.scale,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_isRealOpenSimple,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_orthogonal,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_contacts_center,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_contacts_same_position,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedCrossingBars_disjoint,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.periodicRedistributedHeight_vertex_clearance,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedPeriodicColumnHeight_translate,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedPeriodicColumnHeight_row_clearance,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedPeriodicColumnHeight_preserves_order,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedPeriodicColumnHeight_avoids_lifted_vertex,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedCrossingBar_avoids_lifted_rectangle,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.rationalSlab_translate,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.rationalSlab_order,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.seamCoordinate_strictMonoOn,
+      ``LeanTrominoes.GridSegment.local_horizontal_seam_abscissa_bounds,
+      ``LeanTrominoes.PeriodicGridDrawing.horizontalCrossingCopies_abscissa_injective,
+      ``LeanTrominoes.PeriodicGridDrawing.periodic_seam_crossing_residue_mem,
+      ``LeanTrominoes.PeriodicGridDrawing.periodicSeamCoordinate_translate,
+      ``LeanTrominoes.PeriodicGridDrawing.periodicSeamCoordinate_preserves_order,
+      ``LeanTrominoes.PeriodicGridDrawing.periodicSeamCoordinate_slab_clearance,
+      ``LeanTrominoes.PeriodicGridDrawing.row_seam_integral_column_bias,
+      ``LeanTrominoes.PeriodicGridDrawing.row_seam_port_column_locality,
+      ``LeanTrominoes.PeriodicGridDrawing.row_seam_ports_preserve_order,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedSlab_room,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedVerticalSlabPort_inside,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedHorizontalSlabPort_inside,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedVerticalSlabPort_point,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedHorizontalSlabPort_point,
+      ``LeanTrominoes.RationalPerturbation.margin_positive,
+      ``LeanTrominoes.RationalPerturbation.evaluate_order,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingCopies_height_injective,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingHeights_card_eq,
       ``LeanTrominoes.OrthogonalDrawingRefinement.height_brackets_same_or_separated,

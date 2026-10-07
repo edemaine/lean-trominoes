@@ -143,6 +143,12 @@ can meet only at boundary ports. Its input crossing assembly remains open.
 Disjoint straight boundary chords are proved noninterlacing, horizontal
 seam tables cover every translated crossing, and padded redistribution
 reserves margins linear in the crossing count on a grid of size ≤3300M³.
+Padded crossing bars avoid every enlarged vertex connector in every period.
+Integral row-seam ports preserve crossing order, commute with translations,
+and stay inside the original column cell. At integer columns, the proved
+slope rule assigns rising crossings to the left slab and falling crossings
+to the right slab. These crossing ports meet the rectangle router's margin
+requirements, and their endpoints agree with the crossing bars and row seams.
 
 `PeriodicTrominoPrefill.planeProblem_coREComplete` proves co-r.e. completeness
 of periodic L- and I-tromino completion in the plane. `compileDrawing_valid`
