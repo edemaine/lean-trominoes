@@ -24,6 +24,7 @@ import LeanTrominoes.FixedNormalizedOrientationSeedCompleteness
 import LeanTrominoes.GadgetIPreferredSelection
 import LeanTrominoes.GadgetICanonicalSeedComputability
 import LeanTrominoes.FixedPolyominoSeedQuarterSoundness
+import LeanTrominoes.FixedPolyominoSeedCompleteness
 import LeanTrominoes.PeriodicCNFPlanarRetainedPolaritySeed
 import LeanTrominoes.BumpySeedRefinement
 import LeanTrominoes.PeriodicCNFDimensions
@@ -74,6 +75,9 @@ run_cmd do
       ``LeanTrominoes.Gadget.CanonicalISelection.refinedSeedPlacements_primrec,
       ``LeanTrominoes.FixedWangNormalizedSeedDecoder.uniform_window,
       ``LeanTrominoes.FixedPolyominoSeed.quarter_satisfies,
+      ``LeanTrominoes.FixedPolyominoSeed.coREComplete,
+      ``LeanTrominoes.FixedPolyominoSeed.corollary57,
+      ``LeanTrominoes.FixedPolyominoSeed.reduction_computable,
       ``LeanTrominoes.FixedMachineWangSeed.PlaneExtension.quarter_of_seeded_quarter,
       ``LeanTrominoes.KeyedPeriodicComplement.PartialGadgetReadout.readout_eq_of_deep_pins,
       ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.encodedSeedFactor,

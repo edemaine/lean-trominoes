@@ -84,6 +84,7 @@ import LeanTrominoes.FixedNormalizedOrientationSeedCompleteness
 import LeanTrominoes.GadgetIPreferredSelection
 import LeanTrominoes.GadgetICanonicalSeedComputability
 import LeanTrominoes.FixedPolyominoSeedQuarterSoundness
+import LeanTrominoes.FixedPolyominoSeedCompleteness
 import LeanTrominoes.PeriodicCNFPlanarRetainedPolaritySeed
 import LeanTrominoes.BumpySeedRefinement
 import LeanTrominoes.TrichromaticGraphOrientationCompleteness
@@ -220,6 +221,13 @@ This does not assert a bit-Turing or Lean VM runtime bound.
 
 This module is the public result interface. Lake's `LeanTrominoes.*` glob
 checks every construction module independently of this import list.
+-/
+
+/-!
+`FixedPolyominoSeed.corollary57` proves Corollary 5.7: two fixed polyominoes
+have co-r.e.-complete finite-seed plane completion. The small tile is the
+connected 15-cell bumpy I-tromino. The computable seed includes one prescribed
+Q and finite P patterns; soundness recovers the source input from that same tiling.
 -/
 
 /-!
