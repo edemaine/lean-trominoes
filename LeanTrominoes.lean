@@ -149,6 +149,10 @@ and stay inside the original column cell. At integer columns, the proved
 slope rule assigns rising crossings to the left slab and falling crossings
 to the right slab. These crossing ports meet the rectangle router's margin
 requirements, and their endpoints agree with the crossing bars and row seams.
+A single rational row-seam shift realizes all slope-biased slab choices in
+every period while keeping crossings inside their original straight segments.
+Disjoint chords in rectangles with arbitrary real origins remain disjoint
+after routing whenever the boundary-port map preserves their order.
 
 `PeriodicTrominoPrefill.planeProblem_coREComplete` proves co-r.e. completeness
 of periodic L- and I-tromino completion in the plane. `compileDrawing_valid`

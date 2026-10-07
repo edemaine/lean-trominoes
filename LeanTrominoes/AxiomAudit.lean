@@ -50,6 +50,10 @@ import LeanTrominoes.FiniteHeightPaddedRedistribution
 import LeanTrominoes.PeriodicGridDrawingPaddedCrossingBars
 import LeanTrominoes.PeriodicGridDrawingPaddedSlabPorts
 import LeanTrominoes.FiniteRationalPerturbation
+import LeanTrominoes.PeriodicGridDrawingShiftedSeamBounds
+import LeanTrominoes.RectangleBoundaryMatchingTransport
+import LeanTrominoes.OrthogonalBoundarySlabSeparation
+import LeanTrominoes.PeriodicGridDrawingVirtualHorizontalPortOrder
 import LeanTrominoes.PeriodicGridDrawingAnchorBoundaryOrder
 import LeanTrominoes.PeriodicGridDrawingPeriodicColumnRefinement
 import LeanTrominoes.PeriodicGridDrawingPeriodicCrossingBars
@@ -249,6 +253,28 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.paddedHorizontalSlabPort_point,
       ``LeanTrominoes.RationalPerturbation.margin_positive,
       ``LeanTrominoes.RationalPerturbation.evaluate_order,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.rationalSlab_perturbation,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.rationalSlab_perturbation_strict_bounds,
+      ``LeanTrominoes.RationalPerturbation.slabPerturbation_positive,
+      ``LeanTrominoes.RationalPerturbation.slabPerturbation_preserves_order,
+      ``LeanTrominoes.RationalPerturbation.slabPerturbation_realizes_bias,
+      ``LeanTrominoes.GridSegment.shifted_horizontal_seam_slab,
+      ``LeanTrominoes.GridSegment.shifted_horizontal_seam_realInteriorContains,
+      ``LeanTrominoes.PeriodicGridDrawing.shiftedSeamAbscissa_slab,
+      ``LeanTrominoes.PeriodicGridDrawing.shiftedSeamAbscissae_preserve_order,
+      ``LeanTrominoes.PeriodicGridDrawing.row_shifted_seam_slab,
+      ``LeanTrominoes.PeriodicGridDrawing.row_shifted_seam_realInteriorContains,
+      ``LeanTrominoes.PeriodicGridDrawing.shiftedSeamAbscissa_strict_slab_bounds,
+      ``LeanTrominoes.PeriodicGridDrawing.shiftedSeamAbscissa_in_cell,
+      ``LeanTrominoes.RealRectangleBoundary.shifted_noninterlacing_of_disjoint_interiors,
+      ``LeanTrominoes.RectangleBoundaryMatchingTransport.preserves_before,
+      ``LeanTrominoes.RectangleBoundaryMatchingTransport.routed_straight_chords_disjoint,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.distinct_slabs_contact_first_endpoint,
+      ``LeanTrominoes.PeriodicGridDrawing.columnCutMargin_positive,
+      ``LeanTrominoes.PeriodicGridDrawing.shiftedSeamAbscissa_inside_shrunken_slab,
+      ``LeanTrominoes.PeriodicGridDrawing.virtualHorizontalPort_inside,
+      ``LeanTrominoes.PeriodicGridDrawing.virtualHorizontalPort_realInteriorContains,
+      ``LeanTrominoes.PeriodicGridDrawing.virtualHorizontalPort_before,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingCopies_height_injective,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingHeights_card_eq,
       ``LeanTrominoes.OrthogonalDrawingRefinement.height_brackets_same_or_separated,
