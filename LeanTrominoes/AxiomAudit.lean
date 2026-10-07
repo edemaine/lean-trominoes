@@ -33,6 +33,11 @@ import LeanTrominoes.FiniteOrientationNPComplete
 import LeanTrominoes.TrichromaticGraphOrientationCompleteness
 import LeanTrominoes.TrichromaticOrientationForcedSinkDrawing
 import LeanTrominoes.OrthogonalDrawingRefinementBounds
+import LeanTrominoes.GridSegmentRealSlabOrder
+import LeanTrominoes.PeriodicGridDrawingStraightCopyWindow
+import LeanTrominoes.PeriodicGridDrawingVerticalCrossings
+import LeanTrominoes.PeriodicGridDrawingVerticalCrossingEnumeration
+import LeanTrominoes.FiniteCrossingRanks
 import LeanTrominoes.PeriodicGraphDrawingCardinality
 import LeanTrominoes.GridSegmentCollinearRectangleSeparation
 import LeanTrominoes.DegreeThreeVertexNormalizationSelectedPort
@@ -144,6 +149,16 @@ run_cmd do
       ``LeanTrominoes.GeneralVertexNormalization.normalizedDrawing_isRealLocal,
       ``LeanTrominoes.GeneralVertexNormalization.normalizedDrawing_chosen_west,
       ``LeanTrominoes.GeneralVertexNormalization.lemma23,
+      ``LeanTrominoes.GridSegment.real_slab_order_preserved,
+      ``LeanTrominoes.GridSegment.real_slab_order_strict,
+      ``LeanTrominoes.GridSegment.real_local_segment_copy_window,
+      ``LeanTrominoes.PeriodicGridDrawing.straight_realEdgeRoute_copy_window,
+      ``LeanTrominoes.GridSegment.rationalLineHeight_realContains,
+      ``LeanTrominoes.PeriodicGridDrawing.vertical_crossing_heights_ne,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingHeights_card_bound,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingCopies_complete,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.crossingRank_strictMonoOn,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.ranked_crossingCoordinate_outside_rectangles,
       ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplate_real_contacts_center,
       ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplateAt_contacts_same_position,
       ``LeanTrominoes.DegreeThreeVertexNormalization.selectedTemplateAt_trimmedRoute_contact,
