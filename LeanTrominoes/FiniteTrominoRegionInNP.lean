@@ -88,6 +88,11 @@ def regionVerifier (t : Tromino) :
     · rintro ⟨bits,_,checked⟩
       exact regionVerify_sound t cells bits checked
 
+theorem regionVerifier_sound (t : Tromino) (cells : List Cell) (bits : List Bool)
+    (checked : (regionVerifier t).verify cells bits = true) :
+    t.Tileable (cells.toFinset : Set Cell) :=
+  regionVerify_sound t cells bits checked
+
 theorem region_inNP (t : Tromino) :
     InNP regionEncoding (fun cells => t.Tileable (cells.toFinset : Set Cell)) :=
   ⟨regionVerifier t⟩

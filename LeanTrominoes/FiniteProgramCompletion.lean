@@ -62,4 +62,17 @@ theorem sparseModel (symbols : List encoding.Γ) :
       (presentation (source.formulaOfSymbols symbols)).problemWellFormed (problem_degreeTwoOrThree _)
       (presentation_separated _) (presentation_routesSimple _)
   exact shiftedSparseModel _ _ nodup bounds readback firstColumn firstRow
+
+include zero in
+theorem assignments_keysNodup (symbols : List encoding.Γ) :
+    ((assignments source symbols).map Prod.fst).Nodup := by
+  unfold assignments
+  rw [paddedInputs_eq_presentation source zero,
+    PeriodicThreeDM.NormalizationCompiler.finalStripCellAssignments_inputOfPresentation]
+  obtain ⟨nodup,_,_,_,_⟩ :=
+    (presentation (source.formulaOfSymbols symbols)).finitePaddedSparseFacts
+      (problemZero source zero symbols) (endpointBounds source symbols)
+      (presentation (source.formulaOfSymbols symbols)).problemWellFormed (problem_degreeTwoOrThree _)
+      (presentation_separated _) (presentation_routesSimple _)
+  exact FiniteSparseAssignmentSeamCompiler.keysNodup_shift _ nodup
 end LeanTrominoes.FiniteProgramCompletion

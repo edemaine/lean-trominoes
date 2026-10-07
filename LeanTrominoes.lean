@@ -18,6 +18,7 @@ import LeanTrominoes.FiniteGadgetRegionCompiler
 import LeanTrominoes.FiniteTrominoCompletionInNP
 import LeanTrominoes.FiniteTrominoRegionNPComplete
 import LeanTrominoes.FiniteTrominoCompletionNPComplete
+import LeanTrominoes.FiniteOrientationNPComplete
 import LeanTrominoes.FiniteTrominoVerifierSize
 import LeanTrominoes.FiniteTrominoCompletionCertificate
 import LeanTrominoes.FiniteSATNPHard
