@@ -62,6 +62,7 @@ import LeanTrominoes.GridPolylineRouteWordTranslation
 import LeanTrominoes.GridPolylineIntervalAssembly
 import LeanTrominoes.RationalAffineContactOrder
 import LeanTrominoes.PeriodicGridDrawingRectangleClipIntervals
+import LeanTrominoes.PeriodicGridDrawingRectangleParameterIntervals
 import LeanTrominoes.PeriodicGridDrawingRectangleRouteSeparation
 import LeanTrominoes.PeriodicGridDrawingRectangleTwoSidedContacts
 import LeanTrominoes.PeriodicGridDrawingPaddedIncidenceIsolation
@@ -355,6 +356,11 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_x_distinct,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_clip_interval,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_clip_realInteriorContains,
+      ``LeanTrominoes.GridSegment.rationalXParameter_in_unit_interval,
+      ``LeanTrominoes.GridSegment.rationalXParameter_injective,
+      ``LeanTrominoes.GridSegment.rationalXParameter_translate,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_parameter_bounds,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChordInterval_bounds,
       ``LeanTrominoes.OrthogonalBoundaryRouting.strip_slab_contact_vertical_boundary,
       ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedCrossingBars_contact_same_column,
       ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_vertical_boundary_contact_endpoint,
