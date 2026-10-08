@@ -132,14 +132,16 @@ for straight local planar inputs of degree at most four. Rational row and
 column cuts give proper ports of the original edge occurrences, preserve
 crossing and incidence order in every period, and reserve margins for
 enlarged vertex connectors. The computable port enumeration groups ports
-by their parent edge and has at most two ordered ports per parent. Its
+by their parent edge; every nonempty group has exactly two ordered ports.
+Every original edge portion entering a virtual rectangle has a chord in
+the assembled matching, which covers every retained boundary port. Its
 assembled chord family has at most 18M² members and is noninterlacing;
 the resulting orthogonal routes are simple, pairwise disjoint, confined
 to their rectangles, and meet the boundary only at their own ports.
 The proposed grid has size ≤3300M³. Crossing bars avoid every enlarged
 vertex connector, and connector endpoints agree with adjacent slab ports.
-Edge-clip coverage, global periodic route assembly, and polygonal bends
-remain open. A checked example shows why row seams matter: a dogleg
+Global periodic route assembly and polygonal bends remain open.
+A checked example shows why row seams matter: a dogleg
 spanning more than one period can overlap its translated copy.
 
 `PeriodicTrominoPrefill.planeProblem_coREComplete` proves co-r.e. completeness

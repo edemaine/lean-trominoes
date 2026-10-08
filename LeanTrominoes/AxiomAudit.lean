@@ -56,6 +56,7 @@ import LeanTrominoes.OrthogonalBoundarySlabSeparation
 import LeanTrominoes.PeriodicGridDrawingVirtualHorizontalPortOrder
 import LeanTrominoes.PeriodicGridDrawingColumnPortTransport
 import LeanTrominoes.PeriodicGridDrawingRectangleInputRoutes
+import LeanTrominoes.PeriodicGridDrawingRectangleInteriorCoverage
 import LeanTrominoes.PeriodicGridDrawingAnchorBoundaryOrder
 import LeanTrominoes.PeriodicGridDrawingPeriodicColumnRefinement
 import LeanTrominoes.PeriodicGridDrawingPeriodicCrossingBars
@@ -312,6 +313,28 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.rectangleInputRoute_orthogonal,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleInputRoutes_disjoint,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleInputRoute_boundary_contact,
+      ``LeanTrominoes.GridSegment.realContains_spans_unit_column,
+      ``LeanTrominoes.GridSegment.realContains_affine_height,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_parent_cut_realInteriorContains,
+      ``LeanTrominoes.PeriodicGridDrawing.translated_incidence_cell_zero,
+      ``LeanTrominoes.PeriodicGridDrawing.column_crossing_retained_of_virtual_row,
+      ``LeanTrominoes.PeriodicGridDrawing.endpoint_occurrence_cut_retained,
+      ``LeanTrominoes.PeriodicGridDrawing.vertical_cut_retained,
+      ``LeanTrominoes.PeriodicGridDrawing.straight_lifted_endpoints_avoid_row_seam,
+      ``LeanTrominoes.PeriodicGridDrawing.horizontal_cut_table_coverage,
+      ``LeanTrominoes.PeriodicGridDrawing.horizontal_cut_retained,
+      ``LeanTrominoes.PeriodicGridDrawing.virtual_column_cut_height_avoids_row_seams,
+      ``LeanTrominoes.RationalAffineBoundary.two_distinct_contacts,
+      ``LeanTrominoes.RationalAffineBoundary.contact_exists_of_real_interior,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_rational_contact,
+      ``LeanTrominoes.PeriodicGridDrawing.rational_rectangle_contact_retained,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_parent_two_contacts,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleParentPorts_length_eq_two_of_port,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_exists_of_port,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_parent_mem_nineEdgeCopies,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleChordFamily_covers_port,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_exists_of_interior_contact,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleChordFamily_covers_interior_contact,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingCopies_height_injective,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingHeights_card_eq,
       ``LeanTrominoes.OrthogonalDrawingRefinement.height_brackets_same_or_separated,
