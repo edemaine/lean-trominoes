@@ -134,6 +134,15 @@ import LeanTrominoes.PeriodicGridDrawingVerticalCoreExternalSeparation
 import LeanTrominoes.PeriodicGridDrawingVerticalCoreFanOccurrenceSeparation
 import LeanTrominoes.PeriodicGridDrawingVerticalCoreOccurrenceSeparation
 import LeanTrominoes.PeriodicGridDrawingVerticalFanContactVertices
+import LeanTrominoes.GridSegmentLocalCellContact
+import LeanTrominoes.PeriodicGridDrawingCrossingBarLocality
+import LeanTrominoes.PeriodicGridDrawingRectanglePieceLocalCells
+import LeanTrominoes.PeriodicGridDrawingRectanglePieceLocality
+import LeanTrominoes.PeriodicGridDrawingRefinedLocalBoxes
+import LeanTrominoes.PeriodicGridDrawingScaledStraightLocality
+import LeanTrominoes.PeriodicGridDrawingStraightLocalCoordinateBoxes
+import LeanTrominoes.PeriodicGridDrawingStraightRefinementLocality
+import LeanTrominoes.PeriodicGridDrawingStraightRefinementTheorem
 import Lean.Util.CollectAxioms
 
 /-!
@@ -503,6 +512,20 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementRoute_vertex_avoidance,
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_vertices_avoid_routes,
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_isRealDrawing,
+      ``LeanTrominoes.GridSegment.cell_index_bounds_of_overlap,
+      ``LeanTrominoes.GridSegment.cell_eq_endpoint_of_local_coordinate_bounds,
+      ``LeanTrominoes.GridSegment.local_coordinate_shifted_open_box,
+      ``LeanTrominoes.GridSegment.scaled_local_coordinate_endpoint_box,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedCrossingRoute_isRealLocal,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_local_cell,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedRectangleInputRoute_in_refined_cell,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece?_isRealLocal,
+      ``LeanTrominoes.PeriodicGridDrawing.refined_real_local_of_coordinate_box,
+      ``LeanTrominoes.PeriodicGridDrawing.scaled_straight_segment_isRealLocal,
+      ``LeanTrominoes.PeriodicGridDrawing.straightSegment_rational_local_coordinate_bounds,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedPaddedIncidenceRoute_in_refined_cell,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_isRealLocal,
+      ``LeanTrominoes.PeriodicGridDrawing.straight_refinement,
       ``LeanTrominoes.GridSegment.scaled_integer_near_eq,
       ``LeanTrominoes.GridSegment.between_of_scaled_neighborhood,
       ``LeanTrominoes.GridSegment.scaled_vertical_neighborhood_contact_implies_incident,
