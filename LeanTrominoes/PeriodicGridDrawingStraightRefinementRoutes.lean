@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LeanTrominoes.PeriodicGridDrawingVerticalEdgeRoute
+import LeanTrominoes.PeriodicGridDrawingVerticalFanRouteSimple
 import LeanTrominoes.PeriodicGridDrawingNonverticalEdgeRouteSimple
 
 /-! # Replacement routes for all straight protoedges -/
@@ -14,7 +15,7 @@ def straightRefinementRoute {Vertex : Type*} [DecidableEq Vertex]
     (tagged : PeriodicEdge Vertex × Nat) : List Cell :=
   if (drawing.liftedStraightSegment tagged.2 (0,0)).start.1 =
       (drawing.liftedStraightSegment tagged.2 (0,0)).finish.1 then
-    verticalEdgeRoute drawing tagged.2
+    verticalFanEdgeRoute graph drawing tagged
   else nonverticalEdgeRoute graph drawing tagged
 
 theorem straightRefinementRoute_valid {Vertex : Type*} [DecidableEq Vertex]
@@ -27,8 +28,8 @@ theorem straightRefinementRoute_valid {Vertex : Type*} [DecidableEq Vertex]
       OrthogonalPolyline (straightRefinementRoute graph drawing tagged) := by
   unfold straightRefinementRoute
   split_ifs with vertical
-  · exact ⟨verticalEdgeRoute_isRealOpenSimple planar.1 member (straight tagged member),
-      verticalEdgeRoute_orthogonal planar.1 member (straight tagged member) vertical⟩
+  · exact ⟨(verticalFanEdgeRoute_valid planar degree straight member vertical).1,
+      (verticalFanEdgeRoute_valid planar degree straight member vertical).2.1⟩
   · have valid := nonverticalEdgeRoute_valid planar degree graphLocal straight member vertical
     exact ⟨valid.1,valid.2.1⟩
 
@@ -47,7 +48,7 @@ theorem straightRefinementRoute_endpoints {Vertex : Type*} [DecidableEq Vertex]
           (drawing.vertexPosition graph tagged.1.target))) := by
   unfold straightRefinementRoute
   split_ifs with vertical
-  · exact verticalEdgeRoute_endpoints planar.1.1 member
+  · exact (verticalFanEdgeRoute_endpoints graph drawing tagged).2
   · exact (nonverticalEdgeRoute_endpoints planar degree graphLocal straight member vertical).2
 
 end LeanTrominoes.PeriodicGridDrawing

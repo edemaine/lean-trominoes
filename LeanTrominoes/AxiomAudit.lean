@@ -95,6 +95,29 @@ import LeanTrominoes.GridPolylineRealOpenSimple
 import LeanTrominoes.GridPolylineRealAlgebra
 import LeanTrominoes.KeyedComplementRecoveredWindowTilings
 import LeanTrominoes.KeyedComplementGadgetPins
+import LeanTrominoes.GridSegmentVerticalCore
+import LeanTrominoes.OrthogonalBoundaryPortPointInjection
+import LeanTrominoes.OrthogonalEnlargedCrossingColumnContacts
+import LeanTrominoes.OrthogonalVertexEnlargedHorizontalBoundaryContacts
+import LeanTrominoes.OrthogonalVertexHorizontalBoundaryLast
+import LeanTrominoes.OrthogonalVertexVerticalAnchors
+import LeanTrominoes.OrthogonalVertexVerticalSegmentCounterexample
+import LeanTrominoes.OrthogonalVerticalCoreFanContacts
+import LeanTrominoes.PeriodicGridDrawingEndpointFanSeparation
+import LeanTrominoes.PeriodicGridDrawingPaddedPeriodicVertexOrder
+import LeanTrominoes.PeriodicGridDrawingRectanglePieceOccurrenceSeparation
+import LeanTrominoes.PeriodicGridDrawingRectanglePortContactColumns
+import LeanTrominoes.PeriodicGridDrawingRectanglePortContactParents
+import LeanTrominoes.PeriodicGridDrawingRectangleRouteContactParents
+import LeanTrominoes.PeriodicGridDrawingVerticalCoreRouteGeometry
+import LeanTrominoes.PeriodicGridDrawingVerticalCrossingOldSeparation
+import LeanTrominoes.PeriodicGridDrawingVerticalCrossingSeparation
+import LeanTrominoes.PeriodicGridDrawingVerticalFanRoute
+import LeanTrominoes.PeriodicGridDrawingVerticalFanRouteSimple
+import LeanTrominoes.PeriodicGridDrawingVerticalFanVertexAvoidance
+import LeanTrominoes.PeriodicGridDrawingVerticalPortAnchors
+import LeanTrominoes.PeriodicGridDrawingVerticalRectangleSeparation
+import LeanTrominoes.PeriodicHeightVertexOrder
 import Lean.Util.CollectAxioms
 
 /-!
@@ -464,6 +487,51 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementRoute_vertex_avoidance,
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_vertices_avoid_routes,
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_isRealDrawing,
+      ``LeanTrominoes.GridSegment.verticalCore_isVertical,
+      ``LeanTrominoes.GridSegment.verticalCore_order,
+      ``LeanTrominoes.GridSegment.verticalCore_endpoints_contained,
+      ``LeanTrominoes.GridSegment.verticalCore_realContains_parent,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.Port.eq_of_point_eq,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedCrossingBar_contact_scaled_column,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.rectangleTemplate_horizontal_boundary_contact,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_horizontal_boundary_contact_endpoint,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_horizontal_boundary_contact_last,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.AnchorProfile.down_anchor,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.AnchorProfile.up_anchor,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.east_fan_meets_vertical_segment_interior,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.verticalCore_fan_boundary,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.verticalCore_fan_contact_last,
+      ``LeanTrominoes.PeriodicGridDrawing.endpoint_fans_disjoint,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedPeriodicColumnHeight_below_lifted_vertex,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedPeriodicColumnHeight_above_lifted_vertex,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedRectangleInputRoute_add_cell,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece?_translated_raw_image,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece_occurrences_contact_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_integral_ports_contact_columns,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_integral_ports_same_cell_parent_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_integral_ports_contact_parent_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_integral_parent_injective,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedRectangleParentRoute_endpoint_key,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedRectangleParentRoutes_contact_parent_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalCoreRoute_eq_segment,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalCoreRoute_valid,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalFanRouteWord_connected,
+      ``LeanTrominoes.PeriodicGridDrawing.straight_vertical_avoids_crossing_point,
+      ``LeanTrominoes.PeriodicGridDrawing.scaled_vertical_segment_avoids_crossing_bar,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalFanRouteWord_long,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalFanEdgeRoute_endpoints,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalCoreRoute_coordinates,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalFanRouteWord_separated,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalFanEdgeRoute_valid,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalFanEdgeRoute_vertex_avoidance,
+      ``LeanTrominoes.PeriodicGridDrawing.portBoundaryAnchor_of_up,
+      ``LeanTrominoes.PeriodicGridDrawing.portBoundaryAnchor_of_down,
+      ``LeanTrominoes.PeriodicGridDrawing.vertical_endpoint_anchors,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalEdgeRoute_contains_x,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedRectangleInputRoute_avoids_scaled_column,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalEdgeRoute_avoids_rectangle,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.periodicRedistributedHeight_below_vertex,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.periodicRedistributedHeight_above_vertex,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_parameter_bounds,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChordInterval_bounds,
       ``LeanTrominoes.OrthogonalBoundaryRouting.strip_slab_contact_vertical_boundary,

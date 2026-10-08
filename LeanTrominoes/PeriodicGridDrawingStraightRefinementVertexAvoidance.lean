@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LeanTrominoes.PeriodicGridDrawingStraightRefinementDrawing
 import LeanTrominoes.PeriodicGridDrawingNonverticalVertexAvoidance
 import LeanTrominoes.PeriodicGridDrawingVerticalVertexAvoidance
+import LeanTrominoes.PeriodicGridDrawingVerticalFanVertexAvoidance
 
 /-! # The assembled drawing avoids graph vertices in every periodic copy -/
 namespace LeanTrominoes.PeriodicGridDrawing
@@ -25,7 +26,7 @@ theorem straightRefinementRoute_vertex_avoidance {Vertex : Type*} [DecidableEq V
         (Cell.add vertex (drawing.periodTranslation vertexCell)))) := by
   unfold straightRefinementRoute at contains ⊢
   split_ifs at contains ⊢ with vertical
-  · exact verticalEdgeRoute_vertex_avoidance planar.1 member vertexMember vertexCell contains
+  · exact verticalFanEdgeRoute_vertex_avoidance planar degree straight member vertical vertexMember vertexCell contains
   · exact nonverticalEdgeRoute_vertex_avoidance planar degree graphLocal straight member vertical vertexMember vertexCell contains
 
 theorem straightRefinementDrawing_vertices_avoid_routes {Vertex : Type*} [DecidableEq Vertex]
