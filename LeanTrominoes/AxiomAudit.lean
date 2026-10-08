@@ -70,6 +70,7 @@ import LeanTrominoes.PeriodicGridDrawingCutPieceParameterPoints
 import LeanTrominoes.PeriodicGridDrawingEdgeRouteOrthogonal
 import LeanTrominoes.PeriodicGridDrawingEdgePieceContactEndpoints
 import LeanTrominoes.PeriodicGridDrawingNonverticalEdgeRouteSimple
+import LeanTrominoes.PeriodicGridDrawingStraightRefinementVertexAvoidance
 import LeanTrominoes.RationalAffineContactOrder
 import LeanTrominoes.PeriodicGridDrawingRectangleClipIntervals
 import LeanTrominoes.PeriodicGridDrawingRectangleParameterIntervals
@@ -442,6 +443,27 @@ run_cmd do
       ``LeanTrominoes.GridPolyline.separatedWord_of_parameter_order,
       ``LeanTrominoes.PeriodicGridDrawing.nonverticalEdgePieces_separated_word,
       ``LeanTrominoes.PeriodicGridDrawing.nonverticalEdgeRoute_valid,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalEdgeRoute_endpoints,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalEdgeRoute_isRealOpenSimple,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalEdgeRoute_orthogonal,
+      ``LeanTrominoes.GridPolyline.RealIsEndpoint.map,
+      ``LeanTrominoes.GridPolyline.RealIsEndpoint.translate,
+      ``LeanTrominoes.GridPolyline.RealIsEndpoint.scale,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_contains_scaled_grid_point,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedCrossingBar_contains_scaled_grid_point,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementRoute_valid,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementRoute_endpoints,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_gridSize_cubic,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_compatible,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_routes_simple,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_orthogonal,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece?_avoids_scaled_grid_point,
+      ``LeanTrominoes.PeriodicGridDrawing.crossingEdgePiece_avoids_scaled_vertex,
+      ``LeanTrominoes.PeriodicGridDrawing.nonverticalEdgeRoute_vertex_avoidance,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalEdgeRoute_vertex_avoidance,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementRoute_vertex_avoidance,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_vertices_avoid_routes,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_isRealDrawing,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_parameter_bounds,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChordInterval_bounds,
       ``LeanTrominoes.OrthogonalBoundaryRouting.strip_slab_contact_vertical_boundary,

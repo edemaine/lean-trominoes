@@ -162,7 +162,10 @@ crossing bars, and source and target fans. The assembled route is orthogonal
 and has exactly the union of its piece images. Shared new endpoints recover
 equal original parameters, excluding nonadjacent contacts. The assembled
 nonvertical route is simple without extra join or separation hypotheses.
-Vertical edges, global periodic planarity, and polygonal bends remain open.
+Vertical edges use their directly scaled segments. The executable finite
+straight-edge drawing is compatible, has simple orthogonal routes, avoids
+graph vertices in every periodic copy, and has grid size at most 3300M³.
+Global periodic planarity, locality, and polygonal bends remain open.
 A checked example shows why row seams matter: a dogleg
 spanning more than one period can overlap its translated copy.
 
