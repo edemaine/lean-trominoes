@@ -152,7 +152,15 @@ The interval assembler checks the final route's source, target, simplicity,
 orthogonality, and exact image from its pieces and their joining conditions.
 The computed rectangle groups delimit the exact rational affine clips,
 whose points lie strictly inside their original edge segments.
-Global periodic route assembly and polygonal bends remain open.
+For each straight nonvertical edge, an executable list of rectangle clips,
+crossing bars, and vertex fans covers every original edge parameter.
+Distinct pieces have disjoint parameter interiors. Sorting and removing
+duplicates gives a consecutive partition from zero to one, and the
+executable route assembler has the exact scaled graph endpoints.
+Consecutive rectangle pieces join at matching horizontal period-seam ports.
+Its simplicity, orthogonality, and image follow once the computed joins
+and geometric separation are established. Those joins and separation,
+vertical edges, global periodic planarity, and polygonal bends remain open.
 A checked example shows why row seams matter: a dogleg
 spanning more than one period can overlap its translated copy.
 
