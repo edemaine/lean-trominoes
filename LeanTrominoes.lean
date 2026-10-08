@@ -140,6 +140,13 @@ the resulting orthogonal routes are simple, pairwise disjoint, confined
 to their rectangles, and meet the boundary only at their own ports.
 The proposed grid has size ≤3300M³. Crossing bars avoid every enlarged
 vertex connector, and connector endpoints agree with adjacent slab ports.
+Periodic rectangle routes can meet distinct rectangles only at endpoints.
+Rectangle contacts with crossing bars and vertex fans are endpoints of
+both pieces. Periodic vertex fans remain within their own cells and meet
+only at their common vertex center; distinct crossing bars are disjoint.
+The actual crossing routes commute with periods and join adjacent ports.
+A general separated-chain lemma preserves simplicity and orthogonality
+when joining a finite word of pieces.
 Global periodic route assembly and polygonal bends remain open.
 A checked example shows why row seams matter: a dogleg
 spanning more than one period can overlap its translated copy.

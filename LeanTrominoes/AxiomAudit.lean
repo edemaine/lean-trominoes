@@ -57,6 +57,11 @@ import LeanTrominoes.PeriodicGridDrawingVirtualHorizontalPortOrder
 import LeanTrominoes.PeriodicGridDrawingColumnPortTransport
 import LeanTrominoes.PeriodicGridDrawingRectangleInputRoutes
 import LeanTrominoes.PeriodicGridDrawingRectangleInteriorCoverage
+import LeanTrominoes.GridPolylineRouteWord
+import LeanTrominoes.PeriodicGridDrawingRectangleRouteSeparation
+import LeanTrominoes.PeriodicGridDrawingRectangleTwoSidedContacts
+import LeanTrominoes.PeriodicGridDrawingPaddedIncidenceIsolation
+import LeanTrominoes.PeriodicGridDrawingPaddedCrossingSeparation
 import LeanTrominoes.PeriodicGridDrawingAnchorBoundaryOrder
 import LeanTrominoes.PeriodicGridDrawingPeriodicColumnRefinement
 import LeanTrominoes.PeriodicGridDrawingPeriodicCrossingBars
@@ -335,6 +340,28 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.rectangleChordFamily_covers_port,
       ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_exists_of_interior_contact,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleChordFamily_covers_interior_contact,
+      ``LeanTrominoes.GridPolyline.joinWord_valid,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.strip_slab_contact_vertical_boundary,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedCrossingBars_contact_same_column,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_vertical_boundary_contact_endpoint,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleRouteOffset_eq_translate,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedRectangleInputRoute_isRealOpenSimple,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedRectangleInputRoutes_distinct_cells_contact_endpoint,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedRectangleInputRoutes_same_cell_disjoint,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_horizontal_ports_join,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_horizontal_parent_keys_join,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_incidence_port_is_fan_endpoint,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedIncidenceRoute_isRealOpenSimple,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedPaddedIncidenceRoute_eq_translate,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedPaddedIncidenceRoute_in_cell,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedPaddedIncidenceRoutes_contact,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedCrossingBar_avoids_incidence_route,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedCrossingRoute_head_joins_rectangle,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedCrossingRoute_last_joins_rectangle,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedCrossingRoute_add_cell,
+      ``LeanTrominoes.PeriodicGridDrawing.paddedCrossingRoutes_contact_identifies_occurrence,
+      ``LeanTrominoes.PeriodicGridDrawing.crossing_bar_rectangle_contact_endpoints,
+      ``LeanTrominoes.PeriodicGridDrawing.vertex_fan_rectangle_contact_endpoints,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingCopies_height_injective,
       ``LeanTrominoes.PeriodicGridDrawing.verticalCrossingHeights_card_eq,
       ``LeanTrominoes.OrthogonalDrawingRefinement.height_brackets_same_or_separated,
