@@ -67,6 +67,9 @@ import LeanTrominoes.PeriodicGridDrawingRectanglePieceJoins
 import LeanTrominoes.PeriodicGridDrawingRectangleVerticalPortPositions
 import LeanTrominoes.PeriodicGridDrawingLiftedCrossingPortPoints
 import LeanTrominoes.PeriodicGridDrawingCutPieceParameterPoints
+import LeanTrominoes.PeriodicGridDrawingEdgeRouteOrthogonal
+import LeanTrominoes.PeriodicGridDrawingEdgePieceContactEndpoints
+import LeanTrominoes.PeriodicGridDrawingNonverticalEdgeRouteSimple
 import LeanTrominoes.RationalAffineContactOrder
 import LeanTrominoes.PeriodicGridDrawingRectangleClipIntervals
 import LeanTrominoes.PeriodicGridDrawingRectangleParameterIntervals
@@ -399,6 +402,46 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.crossingEdgePiece_endpoint_original_x,
       ``LeanTrominoes.PeriodicGridDrawing.sourceEdgePiece_finish_original_x,
       ``LeanTrominoes.PeriodicGridDrawing.targetEdgePiece_start_original_x,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_at_cut_boundary,
+      ``LeanTrominoes.PeriodicGridDrawing.incidence_parent_prototype_line,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_crossing_of_proper_cut,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_incidence_of_endpoint_cut,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece?_endpoint_data,
+      ``LeanTrominoes.PeriodicGridDrawing.crossing_rectangle_piece_endpoint_join,
+      ``LeanTrominoes.PeriodicGridDrawing.fan_rectangle_piece_endpoint_join,
+      ``LeanTrominoes.PeriodicGridDrawing.cutPieces_cannot_join,
+      ``LeanTrominoes.PeriodicGridDrawing.nonverticalEdgePieces_join,
+      ``LeanTrominoes.GridPolyline.joinWord_orthogonal_image,
+      ``LeanTrominoes.PeriodicGridDrawing.nonverticalEdgeRoute_valid_of_separated,
+      ``LeanTrominoes.PeriodicGridDrawing.nonverticalEdgeRoute_orthogonal_image,
+      ``LeanTrominoes.GridPolyline.realIsEndpoint_reverse,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece?_raw_image_endpoints,
+      ``LeanTrominoes.PeriodicGridDrawing.crossingEdgePiece_avoids_endpoint_fans,
+      ``LeanTrominoes.PeriodicGridDrawing.source_target_pieces_disjoint,
+      ``LeanTrominoes.PeriodicGridDrawing.cutPieces_contact_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePieces_distinct_contact_endpoints,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece?_crossing_contact_endpoints,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece?_fan_contact_endpoints,
+      ``LeanTrominoes.PeriodicGridDrawing.nonverticalEdgePieces_distinct_contact_endpoints,
+      ``LeanTrominoes.OrthogonalBoundaryRouting.Port.point_bounds_faces,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleIntegralPort_point_bounds_faces,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_at_new_cut_boundary,
+      ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_new_cut_recovers_parameter,
+      ``LeanTrominoes.PeriodicGridDrawing.crossingEdgePiece_endpoint_data,
+      ``LeanTrominoes.PeriodicGridDrawing.crossing_rectangle_endpoint_parameters_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_before_crossing_contact,
+      ``LeanTrominoes.GridPolyline.ordered_endpoint_contact,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece?_fan_outer_contact,
+      ``LeanTrominoes.PeriodicGridDrawing.endpointPort_nonvertical_anchor_x,
+      ``LeanTrominoes.PeriodicGridDrawing.fanEdgePiece_outer_endpoint_data,
+      ``LeanTrominoes.PeriodicGridDrawing.fan_rectangle_endpoint_parameters_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_fan_contact_parameter,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_distinct_integral_ports_old_y_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_rectangle_endpoint_parameters_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.nonverticalEdgePieces_ordered_contact,
+      ``LeanTrominoes.GridPolyline.separatedWord_of_parameter_order,
+      ``LeanTrominoes.PeriodicGridDrawing.nonverticalEdgePieces_separated_word,
+      ``LeanTrominoes.PeriodicGridDrawing.nonverticalEdgeRoute_valid,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_parameter_bounds,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChordInterval_bounds,
       ``LeanTrominoes.OrthogonalBoundaryRouting.strip_slab_contact_vertical_boundary,

@@ -157,10 +157,12 @@ crossing bars, and vertex fans covers every original edge parameter.
 Distinct pieces have disjoint parameter interiors. Sorting and removing
 duplicates gives a consecutive partition from zero to one, and the
 executable route assembler has the exact scaled graph endpoints.
-Consecutive rectangle pieces join at matching horizontal period-seam ports.
-Its simplicity, orthogonality, and image follow once the computed joins
-and geometric separation are established. Those joins and separation,
-vertical edges, global periodic planarity, and polygonal bends remain open.
+All consecutive computed pieces join, including rectangle period seams,
+crossing bars, and source and target fans. The assembled route is orthogonal
+and has exactly the union of its piece images. Shared new endpoints recover
+equal original parameters, excluding nonadjacent contacts. The assembled
+nonvertical route is simple without extra join or separation hypotheses.
+Vertical edges, global periodic planarity, and polygonal bends remain open.
 A checked example shows why row seams matter: a dogleg
 spanning more than one period can overlap its translated copy.
 
