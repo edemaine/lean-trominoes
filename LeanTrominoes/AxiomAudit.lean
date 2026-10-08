@@ -144,6 +144,15 @@ import LeanTrominoes.PeriodicGridDrawingStraightLocalCoordinateBoxes
 import LeanTrominoes.PeriodicGridDrawingStraightRefinementLocality
 import LeanTrominoes.PeriodicGridDrawingStraightRefinementTheorem
 import Lean.Util.CollectAxioms
+import LeanTrominoes.PeriodicGridDrawingIndexing
+import LeanTrominoes.PeriodicPlanarThreeDMContractedLocality
+import LeanTrominoes.PeriodicPlanarThreeDMIncidenceOffsets
+import LeanTrominoes.PeriodicPlanarThreeDMTerminalOffsets
+import LeanTrominoes.PeriodicThreeDMContractionLocality
+import LeanTrominoes.TrichromaticGraphOrientationLineDecision
+import LeanTrominoes.TrichromaticGraphOrientationLocalCoRE
+import LeanTrominoes.TrichromaticGraphOrientationLocalCompleteness
+import LeanTrominoes.TrichromaticGraphOrientationPlanarHardness
 
 /-!
 # Axiom regression checks for the main completeness theorems
@@ -526,6 +535,43 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.liftedPaddedIncidenceRoute_in_refined_cell,
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_isRealLocal,
       ``LeanTrominoes.PeriodicGridDrawing.straight_refinement,
+      ``LeanTrominoes.PeriodicGraph.indexed_wellFormed,
+      ``LeanTrominoes.PeriodicGraph.indexed_isLocal,
+      ``LeanTrominoes.PeriodicGridDrawing.vertexPosition_indexed,
+      ``LeanTrominoes.PeriodicGridDrawing.isCompatible_indexed,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.encodedProblem_incidenceOffsetsComparable,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.encodedProblem_contractedGraph_isLocal,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.normalizedProblem_incidenceOffsetsComparable,
+      ``LeanTrominoes.PeriodicOneInThreePolarityNormalizationRouteSubdivision.paddedPeriodicThreeDMProblem_incidenceOffsetsComparable,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.encodedReference_offset_zero_of_local,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.encodedReferences_offsets_comparable,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.encoded_incidence_reference,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.encoded_incidence_offsets_comparable,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.terminalGroup_injective_below_three,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.occurrenceReverseOffset_eq_of_terminal_eq,
+      ``LeanTrominoes.PeriodicPlanarOneInThreeToThreeDM.occurrenceReverseOffset_eq_of_elementIndex_eq,
+      ``LeanTrominoes.PeriodicThreeDM.contractedGraph_isLocal,
+      ``LeanTrominoes.TrichromaticGraphOrientation.incoming_offset,
+      ``LeanTrominoes.TrichromaticGraphOrientation.vertexClauses_offsets,
+      ``LeanTrominoes.TrichromaticGraphOrientation.formula_edgeLocal,
+      ``LeanTrominoes.TrichromaticGraphOrientation.formula_horizontal,
+      ``LeanTrominoes.TrichromaticGraphOrientation.localFormula_satisfiable,
+      ``LeanTrominoes.TrichromaticGraphOrientation.lineCheck_correct,
+      ``LeanTrominoes.TrichromaticGraphOrientation.isLocal_primrec,
+      ``LeanTrominoes.TrichromaticGraphOrientation.localProblem_coRE,
+      ``LeanTrominoes.PeriodicWangPlanarThreeDMReduction.problem_incidenceOffsetsComparable,
+      ``LeanTrominoes.PeriodicWangPlanarThreeDMReduction.problem_contractedGraph_isLocal,
+      ``LeanTrominoes.PeriodicThreeDM.GraphOrientationEncoding.input_isLocal,
+      ``LeanTrominoes.TrichromaticGraphOrientation.wangReduction_isLocal,
+      ``LeanTrominoes.TrichromaticGraphOrientation.wangReduction_local_correct,
+      ``LeanTrominoes.TrichromaticGraphOrientation.localProblem_coREHard,
+      ``LeanTrominoes.TrichromaticGraphOrientation.localProblem_coREComplete,
+      ``LeanTrominoes.TrichromaticGraphOrientation.wangReduction_localPlanar_correct,
+      ``LeanTrominoes.TrichromaticGraphOrientation.localPlanarProblem_coREHard,
+      ``LeanTrominoes.TrichromaticGraphOrientation.underlyingGraph_contracted,
+      ``LeanTrominoes.TrichromaticGraphOrientation.wangReduction_hasPlanarPresentation,
+      ``LeanTrominoes.TrichromaticGraphOrientation.wangReduction_planar_correct,
+      ``LeanTrominoes.TrichromaticGraphOrientation.planarProblem_coREHard,
       ``LeanTrominoes.GridSegment.scaled_integer_near_eq,
       ``LeanTrominoes.GridSegment.between_of_scaled_neighborhood,
       ``LeanTrominoes.GridSegment.scaled_vertical_neighborhood_contact_implies_incident,
