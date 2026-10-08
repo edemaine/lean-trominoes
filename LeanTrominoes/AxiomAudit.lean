@@ -58,6 +58,10 @@ import LeanTrominoes.PeriodicGridDrawingColumnPortTransport
 import LeanTrominoes.PeriodicGridDrawingRectangleInputRoutes
 import LeanTrominoes.PeriodicGridDrawingRectangleInteriorCoverage
 import LeanTrominoes.GridPolylineRouteWord
+import LeanTrominoes.GridPolylineRouteWordTranslation
+import LeanTrominoes.GridPolylineIntervalAssembly
+import LeanTrominoes.RationalAffineContactOrder
+import LeanTrominoes.PeriodicGridDrawingRectangleClipIntervals
 import LeanTrominoes.PeriodicGridDrawingRectangleRouteSeparation
 import LeanTrominoes.PeriodicGridDrawingRectangleTwoSidedContacts
 import LeanTrominoes.PeriodicGridDrawingPaddedIncidenceIsolation
@@ -341,6 +345,16 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.rectanglePort_exists_of_interior_contact,
       ``LeanTrominoes.PeriodicGridDrawing.rectangleChordFamily_covers_interior_contact,
       ``LeanTrominoes.GridPolyline.joinWord_valid,
+      ``LeanTrominoes.GridPolyline.joinWord_translate,
+      ``LeanTrominoes.GridPolyline.assembleIntervals_valid,
+      ``LeanTrominoes.RationalIntervalPartition.ordered_cover_chain,
+      ``LeanTrominoes.RationalIntervalPartition.sortIntervals_cover_chain,
+      ``LeanTrominoes.RationalAffineBoundary.contacts_are_two_endpoints,
+      ``LeanTrominoes.RationalAffineBoundary.closed_clip_x_interval,
+      ``LeanTrominoes.RealRectangleBoundary.Port.eq_of_point_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_x_distinct,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_clip_interval,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleParentChord_clip_realInteriorContains,
       ``LeanTrominoes.OrthogonalBoundaryRouting.strip_slab_contact_vertical_boundary,
       ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedCrossingBars_contact_same_column,
       ``LeanTrominoes.OrthogonalDrawingRefinement.enlargedRectangleTemplate_vertical_boundary_contact_endpoint,

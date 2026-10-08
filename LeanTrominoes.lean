@@ -147,6 +147,11 @@ only at their common vertex center; distinct crossing bars are disjoint.
 The actual crossing routes commute with periods and join adjacent ports.
 A general separated-chain lemma preserves simplicity and orthogonality
 when joining a finite word of pieces.
+Sorting a disjoint rational interval cover determines a gap-free chain.
+The interval assembler checks the final route's source, target, simplicity,
+orthogonality, and exact image from its pieces and their joining conditions.
+The computed rectangle groups delimit the exact rational affine clips,
+whose points lie strictly inside their original edge segments.
 Global periodic route assembly and polygonal bends remain open.
 A checked example shows why row seams matter: a dogleg
 spanning more than one period can overlap its translated copy.
