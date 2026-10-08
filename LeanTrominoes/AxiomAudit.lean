@@ -118,6 +118,22 @@ import LeanTrominoes.PeriodicGridDrawingVerticalFanVertexAvoidance
 import LeanTrominoes.PeriodicGridDrawingVerticalPortAnchors
 import LeanTrominoes.PeriodicGridDrawingVerticalRectangleSeparation
 import LeanTrominoes.PeriodicHeightVertexOrder
+import LeanTrominoes.GridSegmentScaledIntegerNeighborhood
+import LeanTrominoes.GridSegmentVerticalCoreInterior
+import LeanTrominoes.PeriodicGridDrawingEndpointFanOccurrences
+import LeanTrominoes.PeriodicGridDrawingEndpointOccurrenceInjection
+import LeanTrominoes.PeriodicGridDrawingRectangleBarOccurrenceSeparation
+import LeanTrominoes.PeriodicGridDrawingRectangleFanOccurrenceSeparation
+import LeanTrominoes.PeriodicGridDrawingRectanglePortPhysicalPieces
+import LeanTrominoes.PeriodicGridDrawingRectangleStripContactKeys
+import LeanTrominoes.PeriodicGridDrawingRefinementPhysicalImages
+import LeanTrominoes.PeriodicGridDrawingRefinementPhysicalSeparation
+import LeanTrominoes.PeriodicGridDrawingRefinementPieceTranslations
+import LeanTrominoes.PeriodicGridDrawingStraightRefinementPlanarity
+import LeanTrominoes.PeriodicGridDrawingVerticalCoreExternalSeparation
+import LeanTrominoes.PeriodicGridDrawingVerticalCoreFanOccurrenceSeparation
+import LeanTrominoes.PeriodicGridDrawingVerticalCoreOccurrenceSeparation
+import LeanTrominoes.PeriodicGridDrawingVerticalFanContactVertices
 import Lean.Util.CollectAxioms
 
 /-!
@@ -487,6 +503,40 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementRoute_vertex_avoidance,
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_vertices_avoid_routes,
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_isRealDrawing,
+      ``LeanTrominoes.GridSegment.scaled_integer_near_eq,
+      ``LeanTrominoes.GridSegment.between_of_scaled_neighborhood,
+      ``LeanTrominoes.GridSegment.scaled_vertical_neighborhood_contact_implies_incident,
+      ``LeanTrominoes.GridSegment.verticalCore_inverse_image_interior,
+      ``LeanTrominoes.PeriodicGridDrawing.endpointFan_occurrence_injective,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece_endpoint_fan_contact_occurrence_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalCore_endpoint_fan_contact_occurrence_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.endpointPort_occurrence_injective,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedRectangleParentRoute_bar_contact_parent_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece_bar_contact_occurrence_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedRectangleParentRoute_fan_contact_parent_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangleEdgePiece_fan_contact_occurrence_eq,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_crossing_port_on_bar,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_incidence_port_on_fan,
+      ``LeanTrominoes.PeriodicGridDrawing.rectangle_crossing_port_lifted_crosses,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedRectangleParentRoute_strip_contact_key,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementRoute_physical_image,
+      ``LeanTrominoes.PeriodicGridDrawing.refinementPhysicalContains_fan_or_nonfan,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedStraightSegment_isVertical_of_zero,
+      ``LeanTrominoes.PeriodicGridDrawing.refinement_nonfan_fan_disjoint,
+      ``LeanTrominoes.PeriodicGridDrawing.refinement_nonfan_nonfan_disjoint,
+      ``LeanTrominoes.PeriodicGridDrawing.refinementPhysicalContains_contact_scaled_vertex,
+      ``LeanTrominoes.GridSegment.verticalCore_translate,
+      ``LeanTrominoes.PeriodicGridDrawing.liftedPaddedIncidenceRoute_add_cell,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalCoreRoute_lifted_image,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_routes_meet_only_at_endpoints,
+      ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_isRealPlanarDrawing,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalCore_lifted_fan_contact_identifies_endpoint,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalCore_lifted_avoids_rectangle_piece,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalCoreRoute_fan_contact_identifies_endpoint,
+      ``LeanTrominoes.PeriodicGridDrawing.verticalCore_occurrences_disjoint,
+      ``LeanTrominoes.PeriodicGridDrawing.scaled_vertical_segment_fan_contact_vertex,
+      ``LeanTrominoes.GridSegment.verticalCore_avoids_scaled_endpoint,
+      ``LeanTrominoes.OrthogonalDrawingRefinement.verticalCore_fan_contact_core_endpoint,
       ``LeanTrominoes.GridSegment.verticalCore_isVertical,
       ``LeanTrominoes.GridSegment.verticalCore_order,
       ``LeanTrominoes.GridSegment.verticalCore_endpoints_contained,

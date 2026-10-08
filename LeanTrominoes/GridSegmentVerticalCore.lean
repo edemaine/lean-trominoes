@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LeanTrominoes.GridSegmentRealConvexity
 import LeanTrominoes.PeriodicGridDrawingScaling
+import LeanTrominoes.GridSegmentRealIntersection
 
 /-! # A vertical segment shortened by the radius of its endpoint fans -/
 namespace LeanTrominoes.GridSegment
@@ -79,5 +80,28 @@ theorem verticalCore_realContains_parent {segment : GridSegment} (vertical : seg
   have ends := verticalCore_endpoints_contained vertical spacing
   exact realContains_of_endpoints_contained (realContains_of_contains ends.1)
     (realContains_of_contains ends.2) contains
+
+theorem verticalCore_avoids_scaled_endpoint {segment : GridSegment} (vertical : segment.IsVertical)
+    {factor : Int} {radius : Nat} (positive : 0 < radius) (spacing : 20*(radius : Int) < factor)
+    (target : Bool) :
+    ¬ (segment.verticalCore factor radius).RealContains
+      (realCell (Cell.scale factor (if target then segment.finish else segment.start))) := by
+  intro contains
+  have box := realBoxContains_of_realContains contains
+  have order := verticalCore_order vertical spacing
+  have radiusPositive : (0 : ℝ) < radius := by exact_mod_cast positive
+  by_cases forward : segment.start.2 < segment.finish.2
+  · simp only [if_pos forward] at order
+    simp only [RealBoxContains,min_eq_left order.le,max_eq_right order.le] at box
+    cases target
+    all_goals simp only [Bool.false_eq_true,if_false,if_true,realCell,verticalCore,if_pos forward,Cell.add,Cell.scale] at box
+    all_goals push_cast at box
+    all_goals linarith [box.2.2.1,box.2.2.2]
+  · simp only [if_neg forward] at order
+    simp only [RealBoxContains,min_eq_right order.le,max_eq_left order.le] at box
+    cases target
+    all_goals simp only [Bool.false_eq_true,if_false,if_true,realCell,verticalCore,if_neg forward,Cell.add,Cell.scale] at box
+    all_goals push_cast at box
+    all_goals linarith [box.2.2.1,box.2.2.2]
 
 end LeanTrominoes.GridSegment
