@@ -175,6 +175,28 @@ import LeanTrominoes.TrichromaticGraphOrientationIncidenceIndices
 import LeanTrominoes.TrichromaticGraphOrientationLineMembership
 import LeanTrominoes.TrichromaticGraphOrientationSelectedIndices
 import LeanTrominoes.TrichromaticGraphOrientationVertexGuard
+import LeanTrominoes.PeriodicCNFStripCountedContractedIncidenceTargetFilter
+import LeanTrominoes.ProgramGraphOrientationElements
+import LeanTrominoes.ProgramGraphOrientationEndpointFields
+import LeanTrominoes.ProgramGraphOrientationFiniteEncoding
+import LeanTrominoes.ProgramGraphOrientationSourceFields
+import LeanTrominoes.ProgramGraphOrientationVertexFields
+import LeanTrominoes.TrichromaticGraphOrientationFieldsCompiler
+import LeanTrominoes.TrichromaticGraphOrientationFinite
+import LeanTrominoes.TrichromaticGraphOrientationFiniteHardness
+import LeanTrominoes.TrichromaticGraphOrientationLineHardness
+import LeanTrominoes.TrichromaticGraphOrientationLineReduction
+import LeanTrominoes.TrichromaticGraphOrientationNativeEncoding
+import LeanTrominoes.TrichromaticGraphOrientationNativeEndpointFields
+import LeanTrominoes.TrichromaticGraphOrientationNativeOffsetFields
+import LeanTrominoes.TrichromaticGraphOrientationNativeSourceFields
+import LeanTrominoes.TrichromaticGraphOrientationNativeVertexFields
+import LeanTrominoes.UnaryColumnBoundedSignedDifference
+import LeanTrominoes.UnaryColumnChoiceCompiler
+import LeanTrominoes.UnaryColumnDenseLookupCompiler
+import LeanTrominoes.UnaryColumnFilterCompiler
+import LeanTrominoes.UnaryColumnFiveCompiler
+import LeanTrominoes.UnaryColumnOrdinalCompiler
 
 /-!
 # Axiom regression checks for the main completeness theorems
@@ -557,6 +579,51 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.liftedPaddedIncidenceRoute_in_refined_cell,
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_isRealLocal,
       ``LeanTrominoes.PeriodicGridDrawing.straight_refinement,
+      ``LeanTrominoes.PeriodicCNFStripReduction.CountedContractedIncidence.targetControls_cons_two,
+      ``LeanTrominoes.PeriodicCNFStripReduction.CountedContractedIncidence.targetControls_cons_three,
+      ``LeanTrominoes.PeriodicCNFStripReduction.CountedContractedIncidence.targetControls_eq_blocks,
+      ``LeanTrominoes.PeriodicCNFStripReduction.CountedContractedIncidence.selected_targets_eq_contracted,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programThreeDMOneColorCodes,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programThreeDMElement_mem,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programThreeDMWellFormed,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programThreeDMIncidenceElement_mem,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programThreeDMDegree,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programTriplePositions_length,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programThreeDM_zeroOffsets,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programOrientationGraph_zeroOffsets,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programOrientationGraph_finite_correct,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programElementKeys_nodup,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programElement_eq_of_key_eq,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programVertices_eq,
+      ``LeanTrominoes.PeriodicCNFStripReduction.programVertexKey_injective_on,
+      ``LeanTrominoes.TrichromaticGraphOrientation.ends_offset_eq_zero,
+      ``LeanTrominoes.TrichromaticGraphOrientation.incoming_offset_eq_zero,
+      ``LeanTrominoes.TrichromaticGraphOrientation.freeze_orientation,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteHasOrientation_iff,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteProblem_iff,
+      ``LeanTrominoes.PeriodicThreeDM.GraphOrientationEncoding.input_zeroOffsets,
+      ``LeanTrominoes.PeriodicThreeDM.GraphOrientationEncoding.finiteProblem_iff,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteReduction_correct,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteManyOne,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteProblem_npHard,
+      ``LeanTrominoes.TrichromaticGraphOrientation.localLineReduction_correct,
+      ``LeanTrominoes.TrichromaticGraphOrientation.localLineManyOne,
+      ``LeanTrominoes.TrichromaticGraphOrientation.localLineProblem_PSPACEHard,
+      ``LeanTrominoes.TrichromaticGraphOrientation.localLineProblem_PSPACEComplete,
+      ``LeanTrominoes.PeriodicThreeDM.GraphOrientationEncoding.input_isOneDimensional,
+      ``LeanTrominoes.PeriodicCNFStripReduction.problem_incidenceOffsetsComparable,
+      ``LeanTrominoes.PeriodicCNFStripReduction.nativeThreeDM_incidenceOffsetsComparable,
+      ``LeanTrominoes.PeriodicCNFStripReduction.nativeOrientationGraph_isLocal,
+      ``LeanTrominoes.PeriodicCNFStripReduction.nativeOrientationGraph_isOneDimensional,
+      ``LeanTrominoes.PeriodicCNFStripReduction.nativeOrientationGraph_correct,
+      ``LeanTrominoes.PeriodicCNFStripReduction.incidenceElement_of_mem,
+      ``LeanTrominoes.PeriodicCNFStripReduction.contractedEdge_endpoints_mem,
+      ``LeanTrominoes.PeriodicCNFStripReduction.incidence_offset_reference_of_mem,
+      ``LeanTrominoes.PeriodicCNFStripReduction.nativeElementKeys_nodup,
+      ``LeanTrominoes.PeriodicCNFStripReduction.nativeElement_eq_of_key_eq,
+      ``LeanTrominoes.PeriodicCNFStripReduction.nativeVertices_eq,
+      ``LeanTrominoes.PeriodicCNFStripReduction.nativeVertexKey_injective_on,
+      ``LeanTrominoes.UnaryColumn.encode_small_int,
       ``LeanTrominoes.TrichromaticGraphOrientation.CoreGuard.recordCheck_truth,
       ``LeanTrominoes.TrichromaticGraphOrientation.CoreGuard.core_truth,
       ``LeanTrominoes.TrichromaticGraphOrientation.CoreGuard.core_noPower,
