@@ -279,6 +279,31 @@ import LeanTrominoes.PeriodicGridDrawingPolygonalPointBounds
 import LeanTrominoes.PeriodicGridDrawingPolygonalPointOccurrences
 import LeanTrominoes.PeriodicGridDrawingPolygonalSegmentContacts
 import LeanTrominoes.PeriodicGridDrawingRealEndpointVertices
+import LeanTrominoes.GridPolylineRealJoinSimple
+import LeanTrominoes.GridPolylineRealReplacementContacts
+import LeanTrominoes.GridPolylineRealRouteChain
+import LeanTrominoes.GridPolylineRealRouteChainClosure
+import LeanTrominoes.GridPolylineRealRouteChainTranslation
+import LeanTrominoes.PeriodicGridDrawingBendContractionDrawing
+import LeanTrominoes.PeriodicGridDrawingBendContractionEndpointTransport
+import LeanTrominoes.PeriodicGridDrawingBendContractionEndpoints
+import LeanTrominoes.PeriodicGridDrawingBendContractionLiftedContacts
+import LeanTrominoes.PeriodicGridDrawingBendContractionLiftedPieces
+import LeanTrominoes.PeriodicGridDrawingBendContractionLocality
+import LeanTrominoes.PeriodicGridDrawingBendContractionPieceEndpoints
+import LeanTrominoes.PeriodicGridDrawingBendContractionPieceSimplicity
+import LeanTrominoes.PeriodicGridDrawingBendContractionPieces
+import LeanTrominoes.PeriodicGridDrawingBendContractionPlanarity
+import LeanTrominoes.PeriodicGridDrawingBendContractionRecords
+import LeanTrominoes.PeriodicGridDrawingBendSubdivisionOccurrenceTransport
+import LeanTrominoes.PeriodicGridDrawingBendSubdivisionPlanarity
+import LeanTrominoes.PeriodicGridDrawingBendSubdivisionRouteContacts
+import LeanTrominoes.PeriodicGridDrawingBendSubdivisionRouteSimplicity
+import LeanTrominoes.PeriodicGridDrawingBendSubdivisionVertexAvoidance
+import LeanTrominoes.PeriodicGridDrawingBendSubdivisionVertexTransport
+import LeanTrominoes.PeriodicGridDrawingPolygonalListedPointContacts
+import LeanTrominoes.PeriodicGridDrawingPolygonalRefinementTheorem
+import LeanTrominoes.PeriodicGridDrawingPolygonalSubdivisionRefinement
 
 /-!
 # Main theorem interface
@@ -460,4 +485,13 @@ periodic subspace tiling and completion are co-r.e. in every dimension, and
 both strip problems are in PSPACE for each fixed polynomial bounding box.
 The strip inputs use native binary fields; the window-to-Savitch evaluator
 has a run-level finite-alphabet Turing-machine space certificate.
+-/
+
+/-!
+`PeriodicGridDrawing.polygonal_refinement` refines any planar local polygonal
+drawing of a degree-four periodic graph into a planar local orthogonal drawing,
+including loops and bends on period seams. Original vertices are scaled by an
+explicit positive integer. The grid bound is `865075200*M^6`; straight inputs
+have the sharper bound `3300*M^3` from `PeriodicGridDrawing.straight_refinement`.
+These are polynomial bounds, without claiming the paper's quadratic bound.
 -/
