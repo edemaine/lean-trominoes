@@ -197,6 +197,31 @@ import LeanTrominoes.UnaryColumnDenseLookupCompiler
 import LeanTrominoes.UnaryColumnFilterCompiler
 import LeanTrominoes.UnaryColumnFiveCompiler
 import LeanTrominoes.UnaryColumnOrdinalCompiler
+import LeanTrominoes.BoolCoherentCount
+import LeanTrominoes.EncodedUnaryColumnCountCompiler
+import LeanTrominoes.EncodedUnaryColumnLogicCompiler
+import LeanTrominoes.EncodedUnaryColumnLookupCompiler
+import LeanTrominoes.PeriodicGridDrawingSeamShift
+import LeanTrominoes.TrichromaticGraphOrientationFieldReads
+import LeanTrominoes.TrichromaticGraphOrientationFiniteBinaryFields
+import LeanTrominoes.TrichromaticGraphOrientationFiniteBinaryInNP
+import LeanTrominoes.TrichromaticGraphOrientationFiniteBinaryNormalization
+import LeanTrominoes.TrichromaticGraphOrientationFiniteBinaryPrepare
+import LeanTrominoes.TrichromaticGraphOrientationFiniteCertificates
+import LeanTrominoes.TrichromaticGraphOrientationFiniteCheckColumns
+import LeanTrominoes.TrichromaticGraphOrientationFiniteCheckSemantics
+import LeanTrominoes.TrichromaticGraphOrientationFiniteColumns
+import LeanTrominoes.TrichromaticGraphOrientationFiniteCountColumns
+import LeanTrominoes.TrichromaticGraphOrientationFiniteCountSemantics
+import LeanTrominoes.TrichromaticGraphOrientationFiniteCounts
+import LeanTrominoes.TrichromaticGraphOrientationFiniteInNP
+import LeanTrominoes.TrichromaticGraphOrientationFiniteIncidenceColumns
+import LeanTrominoes.TrichromaticGraphOrientationFiniteNPComplete
+import LeanTrominoes.TrichromaticGraphOrientationFiniteNativeVerifier
+import LeanTrominoes.TrichromaticGraphOrientationFiniteRecordSemantics
+import LeanTrominoes.TrichromaticGraphOrientationUnaryCompiler
+import LeanTrominoes.TrichromaticGraphOrientationUnaryEncoding
+import LeanTrominoes.UnaryAllOnesCompiler
 
 /-!
 # Axiom regression checks for the main completeness theorems
@@ -579,6 +604,60 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.liftedPaddedIncidenceRoute_in_refined_cell,
       ``LeanTrominoes.PeriodicGridDrawing.straightRefinementDrawing_isRealLocal,
       ``LeanTrominoes.PeriodicGridDrawing.straight_refinement,
+      ``LeanTrominoes.bool_count_length_of_all_true,
+      ``LeanTrominoes.bool_all_true_of_count_length,
+      ``LeanTrominoes.bool_coherent_iff_count,
+      ``LeanTrominoes.EncodedUnaryColumn.equalityWord_trueCount,
+      ``LeanTrominoes.PeriodicGridDrawing.SeamShift.coefficient_nonzero,
+      ``LeanTrominoes.PeriodicGridDrawing.SeamShift.coefficient_bounds,
+      ``LeanTrominoes.PeriodicGridDrawing.SeamShift.coefficient_not_multiple,
+      ``LeanTrominoes.PeriodicGridDrawing.SeamShift.realContains_determinant,
+      ``LeanTrominoes.PeriodicGridDrawing.SeamShift.avoids_scaled_grid,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FlatEncoding.recordField_getD,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FlatEncoding.vertexKind_getD,
+      ``LeanTrominoes.TrichromaticGraphOrientation.BinaryVerifier.decodedFields_sub_one,
+      ``LeanTrominoes.TrichromaticGraphOrientation.BinaryVerifier.binary_fields_length_ge,
+      ``LeanTrominoes.TrichromaticGraphOrientation.BinaryVerifier.edgeCount_le_length,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteProblem_inNP,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteProblem_npComplete,
+      ``LeanTrominoes.TrichromaticGraphOrientation.BinaryVerifier.bound_counts,
+      ``LeanTrominoes.TrichromaticGraphOrientation.BinaryVerifier.cappedInt_encode,
+      ``LeanTrominoes.TrichromaticGraphOrientation.BinaryVerifier.fields_normalize,
+      ``LeanTrominoes.TrichromaticGraphOrientation.BinaryVerifier.normalize_eq_of_bounded,
+      ``LeanTrominoes.TrichromaticGraphOrientation.BinaryVerifier.finiteProblem_fields_bounded,
+      ``LeanTrominoes.TrichromaticGraphOrientation.BinaryVerifier.capped_eq_decoder,
+      ``LeanTrominoes.TrichromaticGraphOrientation.BinaryVerifier.check_correct,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.incoming_atom_bound,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.finiteInwardCount_congr,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.finiteOrientation_congr,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.certificate_read,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.finiteProblem_iff_certificate,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.color_count_length_iff,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.monochromatic_count_iff,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.colorCheck_correct,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.inwardCheck_correct,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.vertexCheck_correct,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.degree_count_eq,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.inward_literal_value,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.inward_count_eq,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.colorField_eq_iff,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.color_count_eq,
+      ``LeanTrominoes.TrichromaticGraphOrientation.coherent_values_iff,
+      ``LeanTrominoes.TrichromaticGraphOrientation.coherent_count_iff,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteIsOrientation_iff_counts,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteProblem_unary_inNP,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteUnaryManyOne,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteProblem_unary_npHard,
+      ``LeanTrominoes.TrichromaticGraphOrientation.finiteProblem_unary_npComplete,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.check_parts,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.check_correct,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.endpoint_checks_iff,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.int_encode_zero_iff,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.offsetCheck_eq_true,
+      ``LeanTrominoes.TrichromaticGraphOrientation.FiniteVerifier.offset_checks_iff,
+      ``LeanTrominoes.TrichromaticGraphOrientation.UnaryEncoding.decodeUnary_fields,
+      ``LeanTrominoes.TrichromaticGraphOrientation.UnaryEncoding.edgeCount_le_length,
+      ``LeanTrominoes.UnaryAllOnes.failures_sum_zero,
       ``LeanTrominoes.PeriodicCNFStripReduction.CountedContractedIncidence.targetControls_cons_two,
       ``LeanTrominoes.PeriodicCNFStripReduction.CountedContractedIncidence.targetControls_cons_three,
       ``LeanTrominoes.PeriodicCNFStripReduction.CountedContractedIncidence.targetControls_eq_blocks,
