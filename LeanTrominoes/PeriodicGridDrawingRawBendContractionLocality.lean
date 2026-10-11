@@ -33,8 +33,8 @@ theorem contractedDrawing_local {V : Type*} [DecidableEq V] {source : PeriodicGr
   intro parent parentMember p contains
   rw [contractedDrawing_edgeRoute parentMember] at contains
   obtain ⟨route,routeMember,routeContains⟩ := GridPolyline.joinRouteChain_contains
-    (parentPieces_chain planar localDrawing localGraph degree parentMember)
-    (fun route member => (parentPieces_openSimple planar localDrawing localGraph degree parentMember member).1) contains
+    (parentPieces_chain planar parentMember)
+    (fun route member => (parentPieces_openSimple planar degree parentMember member).1) contains
   obtain ⟨record,recordMember,rfl⟩ := List.mem_map.mp routeMember
   have bounds := refinedPiece_inside_parent_rectangle planar localDrawing parentMember recordMember routeContains
   apply real_local_of_rectangle (localGraph parent.1 (List.fst_mem_of_mem_zipIdx parentMember))

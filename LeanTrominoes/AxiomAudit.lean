@@ -677,6 +677,7 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.straight_refinement,
       ``LeanTrominoes.GridPolyline.isRealSimple_join_closed,
       ``LeanTrominoes.GridPolyline.realEndpoint_of_prescribed_endpoints,
+      ``LeanTrominoes.GridPolyline.realIsEndpoint_iff_prescribed_endpoints,
       ``LeanTrominoes.GridPolyline.IsRealSimple.replacement_contacts,
       ``LeanTrominoes.GridPolyline.joinRouteChain_head,
       ``LeanTrominoes.GridPolyline.joinRouteChain_long,

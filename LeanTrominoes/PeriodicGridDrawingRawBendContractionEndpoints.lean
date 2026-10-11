@@ -8,19 +8,8 @@ import LeanTrominoes.PeriodicGridDrawingRawBendContractionPieceSimplicity
 namespace LeanTrominoes.PeriodicGridDrawing.RawBendSubdivision
 open PeriodicGraph.BendSubdivision OrthogonalDrawingRefinement
 
-theorem parentPieces_nonempty {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
-    {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
-    (localDrawing : drawing.IsRealLocal source) (localGraph : source.IsLocal)
-    {parent : PeriodicEdge V × Nat} (parentMember : parent ∈ source.edges.zipIdx) :
-    0 < (parentPieces source drawing parent).length := by
-  have oldSimple := planar.1.2.1 _ (edgeRoute_mem_of_compatible planar.1.1 parentMember)
-  rw [parentPieces_length planar parentMember,gridPolylineSegments_length]
-  have long := oldSimple.1
-  omega
-
 theorem contractedRoute_endpoints_map {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
-    (localDrawing : drawing.IsRealLocal source) (localGraph : source.IsLocal)
     (degree : source.DegreeAtMost 4) {parent : PeriodicEdge V × Nat}
     (parentMember : parent ∈ source.edges.zipIdx) :
     (contractedRoute source drawing parent).head?=
@@ -29,8 +18,8 @@ theorem contractedRoute_endpoints_map {V : Type*} [DecidableEq V] {source : Peri
     (contractedRoute source drawing parent).getLast?=
       (drawing.edgeRoute parent.2).getLast?.map
         (Cell.scale (cubicScale drawing)) := by
-  have positive := parentPieces_nonempty planar localDrawing localGraph parentMember
-  have allSimple := fun route member => parentPieces_openSimple planar localDrawing localGraph degree parentMember
+  have positive := parentPieces_nonempty planar parentMember
+  have allSimple := fun route member => parentPieces_openSimple planar degree parentMember
     (route := route) member
   obtain ⟨first,firstMember,_,firstRoute,firstPiece⟩ := parentPiece_data planar parentMember positive
   have firstEnds := refinedPiece_endpoints source drawing first
@@ -63,7 +52,6 @@ theorem contractedRoute_endpoints_map {V : Type*} [DecidableEq V] {source : Peri
 
 theorem contractedRoute_endpoints {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
-    (localDrawing : drawing.IsRealLocal source) (localGraph : source.IsLocal)
     (degree : source.DegreeAtMost 4) {parent : PeriodicEdge V × Nat}
     (parentMember : parent ∈ source.edges.zipIdx) :
     (contractedRoute source drawing parent).head?=some (Cell.scale (cubicScale drawing)
@@ -71,7 +59,7 @@ theorem contractedRoute_endpoints {V : Type*} [DecidableEq V] {source : Periodic
     (contractedRoute source drawing parent).getLast?=some (Cell.add
       (Cell.scale (cubicScale drawing) (drawing.vertexPosition source parent.1.target))
       (Cell.scale (cubicScale drawing*drawing.gridSize) parent.1.offset)) := by
-  have endpoints := contractedRoute_endpoints_map planar localDrawing localGraph degree parentMember
+  have endpoints := contractedRoute_endpoints_map planar degree parentMember
   have oldEnds := planar.1.1.2.2.2.2.2 parent parentMember
   rw [oldEnds.1,oldEnds.2] at endpoints
   simp only [Option.map_some] at endpoints

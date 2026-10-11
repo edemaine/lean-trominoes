@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LeanTrominoes.PeriodicGridDrawingRawBendContractionDrawing
 import LeanTrominoes.PeriodicGridDrawingRawBendContractionLiftedContacts
 import LeanTrominoes.PeriodicGridDrawingRawBendPieceVertexContacts
+import LeanTrominoes.PeriodicGridDrawingVertexTable
 
 /-! # Joining cubic raw pieces gives a planar drawing of the original graph -/
 namespace LeanTrominoes.PeriodicGridDrawing.RawBendSubdivision
@@ -41,16 +42,8 @@ private theorem stored_vertex_lookup {V : Type*} [DecidableEq V] {source : Perio
     {drawing : PeriodicGridDrawing} (compatible : drawing.IsCompatible source) {point : Cell}
     (member : point ∈ drawing.vertexPositions) :
     ∃ vertex∈source.vertices,drawing.vertexPosition source vertex=point := by
-  obtain ⟨index,valid,atIndex⟩ := List.mem_iff_getElem.mp member
-  have graphValid : index < source.vertices.length := by rwa [compatible.2.1] at valid
-  let vertex := source.vertices[index]'graphValid
-  have vertexMember : vertex ∈ source.vertices := List.getElem_mem graphValid
-  have indexValid := List.idxOf_lt_length_of_mem vertexMember
-  have indexEq : source.vertices.idxOf vertex=index :=
-    compatible.1.1.getElem_inj_iff.mp (List.getElem_idxOf indexValid)
-  refine ⟨vertex,vertexMember,?_⟩
-  rw [vertexPosition,indexEq,List.getD_eq_getElem _ _ valid]
-  exact atIndex
+  rw [vertexPositions_eq_map_vertexPosition source drawing compatible.1.1 compatible.2.1] at member
+  exact List.mem_map.mp member
 
 theorem contractedDrawing_verticesAvoidRoutes {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
@@ -68,39 +61,25 @@ theorem contractedDrawing_verticesAvoidRoutes {V : Type*} [DecidableEq V] {sourc
     apply Prod.ext <;> simp only [Cell.scale,Cell.add,periodTranslation] <;> ring
   rw [coordinateEq] at contains ⊢
   obtain ⟨record,recordMember,pieceContains⟩ :=
-    liftedContractedRoute_contains planar localDrawing localGraph degree edgeMember edgeCopy contains
+    liftedContractedRoute_contains planar degree edgeMember edgeCopy contains
   have globalMember := parentRecord_mem edgeMember recordMember
   rw [liftedRefinedPiece_eq] at pieceContains
   have originalMember : Vertex.original vertex ∈ (subdivisionGraph source drawing).vertices :=
     original_vertex_mem.mpr vertexMember
-  have vertexContains : GridPolyline.RealContains
-      (liftedPieceRoute source drawing (record.2,recordIndex source drawing record)
-        (Cell.add (sourceCell drawing record.2.source) edgeCopy))
-      (realCell (Cell.scale (cubicScale drawing)
-        (Cell.add (position source drawing (.original vertex)) (drawing.periodTranslation vertexCopy)))) := by
-    simpa only [position,positionEq] using pieceContains
   have contact := liftedPieceRoute_vertex_contact planar localGraph localDrawing originalMember
-    (recordIndex_tagged globalMember) (Cell.add (sourceCell drawing record.2.source) edgeCopy) vertexCopy vertexContains
-  have rawAbsolute : (subdivisionSegment source drawing record.2).translate
-      (drawing.periodTranslation (Cell.add (sourceCell drawing record.2.source) edgeCopy)) =
-      (absoluteSegment (position source drawing) drawing.gridSize (sourceCell drawing) record.2).translate
-        (drawing.periodTranslation edgeCopy) := by
-    rw [lifted_subdivision_segment_eq]
-    congr 2
-    apply Prod.ext <;> simp only [Cell.add,Cell.sub] <;> ring
-  rw [rawAbsolute] at contact
+    (recordIndex_tagged globalMember) (Cell.add (sourceCell drawing record.2.source) edgeCopy) vertexCopy
+    (by simpa only [position,positionEq] using pieceContains)
+  rw [record_lifted_segment_eq] at contact
   have oldSegmentContains : ((absoluteSegment (position source drawing) drawing.gridSize (sourceCell drawing) record.2).translate
       (drawing.periodTranslation edgeCopy)).RealContains
         (realCell (Cell.add oldPoint (drawing.periodTranslation vertexCopy))) := by
     rcases contact with atStart | atFinish
     · simp only [position,positionEq] at atStart
       rw [atStart]
-      exact GridSegment.realContains_start
-        ((absoluteSegment (position source drawing) drawing.gridSize (sourceCell drawing) record.2).translate (drawing.periodTranslation edgeCopy))
+      exact GridSegment.realContains_start _
     · simp only [position,positionEq] at atFinish
       rw [atFinish]
-      exact GridSegment.realContains_finish
-        ((absoluteSegment (position source drawing) drawing.gridSize (sourceCell drawing) record.2).translate (drawing.periodTranslation edgeCopy))
+      exact GridSegment.realContains_finish _
   have pieceMember := record_segment_in_original_route planar.1 globalMember
   have liftedMember := tagged_segment_translate pieceMember (drawing.periodTranslation edgeCopy)
   have oldContains : GridPolyline.RealContains (drawing.realEdgeRoute record.1.1 edgeCopy)
@@ -109,13 +88,13 @@ theorem contractedDrawing_verticesAvoidRoutes {V : Type*} [DecidableEq V] {sourc
   have oldEndpoint := planar.1.2.2 _ oldPointMember vertexCopy edgeCopy _
     (record_parent_index_valid planar.1.1 globalMember) oldContains
   rw [parentRecord_parent recordMember] at oldEndpoint
-  exact liftedContractedRoute_endpoint_transport planar localDrawing localGraph degree edgeMember edgeCopy oldEndpoint
+  exact liftedContractedRoute_endpoint_transport planar degree edgeMember edgeCopy oldEndpoint
 
 theorem contractedDrawing_planar {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
     (localDrawing : drawing.IsRealLocal source) (localGraph : source.IsLocal)
     (degree : source.DegreeAtMost 4) : (contractedDrawing source drawing).IsRealPlanarDrawing source :=
-  ⟨⟨contractedDrawing_compatible planar localDrawing localGraph degree,
+  ⟨⟨contractedDrawing_compatible planar degree,
     contractedDrawing_routesSimple planar localDrawing localGraph degree,
     contractedDrawing_verticesAvoidRoutes planar localDrawing localGraph degree⟩,
     contractedDrawing_routesMeetOnlyAtEndpoints planar localDrawing localGraph degree⟩

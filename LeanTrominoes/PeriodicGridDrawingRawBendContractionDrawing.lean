@@ -60,7 +60,6 @@ theorem contractedDrawing_edgeRoute {V : Type*} [DecidableEq V] {source : Period
 
 theorem contractedDrawing_compatible {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
-    (localDrawing : drawing.IsRealLocal source) (localGraph : source.IsLocal)
     (degree : source.DegreeAtMost 4) : (contractedDrawing source drawing).IsCompatible source := by
   have scaled := isCompatible_scale (cubicFactor_positive drawing) source drawing planar.1.1
   have sameSize : (contractedDrawing source drawing).gridSize=(drawing.scale (cubicFactor drawing)).gridSize := by
@@ -75,7 +74,7 @@ theorem contractedDrawing_compatible {V : Type*} [DecidableEq V] {source : Perio
     simpa only [PositionInFundamentalSquare,sameSize] using bounds
   · intro parent member
     rw [contractedDrawing_edgeRoute member,contractedDrawing_vertexPosition,contractedDrawing_vertexPosition]
-    have endpoints := contractedRoute_endpoints planar localDrawing localGraph degree member
+    have endpoints := contractedRoute_endpoints planar degree member
     constructor
     · simpa only [cubicFactor_cast] using endpoints.1
     · simpa only [contractedDrawing_periodTranslation,cubicFactor_cast] using endpoints.2
@@ -97,13 +96,12 @@ theorem refinedPiece_orthogonal {V : Type*} [DecidableEq V] {source : PeriodicGr
 
 theorem contractedDrawing_orthogonal {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
-    (localDrawing : drawing.IsRealLocal source) (localGraph : source.IsLocal)
     (degree : source.DegreeAtMost 4) : (contractedDrawing source drawing).IsOrthogonal := by
   apply (isOrthogonal_iff_routes _).mpr
   intro route member
   obtain ⟨parent,parentMember,rfl⟩ := List.mem_map.mp member
-  apply GridPolyline.joinRouteChain_orthogonal (parentPieces_chain planar localDrawing localGraph degree parentMember)
-    (fun route member => (parentPieces_openSimple planar localDrawing localGraph degree parentMember member).1)
+  apply GridPolyline.joinRouteChain_orthogonal (parentPieces_chain planar parentMember)
+    (fun route member => (parentPieces_openSimple planar degree parentMember member).1)
   intro piece pieceMember
   obtain ⟨record,recordMember,rfl⟩ := List.mem_map.mp pieceMember
   exact refinedPiece_orthogonal planar (parentRecord_mem parentMember recordMember)

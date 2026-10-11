@@ -11,7 +11,6 @@ open PeriodicGraph.BendSubdivision OrthogonalDrawingRefinement
 
 theorem parentPieces_openSimple {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
-    (localDrawing : drawing.IsRealLocal source) (localGraph : source.IsLocal)
     (degree : source.DegreeAtMost 4) {parent : PeriodicEdge V × Nat}
     (parentMember : parent ∈ source.edges.zipIdx) {route : List Cell}
     (member : route ∈ parentPieces source drawing parent) : GridPolyline.IsRealOpenSimple route := by
@@ -20,8 +19,7 @@ theorem parentPieces_openSimple {V : Type*} [DecidableEq V] {source : PeriodicGr
 
 theorem parentPieces_chain {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
-    (localDrawing : drawing.IsRealLocal source) (localGraph : source.IsLocal)
-    (degree : source.DegreeAtMost 4) {parent : PeriodicEdge V × Nat}
+    {parent : PeriodicEdge V × Nat}
     (parentMember : parent ∈ source.edges.zipIdx) :
     (parentPieces source drawing parent).IsChain (fun first second => first.getLast?=second.head?) := by
   apply List.isChain_iff_getElem.mpr
@@ -72,17 +70,11 @@ theorem contractedRoute_simple {V : Type*} [DecidableEq V] {source : PeriodicGra
     (localDrawing : drawing.IsRealLocal source) (localGraph : source.IsLocal)
     (degree : source.DegreeAtMost 4) {parent : PeriodicEdge V × Nat}
     (parentMember : parent ∈ source.edges.zipIdx) : GridPolyline.IsRealSimple (contractedRoute source drawing parent) := by
-  have oldSimple := planar.1.2.1 _ (edgeRoute_mem_of_compatible planar.1.1 parentMember)
-  have length := parentPieces_length planar parentMember
-  rw [gridPolylineSegments_length] at length
-  have piecesNonempty : parentPieces source drawing parent≠[] := by
-    intro empty
-    rw [empty,List.length_nil] at length
-    have long := oldSimple.1
-    omega
+  have piecesNonempty : parentPieces source drawing parent≠[] :=
+    List.ne_nil_of_length_pos (parentPieces_nonempty planar parentMember)
   exact GridPolyline.joinRouteChain_simple piecesNonempty
-    (fun _ member => parentPieces_openSimple planar localDrawing localGraph degree parentMember member)
-    (parentPieces_chain planar localDrawing localGraph degree parentMember)
+    (fun _ member => parentPieces_openSimple planar degree parentMember member)
+    (parentPieces_chain planar parentMember)
     (parentPieces_contactPattern planar localDrawing localGraph degree parentMember)
 
 end LeanTrominoes.PeriodicGridDrawing.RawBendSubdivision

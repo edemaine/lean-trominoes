@@ -46,6 +46,15 @@ theorem parentPieces_length {V : Type*} [DecidableEq V] {source : PeriodicGraph 
       (gridPolylineSegments (drawing.edgeRoute parent.2)).length := by
   exact (List.length_map _).trans (parentRecords_length planar member)
 
+theorem parentPieces_nonempty {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
+    {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
+    {parent : PeriodicEdge V × Nat} (parentMember : parent ∈ source.edges.zipIdx) :
+    0 < (parentPieces source drawing parent).length := by
+  have oldSimple := planar.1.2.1 _ (edgeRoute_mem_of_compatible planar.1.1 parentMember)
+  rw [parentPieces_length planar parentMember,gridPolylineSegments_length]
+  have long := oldSimple.1
+  omega
+
 theorem parentPiece_data {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
     {parent : PeriodicEdge V × Nat} (parentMember : parent ∈ source.edges.zipIdx)

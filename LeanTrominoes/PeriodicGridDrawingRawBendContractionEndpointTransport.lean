@@ -11,14 +11,13 @@ open PeriodicGraph.BendSubdivision PeriodicOrthocrossing
 
 theorem liftedContractedRoute_endpoints_map {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
-    (localDrawing : drawing.IsRealLocal source) (localGraph : source.IsLocal)
     (degree : source.DegreeAtMost 4) {parent : PeriodicEdge V × Nat}
     (member : parent ∈ source.edges.zipIdx) (copy : Cell) :
     ((contractedRoute source drawing parent).map (Cell.add (Cell.scale (cubicScale drawing*drawing.gridSize) copy))).head?=
       (drawing.realEdgeRoute parent.2 copy).head?.map (Cell.scale (cubicScale drawing)) ∧
     ((contractedRoute source drawing parent).map (Cell.add (Cell.scale (cubicScale drawing*drawing.gridSize) copy))).getLast?=
       (drawing.realEdgeRoute parent.2 copy).getLast?.map (Cell.scale (cubicScale drawing)) := by
-  have ends := contractedRoute_endpoints_map planar localDrawing localGraph degree member
+  have ends := contractedRoute_endpoints_map planar degree member
   have functionEq : Cell.add (Cell.scale (cubicScale drawing*drawing.gridSize) copy) ∘ Cell.scale (cubicScale drawing)=
       Cell.scale (cubicScale drawing) ∘ Cell.add (drawing.periodTranslation copy) := by
     funext point
@@ -29,13 +28,12 @@ theorem liftedContractedRoute_endpoints_map {V : Type*} [DecidableEq V] {source 
 
 theorem liftedContractedRoute_endpoint_transport {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
-    (localDrawing : drawing.IsRealLocal source) (localGraph : source.IsLocal)
     (degree : source.DegreeAtMost 4) {parent : PeriodicEdge V × Nat}
     (member : parent ∈ source.edges.zipIdx) (copy : Cell) {point : Cell}
     (endpoint : GridPolyline.RealIsEndpoint (drawing.realEdgeRoute parent.2 copy) (realCell point)) :
     GridPolyline.RealIsEndpoint ((contractedRoute source drawing parent).map
       (Cell.add (Cell.scale (cubicScale drawing*drawing.gridSize) copy))) (realCell (Cell.scale (cubicScale drawing) point)) := by
-  have ends := liftedContractedRoute_endpoints_map planar localDrawing localGraph degree member copy
+  have ends := liftedContractedRoute_endpoints_map planar degree member copy
   rcases endpoint with ⟨actual,atHead,equal⟩ | ⟨actual,atLast,equal⟩
   · have same := realCell_injective equal
     subst actual

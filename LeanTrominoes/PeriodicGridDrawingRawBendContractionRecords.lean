@@ -38,6 +38,17 @@ noncomputable def refinedPiece {V : Type*} [DecidableEq V] (source : PeriodicGra
     (drawing : PeriodicGridDrawing) (record : (Nat × Nat) × PeriodicEdge (Vertex V)) : List Cell :=
   liftedPieceRoute source drawing (record.2,recordIndex source drawing record) (sourceCell drawing record.2.source)
 
+/-- The record's source-cell label restores its absolute parent-segment coordinates. -/
+theorem record_lifted_segment_eq {V : Type*} [DecidableEq V] (source : PeriodicGraph V)
+    (drawing : PeriodicGridDrawing) (record : (Nat × Nat) × PeriodicEdge (Vertex V)) (copy : Cell) :
+    (subdivisionSegment source drawing record.2).translate
+        (drawing.periodTranslation (Cell.add (sourceCell drawing record.2.source) copy)) =
+      (absoluteSegment (position source drawing) drawing.gridSize (sourceCell drawing) record.2).translate
+        (drawing.periodTranslation copy) := by
+  rw [lifted_subdivision_segment_eq]
+  congr 2
+  apply Prod.ext <;> simp only [Cell.add,Cell.sub] <;> ring
+
 theorem refinedPiece_openSimple {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source) (degree : source.DegreeAtMost 4)
     {record : (Nat × Nat) × PeriodicEdge (Vertex V)} (member : record ∈ records source drawing) :
@@ -54,7 +65,7 @@ theorem refinedPiece_endpoints {V : Type*} [DecidableEq V] (source : PeriodicGra
   simp only [refinedPiece,liftedPieceRoute,translatePolyline,List.head?_map,List.getLast?_map,
     endpoints.1,endpoints.2,Option.map_some]
   constructor <;> apply congrArg some <;> apply Prod.ext <;>
-    simp only [absoluteSegment,subdivisionSegment,GridSegment.mk,cubicScale,Cell.add,Cell.scale] <;> ring
+    simp only [absoluteSegment,subdivisionSegment,cubicScale,Cell.add,Cell.scale] <;> ring
 
 theorem refinedPiece_endpoint_contacts {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
     {drawing : PeriodicGridDrawing} (planar : drawing.IsRealPlanarDrawing source)
@@ -81,12 +92,8 @@ theorem refinedPiece_endpoint_contacts {V : Type*} [DecidableEq V] {source : Per
   rw [absolute,absolute] at contacts
   have firstEnds := refinedPiece_endpoints source drawing first
   have secondEnds := refinedPiece_endpoints source drawing second
-  constructor
-  · rcases contacts.1 with equal | equal
-    · exact Or.inl ⟨_,firstEnds.1,equal⟩
-    · exact Or.inr ⟨_,firstEnds.2,equal⟩
-  · rcases contacts.2 with equal | equal
-    · exact Or.inl ⟨_,secondEnds.1,equal⟩
-    · exact Or.inr ⟨_,secondEnds.2,equal⟩
+  rw [GridPolyline.realIsEndpoint_iff_prescribed_endpoints firstEnds.1 firstEnds.2,
+    GridPolyline.realIsEndpoint_iff_prescribed_endpoints secondEnds.1 secondEnds.2]
+  exact contacts
 
 end LeanTrominoes.PeriodicGridDrawing.RawBendSubdivision

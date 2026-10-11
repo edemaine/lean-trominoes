@@ -24,11 +24,7 @@ theorem liftedRefinedPiece_occurrences_ne {V : Type*} [DecidableEq V] {source : 
   rw [indexEq,recordAt_recordIndex secondMember] at firstAt
   have recordEq : first=second := firstAt.symm
   subst second
-  have copies := congrArg Prod.snd equal
-  have x := congrArg Prod.fst copies
-  have y := congrArg Prod.snd copies
-  have copyEq : firstCopy=secondCopy := by
-    exact Prod.ext (by simp only [Cell.add] at x; omega) (by simp only [Cell.add] at y; omega)
+  have copyEq := Cell.add_left_injective _ (congrArg Prod.snd equal)
   exact different (Prod.ext rfl copyEq)
 
 theorem liftedContractedRoute_contacts {V : Type*} [DecidableEq V] {source : PeriodicGraph V}
@@ -46,9 +42,9 @@ theorem liftedContractedRoute_contacts {V : Type*} [DecidableEq V] {source : Per
     GridPolyline.RealIsEndpoint ((contractedRoute source drawing second).map
       (Cell.add (Cell.scale (cubicScale drawing*drawing.gridSize) secondCopy))) p := by
   obtain ⟨firstRecord,firstRecordMember,firstPieceContains⟩ :=
-    liftedContractedRoute_contains planar localDrawing localGraph degree firstMember firstCopy firstContains
+    liftedContractedRoute_contains planar degree firstMember firstCopy firstContains
   obtain ⟨secondRecord,secondRecordMember,secondPieceContains⟩ :=
-    liftedContractedRoute_contains planar localDrawing localGraph degree secondMember secondCopy secondContains
+    liftedContractedRoute_contains planar degree secondMember secondCopy secondContains
   have firstGlobal := parentRecord_mem firstMember firstRecordMember
   have secondGlobal := parentRecord_mem secondMember secondRecordMember
   have recordDifferent : (firstRecord.1.1,firstCopy)≠(secondRecord.1.1,secondCopy) := by
@@ -60,26 +56,14 @@ theorem liftedContractedRoute_contacts {V : Type*} [DecidableEq V] {source : Per
     (Cell.add (sourceCell drawing secondRecord.2.source) secondCopy)
     (liftedRefinedPiece_occurrences_ne firstGlobal secondGlobal firstCopy secondCopy recordDifferent)
     firstPieceContains secondPieceContains
-  have rawAbsolute (record : (Nat × Nat) × PeriodicEdge (Vertex V)) (copy : Cell) :
-      (subdivisionSegment source drawing record.2).translate
-        (drawing.periodTranslation (Cell.add (sourceCell drawing record.2.source) copy)) =
-      (absoluteSegment (position source drawing) drawing.gridSize (sourceCell drawing) record.2).translate
-        (drawing.periodTranslation copy) := by
-    rw [lifted_subdivision_segment_eq]
-    congr 2
-    apply Prod.ext <;> simp only [Cell.add,Cell.sub] <;> ring
-  rw [rawAbsolute,rawAbsolute] at rawContacts
+  rw [record_lifted_segment_eq,record_lifted_segment_eq] at rawContacts
   have firstEnds := liftedRefinedPiece_endpoints source drawing firstRecord firstCopy
   have secondEnds := liftedRefinedPiece_endpoints source drawing secondRecord secondCopy
   have endpoints : GridPolyline.RealIsEndpoint (liftedRefinedPiece source drawing firstRecord firstCopy) p ∧
       GridPolyline.RealIsEndpoint (liftedRefinedPiece source drawing secondRecord secondCopy) p := by
-    constructor
-    · rcases rawContacts.1 with equal | equal
-      · exact Or.inl ⟨_,firstEnds.1,equal⟩
-      · exact Or.inr ⟨_,firstEnds.2,equal⟩
-    · rcases rawContacts.2 with equal | equal
-      · exact Or.inl ⟨_,secondEnds.1,equal⟩
-      · exact Or.inr ⟨_,secondEnds.2,equal⟩
+    rw [GridPolyline.realIsEndpoint_iff_prescribed_endpoints firstEnds.1 firstEnds.2,
+      GridPolyline.realIsEndpoint_iff_prescribed_endpoints secondEnds.1 secondEnds.2]
+    exact rawContacts
   obtain ⟨a,firstOldContains,pointEq⟩ := liftedRefinedPiece_endpoint_preimage planar
     firstGlobal firstCopy endpoints.1
   obtain ⟨b,secondOldContains,secondPointEq⟩ := liftedRefinedPiece_endpoint_preimage planar
@@ -94,7 +78,7 @@ theorem liftedContractedRoute_contacts {V : Type*} [DecidableEq V] {source : Per
     recordDifferent _ firstOldContains secondOldContains
   rw [parentRecord_parent firstRecordMember,parentRecord_parent secondRecordMember] at oldEndpoints
   rw [pointEq]
-  exact ⟨liftedContractedRoute_endpoint_transport planar localDrawing localGraph degree firstMember firstCopy oldEndpoints.1,
-    liftedContractedRoute_endpoint_transport planar localDrawing localGraph degree secondMember secondCopy oldEndpoints.2⟩
+  exact ⟨liftedContractedRoute_endpoint_transport planar degree firstMember firstCopy oldEndpoints.1,
+    liftedContractedRoute_endpoint_transport planar degree secondMember secondCopy oldEndpoints.2⟩
 
 end LeanTrominoes.PeriodicGridDrawing.RawBendSubdivision

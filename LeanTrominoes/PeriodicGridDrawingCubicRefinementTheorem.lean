@@ -24,7 +24,7 @@ theorem polygonal_cubic_refinement {V : Type*} [DecidableEq V]
   exact ⟨contractedDrawing graph drawing,
     contractedDrawing_planar planar drawingLocal graphLocal degree,
     contractedDrawing_local planar drawingLocal graphLocal degree,
-    contractedDrawing_orthogonal planar drawingLocal graphLocal degree,
+    contractedDrawing_orthogonal planar degree,
     contractedDrawing_gridSize_bound graph drawing,rfl⟩
 
 end LeanTrominoes.PeriodicGridDrawing

@@ -14,6 +14,16 @@ theorem realEndpoint_of_prescribed_endpoints {route : List Cell} {first last : C
   · exact Or.inl (equal.trans (congrArg realCell (Option.some.inj (atHead.symm.trans head))))
   · exact Or.inr (equal.trans (congrArg realCell (Option.some.inj (atLast.symm.trans finish))))
 
+/-- Prescribed endpoints characterize the endpoint predicate exactly. -/
+theorem realIsEndpoint_iff_prescribed_endpoints {route : List Cell} {first last : Cell}
+    (head : route.head?=some first) (finish : route.getLast?=some last) {p : ℝ × ℝ} :
+    RealIsEndpoint route p ↔ p=realCell first ∨ p=realCell last := by
+  constructor
+  · exact realEndpoint_of_prescribed_endpoints head finish
+  · rintro (equal | equal)
+    · exact Or.inl ⟨first,head,equal⟩
+    · exact Or.inr ⟨last,finish,equal⟩
+
 theorem IsRealSimple.replacement_contacts {route : List Cell} (simple : IsRealSimple route)
     (transform : Cell → Cell) (injective : Function.Injective transform)
     {first second : GridSegment × Nat}
