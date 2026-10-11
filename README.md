@@ -9,7 +9,8 @@ Jayson Lynch. The working paper is included as
 Use the checked-in source as the reference for theorem statements and proofs
 in this formalization.
 
-The eventual goal is every theorem and lemma in the paper. Theorem 5.2 is
+The numbered paper results and their formalization scope are summarized in
+the coverage table below. Theorem 5.2 is
 proved: for either single tromino, periodic-subset tiling is co-r.e.-complete
 in the plane and PSPACE-complete in a strip.
 
@@ -220,13 +221,13 @@ paper theorem being complete; the entries below distinguish these cases.
 | Theorem 5.5 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Corollary 5.6 | Plane co-r.e. completeness and strip PSPACE completeness proved |
 | Corollary 5.7 | Proved: finite-seed plane completion by two fixed polyominoes is co-r.e. complete, with a connected 15-cell P. A computable machine-input seed prescribes one Q and canonical refined P patterns. Any completion recovers the universal Wang quarter-plane and every input pin from the original mixed tiling. Unused variables are retained as free bits; inconsistent prescriptions emit an overlapping seed. The input-dependent safety translation preserves the fixed tile pair. The reduction and final theorem pass the axiom audit |
-| Two connected polycubes | Full 3D and every fixed slab height > 1 proved |
+| Corollary 5.8 | Two connected polycubes: full 3D and every fixed slab height > 1 proved |
 | Corollary 5.9 | Translation-only co-r.e. completeness in full 3D and every fixed slab height > 1 proved |
-| Tromino completion | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |
+| Theorem 5.10, Corollary 5.11 | L- and I-tromino plane co-r.e. completeness, strip PSPACE completeness (unary encoding), and the aperiodic-completion corollary proved |
 | Theorems 2.1–2.2, Lemma 2.3 | Theorem 2.1 is proved for arbitrary degrees, loops, and isolated vertices: simple real routes, locality, orthocrossing, vertex avoidance, grid size ≤16(|V|+|E|+1), and orthogonality at degree four. Lemma 2.3 preserves rational vertex positions, planarity, simplicity, and locality, multiplies the grid by 32, and normalizes degree-three incidence directions. Theorem 2.2 is proved with the current manuscript’s O(M³) bound: `PeriodicGridDrawing.polygonal_cubic_refinement` gives a planar local orthogonal drawing of any planar local polygonal drawing of degree at most four, with grid size ≤84480M³. It includes loops and periodic seam bends and scales original vertices exactly by (16M+32)(160M+1600). The straight-input theorem retains its sharper constant ≤3300M³ |
 | Theorems 3.5–3.7 | Complete with supplied, verified planar drawings in 1D and 2D. Local planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 have the polynomial grid restriction (in fact linear in 2D). Local planar 3DM has colored degree 2 or 3. Native encodings have PSPACE completeness in 1D and co-r.e. completeness in 2D |
 | Theorem 3.8 | Normalized trichromatic orientation is co-r.e. complete in 2D and PSPACE complete in 1D under its native binary encoding. Finite normalized planar drawings are NP-complete under a sparse unary encoding. Ordinary local periodic colored graph orientation is co-r.e. complete, with hard outputs admitting verified orthogonal planar presentations. Ordinary local 1D colored graph orientation is PSPACE-complete under a lossless native binary encoding of vertex kinds and edge records. The decider verifies endpoints, offsets, degree three, and colors, then searches three-column states with one bit per edge and column. The polynomial-time reduction compiles the actual contracted graph, including dense vertex names and signed offsets. Ordinary finite colored graph orientation is NP-complete under the same native binary encoding. An actual polynomial-time verifier checks endpoint bounds, zero offsets, degree and color constraints, and inward counts, with one witness bit per edge. Oversized binary fields are rejected before unary expansion; loops contribute two incidences. NP completeness also holds for the lossless unary graph encoding |
-| Section 4, Horn and dual Horn SAT | Period-one models in every dimension, finite-quotient equivalence, and executable solvers proved; linear operation bound proved for explicitly indexed inputs in the unit-cost RAM model |
+| Theorem 4.2 | Horn and dual Horn SAT: period-one models in every dimension, finite-quotient equivalence, and executable solvers proved; linear operation bound proved for explicitly indexed inputs in the unit-cost RAM model |
 | Theorem 4.1 | Executable local periodic 2SAT decision in every fixed dimension, with a verified polynomial indexed-RAM operation bound including clause normalization and finite-cover construction |
 | Lemma 4.3 | In every dimension, every free vertex of a period-one matching in a local periodic graph with a perfect matching starts a simple augmenting path of diameter at most `2*d*|E|`; no bipartiteness assumption |
 | Lemma 4.4 | Every proper bipartition of a connected periodic graph is invariant under twice every lattice translation, in every dimension |
@@ -239,7 +240,6 @@ paper theorem being complete; the entries below distinguish these cases.
 | Corollary 5.14 | Every completable periodic domino prefill has a completion with those doubled periods |
 | Corollary 5.15 | Executable decision from cell representatives and arbitrary nonsingular integer period matrices; quadratic operation budget in the number of representatives for each fixed dimension, in the unit-cost arithmetic RAM model |
 | Corollary 5.4 | Proved for both trominoes under the explicit unary coordinate encoding: `Tromino.FiniteCoordinateColumns.region_npComplete` |
-| Other results 5.7–5.11 except those listed above | Open |
 
 The [finite-seed polyomino search](LeanTrominoes/FinitePolyominoCompletionSearch.lean)
 keeps every prescribed placement at every finite stage, including placements
