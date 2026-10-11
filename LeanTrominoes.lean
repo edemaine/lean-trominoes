@@ -303,6 +303,7 @@ import LeanTrominoes.PeriodicGridDrawingBendSubdivisionVertexAvoidance
 import LeanTrominoes.PeriodicGridDrawingBendSubdivisionVertexTransport
 import LeanTrominoes.PeriodicGridDrawingPolygonalListedPointContacts
 import LeanTrominoes.PeriodicGridDrawingPolygonalRefinementTheorem
+import LeanTrominoes.PeriodicGridDrawingCubicRefinementTheorem
 import LeanTrominoes.PeriodicGridDrawingPolygonalSubdivisionRefinement
 
 /-!
@@ -488,10 +489,9 @@ has a run-level finite-alphabet Turing-machine space certificate.
 -/
 
 /-!
-`PeriodicGridDrawing.polygonal_refinement` refines any planar local polygonal
-drawing of a degree-four periodic graph into a planar local orthogonal drawing,
-including loops and bends on period seams. Original vertices are scaled by an
-explicit positive integer. The grid bound is `865075200*M^6`; straight inputs
-have the sharper bound `3300*M^3` from `PeriodicGridDrawing.straight_refinement`.
-These are polynomial bounds, without claiming the paper's quadratic bound.
+`PeriodicGridDrawing.polygonal_cubic_refinement` proves Theorem 2.2 for
+arbitrary planar local polygonal drawings of degree-four periodic graphs,
+including loops and bends on period seams. The output is planar, local,
+and orthogonal, with grid size at most `84480*M^3`. Original vertices are
+scaled exactly by `(16*M+32)*(160*M+1600)`.
 -/

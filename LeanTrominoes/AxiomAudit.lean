@@ -143,6 +143,9 @@ import LeanTrominoes.PeriodicGridDrawingScaledStraightLocality
 import LeanTrominoes.PeriodicGridDrawingStraightLocalCoordinateBoxes
 import LeanTrominoes.PeriodicGridDrawingStraightRefinementLocality
 import LeanTrominoes.PeriodicGridDrawingStraightRefinementTheorem
+import LeanTrominoes.PeriodicGridDrawingCubicRefinementTheorem
+import LeanTrominoes.PeriodicGridDrawingRawBendIncidentSourceCores
+import LeanTrominoes.OrthogonalBendFanBoundaryLocality
 import Lean.Util.CollectAxioms
 import LeanTrominoes.PeriodicGridDrawingIndexing
 import LeanTrominoes.PeriodicPlanarThreeDMContractedLocality
@@ -753,6 +756,7 @@ run_cmd do
       ``LeanTrominoes.PeriodicGridDrawing.BendSubdivision.original_lifted_representative,
       ``LeanTrominoes.PeriodicGridDrawing.polygonal_listed_point_segment_contact,
       ``LeanTrominoes.PeriodicGridDrawing.polygonal_refinement,
+      ``LeanTrominoes.PeriodicGridDrawing.polygonal_cubic_refinement,
       ``LeanTrominoes.PeriodicGridDrawing.BendSubdivision.bendRefinementFactor_spacing,
       ``LeanTrominoes.PeriodicGridDrawing.BendSubdivision.orthogonalSubdivision_planar,
       ``LeanTrominoes.PeriodicGridDrawing.BendSubdivision.orthogonalSubdivision_local,
@@ -1329,3 +1333,116 @@ run_cmd do
       ax != ``propext && ax != ``Classical.choice && ax != ``Quot.sound
     unless extra.isEmpty do
       throwError "{name} depends on unexpected axioms: {extra}"
+
+-- Audit every declaration in the cubic refinement construction, including
+-- generated finite-certificate proofs and auxiliary definitions.
+open Lean Elab Command in
+run_cmd do
+  let env ← getEnv
+  let modules : List Name := [`LeanTrominoes.GridPolylineRealTube,
+    `LeanTrominoes.GridSegmentBoundedCoreReflection,
+    `LeanTrominoes.GridSegmentBoundedCoreTubes,
+    `LeanTrominoes.GridSegmentBoundedDirectionPerturbation,
+    `LeanTrominoes.GridSegmentDigitalRoute,
+    `LeanTrominoes.GridSegmentDigitalSamples,
+    `LeanTrominoes.GridSegmentKickedCoreDigitalRoutes,
+    `LeanTrominoes.GridSegmentKickedDigitalRoute,
+    `LeanTrominoes.GridSegmentKickedDigitalRouteBounds,
+    `LeanTrominoes.GridSegmentOrderedCoreDigitalRoutes,
+    `LeanTrominoes.GridSegmentOrderedLeftRayTubes,
+    `LeanTrominoes.GridSegmentOrderedRayTubes,
+    `LeanTrominoes.GridSegmentRationalSlopeOrder,
+    `LeanTrominoes.GridSegmentRealBoxTransforms,
+    `LeanTrominoes.GridSegmentRealTube,
+    `LeanTrominoes.GridSegmentRealTubeTranslation,
+    `LeanTrominoes.GridSegmentScaledOrderedTubes,
+    `LeanTrominoes.OrthogonalBendFanAssignment,
+    `LeanTrominoes.OrthogonalBendFanBoundaryLocality,
+    `LeanTrominoes.OrthogonalBendFanRaySigns,
+    `LeanTrominoes.OrthogonalBendFanTemplates,
+    `LeanTrominoes.OrthogonalCubicRefinementBounds,
+    `LeanTrominoes.OrthogonalPolylineRealLoopErasure,
+    `LeanTrominoes.PeriodicGridDrawingAnchorBoundarySpacing,
+    `LeanTrominoes.PeriodicGridDrawingCubicRefinementTheorem,
+    `LeanTrominoes.PeriodicGridDrawingRawBendContractionDrawing,
+    `LeanTrominoes.PeriodicGridDrawingRawBendContractionEndpointTransport,
+    `LeanTrominoes.PeriodicGridDrawingRawBendContractionEndpoints,
+    `LeanTrominoes.PeriodicGridDrawingRawBendContractionLiftedContacts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendContractionLiftedPieces,
+    `LeanTrominoes.PeriodicGridDrawingRawBendContractionLocality,
+    `LeanTrominoes.PeriodicGridDrawingRawBendContractionPieceSimplicity,
+    `LeanTrominoes.PeriodicGridDrawingRawBendContractionPieces,
+    `LeanTrominoes.PeriodicGridDrawingRawBendContractionPlanarity,
+    `LeanTrominoes.PeriodicGridDrawingRawBendContractionRecords,
+    `LeanTrominoes.PeriodicGridDrawingRawBendCoreFanContactIdentification,
+    `LeanTrominoes.PeriodicGridDrawingRawBendCoreHalfPlanes,
+    `LeanTrominoes.PeriodicGridDrawingRawBendCoreSeparation,
+    `LeanTrominoes.PeriodicGridDrawingRawBendDigitalCores,
+    `LeanTrominoes.PeriodicGridDrawingRawBendDirectionBounds,
+    `LeanTrominoes.PeriodicGridDrawingRawBendFanAssignment,
+    `LeanTrominoes.PeriodicGridDrawingRawBendFanContacts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendFanGeometry,
+    `LeanTrominoes.PeriodicGridDrawingRawBendFanPlacement,
+    `LeanTrominoes.PeriodicGridDrawingRawBendFanRectangleLocality,
+    `LeanTrominoes.PeriodicGridDrawingRawBendHorizontalPieceSimple,
+    `LeanTrominoes.PeriodicGridDrawingRawBendHorizontalPorts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendIncidentCoreData,
+    `LeanTrominoes.PeriodicGridDrawingRawBendIncidentCoreGeometry,
+    `LeanTrominoes.PeriodicGridDrawingRawBendIncidentCoreSeparation,
+    `LeanTrominoes.PeriodicGridDrawingRawBendIncidentFanContacts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendIncidentHorizontalCores,
+    `LeanTrominoes.PeriodicGridDrawingRawBendIncidentSourceCores,
+    `LeanTrominoes.PeriodicGridDrawingRawBendIncidentVerticalFanContacts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendLiftedFanContacts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendLiftedIncidentCores,
+    `LeanTrominoes.PeriodicGridDrawingRawBendLiftedPieceRectangleLocality,
+    `LeanTrominoes.PeriodicGridDrawingRawBendLiftedPieceRoutes,
+    `LeanTrominoes.PeriodicGridDrawingRawBendLiftedVertexUniqueness,
+    `LeanTrominoes.PeriodicGridDrawingRawBendNonincidentFanCores,
+    `LeanTrominoes.PeriodicGridDrawingRawBendOrderedLeftCores,
+    `LeanTrominoes.PeriodicGridDrawingRawBendOrderedRightCores,
+    `LeanTrominoes.PeriodicGridDrawingRawBendOrientedCoreData,
+    `LeanTrominoes.PeriodicGridDrawingRawBendParentBoundarySigns,
+    `LeanTrominoes.PeriodicGridDrawingRawBendParentFanLocality,
+    `LeanTrominoes.PeriodicGridDrawingRawBendParentNodeLabels,
+    `LeanTrominoes.PeriodicGridDrawingRawBendParentOriginalFanLocality,
+    `LeanTrominoes.PeriodicGridDrawingRawBendParentPieceFanLocality,
+    `LeanTrominoes.PeriodicGridDrawingRawBendParentPieceLocality,
+    `LeanTrominoes.PeriodicGridDrawingRawBendParentPorts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendParentRayGeometry,
+    `LeanTrominoes.PeriodicGridDrawingRawBendPeriodicCores,
+    `LeanTrominoes.PeriodicGridDrawingRawBendPieceContacts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendPieceRectangleLocality,
+    `LeanTrominoes.PeriodicGridDrawingRawBendPieceRoutes,
+    `LeanTrominoes.PeriodicGridDrawingRawBendPieceSimplicity,
+    `LeanTrominoes.PeriodicGridDrawingRawBendPieceVertexContacts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendPortSpacing,
+    `LeanTrominoes.PeriodicGridDrawingRawBendPorts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendRayKeys,
+    `LeanTrominoes.PeriodicGridDrawingRawBendSubdivision,
+    `LeanTrominoes.PeriodicGridDrawingRawBendSubdivisionCompatibility,
+    `LeanTrominoes.PeriodicGridDrawingRawBendSubdivisionContacts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendSubdivisionPlanarity,
+    `LeanTrominoes.PeriodicGridDrawingRawBendSubdivisionRecords,
+    `LeanTrominoes.PeriodicGridDrawingRawBendSubdivisionSegments,
+    `LeanTrominoes.PeriodicGridDrawingRawBendSubdivisionVertexAvoidance,
+    `LeanTrominoes.PeriodicGridDrawingRawBendSubdivisionVertices,
+    `LeanTrominoes.PeriodicGridDrawingRawBendVerticalCoreContacts,
+    `LeanTrominoes.PeriodicGridDrawingRawBendVerticalFanGeometry,
+    `LeanTrominoes.PeriodicGridDrawingRawBendVerticalFanPlacement,
+    `LeanTrominoes.PeriodicGridDrawingRawBendVerticalPorts,
+    `LeanTrominoes.PeriodicGridDrawingRealAffineGeometry]
+  for module in modules do
+    unless env.header.moduleNames.contains module do
+      throwError "Missing cubic refinement module: {module}"
+  let mut count := 0
+  for (name, _) in env.constants.toList do
+    if let some index := env.getModuleIdxFor? name then
+      if modules.contains env.header.moduleNames[index.toNat]! then
+        let axioms ← Lean.collectAxioms name
+        let extra := axioms.filter fun ax =>
+          ax != ``propext && ax != ``Classical.choice && ax != ``Quot.sound
+        unless extra.isEmpty do
+          throwError "{name} depends on unexpected axioms: {extra}"
+        count := count+1
+  logInfo m!"Cubic refinement construction: strict axiom audit passed for {count} declarations."
