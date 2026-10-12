@@ -31,13 +31,11 @@ theorem pieceRoute_inside_rectangle {V : Type*} [DecidableEq V] {source : Period
       (pieceTargetFan_head source drawing tagged))
     have box := coreRoute_box source drawing tagged coreContains
     simp only [realCell] at firstAnchor lastAnchor
-    rcases le_total (cubicCore source drawing tagged).start.1 (cubicCore source drawing tagged).finish.1 with xOrder | xOrder <;>
-      rcases le_total (cubicCore source drawing tagged).start.2 (cubicCore source drawing tagged).finish.2 with yOrder | yOrder
-    all_goals
-      simp only [GridSegment.RealBoxContains,min_eq_left xOrder,min_eq_right xOrder,max_eq_left xOrder,max_eq_right xOrder,
-        min_eq_left yOrder,min_eq_right yOrder,max_eq_left yOrder,max_eq_right yOrder] at box
-      exact ⟨by linarith [firstAnchor.1,lastAnchor.1,box.1],by linarith [firstAnchor.2.1,lastAnchor.2.1,box.2.1],
-        by linarith [firstAnchor.2.2.1,lastAnchor.2.2.1,box.2.2.1],by linarith [firstAnchor.2.2.2,lastAnchor.2.2.2,box.2.2.2]⟩
+    simp only [GridSegment.RealBoxContains,Int.cast_min,Int.cast_max] at box
+    exact ⟨(le_min firstAnchor.1 lastAnchor.1).trans box.1,
+      box.2.1.trans (max_le firstAnchor.2.1 lastAnchor.2.1),
+      (le_min firstAnchor.2.2.1 lastAnchor.2.2.1).trans box.2.2.1,
+      box.2.2.2.trans (max_le firstAnchor.2.2.2 lastAnchor.2.2.2)⟩
   · exact targetBounds point lastContains
 
 end LeanTrominoes.PeriodicGridDrawing.RawBendSubdivision

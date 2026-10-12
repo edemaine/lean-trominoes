@@ -3,7 +3,6 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LeanTrominoes.PeriodicGridDrawingRawBendPieceContacts
-import LeanTrominoes.PeriodicGridDrawingRawBendParentPieceFanLocality
 import LeanTrominoes.GridPolylineRealReplacementContacts
 
 /-! # Recovering cubic piece routes by their original polygonal occurrences -/
@@ -85,11 +84,7 @@ theorem refinedPiece_endpoint_contacts {V : Type*} [DecidableEq V] {source : Per
     (recordIndex_tagged firstMember) (recordIndex_tagged secondMember)
     (sourceCell drawing first.2.source) (sourceCell drawing second.2.source)
     (fun equal => indicesDifferent (congrArg Prod.fst equal)) firstContains secondContains
-  have absolute (edge : PeriodicEdge (Vertex V)) :
-      (subdivisionSegment source drawing edge).translate (drawing.periodTranslation (sourceCell drawing edge.source)) =
-        absoluteSegment (position source drawing) drawing.gridSize (sourceCell drawing) edge :=
-    liftedIncidentRawSegment_absolute source drawing (edge,0) false
-  rw [absolute,absolute] at contacts
+  simp only [subdivisionSegment,periodTranslation,straightRoute_absolute_segment] at contacts
   have firstEnds := refinedPiece_endpoints source drawing first
   have secondEnds := refinedPiece_endpoints source drawing second
   rw [GridPolyline.realIsEndpoint_iff_prescribed_endpoints firstEnds.1 firstEnds.2,

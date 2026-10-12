@@ -25,8 +25,7 @@ theorem liftedIncidentRawSegment_absolute {V : Type*} [DecidableEq V]
       else absoluteSegment (position source drawing) drawing.gridSize (sourceCell drawing) tagged.1 := by
   cases target <;>
     simp only [liftedIncidentRawSegment,incidentRawSegment,Bool.false_eq_true,ite_false,ite_true,
-      subdivisionSegment,GridSegment.translate,GridSegment.reverse,absoluteSegment] <;>
-    congr 1 <;> apply Prod.ext <;> simp only [periodTranslation,Cell.add,Cell.scale] <;> ring
+      ← GridSegment.reverse_translate,subdivisionSegment,periodTranslation,straightRoute_absolute_segment]
 
 theorem parent_piece_fan_inside_rectangle {V : Type*} [DecidableEq V]
     {source : PeriodicGraph V} {drawing : PeriodicGridDrawing}

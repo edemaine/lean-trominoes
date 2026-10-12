@@ -5,23 +5,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LeanTrominoes.PeriodicGridDrawingRawBendParentPorts
 
 /-! # Original target vertices have their parent's target-cell label -/
-namespace LeanTrominoes.PeriodicGraph.BendSubdivision
-
-theorem chainEdges_node_pair_tail {V : Type*} {points : List (V × Cell)} {edge : PeriodicEdge V}
-    (member : edge ∈ chainEdges points) :
-    ∃ first ∈ points.dropLast, ∃ second ∈ points.tail,
-      edge = ⟨first.1,second.1,Cell.sub second.2 first.2⟩ := by
-  induction points using List.twoStepInduction with
-  | nil | singleton => simp [chainEdges] at member
-  | cons_cons first second rest _ induction =>
-      simp only [chainEdges,List.mem_cons] at member
-      rcases member with rfl | member
-      · exact ⟨first,by simp [List.dropLast_cons_cons],second,by simp,rfl⟩
-      · obtain ⟨a,aMember,b,bMember,equal⟩ := induction second member
-        exact ⟨a,by rw [List.dropLast_cons_cons]; exact List.mem_cons_of_mem _ aMember,
-          b,by simpa only [List.tail_cons] using List.mem_of_mem_tail bMember,equal⟩
-
-end LeanTrominoes.PeriodicGraph.BendSubdivision
 namespace LeanTrominoes.PeriodicGridDrawing.RawBendSubdivision
 open PeriodicGraph.BendSubdivision
 
