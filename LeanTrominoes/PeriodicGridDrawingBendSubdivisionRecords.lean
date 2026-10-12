@@ -8,11 +8,6 @@ import LeanTrominoes.PeriodicGridDrawingBendSubdivision
 namespace LeanTrominoes.PeriodicGridDrawing.BendSubdivision
 open PeriodicGraph.BendSubdivision
 
-private theorem fstIndex {A : Type*} (values : List A) (offset : Nat) : (values.zipIdx offset).map Prod.fst=values := by
-  induction values generalizing offset with
-  | nil => rfl
-  | cons first rest induction => simp only [List.zipIdx_cons,List.map_cons,induction]
-
 def records {V : Type*} (source : PeriodicGraph V) (drawing : PeriodicGridDrawing) (factor : Nat) :
     List ((Nat × Nat) × PeriodicEdge (Vertex V)) :=
   source.edges.zipIdx.flatMap fun parent =>
@@ -24,7 +19,7 @@ theorem records_edges {V : Type*} (source : PeriodicGraph V) (drawing : Periodic
   simp only [records,List.map_flatMap,List.map_map,Function.comp_def]
   change (source.edges.zipIdx.flatMap fun parent =>
     (chainEdges (nodes parent (middle drawing factor parent))).zipIdx.map Prod.fst)=_
-  simp only [fstIndex]
+  simp only [List.zipIdx_map_fst]
   rfl
 
 theorem records_keys_unique {V : Type*} (source : PeriodicGraph V) (drawing : PeriodicGridDrawing) (factor : Nat) :

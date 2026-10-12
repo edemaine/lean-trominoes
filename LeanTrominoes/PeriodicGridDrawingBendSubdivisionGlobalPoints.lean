@@ -16,11 +16,7 @@ def globalPoint {V : Type*} [DecidableEq V] (source : PeriodicGraph V)
 
 theorem internalPoints_fst (drawing : PeriodicGridDrawing) (index : Nat) :
     (internalPoints drawing index).map Prod.fst=(drawing.edgeRoute index).tail.dropLast := by
-  have fstIndex (values : List Cell) (offset : Nat) : (values.zipIdx offset).map Prod.fst=values := by
-    induction values generalizing offset with
-    | nil => rfl
-    | cons first rest induction => simp only [List.zipIdx_cons,List.map_cons,induction]
-  exact fstIndex _ _
+  exact List.zipIdx_map_fst _ _
 
 theorem middle_globalPoints {V : Type*} [DecidableEq V] (source : PeriodicGraph V)
     (drawing : PeriodicGridDrawing) (factor : Nat) (tagged : PeriodicEdge V × Nat) :

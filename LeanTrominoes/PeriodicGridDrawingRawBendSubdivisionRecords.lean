@@ -8,11 +8,6 @@ import LeanTrominoes.PeriodicGridDrawingRawBendSubdivisionSegments
 namespace LeanTrominoes.PeriodicGridDrawing.RawBendSubdivision
 open PeriodicGraph.BendSubdivision
 
-private theorem fstIndex {A : Type*} (values : List A) (offset : Nat) : (values.zipIdx offset).map Prod.fst = values := by
-  induction values generalizing offset with
-  | nil => rfl
-  | cons first rest induction => simp only [List.zipIdx_cons,List.map_cons,induction]
-
 def records {V : Type*} (source : PeriodicGraph V) (drawing : PeriodicGridDrawing) :
     List ((Nat × Nat) × PeriodicEdge (Vertex V)) :=
   source.edges.zipIdx.flatMap fun parent =>
@@ -22,7 +17,7 @@ theorem records_edges {V : Type*} (source : PeriodicGraph V) (drawing : Periodic
     (records source drawing).map Prod.snd = (subdivisionGraph source drawing).edges := by
   simp only [records,List.map_flatMap,List.map_map,Function.comp_def]
   change (source.edges.zipIdx.flatMap fun parent => (chainEdges (nodes parent (middle drawing parent))).zipIdx.map Prod.fst) = _
-  simp only [fstIndex]
+  simp only [List.zipIdx_map_fst]
   rfl
 
 theorem records_keys_unique {V : Type*} (source : PeriodicGraph V) (drawing : PeriodicGridDrawing) :
@@ -81,18 +76,12 @@ theorem recordAt_key_injective {V : Type*} {source : PeriodicGraph V} {drawing :
     (firstValid : first < (subdivisionGraph source drawing).edges.length)
     (secondValid : second < (subdivisionGraph source drawing).edges.length)
     (equal : (recordAt source drawing first).1 = (recordAt source drawing second).1) : first = second := by
-  have firstRecordValid : first < (records source drawing).length := by rwa [records_length]
-  have secondRecordValid : second < (records source drawing).length := by rwa [records_length]
-  let keys := (records source drawing).map Prod.fst
-  let firstIndex : Fin keys.length := ⟨first,by simp only [keys,List.length_map]; exact firstRecordValid⟩
-  let secondIndex : Fin keys.length := ⟨second,by simp only [keys,List.length_map]; exact secondRecordValid⟩
-  have firstGet : keys.get firstIndex = (recordAt source drawing first).1 := by
-    simp only [keys,firstIndex,List.get_eq_getElem,List.getElem_map,recordAt,List.getD_eq_getElem _ _ firstRecordValid]
-  have secondGet : keys.get secondIndex = (recordAt source drawing second).1 := by
-    simp only [keys,secondIndex,List.get_eq_getElem,List.getElem_map,recordAt,List.getD_eq_getElem _ _ secondRecordValid]
-  have indices := List.nodup_iff_injective_get.mp (records_keys_unique source drawing)
-    (firstGet.trans (equal.trans secondGet.symm))
-  exact congrArg Fin.val indices
+  rw [← records_length] at firstValid secondValid
+  apply ((records_keys_unique source drawing).getElem_inj_iff
+    (hi := by simpa only [List.length_map] using firstValid)
+    (hj := by simpa only [List.length_map] using secondValid)).mp
+  simpa only [List.getElem_map,recordAt,List.getD_eq_getElem _ _ firstValid,
+    List.getD_eq_getElem _ _ secondValid] using equal
 
 theorem lifted_record_keys_ne {V : Type*} {source : PeriodicGraph V} {drawing : PeriodicGridDrawing}
     {first second : PeriodicEdge (Vertex V) × Nat}
@@ -109,11 +98,7 @@ theorem lifted_record_keys_ne {V : Type*} {source : PeriodicGraph V} {drawing : 
   have edgeEq : first.1 = second.1 := (recordAt_edge firstMember).symm.trans (by rw [indexEq]; exact recordAt_edge secondMember)
   have copiesEqual := congrArg (fun key : Nat × Nat × Cell => key.2.2) equal
   rw [edgeEq] at copiesEqual
-  have cellEq : firstCell = secondCell := by
-    have x := congrArg Prod.fst copiesEqual
-    have y := congrArg Prod.snd copiesEqual
-    exact Prod.ext (by simp only [Cell.sub] at x; omega) (by simp only [Cell.sub] at y; omega)
-  exact different (Prod.ext indexEq cellEq)
+  exact different (Prod.ext indexEq (Cell.sub_right_injective _ copiesEqual))
 
 theorem record_segment_in_original_route {V : Type*} [DecidableEq V] {source : PeriodicGraph V} {drawing : PeriodicGridDrawing}
     (valid : drawing.IsRealDrawing source) {record : (Nat × Nat) × PeriodicEdge (Vertex V)}

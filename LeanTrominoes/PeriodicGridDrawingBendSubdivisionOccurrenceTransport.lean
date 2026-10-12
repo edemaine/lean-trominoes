@@ -35,14 +35,7 @@ theorem subdivision_segment_endpoints {V : Type*} [DecidableEq V] (source : Peri
         ((subdivisionDrawing source drawing factor).periodTranslation translate)).finish := by
   simp only [realEdgeRoute,subdivision_edgeRoute_of_tagged source drawing factor member,straightRoute,List.map_cons,
     List.map_nil,GridPolyline.RealIsEndpoint,List.head?_cons,List.getLast?_cons_cons,List.getLast?_singleton,
-    Option.some.injEq,subdivisionSegment,GridSegment.translate]
-  constructor
-  · rintro (⟨endpoint,equality,pointEq⟩ | ⟨endpoint,equality,pointEq⟩)
-    · exact Or.inl (pointEq.trans (congrArg realCell equality.symm))
-    · exact Or.inr (pointEq.trans (congrArg realCell equality.symm))
-  · rintro (pointEq | pointEq)
-    · exact Or.inl ⟨_,rfl,pointEq⟩
-    · exact Or.inr ⟨_,rfl,pointEq⟩
+    Option.some.injEq,subdivisionSegment,GridSegment.translate,exists_eq_left']
 
 theorem lifted_subdivision_segment_eq {V : Type*} [DecidableEq V] (source : PeriodicGraph V) (drawing : PeriodicGridDrawing)
     {factor : Nat} (positive : 0 < factor) (edge : PeriodicEdge (Vertex V)) (translate : Cell) :
