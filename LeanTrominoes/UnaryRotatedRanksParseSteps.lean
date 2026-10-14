@@ -23,7 +23,6 @@ theorem step_scanLeft_left (data : TapeData) (symbol : UnarySymbol)
   subst input
   simp [TM2.step, program, scanLeftCfg, pushRankReverseCfg,
     inputCfg, emptyCfg, cfg, tapes, inputIsNone, inputIsLeft, inputSymbol]
-  rfl
 
 theorem step_pushRankReverse (data : TapeData) (symbol : UnarySymbol) :
     machine.step (pushRankReverseCfg symbol data) =
@@ -31,7 +30,6 @@ theorem step_pushRankReverse (data : TapeData) (symbol : UnarySymbol) :
         { data with rankReverse := symbol :: data.rankReverse }) := by
   simp [TM2.step, program, pushRankReverseCfg, scanLeftCfg,
     inputCfg, emptyCfg, cfg, tapes, leftSymbol, clear]
-  rfl
 
 theorem step_scanLeft_separator (data : TapeData)
     (remaining : List InputSymbol)
@@ -44,7 +42,6 @@ theorem step_scanLeft_separator (data : TapeData)
   subst input
   simp [TM2.step, program, scanLeftCfg, scanRightCfg, emptyCfg, cfg,
     tapes, inputIsNone, inputIsLeft, inputIsSeparator, inputSymbol, clear]
-  rfl
 
 theorem step_scanRight_right (data : TapeData) (symbol : UnarySymbol)
     (remaining : List InputSymbol)
@@ -57,7 +54,6 @@ theorem step_scanRight_right (data : TapeData) (symbol : UnarySymbol)
   subst input
   simp [TM2.step, program, scanRightCfg, pushSizeReverseCfg,
     inputCfg, emptyCfg, cfg, tapes, inputIsNone, inputIsRight, inputSymbol]
-  rfl
 
 theorem step_pushSizeReverse (data : TapeData) (symbol : UnarySymbol) :
     machine.step (pushSizeReverseCfg symbol data) =
@@ -65,7 +61,6 @@ theorem step_pushSizeReverse (data : TapeData) (symbol : UnarySymbol) :
         { data with sizeReverse := symbol :: data.sizeReverse }) := by
   simp [TM2.step, program, pushSizeReverseCfg, scanRightCfg,
     inputCfg, emptyCfg, cfg, tapes, rightSymbol, clear]
-  rfl
 
 theorem step_scanRight_nil (data : TapeData) (inputEq : data.input = []) :
     machine.step (scanRightCfg data) =
@@ -76,7 +71,6 @@ theorem step_scanRight_nil (data : TapeData) (inputEq : data.input = []) :
   subst input
   simp [TM2.step, program, scanRightCfg, restoreRanksCfg,
     emptyCfg, cfg, tapes, inputIsNone, inputSymbol, clear]
-  rfl
 
 theorem step_restoreRanks_cons (data : TapeData) (symbol : UnarySymbol)
     (remaining : List UnarySymbol)
@@ -89,14 +83,12 @@ theorem step_restoreRanks_cons (data : TapeData) (symbol : UnarySymbol)
   subst rankReverse
   simp [TM2.step, program, restoreRanksCfg, pushRankCfg,
     unaryCfg, emptyCfg, cfg, tapes, unaryIsNone, unarySymbol]
-  rfl
 
 theorem step_pushRank (data : TapeData) (symbol : UnarySymbol) :
     machine.step (pushRankCfg symbol data) =
       some (restoreRanksCfg { data with ranks := symbol :: data.ranks }) := by
   simp [TM2.step, program, pushRankCfg, restoreRanksCfg,
     unaryCfg, emptyCfg, cfg, tapes, storedUnary, clear]
-  rfl
 
 theorem step_restoreRanks_nil (data : TapeData)
     (reverseEq : data.rankReverse = []) :
@@ -108,7 +100,6 @@ theorem step_restoreRanks_nil (data : TapeData)
   subst rankReverse
   simp [TM2.step, program, restoreRanksCfg, restoreSizesCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unarySymbol, clear]
-  rfl
 
 theorem step_restoreSizes_cons (data : TapeData) (symbol : UnarySymbol)
     (remaining : List UnarySymbol)
@@ -121,14 +112,12 @@ theorem step_restoreSizes_cons (data : TapeData) (symbol : UnarySymbol)
   subst sizeReverse
   simp [TM2.step, program, restoreSizesCfg, pushSizeCfg,
     unaryCfg, emptyCfg, cfg, tapes, unaryIsNone, unarySymbol]
-  rfl
 
 theorem step_pushSize (data : TapeData) (symbol : UnarySymbol) :
     machine.step (pushSizeCfg symbol data) =
       some (restoreSizesCfg { data with sizes := symbol :: data.sizes }) := by
   simp [TM2.step, program, pushSizeCfg, restoreSizesCfg,
     unaryCfg, emptyCfg, cfg, tapes, storedUnary, clear]
-  rfl
 
 theorem step_restoreSizes_nil (data : TapeData)
     (reverseEq : data.sizeReverse = []) :
@@ -140,7 +129,6 @@ theorem step_restoreSizes_nil (data : TapeData)
   subst sizeReverse
   simp [TM2.step, program, restoreSizesCfg, scanRankCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unarySymbol, clear]
-  rfl
 
 end UnaryRotatedRanksMachine
 end LeanTrominoes

@@ -29,6 +29,5 @@ theorem step_copyCounter_cons (stage : CounterStage) (tag : Tag)
   simp only [tapes, TapeData.scratch_setCounter,
     TapeData.outputReverse_setCounter, update_tapes_scratch,
     update_tapes_outputReverse]
-  rfl
 
 end LeanTrominoes.PeriodicCNF.SourceCycleLinkTaggedRouteEmitterMachine

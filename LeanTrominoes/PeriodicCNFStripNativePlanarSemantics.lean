@@ -73,7 +73,7 @@ theorem nativeRoutedDrawing_finiteCompatible (source : PeriodicCNF Nat) :
   have compatible := compatible_extract _ _ (nativeRoutedPresentation source).compatible
   simpa only [nativeRoutedPresentation_routes, compatible_classical, drawing_classical, graph_classical] using compatible
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance nativePlanarSemanticsStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack

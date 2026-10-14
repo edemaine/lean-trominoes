@@ -15,7 +15,7 @@ noncomputable section
 namespace LeanTrominoes
 namespace Complexity.VerifierInPolyTime
 open Computability Turing
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (verifier : VerifierInPolyTime encoding language)
 
 def finiteCNFComputableInPolyTime :

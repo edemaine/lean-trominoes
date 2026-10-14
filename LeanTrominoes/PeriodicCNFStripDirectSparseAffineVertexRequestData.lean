@@ -126,7 +126,7 @@ theorem expand_sparseBoundedInputVertexRequestRecord
 /-- Compact request stream for every direct contracted vertex. -/
 def directSparseComputedAffineVertexRequestsOfSymbols
     {Input : Type}
-    {encoding : _root_.Computability.FinEncoding Input}
+    {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
@@ -149,7 +149,7 @@ theorem affineExpand_flatMap {Value : Type}
         List.flatMap_cons, induction]
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

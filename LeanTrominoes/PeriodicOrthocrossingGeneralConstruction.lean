@@ -9,7 +9,8 @@ import LeanTrominoes.PeriodicOrthocrossingCorrectness
 /-! # General-degree track drawing and its degree-four orthogonal variant -/
 namespace LeanTrominoes.PeriodicOrthocrossing.GeneralPorts
 
-def position (graph : PeriodicGraph Vertex) [DecidableEq Vertex] (index : Nat) : Cell :=
+def position {Vertex : Type*} (graph : PeriodicGraph Vertex) [DecidableEq Vertex]
+    (index : Nat) : Cell :=
   (blockStart (degrees graph) index+1,2)
 
 def fan {Vertex : Type*} [DecidableEq Vertex] (graph : PeriodicGraph Vertex)

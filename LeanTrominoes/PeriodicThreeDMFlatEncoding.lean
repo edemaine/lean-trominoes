@@ -66,7 +66,7 @@ def decodeFields : List Nat → Option PeriodicThreeDM
   simp only [List.append_nil] at h
   simp [fields,decodeFields,h]
 
-def finEncoding : _root_.Computability.FinEncoding PeriodicThreeDM :=
+def finEncoding : _root_.LeanTrominoes.FiniteEncoding PeriodicThreeDM :=
   finEncodingOfFields fields decodeFields decodeFields_fields
 
 @[simp] theorem tripleFields_length (t : PeriodicThreeDMTriple) : (tripleFields t).length = 9 := by
@@ -93,7 +93,7 @@ def decodeFields : List Nat → Option Input
 @[simp] theorem decodeFields_fields (i : Input) : decodeFields (fields i) = some i := by
   simp [fields,decodeFields,PeriodicGridDrawing.Arithmetic.decodeFields_fields]
 
-def finEncoding : _root_.Computability.FinEncoding Input :=
+def finEncoding : _root_.LeanTrominoes.FiniteEncoding Input :=
   finEncodingOfFields fields decodeFields decodeFields_fields
 
 end Planar

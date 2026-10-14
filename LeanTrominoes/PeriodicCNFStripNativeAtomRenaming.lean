@@ -14,7 +14,7 @@ not the generic encodable representation of nested geometric variables.
 -/
 noncomputable section
 namespace LeanTrominoes.PeriodicCNFStripReduction
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
 noncomputable local instance nativeAtomStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=

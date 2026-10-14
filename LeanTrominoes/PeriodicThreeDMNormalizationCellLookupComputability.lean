@@ -39,11 +39,6 @@ theorem lookupCell_decidableEq_eq
   | nil => rfl
   | cons assignment rest induction =>
       simp only [List.lookup]
-      have comparison :
-          @BEq.beq Cell instBEqOfDecidableEq location assignment.1 =
-            @BEq.beq Cell instBEqProd location assignment.1 := by
-        simp
-      rw [comparison, induction]
 
 theorem lookupAssignment_primrec :
     Primrec lookupAssignment :=

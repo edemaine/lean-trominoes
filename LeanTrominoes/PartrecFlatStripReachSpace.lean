@@ -360,7 +360,8 @@ theorem flatStripFuelCost_le (periodicStrip : PeriodicStrip) :
     simpa [fuel] using fuelPlusBits.trans (by omega)
   have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
   have oneBits : (Computability.encodeNat 1).length = 1 := rfl
-  dsimp only [inputLength] at countBits depthBits fuelBits fuelDirectBits fuelPlusDirectBits depthEq ⊢
+  dsimp only [inputLength, FiniteEncoding.encode]
+    at countBits depthBits fuelBits fuelDirectBits fuelPlusDirectBits depthEq ⊢
   simp [divideEvalFuelCost, divideEvalFuelInputCost,
     fuelOuterLoopCost, flatStripFuelComputationSpaceBound,
     prependCost, getCost, dropCost, idCost, headCost, nilCost,

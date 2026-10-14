@@ -97,13 +97,14 @@ def decode (tokens : List Token) : Option Input := by
     let records ← readAux .horizontal 0 0 tokens
     if h : Valid records then some ⟨records,h⟩ else none
 
-def finEncoding : FinEncoding Input where
+def finEncoding : FiniteEncoding Input where
   Γ := Token
   ΓFin := inferInstance
-  encode input := assignmentsTokens (entries input.1)
-  decode := decode
-  decode_encode input := by
-    simp [decode,input.2]
+  encoding := {
+    encode input := assignmentsTokens (entries input.1)
+    decode := decode
+    decode_encode input := by
+      simp [decode,input.2] }
 
 def region (input : Input) : List Cell := sparseExpandedMotif .I (entries input.1)
 
@@ -135,7 +136,6 @@ theorem model_motif (records : Records) (d : PeriodicOrthogonalDrawing)
   rw [d.indexedCellType_eq_get ⟨x,hx⟩ ⟨y,hy⟩]
   convert lookup using 1
   · simp only [getAt,positionEq]
-    rfl
 
 theorem problem_iff (input : Input) :
     Problem input ↔ Tromino.I.Tileable ((region input).toFinset : Set Cell) := by

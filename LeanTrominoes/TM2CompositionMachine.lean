@@ -584,16 +584,6 @@ theorem step_drainFirst_cons
         remaining bridgeContents secondInput) := by
   simp [FinTM2.step, TM2.step, machine, transferCfg, transferStacks,
     program, bridgeSymbol, haltList]
-  congr 2
-  funext stack
-  cases stack with
-  | bridge => simp [transferStacks]
-  | second stack => simp [transferStacks]
-  | first stack =>
-      by_cases equal : stack = first.tm.k₁
-      · subst stack
-        simp [transferStacks, haltList]
-      · simp [transferStacks, haltList, equal]
 
 theorem step_pushBridge
     {A B C AΓ BΓ CΓ : Type} [Fintype BΓ]
@@ -634,16 +624,6 @@ theorem step_drainFirst_nil
         [] bridgeContents secondInput) := by
   simp [FinTM2.step, TM2.step, machine, transferCfg, transferStacks,
     program, bridgeSymbol, haltList]
-  congr 2
-  funext stack
-  cases stack with
-  | bridge => simp [transferStacks]
-  | second stack => simp [transferStacks]
-  | first stack =>
-      by_cases equal : stack = first.tm.k₁
-      · subst stack
-        simp [transferStacks, haltList]
-      · simp [transferStacks, haltList, equal]
 
 theorem step_drainBridge_cons
     {A B C AΓ BΓ CΓ : Type} [Fintype BΓ]
@@ -958,7 +938,6 @@ def compositionRun
     convert haltList_machine_eq_liftSecond first second
       (List.map second.outputAlphabet.invFun
         (encodeC (g (f input)))) using 1
-    congr 1
 
 /-- A polynomial over natural coefficients is monotone on natural inputs. -/
 theorem polynomial_eval_monotone (polynomial : Polynomial Nat) :

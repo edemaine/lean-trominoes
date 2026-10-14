@@ -22,7 +22,7 @@ open PeriodicOrthocrossing
 open PlanarThreeSAT
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 
@@ -99,7 +99,6 @@ private theorem structuralCarrierBlocksFrom_eq_semantic
         CarrierNormalizedFallbackRouteTailRecords.blocks,
         finalCarrierNormalizedRecordBlockAt]
       rw [induction (start + 2)]
-      rfl
 
 /-- The declarative normalized direct carrier blocks are exactly the generic
 semantic block normal form over physical links. -/

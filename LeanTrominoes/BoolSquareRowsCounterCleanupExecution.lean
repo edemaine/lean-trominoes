@@ -44,7 +44,6 @@ def restoreOdd_evalsInTime (tokens : List Unit) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def clearOdd_evalsInTime (tokens : List Unit) (data : TapeData)
     (oddEq : data.odd = tokens) :
@@ -119,7 +118,6 @@ def moveRoot_evalsInTime (tokens : List Unit) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def reverseSource_evalsInTime (bits : List Bool) (data : TapeData)
     (reverseEq : data.sourceReverse = bits) :
@@ -151,7 +149,6 @@ def reverseSource_evalsInTime (bits : List Bool) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end BoolSquareRowsMachine
 end LeanTrominoes

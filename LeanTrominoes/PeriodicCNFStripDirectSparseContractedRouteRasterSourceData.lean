@@ -138,7 +138,7 @@ theorem directSparseContractedRouteEntry_output
 
 def directSparseContractedRouteEntries
     {Input : Type}
-    {encoding : _root_.Computability.FinEncoding Input}
+    {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
@@ -153,7 +153,7 @@ def directSparseContractedRouteEntries
 has been factored into the fixed generic compiler. -/
 def directSparseContractedRouteSourceTokens
     {Input : Type}
-    {encoding : _root_.Computability.FinEncoding Input}
+    {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
@@ -165,7 +165,7 @@ def directSparseContractedRouteSourceTokens
 canonical compact raster-request stream. -/
 theorem directSparseContractedRouteSourceTokens_output
     {Input : Type}
-    {encoding : _root_.Computability.FinEncoding Input}
+    {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :

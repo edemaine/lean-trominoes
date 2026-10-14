@@ -78,7 +78,7 @@ private theorem degreeExpandedElementCodes_eq_duplicate_of_all_two
           rw [induction degrees tailAligned tailTwo]
 
 private theorem directSourceFinalVariableElementDegrees_all_two
-    {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+    {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
@@ -94,7 +94,7 @@ private theorem directSourceFinalVariableElementDegrees_all_two
     exact localMember
 
 private theorem directSourceFinalVariableDegreeExpanded_eq_duplicate
-    {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+    {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (color : WireColor) (symbols : List encoding.Γ) :
@@ -134,7 +134,7 @@ private theorem degreeExpandedElementCodes_flatMap
           blockLengths firsts seconds]
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

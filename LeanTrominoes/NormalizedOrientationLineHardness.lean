@@ -21,7 +21,7 @@ cell tables, touching vertices, and nonblank vertical seams are rejected. -/
 def LineProblem (drawing : PeriodicOrthogonalDrawing) : Prop :=
   drawing.VerticesSeparated ∧ drawing.HasBlankVerticalBoundary ∧ drawing.HasOrientation
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance orientationHardnessStack (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack

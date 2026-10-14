@@ -18,7 +18,7 @@ open Computability Turing UnaryColumn
 open UnaryFieldEncoderMachine (unaryFields)
 open FiniteNPCompilerPreparation
 open Complexity.VerifierInPolyTime
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (verifier : Complexity.VerifierInPolyTime encoding language)
 
 abbrev Source := Symbol encoding.Γ

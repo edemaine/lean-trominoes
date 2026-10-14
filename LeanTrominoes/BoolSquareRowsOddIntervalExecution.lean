@@ -58,7 +58,6 @@ def oddInterval_evalsInTime (odd workTail : List Unit)
             (by simpa using firstTwo) checked
           convert composed using 1
           · simp [afterOdd, afterWork]
-          · simp
       | cons next rest =>
           let afterCheck : TapeData :=
             { afterOdd with odd := () :: rest }
@@ -85,8 +84,6 @@ def oddInterval_evalsInTime (odd workTail : List Unit)
           convert composed using 1
           · simp [afterCheck, afterOdd, afterWork, List.reverse_cons,
               List.append_assoc]
-          · simp
-            omega
 
 end BoolSquareRowsMachine
 end LeanTrominoes

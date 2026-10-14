@@ -48,7 +48,7 @@ theorem existsCandidates_truth (cells : Bool → List Cell) (height bound first 
       ∃ a ∈ Raw.keys height bound,
         body.Truth (Arithmetic.candidateFields a ++ (front ++ Arithmetic.input cells height bound first second)) := by
   classical
-  simp only [existsCandidates,truth_not,forallCandidates_truth,not_forall,_root_.not_imp,not_not,exists_prop]
+  simp only [existsCandidates,truth_not,forallCandidates_truth,not_forall,Classical.not_imp_iff_and_not,not_not,exists_prop]
 
 theorem forallCandidates_noPower (depth : Nat) (body : Expr) (h : body.noPower = true) :
     (forallCandidates depth body).noPower = true := by

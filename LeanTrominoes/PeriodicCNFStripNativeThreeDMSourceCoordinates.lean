@@ -15,7 +15,7 @@ open Turing Gadget PeriodicThreeDM UnaryColumn DelimitedDirectionDisplacement
 attribute [local instance] horizontalThreeDMTripleVariableDecidableEq
 set_option maxHeartbeats 400000
 set_option synthInstance.maxSize 2048
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance nativeThreeDMCoordinateStack (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack

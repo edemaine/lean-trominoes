@@ -30,12 +30,12 @@ structure Source where
 /-- The promised source uses exactly its underlying flat formula word as its
 physical encoding.  Decoding rejects formulas outside the promise. -/
 noncomputable def finEncoding :
-    _root_.Computability.FinEncoding Source := by
+    _root_.LeanTrominoes.FiniteEncoding Source := by
   classical
   exact
-   { toEncoding :=
-    { Γ := PeriodicCNFFlatEncoding.Symbol
-      encode source :=
+   { Γ := PeriodicCNFFlatEncoding.Symbol
+     encoding :=
+    { encode source :=
         PeriodicCNFFlatEncoding.finEncoding.encode source.formula
       decode symbols := do
         let formula ← PeriodicCNFFlatEncoding.finEncoding.decode symbols

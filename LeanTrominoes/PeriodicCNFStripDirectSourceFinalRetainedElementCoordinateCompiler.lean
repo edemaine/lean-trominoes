@@ -58,7 +58,7 @@ private theorem retainedElementLocalTable_eq (color : WireColor) (size : Nat) :
     simp [retainedElementLocalTable, horizontalThreeDMRetainedClauseLocalPositions, ternary]
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

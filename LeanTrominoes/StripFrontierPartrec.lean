@@ -80,13 +80,15 @@ private def stripBaseVectorValue (tromino : Tromino)
 
 private theorem stripBaseVectorValue_primrec (tromino : Tromino) :
     Primrec (stripBaseVectorValue tromino) := by
-  unfold stripBaseVectorValue
-  exact (stripBaseBoolValue_primrec tromino).comp
-    (Primrec.pair Primrec.vector_head
+  have inputs : Primrec fun values : List.Vector Nat 3 =>
+      (values.head, values.tail.head, values.tail.tail.head) :=
+    Primrec.pair Primrec.vector_head
       (Primrec.pair
         (Primrec.vector_head.comp Primrec.vector_tail)
         (Primrec.vector_head.comp
-          (Primrec.vector_tail.comp Primrec.vector_tail))))
+          (Primrec.vector_tail.comp Primrec.vector_tail)))
+  exact ((stripBaseBoolValue_primrec tromino).comp inputs).of_eq
+    (fun _ => rfl)
 
 private theorem exists_stripBaseVectorCode (tromino : Tromino) :
     ∃ code : Code, ∀ values : List.Vector Nat 3,

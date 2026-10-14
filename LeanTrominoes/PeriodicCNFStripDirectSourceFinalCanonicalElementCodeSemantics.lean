@@ -63,7 +63,7 @@ theorem directSourceFinalClauseElementCodesFromIndices_eq_flatMap
     directSourceFinalClauseElementCodeTags_length, min_self]
 
 @[simp] theorem directSourceFinalClauseIndices_length
-    {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+    {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
@@ -99,7 +99,7 @@ private theorem four_clausePlaceholders_length_eq_degrees
       omega
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

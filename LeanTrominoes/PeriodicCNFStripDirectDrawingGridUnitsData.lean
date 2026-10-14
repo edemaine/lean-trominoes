@@ -30,7 +30,7 @@ def drawingGridUnits (units : List Unit) : List Unit :=
   units.flatMap fun _ => List.replicate directDrawingGridFactor ()
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

@@ -26,7 +26,7 @@ def retainedAtomMarkerBlock :
 from the already compiled guarded formula-shape stream. -/
 def directRetainedPlanarMetadataAtomMarkers
     {Input : Type}
-    {encoding : _root_.Computability.FinEncoding Input}
+    {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :

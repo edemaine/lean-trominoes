@@ -18,7 +18,7 @@ open Computability Turing
 /-- Uniform polynomial-time emitters for the direct sparse prepared stream. -/
 def DirectSparseCompiledTrominoStripPreparedTokenEmitters : Prop :=
   ∀ {Input : Type}
-      (encoding : _root_.Computability.FinEncoding Input)
+      (encoding : _root_.LeanTrominoes.FiniteEncoding Input)
       (language : Input → Prop)
       (decider : PeriodicCNF.ProgramSource encoding language)
       (tromino : Tromino),

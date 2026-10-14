@@ -16,7 +16,7 @@ namespace LeanTrominoes.PeriodicThreeSATThree.PolyTime
 open Computability Turing PeriodicCNF PeriodicCNF.UnaryProgramClauseProfile
 open PeriodicCNF.SplitLiteralPrinter
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 variable [Inhabited encoding.Γ]
 

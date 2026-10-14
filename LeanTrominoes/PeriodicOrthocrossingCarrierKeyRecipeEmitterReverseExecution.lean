@@ -49,7 +49,6 @@ def reverseOutput_evalsInTime (recipes : List Recipe)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end CarrierKeyRecipeEmitterMachine
 end LeanTrominoes.PeriodicOrthocrossing

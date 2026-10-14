@@ -35,7 +35,7 @@ private theorem planar_lookup {problem : PeriodicThreeDM} (p : problem.PlanarPre
   rw [p.stripNormalizedOrthogonalDrawing_get,position_nat_eq _ c hc]
   rfl
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
   {language : Input → Prop} (decider : Complexity.DeciderInPolySpace encoding language)
 local instance sourceModelStack (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 

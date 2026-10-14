@@ -23,7 +23,7 @@ def headerTemplateVariablePosition (header : PeriodicCNF.FormulaShapeFigureNineP
   variablePosition ((templateDrawingOfClauseProfile query.1).incidenceAt query.2).literal.1
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

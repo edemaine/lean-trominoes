@@ -31,7 +31,7 @@ def gridYCompiler {Symbol : Type} [Fintype Symbol] [Inhabited Symbol]
     Compiler (fun s => gridSites (width s) (height s)) (fun _ p => p.2) := by
   exact cartesianRight (naturalRange cw) (naturalRange ch)
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
   {language : Input → Prop} (decider : Complexity.DeciderInPolySpace encoding language)
   [Inhabited encoding.Γ]
 

@@ -38,7 +38,6 @@ def reverseOutput_evalsInTime (tokens output : List OutputToken) :
         first rest
       convert composed using 1
       · simp [List.reverse_cons, List.append_assoc]
-      · simp
 
 end BoolSquareRowsMachine
 end LeanTrominoes

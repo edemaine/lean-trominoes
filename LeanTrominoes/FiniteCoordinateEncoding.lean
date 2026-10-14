@@ -89,18 +89,20 @@ def decodeInput (source : List Token) : Option Input := do
   rcases input with ⟨cells,prefill⟩
   simp [decodeInput,values]
 
-def finEncoding : FinEncoding Input where
+def finEncoding : FiniteEncoding Input where
   Γ := Token
   ΓFin := inferInstance
-  encode := encodeInput
-  decode := decodeInput
-  decode_encode := decodeInput_encodeInput
+  encoding := {
+    encode := encodeInput
+    decode := decodeInput
+    decode_encode := decodeInput_encodeInput }
 
-def regionEncoding : FinEncoding (List Cell) where
+def regionEncoding : FiniteEncoding (List Cell) where
   Γ := Token
   ΓFin := inferInstance
-  encode cells := encodeInput ⟨cells,[]⟩
-  decode source := (decodeInput source).map Input.cells
-  decode_encode cells := by simp
+  encoding := {
+    encode cells := encodeInput ⟨cells,[]⟩
+    decode source := (decodeInput source).map Input.cells
+    decode_encode cells := by simp }
 
 end LeanTrominoes.Tromino.FiniteCoordinateColumns

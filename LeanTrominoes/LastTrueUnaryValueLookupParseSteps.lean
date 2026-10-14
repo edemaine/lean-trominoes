@@ -29,7 +29,6 @@ theorem step_scanLeft_left (data : TapeData) (symbol : RowSymbol)
   simp [TM2.step, program, scanLeftCfg, pushRowReverseCfg,
     emptyCfg, inputCfg, cfg, inputState, tapes,
     inputIsNone, inputIsLeft]
-  rfl
 
 theorem step_pushRowReverse (data : TapeData) (symbol : RowSymbol) :
     machine.step (pushRowReverseCfg symbol data) =
@@ -37,7 +36,6 @@ theorem step_pushRowReverse (data : TapeData) (symbol : RowSymbol) :
         { data with rowsReverse := symbol :: data.rowsReverse }) := by
   simp [TM2.step, program, pushRowReverseCfg, scanLeftCfg,
     inputCfg, inputState, emptyCfg, cfg, tapes, leftRow, clearInput]
-  rfl
 
 theorem step_scanLeft_separator (data : TapeData)
     (remaining : List InputSymbol)
@@ -50,7 +48,6 @@ theorem step_scanLeft_separator (data : TapeData)
   subst input
   simp [TM2.step, program, scanLeftCfg, scanRightCfg, emptyCfg, cfg,
     tapes, inputIsNone, inputIsLeft, inputIsSeparator, clearInput]
-  rfl
 
 theorem step_scanRight_right (data : TapeData) (symbol : UnarySymbol)
     (remaining : List InputSymbol)
@@ -64,7 +61,6 @@ theorem step_scanRight_right (data : TapeData) (symbol : UnarySymbol)
   simp [TM2.step, program, scanRightCfg, pushValueReverseCfg,
     emptyCfg, inputCfg, cfg, inputState, tapes,
     inputIsNone, inputIsRight]
-  rfl
 
 theorem step_pushValueReverse (data : TapeData) (symbol : UnarySymbol) :
     machine.step (pushValueReverseCfg symbol data) =
@@ -72,7 +68,6 @@ theorem step_pushValueReverse (data : TapeData) (symbol : UnarySymbol) :
         { data with valuesReverse := symbol :: data.valuesReverse }) := by
   simp [TM2.step, program, pushValueReverseCfg, scanRightCfg,
     inputCfg, inputState, emptyCfg, cfg, tapes, rightUnary, clearInput]
-  rfl
 
 theorem step_scanRight_nil (data : TapeData)
     (inputEq : data.input = []) :
@@ -84,7 +79,6 @@ theorem step_scanRight_nil (data : TapeData)
   subst input
   simp [TM2.step, program, scanRightCfg, restoreRowsCfg,
     emptyCfg, cfg, tapes, inputIsNone, clearInput]
-  rfl
 
 theorem step_restoreRows_cons (data : TapeData) (symbol : RowSymbol)
     (remaining : List RowSymbol)
@@ -97,14 +91,12 @@ theorem step_restoreRows_cons (data : TapeData) (symbol : RowSymbol)
   subst rowsReverse
   simp [TM2.step, program, restoreRowsCfg, pushRowCfg,
     emptyCfg, rowCfg, rowState, cfg, tapes, rowIsNone]
-  rfl
 
 theorem step_pushRow (data : TapeData) (symbol : RowSymbol) :
     machine.step (pushRowCfg symbol data) =
       some (restoreRowsCfg { data with rows := symbol :: data.rows }) := by
   simp [TM2.step, program, pushRowCfg, restoreRowsCfg,
     rowCfg, rowState, emptyCfg, cfg, tapes, storedRow, clearRow]
-  rfl
 
 theorem step_restoreRows_nil (data : TapeData)
     (reverseEq : data.rowsReverse = []) :
@@ -116,7 +108,6 @@ theorem step_restoreRows_nil (data : TapeData)
   subst rowsReverse
   simp [TM2.step, program, restoreRowsCfg, restoreInitialValuesCfg,
     emptyCfg, cfg, tapes, rowIsNone, clearRow]
-  rfl
 
 theorem step_restoreInitialValues_cons (data : TapeData)
     (symbol : UnarySymbol) (remaining : List UnarySymbol)
@@ -130,7 +121,6 @@ theorem step_restoreInitialValues_cons (data : TapeData)
   subst valuesReverse
   simp [TM2.step, program, restoreInitialValuesCfg, pushInitialValueCfg,
     emptyCfg, unaryCfg, unaryState, cfg, tapes, unaryIsNone]
-  rfl
 
 theorem step_pushInitialValue (data : TapeData) (symbol : UnarySymbol) :
     machine.step (pushInitialValueCfg symbol data) =
@@ -139,7 +129,6 @@ theorem step_pushInitialValue (data : TapeData) (symbol : UnarySymbol) :
   simp [TM2.step, program, pushInitialValueCfg,
     restoreInitialValuesCfg, unaryCfg, unaryState, emptyCfg, cfg, tapes,
     storedUnary, clearUnary]
-  rfl
 
 theorem step_restoreInitialValues_nil (data : TapeData)
     (reverseEq : data.valuesReverse = []) :
@@ -151,7 +140,6 @@ theorem step_restoreInitialValues_nil (data : TapeData)
   subst valuesReverse
   simp [TM2.step, program, restoreInitialValuesCfg, scanRowsCfg,
     emptyCfg, cfg, tapes, unaryIsNone, clearUnary]
-  rfl
 
 end LastTrueUnaryValueLookupMachine
 end LeanTrominoes

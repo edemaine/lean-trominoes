@@ -106,9 +106,6 @@ theorem step_drainInput_nil
         (.setup none) [] inputReverse firstInput secondInput) := by
   simp [FinTM2.step, TM2.step, machine, setupCfg, setupStacks,
     program, setupSymbol]
-  congr 2
-  funext stack
-  cases stack <;> simp [setupStacks]
 
 theorem step_drainInputReverse_cons
     (symbol : InputSymbol) (remaining : List InputSymbol)
@@ -194,10 +191,10 @@ theorem step_drainInputReverse_nil
         (initList second.tm secondInput).stk
         (initList first.tm firstInput)) := by
   simp [FinTM2.step, TM2.step, machine, setupCfg, setupStacks,
-    program, setupSymbol, liftFirstCfg]
+    program, setupSymbol, liftFirstCfg, initList]
   congr 2
   funext stack
-  cases stack <;> simp [setupStacks, componentStacks]
+  cases stack <;> simp [setupStacks, componentStacks, initList]
 
 end
 

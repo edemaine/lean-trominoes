@@ -54,10 +54,5 @@ theorem trueCounts_selectedPaddedCarrierKeyRows_eq
   apply congrArg (List.map rowCount)
   rw [← paddedCarrierKeySelectedValues_eq_retainedKeys
     period descriptors candidateValues]
-  apply List.filter_congr
-  intro value _valueMember
-  by_cases member : value ∈
-      (routeDescriptorTerminalCarrierKeys descriptors).map some <;>
-    simp [member]
 
 end LeanTrominoes.PeriodicOrthocrossing

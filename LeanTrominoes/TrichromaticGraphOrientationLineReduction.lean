@@ -47,7 +47,7 @@ theorem problem_incidenceOffsetsComparable (source : PeriodicCNF Nat) :
     (sourceFormula source) (sourceFormula_isLocal source) (sourceFormula_widthAtMostThree source)
     (sourceFormula_occurrencesAtMostThree_canonicalBEq source) (sourceFormula_clausesNonempty source)
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
 theorem nativeThreeDM_incidenceOffsetsComparable (symbols : List encoding.Γ) :

@@ -78,7 +78,6 @@ def copyHorizontal_evalsInTime
       · simp only [nextData, List.reverse_cons, List.append_assoc,
           List.singleton_append, List.length_cons]
         rw [horizontalReverse_succ]
-      · simp
 
 /-- Restore a drained horizontal coordinate. -/
 def restoreHorizontal_evalsInTime
@@ -115,7 +114,6 @@ def restoreHorizontal_evalsInTime
             scratch := [] })) first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 /-- Copy and restore the full horizontal coordinate. -/
 def copyHorizontalThrough_evalsInTime
@@ -214,7 +212,6 @@ def copyVertical_evalsInTime
       · simp only [nextData, List.reverse_cons, List.append_assoc,
           List.singleton_append, List.length_cons]
         rw [verticalReverse_succ]
-      · simp
 
 /-- Restore the drained positive vertical coordinate and continue with the
 outgoing direction transition. -/
@@ -253,7 +250,6 @@ def restoreVertical_evalsInTime
             scratch := [] })) first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 /-- Copy and restore the positive vertical coordinate. -/
 def copyVerticalThrough_evalsInTime
@@ -405,7 +401,6 @@ def reverseOutput_evalsInTime (state : State)
           (by simpa [reverseOutputCfg, labelCfg] using rest)
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end GadgetSparseRouteRecordMachine
 end

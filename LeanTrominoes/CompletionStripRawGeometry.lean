@@ -92,7 +92,8 @@ theorem biasedCell_eq (t : Tromino) (input : PeriodicStripTrominoPrefill)
 
 theorem bound_le_length (input : PeriodicStripTrominoPrefill) :
     bound input ≤ (CompletionStripEncoding.finEncoding.encode input).length+3 := by
-  simp only [CompletionStripEncoding.finEncoding,CompletionStripEncoding.unaryFields_length,bound]
+  simp only [FiniteEncoding.encode,CompletionStripEncoding.finEncoding,
+    CompletionStripEncoding.unaryFields_length,bound]
   omega
 
 end LeanTrominoes.PeriodicStripTrominoPrefill.Raw

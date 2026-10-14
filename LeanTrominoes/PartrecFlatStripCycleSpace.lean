@@ -696,7 +696,9 @@ theorem candidateFoundCost_le
       first secondRemaining found firstBelow secondBound
     dsimp only [component]
     simp only [flatStripCycleCandidateComponentBound]
-    simpa [values, inputLength] using raw.trans (by omega)
+    simpa [values, inputLength] using raw.trans (by
+      dsimp only [inputLength, FiniteEncoding.encode] at *
+      omega)
   have headRaw := encodedListSpace_singleton_headI_le values
   have headDirect : (Computability.encodeNat values.headI).length ≤
       encodedListSpace values := by
@@ -1389,7 +1391,7 @@ theorem innerScan_fits_polynomial
       ((ToPartrec.Code.flatIterate (candidateStepCode tromino)).comp
         innerScanInputCode)) _ _ _
   dsimp only [first, result] at fit ⊢
-  dsimp only [inputLength] at fit inputBound outputBound' ⊢
+  dsimp only [inputLength, FiniteEncoding.encode] at fit inputBound outputBound' ⊢
   apply fit.mono
   simp [flatStripCycleInnerScanSpaceBound] at inputBound outputBound' ⊢
   omega

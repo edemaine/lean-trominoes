@@ -43,9 +43,10 @@ theorem list_find?
     induction entries with
     | nil => rfl
     | cons head tail induction =>
-        by_cases selected : predicate input head = true
-        · simp [List.find?, selected]
-        · simp [List.find?, selected, induction]
+        cases selected : predicate input head with
+        | false =>
+            simpa only [List.find?_cons, selected, Bool.cond_false] using induction
+        | true => simp only [List.find?_cons, selected, Bool.cond_true]
   exact (Primrec.list_rec valuesPrimrec
     (Primrec.const none) step).of_eq fun input =>
       correct input (values input)

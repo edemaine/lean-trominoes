@@ -56,7 +56,6 @@ def emitFirst_evalsInTime (word : List Bool) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def scanSecond_evalsInTime (word : List Bool) (tail : List WordToken)
     (data : TapeData)
@@ -112,7 +111,6 @@ def scanSecond_evalsInTime (word : List Bool) (tail : List WordToken)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def restoreFirst_evalsInTime (bits : List Bool) (data : TapeData)
     (firstEq : data.first = bits) :
@@ -144,7 +142,6 @@ def restoreFirst_evalsInTime (bits : List Bool) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end DelimitedBinaryWordPairProductMachine
 end LeanTrominoes

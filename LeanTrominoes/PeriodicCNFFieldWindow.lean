@@ -107,7 +107,7 @@ theorem encodeWindow_lt (f : PeriodicCNF Nat) (w : Window f) :
     encodeWindow f w < 2^(3*size f) := by
   have h := (BitVec.ofBoolListLE (List.ofFn fun i : Fin (3*size f) =>
     w (finProdFinEquiv.symm i).1 (finProdFinEquiv.symm i).2)).isLt
-  simpa [encodeWindow] using h
+  simpa only [encodeWindow, List.length_ofFn] using h
 
 def packedTransition (f : PeriodicCNF Nat) (first second : Nat) : Prop :=
   LocalWindow.Transition (Valid f) (decodeWord f first) (decodeWord f second)

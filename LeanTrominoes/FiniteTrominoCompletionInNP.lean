@@ -22,12 +22,13 @@ def completionView (t : Tromino) (prefill : List (Placement Unit)) : Input where
   cells := boxList (radius (completionFootprints t prefill).toFinset)
   prefill := prefill
 
-def completionEncoding (t : Tromino) : FinEncoding (List (Placement Unit)) where
+def completionEncoding (t : Tromino) : FiniteEncoding (List (Placement Unit)) where
   Γ := Token
   ΓFin := inferInstance
-  encode prefill := encodeInput (completionView t prefill)
-  decode source := (decodeInput source).map Input.prefill
-  decode_encode prefill := by simp [completionView]
+  encoding := {
+    encode prefill := encodeInput (completionView t prefill)
+    decode source := (decodeInput source).map Input.prefill
+    decode_encode prefill := by simp [completionView] }
 
 private def completionWitnessInput (t : Tromino) :
     TM2ComputableInPolyTime (encodeWitness (completionEncoding t)) encode

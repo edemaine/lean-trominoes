@@ -54,12 +54,13 @@ theorem decodeUnaryAux_unaryFields (values : List Nat) : decodeUnaryAux 0 (unary
     rw [decodeUnaryAux_replicate]
     simp [decodeUnaryAux,ih]
 
-def finEncoding : FinEncoding Theorem55.StripInput where
+def finEncoding : FiniteEncoding Theorem55.StripInput where
   Γ := Bool
   ΓFin := inferInstance
-  encode input := unaryFields (fields input)
-  decode symbols := (decodeUnaryAux 0 symbols).bind decodeFields
-  decode_encode input := by rw [decodeUnaryAux_unaryFields]; exact decodeFields_fields input
+  encoding := {
+    encode input := unaryFields (fields input)
+    decode symbols := (decodeUnaryAux 0 symbols).bind decodeFields
+    decode_encode input := by rw [decodeUnaryAux_unaryFields]; exact decodeFields_fields input }
 
 end LeanTrominoes.Theorem55StripEncoding
 

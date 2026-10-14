@@ -61,7 +61,8 @@ noncomputable def deciderInPolySpace_of_flatEvaluatorRunFits
     change Fintype Γ'
     infer_instance
   · intro input
-    simp only [LeanTrominoes.PeriodicCNFFlatEncoding.finEncodingOfFields,
+    simp only [LeanTrominoes.FiniteEncoding.encode,
+      LeanTrominoes.PeriodicCNFFlatEncoding.finEncodingOfFields,
       map_finiteEvaluatorInputAlphabet_symm,
       map_finiteEvaluatorOutputAlphabet_symm,
       LeanTrominoes.PeriodicCNFFlatEncoding.encodeNatFields_eq_trList,

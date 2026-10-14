@@ -34,7 +34,7 @@ private theorem tripleVertex_position (p : PeriodicThreeDM) (d : PeriodicGridDra
   have h : n < first.length := by omega
   rw [List.getD_eq_getElem _ _ (by simp; omega),List.getElem_append_left h,List.getD_eq_getElem _ _ h]
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance nativeThreeDMGeometryStack (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack

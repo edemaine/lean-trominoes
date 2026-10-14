@@ -145,7 +145,8 @@ theorem retainedDirectRoutedClauseArmRoute_eq
       straightIncidenceRoutes, straightIncidenceRoute,
       retainedDirectRoutedClauseRepresentativeLiterals,
       retainedDirectRoutedClauseArmIndex,
-      DuplicatorArm.portPosition]
+      retainedDirectSourcePrefixChoices,
+      DuplicatorArm.portPosition] <;> rfl
 
 /-- Every successful total lookup represents the complete actual local
 incidence route selected by the source and presentation index. -/

@@ -25,6 +25,7 @@ theorem scan_encode_semanticWords
       dsimp
       unfold DelimitedBinaryWords.encode at induction
       rw [induction]
+      rfl
 
 /-- Projecting a canonical semantic key-word stream yields one route-index
 field per word followed by the unary-zero lookup sentinel. -/

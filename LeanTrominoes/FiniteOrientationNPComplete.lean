@@ -30,7 +30,7 @@ theorem entries_recordsOfEntries (data : List CompletionPattern.Runtime.DrawingE
 
 attribute [irreducible] recordsOfEntries
 
-variable {Source : Type} {encoding : FinEncoding Source} {language : Source → Prop}
+variable {Source : Type} {encoding : FiniteEncoding Source} {language : Source → Prop}
   (source : ProgramSource encoding language)
   (zero : ∀ symbols, FiniteCNF.ZeroOffsets (source.formulaOfSymbols symbols))
 
@@ -73,7 +73,7 @@ def reductionOfSymbolsComputer : TM2ComputableInPolyTime id finEncoding.encode
     apply TM2PolyTimeOutputEncodingTransport.of_identity_output_eq
       (FiniteProgramSparseTrominoRegion.assignmentTokensComputableInPolyTime source zero)
     intro symbols
-    simp only [finEncoding,reduction_entries]
+    simp only [FiniteEncoding.encode,finEncoding,reduction_entries]
   · letI : IsEmpty encoding.Γ := ⟨fun symbol => nonempty ⟨symbol⟩⟩
     letI : Inhabited finEncoding.Γ := ⟨GadgetSparseAssignmentTokens.Token.fieldEnd⟩
     exact TM2EmptyAlphabetListInputCompiler.computableInPolyTime finEncoding.encode

@@ -19,7 +19,7 @@ noncomputable section
 namespace LeanTrominoes.PeriodicThreeDM
 open Turing PeriodicCNFStripReduction
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 set_option maxHeartbeats 400000
 set_option synthInstance.maxSize 2048

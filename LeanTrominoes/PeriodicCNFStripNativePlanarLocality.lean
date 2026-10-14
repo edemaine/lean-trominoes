@@ -35,7 +35,7 @@ theorem nativeRoutedFormula_occurrences (source : PeriodicCNF Nat) :
     (horizontalSemanticDrawing_routingCertificate source)
   exact PeriodicCNF.occurrencesAtMost_congr_beq _ _ (by infer_instance) (by infer_instance) 3 _ bound
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance nativePlanarLocalStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack

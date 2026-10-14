@@ -1436,7 +1436,7 @@ run_cmd do
   for module in modules do
     unless env.header.moduleNames.contains module do
       throwError "Missing cubic refinement module: {module}"
-  let mut count := 0
+  let mut count : Nat := 0
   for (name, _) in env.constants.toList do
     if let some index := env.getModuleIdxFor? name then
       if modules.contains env.header.moduleNames[index.toNat]! then

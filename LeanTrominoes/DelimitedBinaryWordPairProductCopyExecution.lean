@@ -43,7 +43,6 @@ def copyInput_evalsInTime (tokens : List WordToken) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def duplicate_evalsInTime (tokens : List WordToken) (data : TapeData)
     (reverseEq : data.reverse = tokens) :
@@ -78,7 +77,6 @@ def duplicate_evalsInTime (tokens : List WordToken) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end DelimitedBinaryWordPairProductMachine
 end LeanTrominoes

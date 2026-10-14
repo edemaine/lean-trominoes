@@ -26,7 +26,6 @@ theorem canonicalOrientedOccurrencePair_eq_atPeriod
     CrossingRecord.IsCanonical, CrossingRecord.firstSegment,
     CrossingRecord.secondSegment, InFundamentalDrawingSquare,
     PeriodicGridDrawing.periodTranslation, drawing_gridSize]
-  rfl
 
 end PeriodicOrthocrossing
 end LeanTrominoes

@@ -47,7 +47,6 @@ def readOuter_evalsInTime (word : List Bool) (tail : List WordToken)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def reverseFirst_evalsInTime (bits : List Bool) (data : TapeData)
     (firstEq : data.first = bits) :
@@ -79,7 +78,6 @@ def reverseFirst_evalsInTime (bits : List Bool) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end DelimitedBinaryWordPairProductMachine
 end LeanTrominoes

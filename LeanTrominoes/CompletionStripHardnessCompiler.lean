@@ -91,7 +91,7 @@ def targetPeriodCompiler (t : Tromino) :
   cases t <;> simp [StripOrientation.compile,LBricks.compileStrip,IBricks.compileStrip,brickWidth,Nat.mul_comm]
 
 /-- Actual finite-machine certificate at the target's explicit unary encoding. -/
-def sourceCompletionCompiler {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+def sourceCompletionCompiler {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop} (decider : Complexity.DeciderInPolySpace encoding language)
     [Inhabited encoding.Γ] (t : Tromino) :
     TM2ComputableInPolyTime id CompletionStripEncoding.finEncoding.encode

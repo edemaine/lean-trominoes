@@ -121,6 +121,7 @@ theorem scan_encode (side : Side)
       rw [FiniteStateTransducer.scan_append, scan_pairTokens]
       dsimp
       rw [induction]
+      rfl
 
 theorem tokens_encode (side : Side)
     (input : DelimitedBinaryWordPairs.Input) :

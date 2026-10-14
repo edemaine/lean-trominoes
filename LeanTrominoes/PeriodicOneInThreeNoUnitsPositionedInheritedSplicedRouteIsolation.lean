@@ -120,6 +120,7 @@ theorem localRoutes_eq_inherited_segment
           ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
         <;> simp_all [PlanarOneInThreeNoUnits.instantiatedDrawing,
           PlanarOneInThreeNoUnits.instantiatedTwoDrawing,
+          PeriodicOneInThreeNoUnits.liftLiteral,
           PlanarOneInThreeNoUnits.twoDrawingFor,
           PlanarOneInThreeNoUnits.twoRoute,
           PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.rename,
@@ -152,6 +153,7 @@ theorem localRoutes_eq_inherited_segment
           ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
         <;> simp_all [PlanarOneInThreeNoUnits.instantiatedDrawing,
           PlanarOneInThreeNoUnits.instantiatedThreeDrawing,
+          PeriodicOneInThreeNoUnits.liftLiteral,
           PlanarOneInThreeNoUnits.threeDrawingFor,
           PlanarOneInThreeNoUnits.threeRoute,
           PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.rename,

@@ -48,7 +48,7 @@ theorem preparedContains_primrec : Primrec₂ preparedContains := by
   have padding : Primrec (fun a : Input × Cell =>
       decide (a.2 ∈ PeriodicTrominoPadding.region a.1.1)) :=
     padding_membership_primrec.decide.comp (Primrec.fst.comp Primrec.fst) Primrec.snd
-  exact Primrec.cond source (Primrec.const true) padding
+  exact Primrec.or.comp source padding
 
 theorem parent_primrec : Primrec PlusRefinement.parent := by
   exact Primrec.pair

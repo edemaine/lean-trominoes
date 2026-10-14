@@ -17,7 +17,7 @@ noncomputable section
 namespace LeanTrominoes.PeriodicCNF
 open _root_.Computability Turing
 
-structure ProgramSource {Input : Type} (encoding : _root_.Computability.FinEncoding Input)
+structure ProgramSource {Input : Type} (encoding : _root_.LeanTrominoes.FiniteEncoding Input)
     (language : Input → Prop) where
   request : List encoding.Γ → TransitionEvaluatorMachine.TransitionCompilerRequest
   formulaOfSymbols : List encoding.Γ → PeriodicCNF Nat
@@ -32,7 +32,7 @@ structure ProgramSource {Input : Type} (encoding : _root_.Computability.FinEncod
   correct : ∀ input,language input ↔ LocalPeriodicCNF1DSAT (formulaOfSymbols (encoding.encode input))
 
 namespace ProgramSource
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 
 def program (source : ProgramSource encoding language) (symbols : List encoding.Γ) :=
   (source.request symbols).expression.program

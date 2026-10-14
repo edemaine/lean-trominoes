@@ -83,6 +83,6 @@ theorem spaceTile_connected {n : Nat} (hn : 96 ≤ n) (holes : Polyomino)
         simp only [hx, hy, ↓reduceIte]
         refine ⟨(mem_spaceTile n holes _).mpr (Or.inl ⟨origin, by omega⟩), ?_, ?_⟩
         · simp [Voxel.FaceAdjacent]
-        · simp [rank, keyRank, mem_square, show 0 < n by omega]; omega
+        · simp [rank, keyRank, mem_square, show 0 < n by omega]
 
 end LeanTrominoes.KeyedPeriodicComplement

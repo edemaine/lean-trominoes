@@ -12,7 +12,7 @@ set_option maxHeartbeats 2000000
 namespace LeanTrominoes.FiniteNPThreeOccurrenceCompiler
 open _root_.Computability Turing PeriodicCNF UnaryProgramTokens
 open Complexity.VerifierInPolyTime
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (verifier : Complexity.VerifierInPolyTime encoding language)
 
 def sourceFormula (input : Input) : PeriodicCNF Nat :=
@@ -121,7 +121,7 @@ private def computableOfInhabited [Inhabited encoding.Γ] :
   have encoded (input : Input) : PeriodicCNFFlatEncoding.finEncoding.encode
       (ThreeOccurrenceProfileCompiler.formula (source := source verifier) input)=
         FiniteCNFCompiler.finEncoding.encode (formula verifier input) := by
-    simp only [ThreeOccurrenceProfileCompiler.formula,source_formula,
+    simp only [FiniteEncoding.encode,ThreeOccurrenceProfileCompiler.formula,source_formula,
       PeriodicCNFFlatEncoding.finEncoding,PeriodicCNFFlatEncoding.finEncodingOfFields,
       FiniteCNFCompiler.finEncoding,FiniteCNFCompiler.fields]
     exact congrArg (fun cnf => PeriodicCNFFlatEncoding.encodeNatFields

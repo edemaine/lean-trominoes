@@ -43,7 +43,7 @@ private theorem field_not (positive : Bool) (value : Int) :
   cases positive <;> simp [SignedUnaryCoordinateRefinement.field]
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

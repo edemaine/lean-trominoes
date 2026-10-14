@@ -156,7 +156,6 @@ def reverseTokens_evalsInTime {Data : Type} [Inhabited Data]
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.map_append,
           List.append_assoc]
-      · simp
 
 def reverseInput_evalsInTime {Data : Type} [Inhabited Data]
     (family : Family Data) (word : List Data) (data : TapeData Data)
@@ -192,7 +191,6 @@ def reverseInput_evalsInTime {Data : Type} [Inhabited Data]
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.map_append,
           List.append_assoc]
-      · simp
 
 end IndexedTemplateEmitterMachine
 end PeriodicCNF

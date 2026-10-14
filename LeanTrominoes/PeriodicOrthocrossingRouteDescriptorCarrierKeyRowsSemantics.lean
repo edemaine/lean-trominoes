@@ -30,11 +30,5 @@ theorem routeDescriptorRetainedCarrierKeyRowsAtPeriod_eq
     routeDescriptorTerminalCarrierKeys
   rw [retainedCarrierKeysOfOccurrencesAndPairs_eq_terminalPrefixFilter]
   congr 1
-  apply List.filter_congr
-  intro key _keyMember
-  by_cases member :
-      key ∈ occurrenceTerminalCarrierKeys
-        (routeDescriptorNeighborOccurrences descriptors) <;>
-    simp [member]
 
 end LeanTrominoes.PeriodicOrthocrossing

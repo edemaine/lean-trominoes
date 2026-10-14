@@ -25,7 +25,7 @@ theorem compileCNF_correct (t : Tromino) (source : PeriodicCNF Nat) :
     (compiledStripDrawing_hasBlankVerticalBoundary source)).trans
       (compiledStripDrawing_correct source).symm
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
   {language : Input → Prop}
 
 def compileSource (decider : Complexity.DeciderInPolySpace encoding language)

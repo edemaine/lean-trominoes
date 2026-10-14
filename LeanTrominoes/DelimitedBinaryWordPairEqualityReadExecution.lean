@@ -46,7 +46,6 @@ def readFirst_evalsInTime (word : List Bool) (tail : List Token)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def readSecond_evalsInTime (word : List Bool) (tail : List Token)
     (data : TapeData)
@@ -79,7 +78,6 @@ def readSecond_evalsInTime (word : List Bool) (tail : List Token)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end DelimitedBinaryWordPairEqualityMachine
 end LeanTrominoes

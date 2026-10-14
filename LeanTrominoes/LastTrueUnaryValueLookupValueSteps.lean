@@ -50,7 +50,6 @@ theorem step_pushValueRestore_unit_true (data : TapeData) :
         { data with valuesRestore := .unit :: data.valuesRestore }) := by
   simp [TM2.step, program, pushValueRestoreCfg, pushCandidateUnitCfg,
     rowUnaryCfg, cfg, tapes]
-  rfl
 
 theorem step_pushValueRestore_unit_false (data : TapeData) :
     machine.step (pushValueRestoreCfg false .unit data) =
@@ -58,7 +57,6 @@ theorem step_pushValueRestore_unit_false (data : TapeData) :
         { data with valuesRestore := .unit :: data.valuesRestore }) := by
   simp [TM2.step, program, pushValueRestoreCfg, readValueCfg,
     rowUnaryCfg, rowBitCfg, cfg, tapes]
-  rfl
 
 theorem step_pushValueRestore_delimiter (data : TapeData)
     (selected : Bool) :
@@ -76,7 +74,6 @@ theorem step_pushCandidateUnit (data : TapeData) :
         { data with candidate := () :: data.candidate }) := by
   simp [TM2.step, program, pushCandidateUnitCfg, readValueCfg,
     rowUnaryCfg, rowBitCfg, cfg, tapes, clearUnary]
-  rfl
 
 end LastTrueUnaryValueLookupMachine
 end LeanTrominoes

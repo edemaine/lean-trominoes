@@ -25,7 +25,6 @@ theorem step_scanRows_nil (data : TapeData) (rowsEq : data.rows = []) :
   subst rows
   simp [TM2.step, program, scanRowsCfg, clearValuesCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_scanRows_start (data : TapeData)
     (remaining : List RowSymbol)
@@ -38,7 +37,6 @@ theorem step_scanRows_start (data : TapeData)
   subst rows
   simp [TM2.step, program, scanRowsCfg, nextBitCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_nextBit_bit (data : TapeData) (selected : Bool)
     (remaining : List RowSymbol)
@@ -65,21 +63,18 @@ theorem step_nextBit_end (data : TapeData)
   subst rows
   simp [TM2.step, program, nextBitCfg, drainCandidateCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_prepareValue_true (data : TapeData) :
     machine.step (prepareValueCfg true data) =
       some (clearCandidateCfg true data) := by
   simp [TM2.step, program, prepareValueCfg, clearCandidateCfg,
     rowBitCfg, rowBitState, cfg]
-  rfl
 
 theorem step_prepareValue_false (data : TapeData) :
     machine.step (prepareValueCfg false data) =
       some (readValueCfg false data) := by
   simp [TM2.step, program, prepareValueCfg, readValueCfg,
     rowBitCfg, rowBitState, cfg]
-  rfl
 
 theorem step_clearCandidate_cons (data : TapeData) (selected : Bool)
     (remaining : List Unit)

@@ -81,7 +81,6 @@ def scanFirst_evalsInTime {Data : Type} [Inhabited Data]
         rw [show firstStride * (word.length + 1) =
             firstStride * word.length + firstStride by ring,
           List.replicate_add, List.append_assoc]
-      · simp
 
 def restoreFirst_evalsInTime {Data : Type} [Inhabited Data]
     (firstSelected secondSelected positionSelected : Data → Bool)
@@ -127,7 +126,6 @@ def restoreFirst_evalsInTime {Data : Type} [Inhabited Data]
         firstStep rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end TrivariateTemplateEmitterMachine
 end PeriodicCNF

@@ -17,7 +17,7 @@ namespace PeriodicCNFStripReduction
 open Computability Turing
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 
@@ -40,7 +40,7 @@ def directSparsePreparedMotifComputableInPolyTimeOfRecordEmitter
 has been discharged. -/
 def DirectSparseAssignmentRecordEmitters : Prop :=
   ∀ {Input : Type}
-      (encoding : _root_.Computability.FinEncoding Input)
+      (encoding : _root_.LeanTrominoes.FiniteEncoding Input)
       (language : Input → Prop)
       (decider : PeriodicCNF.ProgramSource encoding language),
     Nonempty

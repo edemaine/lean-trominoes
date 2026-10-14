@@ -59,10 +59,14 @@ noncomputable def truthValuesComputableInPolyTime :
     (tokens : List RouteDescriptorOccurrenceSlotPairFieldTags.Token) :
     (SlotGuardBatch.crossingTruthValues tokens).length =
       crossingSlots.length := by
-  unfold SlotGuardBatch.crossingTruthValues SlotGuardBatch.truthValues
-    FiniteStateTransducer.output
-  rw [SlotGuardBatch.scan_eq_addSlotValues]
-  simp [SlotGuardBatch.finish]
+  have length (slots : List Slot) :
+      (SlotGuardBatch.truthValues slots tokens).length = slots.length := by
+    unfold SlotGuardBatch.truthValues FiniteStateTransducer.output
+    rw [SlotGuardBatch.scan_eq_addSlotValues]
+    simp [SlotGuardBatch.finish]
+  change (SlotGuardBatch.truthValues crossingSlots tokens).length =
+    crossingSlots.length
+  exact length crossingSlots
 
 /-- The compiled combination is the pointwise conjunction of its two aligned
 component truth words. -/

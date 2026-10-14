@@ -40,7 +40,7 @@ private theorem pointValue_scale3 (field : CarrierCrossingPointField.Field) (poi
     CarrierCrossingPointField.keepPositive, Cell.scale, Bool.false_eq_true, ↓reduceIte] <;> omega
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

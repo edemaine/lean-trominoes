@@ -39,7 +39,6 @@ open RouteDescriptorPairFieldTags
   simp [Segment.carrierIsHorizontal, evalPair_all,
     Segment.evalPair, Segment.eval, Point.eval, Expression.evalPair,
     GridSegment.IsHorizontal]
-  rfl
 
 /-- The local vertical predicate recognizes exactly the evaluated segment. -/
 @[simp] theorem Segment.carrierIsVertical_evalPair
@@ -49,6 +48,5 @@ open RouteDescriptorPairFieldTags
   simp [Segment.carrierIsVertical, evalPair_all,
     Segment.evalPair, Segment.eval, Point.eval, Expression.evalPair,
     GridSegment.IsVertical]
-  rfl
 
 end LeanTrominoes.PeriodicOrthocrossing.RouteDescriptorPairAffine

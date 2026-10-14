@@ -27,7 +27,7 @@ attribute [local instance] FinTM2.kFin FinTM2.ΛFin FinTM2.σFin
 
 namespace PolySpaceCompiler
 
-variable {Input : Type} {encoding : Computability.FinEncoding Input}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 

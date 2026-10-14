@@ -48,10 +48,10 @@ def decode (bits : List Bool) : Option Input :=
   rcases input with ⟨bits, square⟩
   simp [decode, square]
 
-noncomputable def finEncoding : _root_.Computability.FinEncoding Input where
-  toEncoding :=
-    { Γ := Bool
-      encode := Input.bits
+noncomputable def finEncoding : _root_.LeanTrominoes.FiniteEncoding Input where
+  Γ := Bool
+  encoding :=
+    { encode := Input.bits
       decode := decode
       decode_encode := decode_encode }
   ΓFin := inferInstance

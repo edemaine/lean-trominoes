@@ -39,7 +39,7 @@ theorem horizontalRoutedClause_length_pos (source : PeriodicCNF Nat)
   exact positionedClause_length_pos _ arity clause member
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

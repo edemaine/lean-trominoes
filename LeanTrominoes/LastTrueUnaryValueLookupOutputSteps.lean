@@ -26,7 +26,6 @@ theorem step_drainCandidate_cons (data : TapeData)
   subst candidate
   simp [TM2.step, program, drainCandidateCfg, pushOutputUnitCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_drainCandidate_nil (data : TapeData)
     (candidateEq : data.candidate = []) :
@@ -38,7 +37,6 @@ theorem step_drainCandidate_nil (data : TapeData)
   subst candidate
   simp [TM2.step, program, drainCandidateCfg, emitDelimiterCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_pushOutputUnit (data : TapeData) :
     machine.step (pushOutputUnitCfg data) =
@@ -46,7 +44,6 @@ theorem step_pushOutputUnit (data : TapeData) :
         { data with outputReverse := .unit :: data.outputReverse }) := by
   simp [TM2.step, program, pushOutputUnitCfg, drainCandidateCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_emitDelimiter (data : TapeData) :
     machine.step (emitDelimiterCfg data) =
@@ -54,7 +51,6 @@ theorem step_emitDelimiter (data : TapeData) :
         { data with outputReverse := .delimiter :: data.outputReverse }) := by
   simp [TM2.step, program, emitDelimiterCfg, restoreValuesCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_restoreValues_cons (data : TapeData) (symbol : UnarySymbol)
     (remaining : List UnarySymbol)
@@ -81,7 +77,6 @@ theorem step_restoreValues_nil (data : TapeData)
   subst valuesRestore
   simp [TM2.step, program, restoreValuesCfg, scanRowsCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_pushRestoredValue (data : TapeData) (symbol : UnarySymbol) :
     machine.step (pushRestoredValueCfg symbol data) =
@@ -115,7 +110,6 @@ theorem step_clearValues_nil (data : TapeData)
   subst values
   simp [TM2.step, program, clearValuesCfg, reverseOutputCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_reverseOutput_cons (data : TapeData) (symbol : UnarySymbol)
     (remaining : List UnarySymbol)
@@ -142,7 +136,6 @@ theorem step_reverseOutput_nil (data : TapeData)
   subst outputReverse
   simp [TM2.step, program, reverseOutputCfg, haltDataCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_pushOutput (data : TapeData) (symbol : UnarySymbol) :
     machine.step (pushOutputCfg symbol data) =

@@ -56,7 +56,7 @@ private theorem decodeCells (cells : List OrthogonalCellType) :
     Nat.one_ne_zero,and_false,or_self,ite_false,decodeCells,Nat.add_sub_cancel]
   rfl
 
-def finEncoding : _root_.Computability.FinEncoding PeriodicOrthogonalDrawing :=
+def finEncoding : _root_.LeanTrominoes.FiniteEncoding PeriodicOrthogonalDrawing :=
   PeriodicCNFFlatEncoding.finEncodingOfFields fields decodeFields decodeFields_fields
 
 theorem fields_length (d : PeriodicOrthogonalDrawing) :

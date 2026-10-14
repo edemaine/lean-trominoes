@@ -12,7 +12,7 @@ noncomputable section
 namespace LeanTrominoes.Theorem55StripHardSource
 open Computability Turing PeriodicCNFStripReduction
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop} (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 

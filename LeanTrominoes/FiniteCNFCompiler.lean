@@ -104,7 +104,7 @@ def decodeFields (fields : List Nat) : Option (FiniteCNF.Formula Nat) :=
 @[simp] theorem decodeFields_fields (formula : FiniteCNF.Formula Nat) :
     decodeFields (fields formula)=some formula := by simp [decodeFields,fields]
 
-def finEncoding : _root_.Computability.FinEncoding (FiniteCNF.Formula Nat) :=
+def finEncoding : _root_.LeanTrominoes.FiniteEncoding (FiniteCNF.Formula Nat) :=
   PeriodicCNFFlatEncoding.finEncodingOfFields fields decodeFields decodeFields_fields
 
 structure Request where
@@ -160,7 +160,6 @@ noncomputable def computableInPolyTime :
     exact PeriodicCNFFlatEncoding.encodeNatFields_eq_trList _
   convert physical.outputsFun request.native using 1 <;> try rfl
   rw [encoded]
-  rfl
 
 noncomputable def finiteAlphabetComputableInPolyTime :
     Complexity.FiniteAlphabetComputableInPolyTime Request.encode finEncoding.encode Request.compile :=

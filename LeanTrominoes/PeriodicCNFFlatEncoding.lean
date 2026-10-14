@@ -142,12 +142,13 @@ the field list natively. -/
 def finEncodingOfFields {α : Type*}
     (fields : α → List Nat) (decodeFields : List Nat → Option α)
     (decode_encode : ∀ value, decodeFields (fields value) = some value) :
-    FinEncoding α where
+    FiniteEncoding α where
   Γ := Symbol
-  encode value := encodeNatFields (fields value)
-  decode symbols := (decodeNatFields symbols).bind decodeFields
-  decode_encode value := by simp [decode_encode]
   ΓFin := inferInstance
+  encoding := {
+    encode value := encodeNatFields (fields value)
+    decode symbols := (decodeNatFields symbols).bind decodeFields
+    decode_encode value := by simp [decode_encode] }
 
 @[simp]
 theorem encodeNatFields_length (fields : List Nat) :
@@ -277,10 +278,9 @@ theorem decodeFormulaFields_formulaFields (formula : PeriodicCNF Nat) :
   simp [formulaFields, decodeFormulaFields, parsed]
 
 /-- A flat finite encoding for natural-variable periodic CNF formulas. -/
-def finEncoding : FinEncoding (PeriodicCNF Nat) where
-  toEncoding := (finEncodingOfFields formulaFields decodeFormulaFields
-    decodeFormulaFields_formulaFields).toEncoding
-  ΓFin := inferInstance
+def finEncoding : FiniteEncoding (PeriodicCNF Nat) :=
+  finEncodingOfFields formulaFields decodeFormulaFields
+    decodeFormulaFields_formulaFields
 
 @[simp]
 theorem finEncoding_encode_length (formula : PeriodicCNF Nat) :

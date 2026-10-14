@@ -65,7 +65,6 @@ def fullRow_evalsInTime (row sourceTail : List Bool)
             (by simpa using firstTwo) checked
           convert composed using 1
           · simp [afterCount, afterBit]
-          · simp
       | cons next remaining =>
           have checked := oneStep
             (step_checkRowCount_cons afterCount
@@ -106,8 +105,6 @@ def fullRow_evalsInTime (row sourceTail : List Bool)
           · rw [restoreMarkers]
             simp [afterCount, afterBit, List.reverse_cons,
               List.append_assoc]
-          · simp
-            omega
 
 end BoolSquareRowsMachine
 end LeanTrominoes

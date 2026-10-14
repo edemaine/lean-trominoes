@@ -40,7 +40,7 @@ def directSourceFinalClauseElementDegreeBlock
   if fan.hasRight then [3, 3, 3, 3] else [3, 3, 3, 2]
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

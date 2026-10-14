@@ -59,7 +59,6 @@ def reverseOutput_evalsInTime {Data : Type} [Inhabited Data]
         firstStep rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def clearFirst_evalsInTime {Data : Type} [Inhabited Data]
     (firstSelected secondSelected positionSelected : Data → Bool)

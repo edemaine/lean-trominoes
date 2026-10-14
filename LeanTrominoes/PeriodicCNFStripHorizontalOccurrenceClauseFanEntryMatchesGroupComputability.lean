@@ -30,14 +30,14 @@ theorem horizontalOccurrenceClauseEntryMatchesGroupComputed_primrec₂ :
         (data.1.1, data.2) :=
     horizontalOccurrenceClauseEntryGroupComputed_primrec.comp
       (Primrec.pair (Primrec.fst.comp Primrec.fst) Primrec.snd)
-  have equal : PrimrecPred fun data :
-      HorizontalClauseRibbonGroupInput ×
-        HorizontalClauseOccurrenceEntry =>
-      horizontalOccurrenceClauseEntryGroupComputed
-          (data.1.1, data.2) = data.1.2 :=
-    Primrec.eq.comp group (Primrec.snd.comp Primrec.fst)
-  exact equal.decide.of_eq fun data => by
-    rfl
+  have equal : Primrec₂ fun first second : PlanarThreeDM.X3CClauseTerminalGroup =>
+      decide (first = second) :=
+    Primrec.eq.decide
+  exact (equal.comp group (Primrec.snd.comp Primrec.fst)).of_eq
+    (g := horizontalOccurrenceClauseEntryMatchesGroupComputed)
+    (fun _ => by
+      unfold horizontalOccurrenceClauseEntryMatchesGroupComputed
+      rfl)
 
 end PeriodicCNFStripReduction
 end LeanTrominoes

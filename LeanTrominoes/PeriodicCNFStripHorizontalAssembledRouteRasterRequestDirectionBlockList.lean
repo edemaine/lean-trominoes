@@ -75,7 +75,7 @@ theorem horizontalAssembledRouteRasterRequestBlocks_directionBlocks
 of compact contracted direction blocks. -/
 theorem directSparseRouteRasterRequestTokens_directionBlocks
     {Input : Type}
-    {encoding : _root_.Computability.FinEncoding Input}
+    {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : Complexity.DeciderInPolySpace encoding language)
     (symbols : List encoding.Γ) :

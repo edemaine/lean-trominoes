@@ -18,7 +18,7 @@ noncomputable section
 namespace LeanTrominoes.Complexity
 open _root_.Computability Turing
 
-variable {A B : Type} {ea : FinEncoding A} {eb : FinEncoding B}
+variable {A B : Type} {ea : FiniteEncoding A} {eb : FiniteEncoding B}
   [Inhabited ea.Γ] [Inhabited eb.Γ]
 
 private def inputSymbol : Sum ea.Γ (Option Bool) → List ea.Γ

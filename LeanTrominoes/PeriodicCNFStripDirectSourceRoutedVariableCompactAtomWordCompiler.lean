@@ -20,7 +20,7 @@ open Computability Turing
 open PeriodicOrthocrossing
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 
@@ -50,7 +50,7 @@ noncomputable def directSourceRoutedVariableCompactAtomWordsComputableInPolyTime
   TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
     (directSourceRoutedVariableCompactAtomWordTokensComputableInPolyTime decider)
     fun symbols => by
-      simpa only [id_eq, DelimitedBinaryWords.finEncoding] using
+      simpa only [FiniteEncoding.encode, id_eq, DelimitedBinaryWords.finEncoding] using
         directSourceRoutedVariableCompactAtomWordTokens_eq_encode
           decider symbols
 

@@ -333,7 +333,6 @@ def restore_evalsInTime (data : TapeData)
             scratch := [] })) first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def incrementScannedData (data : TapeData)
     (word : List PartrecToTM2.Γ') : TapeData :=
@@ -578,7 +577,6 @@ def emitCounter_evalsInTime (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 theorem step_reverseOutput_nil (data : TapeData)
     (outputReverseEq : data.outputReverse = []) :
@@ -634,7 +632,6 @@ def reverseOutput_evalsInTime (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 /-- One delimiter-terminated unary natural. -/
 def unaryField (number : Nat) : List Symbol :=

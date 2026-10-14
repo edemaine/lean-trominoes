@@ -18,15 +18,16 @@ def decodeUnary (symbols : List Symbol) : Option (List Nat) :=
 
 def decode (symbols : List Symbol) : Option Input := decodeUnary symbols >>= FlatEncoding.decodeFields
 
-def finEncoding : _root_.Computability.FinEncoding Input where
+def finEncoding : _root_.LeanTrominoes.FiniteEncoding Input where
   Γ := Symbol
   ΓFin := inferInstance
-  encode graph := unaryFields (FlatEncoding.fields graph)
-  decode := decode
-  decode_encode graph := by simp [decode]
+  encoding := {
+    encode graph := unaryFields (FlatEncoding.fields graph)
+    decode := decode
+    decode_encode graph := by simp [decode] }
 
 theorem edgeCount_le_length (graph : Input) : graph.2.length ≤ (finEncoding.encode graph).length := by
-  simp only [finEncoding,unaryFields_length]
+  simp only [FiniteEncoding.encode,finEncoding,unaryFields_length]
   have fields := FlatEncoding.fields_length graph
   omega
 

@@ -26,7 +26,7 @@ def decode (values : List Nat) : Option TilingInput := do
 @[simp] theorem decode_fields (input : TilingInput) : decode (fields input)=some input := by
   rcases input with ⟨bound,data⟩
   simp [decode,fields,asCompletion]
-def finEncoding : _root_.Computability.FinEncoding TilingInput :=
+def finEncoding : _root_.LeanTrominoes.FiniteEncoding TilingInput :=
   PeriodicCNFFlatEncoding.finEncodingOfFields fields decode decode_fields
 end TilingEncoding
 
@@ -45,7 +45,7 @@ def decode (p : Polynomial Nat) (values : List Nat) : Option (PolynomialBoxTilin
     decode p (fields p input)=some input := by
   simp only [decode,fields,TilingEncoding.decode_fields]
   simp [input.property]
-def finEncoding (p : Polynomial Nat) : _root_.Computability.FinEncoding (PolynomialBoxTilingInput p) :=
+def finEncoding (p : Polynomial Nat) : _root_.LeanTrominoes.FiniteEncoding (PolynomialBoxTilingInput p) :=
   PeriodicCNFFlatEncoding.finEncodingOfFields (fields p) (decode p) (decode_fields p)
 end PolynomialBoxTilingEncoding
 

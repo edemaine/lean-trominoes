@@ -38,7 +38,7 @@ def decodeFields (fields : List Nat) : Option (FiniteCNF.Formula (Nat × Nat)) :
     decodeFields (fields formula)=some formula := by
   simp [decodeFields,fields]
 
-def finEncoding : _root_.Computability.FinEncoding (FiniteCNF.Formula (Nat × Nat)) :=
+def finEncoding : _root_.LeanTrominoes.FiniteEncoding (FiniteCNF.Formula (Nat × Nat)) :=
   PeriodicCNFFlatEncoding.finEncodingOfFields fields decodeFields decodeFields_fields
 
 theorem satisfiable_asPeriodic (formula : FiniteCNF.Formula (Nat × Nat)) :

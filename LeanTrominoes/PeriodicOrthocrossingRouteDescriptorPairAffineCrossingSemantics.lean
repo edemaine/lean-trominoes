@@ -40,7 +40,6 @@ theorem evalPair_isHorizontal
   rcases segment with ⟨start, finish⟩
   simp [isHorizontal, GridSegment.IsHorizontal, Segment.evalPair,
     Segment.eval, Point.eval, Expression.evalPair]
-  rfl
 
 /-- The affine vertical predicate is exactly `GridSegment.IsVertical`. -/
 theorem evalPair_isVertical
@@ -50,7 +49,6 @@ theorem evalPair_isVertical
   rcases segment with ⟨start, finish⟩
   simp [isVertical, GridSegment.IsVertical, Segment.evalPair,
     Segment.eval, Point.eval, Expression.evalPair]
-  rfl
 
 /-- The affine interval predicate is exact strict betweenness. -/
 theorem evalPair_strictlyBetween

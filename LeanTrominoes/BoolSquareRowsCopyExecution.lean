@@ -50,7 +50,6 @@ def copyInput_evalsInTime (bits : List Bool) (data : TapeData)
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc,
           workTokens, List.map_append]
-      · simp
 
 end BoolSquareRowsMachine
 end LeanTrominoes

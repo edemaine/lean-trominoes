@@ -18,7 +18,7 @@ namespace LeanTrominoes.CompletionPattern.Runtime
 open Computability Turing UnaryColumn PeriodicCNFStripReduction
 set_option maxHeartbeats 5000000
 set_option maxRecDepth 100000
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
   {language : Input → Prop} (decider : Complexity.DeciderInPolySpace encoding language)
 
 local instance sourceColumnStack (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack

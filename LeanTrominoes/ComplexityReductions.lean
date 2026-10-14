@@ -26,9 +26,9 @@ open Computability
 finite encoding. -/
 theorem PolyTimeManyOneReducible.trans
     {α β γ : Type}
-    {encodingA : FinEncoding α}
-    {encodingB : FinEncoding β}
-    {encodingC : FinEncoding γ}
+    {encodingA : FiniteEncoding α}
+    {encodingB : FiniteEncoding β}
+    {encodingC : FiniteEncoding γ}
     {p : α → Prop} {q : β → Prop} {r : γ → Prop}
     (first : PolyTimeManyOneReducible encodingA encodingB p q)
     (second : PolyTimeManyOneReducible encodingB encodingC q r) :

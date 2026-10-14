@@ -18,7 +18,7 @@ open Computability Turing PeriodicCNF
 open AffineEmitterPipeline UnaryProgramTokens UnaryProgramTokenAlgebra
 open Complexity.VerifierInPolyTime FiniteNPCompilerPreparation
 attribute [local instance] FinTM2.kFin FinTM2.ΛFin FinTM2.σFin
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (verifier : Complexity.VerifierInPolyTime encoding language)
 noncomputable local instance (stack : verifier.computer.tm.K) :
     Fintype (verifier.computer.tm.Γ stack) := verifier.computer.stackAlphabetFinite stack

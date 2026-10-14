@@ -10,7 +10,7 @@ import LeanTrominoes.TM2EmptyAlphabetListInputCompiler
 noncomputable section
 namespace LeanTrominoes.TrichromaticGraphOrientation
 open Turing PeriodicCNFStripReduction
-variable {Source : Type} {encoding : _root_.Computability.FinEncoding Source} {language : Source → Prop}
+variable {Source : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Source} {language : Source → Prop}
 variable (source : PeriodicCNF.ProgramSource encoding language)
 variable (zero : ∀ symbols, FiniteCNF.ZeroOffsets (source.formulaOfSymbols symbols))
 set_option maxHeartbeats 600000

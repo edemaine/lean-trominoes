@@ -33,7 +33,7 @@ def evaluatorAux (code : ToPartrec.Code) : TM2ComputableAux Γ' Γ' where
   inputAlphabet := finiteEvaluatorInputAlphabet code
   outputAlphabet := finiteEvaluatorOutputAlphabet code
 
-variable {α : Type} (encoding : Computability.FinEncoding α) (fields : α → List Nat)
+variable {α : Type} (encoding : _root_.LeanTrominoes.FiniteEncoding α) (fields : α → List Nat)
     (prepare : Complexity.FiniteAlphabetComputableInPolyTime encoding.encode trList fields)
     (code : ToPartrec.Code)
 

@@ -17,7 +17,7 @@ def LocalPeriodicThreeCNF1DSAT (f : PeriodicCNF Nat) : Prop :=
 
 namespace PolySpaceHardness
 open Turing
-variable {Input : Type} {encoding : Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 
 noncomputable section
 attribute [local instance] FinTM2.kFin FinTM2.ΛFin FinTM2.σFin

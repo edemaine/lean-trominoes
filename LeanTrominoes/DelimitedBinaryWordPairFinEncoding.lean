@@ -13,10 +13,10 @@ namespace LeanTrominoes.DelimitedBinaryWordPairs
 
 /-- Physical finite encoding used by the equality machine. -/
 noncomputable def finEncoding :
-    _root_.Computability.FinEncoding Input where
-  toEncoding :=
-    { Γ := Token
-      encode := encode
+    _root_.LeanTrominoes.FiniteEncoding Input where
+  Γ := Token
+  encoding :=
+    { encode := encode
       decode := decode
       decode_encode := decode_encode }
   ΓFin := inferInstance

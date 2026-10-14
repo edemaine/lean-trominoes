@@ -164,6 +164,10 @@ instance (points : List Cell) : Decidable (RouteInSquare points) := by
 instance (routes : CanonicalVertexPort → List Cell) :
     Decidable (RoutesMeetOnlyAtCenter routes) := by
   unfold RoutesMeetOnlyAtCenter
+  letI (first second : CanonicalVertexPort) :
+      Decidable (∀ point ∈ routes first, point ∈ routes second → point = center) :=
+    List.decidableBAll (fun point => point ∈ routes second → point = center)
+      (routes first)
   infer_instance
 
 /-- Every Figure 2 route has the advertised center and boundary endpoints. -/

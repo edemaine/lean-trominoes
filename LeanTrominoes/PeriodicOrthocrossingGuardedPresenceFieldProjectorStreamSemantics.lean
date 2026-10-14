@@ -28,6 +28,7 @@ theorem scan_encode_semanticWords (activeValue : Bool)
       dsimp
       unfold DelimitedBinaryWords.encode at induction
       rw [induction]
+      rfl
 
 theorem output_encode_semanticWords (activeValue : Bool)
     (keys : List (Option CarrierKeyWords.CarrierKey)) :

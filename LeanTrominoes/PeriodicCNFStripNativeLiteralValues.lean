@@ -32,7 +32,7 @@ private theorem signFields_formula {V : Type*} (formula : PeriodicCNF V)
   have values := congrArg (List.map Bool.toNat) (normalized clause member)
   simpa only [List.map_map, Function.comp_def, signFields] using values.symm
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance nativeValueStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack

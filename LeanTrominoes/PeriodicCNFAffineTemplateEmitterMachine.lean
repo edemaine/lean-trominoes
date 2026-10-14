@@ -730,7 +730,6 @@ def scan_evalsInTime {Data : Type} [Inhabited Data]
               selectedCount selected workspaces + 1 by omega,
             replicate_unit_add_one_right]
           simp [nextData, List.reverse_cons, List.append_assoc]
-        · simp
       · have selectedFalse :
             dataSelected selected workspace = false := by
           exact Bool.eq_false_of_not_eq_true selectedEq
@@ -757,7 +756,6 @@ def scan_evalsInTime {Data : Type} [Inhabited Data]
         convert composed using 1
         · simp [nextData, selectedCount_cons, selectedFalse,
             List.reverse_cons, List.append_assoc]
-        · simp
 
 def scanPosition_evalsInTime {Data : Type} [Inhabited Data]
     (selected : Data → Bool) (recipes : List Recipe) (ending : List Token)
@@ -815,7 +813,6 @@ def scanPosition_evalsInTime {Data : Type} [Inhabited Data]
         rw [show stride * (word.length + 1) =
             stride * word.length + stride by ring,
           List.replicate_add, List.append_assoc]
-      · simp
 
 def restorePosition_evalsInTime {Data : Type} [Inhabited Data]
     (selected : Data → Bool) (recipes : List Recipe) (ending : List Token)
@@ -856,7 +853,6 @@ def restorePosition_evalsInTime {Data : Type} [Inhabited Data]
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def recipeTime (position : Nat) : Recipe → Nat
   | .fixed _ => 1
@@ -1246,7 +1242,6 @@ def reverseOutput_evalsInTime {Data : Type} [Inhabited Data]
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def clearProcessed_evalsInTime {Data : Type} [Inhabited Data]
     (selected : Data → Bool) (recipes : List Recipe) (ending : List Token)
@@ -1391,7 +1386,6 @@ def machine_outputsInTime {Data : Type} [Fintype Data] [Inhabited Data]
     rw [initList_eq_scanCfg, haltList_eq_haltCfg,
       ← haltDataCfg_empty_eq_haltCfg]
     convert whole.evals_in_steps using 1
-    rfl
   · exact whole.steps_le_m.trans (by
       simp [totalTime, count]
       omega)

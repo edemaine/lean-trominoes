@@ -16,7 +16,7 @@ open _root_.Computability Turing UnaryColumn Gadget Gadget.PeriodicOrthogonalDra
 open PeriodicCNF PeriodicCNFStripReduction CompletionPattern CompletionPattern.Runtime LBricks
 open FiniteProgramSparseTrominoRegion PeriodicThreeDM.NormalizationCompiler
 set_option maxHeartbeats 10000
-variable {Source : Type} {encoding : FinEncoding Source} {language : Source → Prop}
+variable {Source : Type} {encoding : FiniteEncoding Source} {language : Source → Prop}
 variable (source : ProgramSource encoding language)
 variable (zero : ∀ symbols,FiniteCNF.ZeroOffsets (source.formulaOfSymbols symbols))
 

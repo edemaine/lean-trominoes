@@ -20,7 +20,7 @@ machines: five finite affine vertex families and one compact route-request
 emitter. -/
 def DirectSparseSourceGeometryEmitters : Prop :=
   ∀ {Input : Type}
-      (encoding : _root_.Computability.FinEncoding Input)
+      (encoding : _root_.LeanTrominoes.FiniteEncoding Input)
       (language : Input → Prop)
       (decider : PeriodicCNF.ProgramSource encoding language),
     Nonempty (DirectSparseAffineTablePhaseFamilies decider) ∧

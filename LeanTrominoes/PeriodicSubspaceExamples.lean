@@ -44,8 +44,9 @@ example : FieldPredicate.check (0,([],[((7,0),0)]),[7]) 1 1=false := by decide
 /-- Offsets exceeding the declared bounding box are rejected. -/
 example : FieldPredicate.check (0,([0],[((7,0),1)]),[]) 1 1=false := by decide
 
-example (input : Strip.Input) : Encoding.decode (Encoding.fields input)=some input :=
-  Encoding.decode_fields input
+example (input : Strip.Input) :
+    Strip.Encoding.decode (Strip.Encoding.fields input)=some input :=
+  Strip.Encoding.decode_fields input
 
 example (p : Polynomial Nat) : Complexity.InPSPACE (PolynomialBoxEncoding.finEncoding p)
     (fun input => Problem input.val) := completion_inPSPACE p

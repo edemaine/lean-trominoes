@@ -29,7 +29,7 @@ open Computability Turing
 a finite-height drawing.  The runtime certificate targets the actual flat
 strip encoding, avoiding any dependence on a noncanonical drawing encoding. -/
 structure NormalizedStripOrientationReduction
-    {α : Type} (sourceEncoding : _root_.Computability.FinEncoding α)
+    {α : Type} (sourceEncoding : _root_.LeanTrominoes.FiniteEncoding α)
     (source : α → Prop) where
   drawing : α → PeriodicOrthogonalDrawing
   stripComputableInPolyTime :
@@ -47,7 +47,7 @@ structure NormalizedStripOrientationReduction
 namespace NormalizedStripOrientationReduction
 
 variable {α : Type}
-    {sourceEncoding : _root_.Computability.FinEncoding α}
+    {sourceEncoding : _root_.LeanTrominoes.FiniteEncoding α}
     {source : α → Prop}
 
 /-- Any certified blank-bordered normalized drawing compiler is already a

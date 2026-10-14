@@ -49,7 +49,6 @@ def outputAlphabetEquiv
       simp only [List.map_cons]
       rw [inputAlphabetEquiv_invFun inner isEnd]
       rw [induction]
-      rfl
 
 @[simp] theorem outputAlphabetEquiv_invFun
     (inner : TM2ComputableInPolyTime id id function)
@@ -67,7 +66,6 @@ def outputAlphabetEquiv
       simp only [List.map_cons]
       rw [outputAlphabetEquiv_invFun inner isEnd]
       rw [induction]
-      rfl
 
 /-- Polynomial-time functions are closed under independently mapping them
 over every complete end-delimited block. -/

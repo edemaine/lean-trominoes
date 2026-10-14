@@ -39,7 +39,7 @@ end LeanTrominoes.PeriodicOneInThree.AtomDescriptors
 
 namespace LeanTrominoes.PeriodicOneInThree.PolyTime
 open Turing PeriodicCNF
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 variable [Inhabited encoding.Γ]
 noncomputable local instance exactOneAtomsStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=

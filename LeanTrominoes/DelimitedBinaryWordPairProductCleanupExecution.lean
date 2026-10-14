@@ -44,7 +44,6 @@ def restoreSource_evalsInTime (tokens : List WordToken) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def clearFirst_evalsInTime (bits : List Bool) (data : TapeData)
     (firstOriginalEq : data.firstOriginal = bits) :

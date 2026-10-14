@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.FiniteEncoding
 import LeanTrominoes.FiniteAlphabetPolyTime
 import Mathlib.Computability.Primrec.List
 import Mathlib.Computability.TuringMachine.Computable
@@ -76,16 +77,17 @@ theorem partrec_trNat_length (number : Nat) :
 /-- A binary finite encoding induced by a `Primcodable` encoding, in the
 native input format of Mathlib's partial-recursive evaluator.  It is the
 ordinary little-endian binary encoding followed by one list delimiter. -/
-def primcodableFinEncoding (α : Type*) [Primcodable α] : FinEncoding α where
+def primcodableFinEncoding (α : Type*) [Primcodable α] : FiniteEncoding α where
   Γ := Turing.PartrecToTM2.Γ'
-  encode value :=
-    Turing.PartrecToTM2.trList [Encodable.encode value]
-  decode symbols :=
-    Encodable.decode
-      (decodeNat (symbols.dropLast.map partrecUnbit))
-  decode_encode value := by
-    simp [partrec_trNat_eq_map_encodeNat, Function.comp_def]
   ΓFin := inferInstance
+  encoding := {
+    encode value :=
+      Turing.PartrecToTM2.trList [Encodable.encode value]
+    decode symbols :=
+      Encodable.decode
+        (decodeNat (symbols.dropLast.map partrecUnbit))
+    decode_encode value := by
+      simp [partrec_trNat_eq_map_encodeNat, Function.comp_def] }
 
 @[simp]
 theorem primcodableFinEncoding_encode_length
@@ -104,7 +106,7 @@ def configurationSpace (tm : FinTM2) (cfg : tm.Cfg) : Nat :=
 /-- A total decider for `language` whose reachable configurations use space
 bounded by a polynomial in the encoded input length. All stack alphabets are
 required to be finite, so one stack cell contains only constant information. -/
-structure DeciderInPolySpace {α : Type} (encoding : FinEncoding α)
+structure DeciderInPolySpace {α : Type} (encoding : FiniteEncoding α)
     (language : α → Prop) extends
       TM2ComputableAux encoding.Γ Turing.PartrecToTM2.Γ' where
   stackAlphabetFinite : ∀ stack, Fintype (tm.Γ stack)
@@ -125,13 +127,13 @@ structure DeciderInPolySpace {α : Type} (encoding : FinEncoding α)
 
 /-- Membership of a decision predicate in PSPACE, relative to a finite input
 encoding. -/
-def InPSPACE {α : Type} (encoding : FinEncoding α) (language : α → Prop) : Prop :=
+def InPSPACE {α : Type} (encoding : FiniteEncoding α) (language : α → Prop) : Prop :=
   Nonempty (DeciderInPolySpace encoding language)
 
 /-- Polynomial-time many-one reducibility between encoded decision predicates,
 with finite alphabets on every stack of the reduction machine. -/
 def PolyTimeManyOneReducible {α β : Type}
-    (encodingA : FinEncoding α) (encodingB : FinEncoding β)
+    (encodingA : FiniteEncoding α) (encodingB : FiniteEncoding β)
     (p : α → Prop) (q : β → Prop) : Prop :=
   ∃ reduce : α → β,
     Nonempty (FiniteAlphabetComputableInPolyTime encodingA.encode encodingB.encode reduce) ∧
@@ -140,7 +142,7 @@ def PolyTimeManyOneReducible {α β : Type}
 /-- Restrict a Mathlib reduction machine to finite stack alphabets before
 packaging it. The reduction function and polynomial time bound are preserved. -/
 theorem PolyTimeManyOneReducible.of_computableInPolyTime {α β : Type}
-    {encodingA : FinEncoding α} {encodingB : FinEncoding β}
+    {encodingA : FiniteEncoding α} {encodingB : FiniteEncoding β}
     {p : α → Prop} {q : β → Prop}
     (reduce : α → β)
     (compiler : Nonempty
@@ -150,14 +152,14 @@ theorem PolyTimeManyOneReducible.of_computableInPolyTime {α β : Type}
   ⟨reduce, compiler.map FiniteAlphabetComputableInPolyTime.ofComputableInPolyTime, correct⟩
 
 /-- Every PSPACE predicate polynomial-time many-one reduces to `language`. -/
-def PSPACEHard {β : Type} (encoding : FinEncoding β) (language : β → Prop) : Prop :=
-  ∀ {α : Type} (sourceEncoding : FinEncoding α) (source : α → Prop),
+def PSPACEHard {β : Type} (encoding : FiniteEncoding β) (language : β → Prop) : Prop :=
+  ∀ {α : Type} (sourceEncoding : FiniteEncoding α) (source : α → Prop),
     InPSPACE sourceEncoding source →
       PolyTimeManyOneReducible sourceEncoding encoding source language
 
 /-- A predicate is PSPACE-complete when it belongs to PSPACE and is
 PSPACE-hard under polynomial-time many-one reductions. -/
-def PSPACEComplete {α : Type} (encoding : FinEncoding α) (language : α → Prop) : Prop :=
+def PSPACEComplete {α : Type} (encoding : FiniteEncoding α) (language : α → Prop) : Prop :=
   InPSPACE encoding language ∧ PSPACEHard encoding language
 
 end LeanTrominoes.Complexity

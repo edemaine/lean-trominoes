@@ -127,7 +127,6 @@ def reverseOutput_evalsInTime (tromino : Tromino)
             output := word.reverse ++ nextData.output })) first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end GadgetSparseAssignmentTokenMachine
 end

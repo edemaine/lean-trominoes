@@ -31,6 +31,5 @@ theorem step_restoreCounter_cons (stage : CounterStage) (cursor : Cursor)
   rw [update_tapes_counter]
   rw [TapeData.setCounter_setScratch]
   simp only [cursorFromState, clear]
-  rfl
 
 end LeanTrominoes.PeriodicCNF.SourceOccurrenceRouteEmitterMachine

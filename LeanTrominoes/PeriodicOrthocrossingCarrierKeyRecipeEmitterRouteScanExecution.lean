@@ -68,7 +68,6 @@ def scanRouteFirst_evalsInTime (recipes : List Recipe)
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc,
           replicate_succ_right]
-      · simp
 
 def scanRouteSecond_evalsInTime (recipes : List Recipe)
     (index : Fin recipes.length)
@@ -119,7 +118,6 @@ def scanRouteSecond_evalsInTime (recipes : List Recipe)
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc,
           replicate_succ_right]
-      · simp
 
 end CarrierKeyRecipeEmitterMachine
 end LeanTrominoes.PeriodicOrthocrossing

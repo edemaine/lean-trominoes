@@ -89,10 +89,10 @@ theorem parse_encodeAux (prior suffix : List (List Bool)) :
   simp [decode, encode, parse_encodeAux]
 
 noncomputable def finEncoding :
-    _root_.Computability.FinEncoding Input where
-  toEncoding :=
-    { Γ := Token
-      encode := encode
+    _root_.LeanTrominoes.FiniteEncoding Input where
+  Γ := Token
+  encoding :=
+    { encode := encode
       decode := decode
       decode_encode := decode_encode }
   ΓFin := inferInstance

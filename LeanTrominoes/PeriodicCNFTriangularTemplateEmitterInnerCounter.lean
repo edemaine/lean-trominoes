@@ -156,7 +156,6 @@ def scanInner_evalsInTime {Data : Type} [Inhabited Data]
         rw [show secondStride * (word.length + 1) =
             secondStride * word.length + secondStride by ring,
           List.replicate_add, List.append_assoc]
-      · simp
 
 /-- Restore the processed-inner counter and advance the inner recipe. -/
 def restoreInner_evalsInTime {Data : Type} [Inhabited Data]
@@ -196,7 +195,6 @@ def restoreInner_evalsInTime {Data : Type} [Inhabited Data]
         firstStep rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end TriangularTemplateEmitterMachine
 end PeriodicCNF

@@ -69,7 +69,7 @@ theorem pack_injective : Function.Injective pack := by
     (FiniteStateTransducer.scan transition none
       (DelimitedBinaryWords.wordTokens bits)).2) equal
   simp only [scan_block] at scanned
-  have decoded := DelimitedBinaryWords.finEncoding.toEncoding.encode_injective scanned
+  have decoded := DelimitedBinaryWords.finEncoding.encoding.encode_injective scanned
   exact congrArg DelimitedBinaryWords.Input.words decoded
 
 theorem scan_blocks (first : Option Bool) (blocks : List (List (List Bool))) :

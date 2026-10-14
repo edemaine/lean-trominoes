@@ -12,7 +12,7 @@ noncomputable section
 namespace LeanTrominoes.PeriodicCNFStripReduction
 open Turing UnaryColumn PositionedPeriodicCNF DelimitedDirectionDisplacement UnaryFieldBooleanFilter
 open PeriodicCNF.FormulaShapeDirectionOrdering
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance ordinaryVertexStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack

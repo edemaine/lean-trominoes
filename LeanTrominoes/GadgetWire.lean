@@ -216,7 +216,6 @@ theorem figure11RedWire_biInfinite_iff
     refine ⟨fun _ => transition, rfl, fun _ => ⟨rawMember, ?_⟩⟩
     exact selfLoop.symm
 
-set_option maxRecDepth 2000 in
 theorem figure12RedWire_biInfinite_iff
     (transition : PortState × PortState) :
     IsBiInfiniteTransition

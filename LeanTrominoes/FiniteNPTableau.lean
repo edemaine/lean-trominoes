@@ -14,7 +14,7 @@ A machine that emits the formula in polynomial time is a separate obligation.
 noncomputable section
 namespace LeanTrominoes.Complexity.VerifierInPolyTime
 open Computability Turing
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (verifier : VerifierInPolyTime encoding language)
 attribute [local instance] FinTM2.kFin FinTM2.ΛFin FinTM2.σFin
 noncomputable local instance (stack : verifier.computer.tm.K) :
@@ -89,7 +89,7 @@ theorem acceptance_iff (input : Input) (certificate : List Bool)
           verifier.computer.outputAlphabet.invFun)=acceptingWord verifier := by
       simpa [actualTerminal,acceptingConfiguration,haltList] using stackEq
     have encoded := (List.map_injective_iff.mpr verifier.computer.outputAlphabet.symm.injective) mapped
-    exact _root_.Computability.Encoding.encode_injective (primcodableFinEncoding Bool).toEncoding encoded
+    exact _root_.Computability.Encoding.encode_injective (primcodableFinEncoding Bool).encoding encoded
   · intro accepted
     have actualSteps : actualRun.steps ≤ timeLimit verifier input := by
       apply actualRun.steps_le_m.trans

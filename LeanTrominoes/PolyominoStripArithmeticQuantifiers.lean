@@ -69,6 +69,6 @@ theorem exists_candidates (height bound : Nat) (p : List Nat → Prop) :
       p [y,symmetry,kind,column]) ↔ ∃ a ∈ Raw.keys height bound, p (candidateFields a) := by
   classical
   have h := forall_candidates height bound (fun fields => ¬ p fields)
-  simpa only [not_forall,_root_.not_imp,not_not,exists_prop] using not_congr h
+  simpa only [not_forall,Classical.not_imp_iff_and_not,not_not,exists_prop] using not_congr h
 
 end LeanTrominoes.PolyominoStripWindow.Arithmetic

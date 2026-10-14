@@ -27,7 +27,7 @@ private theorem targetCoordinate_congr (p : PeriodicThreeDM) (d : PeriodicGridDr
       (.element b.color ((p.triples.getD b.tripleIndex default).reference b.color).atom))).toNat :=
   targetCoordinate_eq p d a (p.incidenceElement b) h horizontal
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language) [Inhabited encoding.Γ]
 set_option maxHeartbeats 400000
 set_option synthInstance.maxSize 2048

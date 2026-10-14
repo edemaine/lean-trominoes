@@ -414,7 +414,6 @@ def emitBody_evalsInTime (word : List Symbol) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def emitHeader_evalsInTime (word : List Symbol) (data : TapeData)
     (headerEq : data.headerReverse = word) :
@@ -445,7 +444,6 @@ def emitHeader_evalsInTime (word : List Symbol) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 /-- Put the tagged unary count suffix first, delimit it, and expand the token
 body. -/
@@ -513,7 +511,6 @@ def machine_outputsInTime (sources : List Source) :
     rw [initList_eq_scanCfg, haltList_eq_haltCfg,
       ← haltDataCfg_empty_eq_haltCfg]
     convert whole.evals_in_steps using 1
-    rfl
   · exact whole.steps_le_m.trans (by
       simp [totalTime]
       omega)

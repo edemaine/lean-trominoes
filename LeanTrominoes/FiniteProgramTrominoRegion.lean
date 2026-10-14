@@ -12,7 +12,7 @@ noncomputable section
 namespace LeanTrominoes.FiniteProgramTrominoRegion
 open PeriodicCNF PeriodicCNFStripReduction
 attribute [local instance] variableDecidableEq variableBEq
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (source : ProgramSource encoding language)
     (zero : ∀ symbols,FiniteCNF.ZeroOffsets (source.formulaOfSymbols symbols))
 

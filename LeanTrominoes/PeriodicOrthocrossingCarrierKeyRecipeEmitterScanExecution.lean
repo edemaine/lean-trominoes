@@ -68,7 +68,6 @@ def scan_evalsInTime (recipes : List Recipe)
                   CarrierKeyRecipeEmitter.routeCount,
                   replicate_unit_succ_right, List.append_assoc,
                   clearPayload_eq_self state payloadEq]
-              · simp
           | second =>
               let nextData : TapeData :=
                 { data with
@@ -95,7 +94,6 @@ def scan_evalsInTime (recipes : List Recipe)
                   CarrierKeyRecipeEmitter.routeCount,
                   replicate_unit_succ_right, List.append_assoc,
                   clearPayload_eq_self state payloadEq]
-              · simp
       | activation active =>
           let nextState : State recipes.length :=
             { actives := FixedLengthWordEvaluator.shiftAppend
@@ -121,7 +119,6 @@ def scan_evalsInTime (recipes : List Recipe)
           convert composed using 1
           · simp [scanState, scanToken, nextState, nextData, routeUnits,
               CarrierKeyRecipeEmitter.routeCount]
-          · simp
 
 end CarrierKeyRecipeEmitterMachine
 end LeanTrominoes.PeriodicOrthocrossing

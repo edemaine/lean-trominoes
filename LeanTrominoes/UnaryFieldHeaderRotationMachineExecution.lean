@@ -264,7 +264,6 @@ def emitFirst_evalsInTime (word : List Symbol) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def copySuffix_evalsInTime (symbols : List Symbol) (data : TapeData)
     (inputEq : data.input = symbols) :
@@ -297,7 +296,6 @@ def copySuffix_evalsInTime (symbols : List Symbol) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def reverseOutput_evalsInTime (word : List Symbol) (data : TapeData)
     (outputReverseEq : data.outputReverse = word) :
@@ -329,7 +327,6 @@ def reverseOutput_evalsInTime (word : List Symbol) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end UnaryFieldHeaderRotationMachine
 end LeanTrominoes

@@ -15,7 +15,7 @@ noncomputable section
 namespace LeanTrominoes.FiniteProgramSparseTrominoRegion
 open _root_.Computability Turing Gadget PeriodicCNF PeriodicCNFStripReduction
 open PeriodicThreeDM.NormalizationCompiler
-variable {Source : Type} {encoding : FinEncoding Source} {language : Source → Prop}
+variable {Source : Type} {encoding : FiniteEncoding Source} {language : Source → Prop}
 variable (source : ProgramSource encoding language)
 variable (zero : ∀ symbols,FiniteCNF.ZeroOffsets (source.formulaOfSymbols symbols))
 

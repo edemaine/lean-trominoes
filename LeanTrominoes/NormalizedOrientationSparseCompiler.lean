@@ -98,7 +98,7 @@ private def assembleEncoding {Symbol : Type} [Fintype Symbol] [Inhabited Symbol]
   intro s
   exact (PeriodicCNFFlatEncoding.encodeNatFields_eq_trList (FlatEncoding.fields (drawing s))).symm
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language) [Inhabited encoding.Γ]
 
 def sourceCellCountCompiler : ScalarCompiler (fun s =>

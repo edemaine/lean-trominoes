@@ -30,7 +30,7 @@ private theorem cyclicSuccessorKey_base_rank (values : List Nat) (value rank : N
   simp only [StableOccurrenceRanks.cyclicSuccessorKey, quotient, remainder]
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

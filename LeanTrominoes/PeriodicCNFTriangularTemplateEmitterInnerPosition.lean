@@ -190,8 +190,7 @@ def innerPosition_evalsInTime {Data : Type} [Inhabited Data]
       (some (parameters.finishInnerPositionCfg emittedData)) entered (by
         convert template using 1
         · rfl
-        · simp [emittedData]
-        · simp)
+        · simp [emittedData])
     have finished := oneStep (step_finishInnerPosition parameters emittedData)
     have whole := EvalsToInTime.trans parameters.transition
       (innerTemplateTime parameters first outer innerCount + 1) 1

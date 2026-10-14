@@ -16,7 +16,7 @@ namespace PeriodicCNFStripReduction
 open Computability Turing
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 
@@ -24,7 +24,7 @@ variable (decider : PeriodicCNF.ProgramSource encoding language)
 /-- Uniform finite-token emitter contract for the remaining geometric loop. -/
 def DirectCompiledTrominoStripCountedTokenEmitters : Prop :=
   ∀ {Input : Type}
-      (encoding : _root_.Computability.FinEncoding Input)
+      (encoding : _root_.LeanTrominoes.FiniteEncoding Input)
       (language : Input → Prop)
       (decider : PeriodicCNF.ProgramSource encoding language)
       (tromino : Tromino),

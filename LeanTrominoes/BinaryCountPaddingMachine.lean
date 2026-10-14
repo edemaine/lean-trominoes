@@ -392,7 +392,6 @@ def restore_evalsInTime {Source : Type} [Inhabited Source]
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 /-- Two-label carry-scan cost. -/
 def incrementScanTime : List PartrecToTM2.Γ' → Nat
@@ -648,7 +647,6 @@ def emitCounter_evalsInTime {Source : Type} [Inhabited Source]
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 theorem step_reverseOutput_nil {Source : Type} [Inhabited Source]
     (selected : Source → Bool) (data : TapeData Source)
@@ -718,7 +716,6 @@ def reverseOutput_evalsInTime {Source : Type} [Inhabited Source]
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 /-- Number of selected symbols in the retained source word. -/
 def selectedCount {Source : Type} (selected : Source → Bool) :

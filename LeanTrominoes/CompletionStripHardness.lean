@@ -16,7 +16,7 @@ namespace LeanTrominoes.CompletionPattern.Runtime
 open Computability Turing
 set_option maxHeartbeats 2000000
 set_option maxRecDepth 3000
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
   {language : Input → Prop} (decider : Complexity.DeciderInPolySpace encoding language)
 
 /-- The empty source alphabet has only one symbol word and is compiled by a

@@ -10,7 +10,7 @@ import LeanTrominoes.PeriodicCNFOrdinarySourceRouteWords
 noncomputable section
 namespace LeanTrominoes.PeriodicCNFStripReduction
 open PeriodicCNF PeriodicOrthocrossing PeriodicCNF.OrdinarySourceProjection
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance ordinaryRouteSemanticStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack

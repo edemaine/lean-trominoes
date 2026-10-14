@@ -122,7 +122,6 @@ def inputAlphabetEquiv
   | cons symbol remaining induction =>
       rw [List.map_cons, inputAlphabetEquiv_invFun first second symbol,
         induction]
-      rfl
 
 /-- Polynomial-time functions are closed under running two machines on the
 same finite-alphabet input and returning a separated encoding of their pair

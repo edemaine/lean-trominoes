@@ -65,7 +65,6 @@ def scanPeriodUnits_evalsInTime (word : List Unit)
               nextData.horizontalComplement })) first remaining
       convert whole using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 /-- Move a unary horizontal field from the complement counter to the live
 horizontal counter.  `word` is physically present at the head of the
@@ -134,8 +133,6 @@ def scanHorizontalUnits_evalsInTime (word complementRest : List Unit)
         (by simpa using firstTwo) remaining
       convert whole using 1
       · simp [nextData, afterScan, List.reverse_cons, List.append_assoc]
-      · simp
-        omega
 
 /-- Consume the horizontal delimiter and discard the one reserved
 complement unit. -/
@@ -204,7 +201,6 @@ def scanVerticalUnits_evalsInTime (word : List Unit)
               nextData.verticalPositive })) first remaining
       convert whole using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end GadgetSparseRouteRecordMachine
 end

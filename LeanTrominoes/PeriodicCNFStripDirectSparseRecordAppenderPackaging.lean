@@ -16,7 +16,7 @@ namespace PeriodicCNFStripReduction
 /-- Uniform split contract for the two remaining geometry passes. -/
 def DirectSparseSplitRecordAppenders : Prop :=
   ∀ {Input : Type}
-      (encoding : _root_.Computability.FinEncoding Input)
+      (encoding : _root_.LeanTrominoes.FiniteEncoding Input)
       (language : Input → Prop)
       (decider : PeriodicCNF.ProgramSource encoding language),
     Nonempty (DirectSparseVertexRecordAppender decider) ∧

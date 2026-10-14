@@ -10,7 +10,7 @@ import LeanTrominoes.FiniteCompletionEncodingCompiler
 noncomputable section
 namespace LeanTrominoes.FiniteProgramCompletion
 open _root_.Computability Turing PeriodicCNF CompletionPattern CompletionPattern.Runtime
-variable {Source : Type} {encoding : FinEncoding Source} {language : Source → Prop}
+variable {Source : Type} {encoding : FiniteEncoding Source} {language : Source → Prop}
 variable (source : ProgramSource encoding language)
 variable (zero : ∀ symbols,FiniteCNF.ZeroOffsets (source.formulaOfSymbols symbols))
 

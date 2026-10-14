@@ -12,7 +12,7 @@ import LeanTrominoes.FiniteProgramSparseTrominoRegion
 noncomputable section
 namespace LeanTrominoes.PeriodicCNFStripReduction
 open Turing Gadget PeriodicThreeDM UnaryColumn
-variable {Source : Type} {encoding : _root_.Computability.FinEncoding Source} {language : Source → Prop}
+variable {Source : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Source} {language : Source → Prop}
 variable (source : PeriodicCNF.ProgramSource encoding language)
 variable (zero : ∀ symbols, FiniteCNF.ZeroOffsets (source.formulaOfSymbols symbols))
 set_option maxHeartbeats 600000

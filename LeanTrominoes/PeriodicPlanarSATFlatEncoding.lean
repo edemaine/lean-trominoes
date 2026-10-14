@@ -32,7 +32,7 @@ theorem decodeFields_fields (input : Input Nat) : decodeFields (fields input) = 
   simp [fields,decodeFields,
     PeriodicGridDrawing.Arithmetic.decodeFields_fields,decodeFormulaFields_formulaFields]
 
-def finEncoding : _root_.Computability.FinEncoding (Input Nat) :=
+def finEncoding : _root_.LeanTrominoes.FiniteEncoding (Input Nat) :=
   finEncodingOfFields fields decodeFields decodeFields_fields
 
 theorem fields_space (input : Input Nat) :

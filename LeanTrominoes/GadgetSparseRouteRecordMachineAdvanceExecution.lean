@@ -52,7 +52,6 @@ def wrapEast_evalsInTime (color : Gadget.WireColor)
               nextData.horizontalComplement })) first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 /-- Move the entire complement into the horizontal counter at west wrap. -/
 def wrapWest_evalsInTime (color : Gadget.WireColor)
@@ -87,7 +86,6 @@ def wrapWest_evalsInTime (color : Gadget.WireColor)
             horizontalComplement := [] })) first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 /-- Exact transition allowance; only horizontal wrap scans a full unary
 counter. -/

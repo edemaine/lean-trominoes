@@ -555,6 +555,9 @@ Development history is preserved in Git.
 lake build
 ```
 
+If a parallel build reaches Windows' memory commit limit, reduce the worker
+count with `LEAN_NUM_THREADS=4 lake build` in Bash.
+
 The library's `LeanTrominoes.*` glob includes every Lean source module, even
 when it is not imported by the small public root. New files therefore enter
 the default build automatically. To build one module and its dependencies:
@@ -571,7 +574,7 @@ lake env lean LeanTrominoes/AxiomAudit.lean
 lake env leanchecker --fresh LeanTrominoes
 ```
 
-The project uses Lean 4.31.0 and depends on
+The project uses Lean 4.35.0 and depends on
 [`lean-wang`](https://github.com/edemaine/lean-wang).
 [lean-toolchain](lean-toolchain) pins Lean;
 [lake-manifest.json](lake-manifest.json) pins the fetched dependencies.

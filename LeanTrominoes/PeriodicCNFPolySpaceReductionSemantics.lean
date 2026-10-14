@@ -29,7 +29,7 @@ open Turing
 
 namespace PolySpaceReduction
 
-variable {Input : Type} {encoding : Computability.FinEncoding Input}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
@@ -198,8 +198,8 @@ theorem mem_iff_localPeriodicCNF1DSAT (input : Input) :
       exact (List.map_injective_iff.mpr
         decider.outputAlphabet.symm.injective) mappedEq
     have resultTrue : decider.result input = true :=
-      Computability.Encoding.encode_injective
-        (Complexity.primcodableFinEncoding Bool).toEncoding encodedEq
+      _root_.Computability.Encoding.encode_injective
+        (Complexity.primcodableFinEncoding Bool).encoding encodedEq
     exact (decider.correct input).mp resultTrue
 
 end PolySpaceReduction

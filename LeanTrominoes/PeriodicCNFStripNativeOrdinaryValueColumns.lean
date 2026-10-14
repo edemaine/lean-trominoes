@@ -14,7 +14,7 @@ noncomputable section
 namespace LeanTrominoes.PeriodicCNFStripReduction
 open Turing PeriodicCNF PeriodicOrthocrossing
 open PeriodicCNF.FormulaShapeDirectionOrdering PeriodicCNF.OrdinarySourceProjection
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance ordinaryValueStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack

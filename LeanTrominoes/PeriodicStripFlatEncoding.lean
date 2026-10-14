@@ -83,7 +83,7 @@ theorem decodeStripFields_stripFields (periodicStrip : PeriodicStrip) :
   simp [stripFields, decodeStripFields, parsed]
 
 /-- Flat finite encoding used by the formal statement of the 1.5D problem. -/
-def finEncoding : FinEncoding PeriodicStrip :=
+def finEncoding : FiniteEncoding PeriodicStrip :=
   PeriodicCNFFlatEncoding.finEncodingOfFields stripFields decodeStripFields
     decodeStripFields_stripFields
 

@@ -152,7 +152,6 @@ def move_ok_inSpace {p k₁ k₂ q s L₁ o L₂}
               simp [middle, nextStacks, TM2.step, tr.eq_def,
                 pop', push', sourceValue, predicateValue,
                 Function.update_of_ne different.symm]
-              rfl
             have spaceEq :
                 TM2.stackSpace middle =
                   TM2.stackSpace
@@ -273,7 +272,6 @@ def clear_ok_inSpace {p k q s L₁ o L₂}
                   some middle := by
               simp [middle, nextStacks, TM2.step, tr.eq_def,
                 pop', sourceValue, predicateValue]
-              rfl
             have spaceLe :
                 TM2.stackSpace middle ≤
                   TM2.stackSpace
@@ -487,7 +485,6 @@ def copy_ok_inSpace (q s a b c d) :
                 K'.elim a (symbol :: b) c d⟩ =
             some middle := by
         simp [middle, tr, pop', push']
-        rfl
       have first :
           EvalsToInSpace (TM2.step tr) TM2.stackSpace
             (a.length + 2 * (symbol :: b).length + c.length + d.length)
@@ -587,7 +584,6 @@ def head_main_ok_inSpace {q s L} {c d : List Γ'} :
   have pushStep :
       TM2.step tr afterMove = some afterPush := by
     simp [afterMove, afterPush, TM2.step, tr.eq_def]
-    rfl
   have pushSpace :
       TM2.stackSpace afterPush ≤
         (trList L).length + c.length + d.length + 1 := by
@@ -735,7 +731,6 @@ def head_stack_ok_inSpace {q s L₁ L₂ L₃} :
       have pushStep :
           TM2.step tr afterMove = some afterPush := by
         simp [afterMove, afterPush, TM2.step, tr.eq_def]
-        rfl
       have pushSpace :
           TM2.stackSpace afterPush ≤
             (trList L₁).length + (trList []).length +
@@ -755,7 +750,6 @@ def head_stack_ok_inSpace {q s L₁ L₂ L₃} :
       have readStep :
           TM2.step tr afterPush = some afterRead := by
         simp [afterPush, afterRead, TM2.step, tr.eq_def]
-        rfl
       have read :
           EvalsToInSpace (TM2.step tr) TM2.stackSpace
             ((trList L₁).length + (trList []).length +
@@ -841,7 +835,6 @@ def head_stack_ok_inSpace {q s L₁ L₂ L₃} :
       have pushStep :
           TM2.step tr afterMove = some afterPush := by
         simp [afterMove, afterPush, TM2.step, tr.eq_def]
-        rfl
       have pushSpace :
           TM2.stackSpace afterPush ≤
             (trList L₁).length +
@@ -866,7 +859,6 @@ def head_stack_ok_inSpace {q s L₁ L₂ L₃} :
       have readStep :
           TM2.step tr afterPush = some afterRead := by
         simp [afterPush, afterRead, TM2.step, tr.eq_def]
-        rfl
       have read :
           EvalsToInSpace (TM2.step tr) TM2.stackSpace
             ((trList L₁).length +
@@ -950,7 +942,6 @@ noncomputable def succ_ok_inSpace {q s n} {c d : List Γ'} :
                 K'.elim [Γ'.cons] [] c d⟩ =
             some afterSucc := by
         simp [afterSucc, TM2.step, tr.eq_def]
-        rfl
       have first :
           EvalsToInSpace (TM2.step tr) TM2.stackSpace
             ([Γ'.cons].length + c.length + d.length + 1)
@@ -1074,7 +1065,6 @@ noncomputable def succ_ok_inSpace {q s n} {c d : List Γ'} :
                       reversePrefix c d⟩ =
                 some middle := by
             simp [middle, trPosNum, TM2.step, tr.eq_def]
-            rfl
           have first :
               EvalsToInSpace (TM2.step tr) TM2.stackSpace
                 ((trPosNum PosNum.one).length + 1 +
@@ -1093,7 +1083,6 @@ noncomputable def succ_ok_inSpace {q s n} {c d : List Γ'} :
           have secondStep :
               TM2.step tr middle = some afterSucc := by
             simp [middle, afterSucc, TM2.step, tr.eq_def]
-            rfl
           have second :
               EvalsToInSpace (TM2.step tr) TM2.stackSpace
                 ((trPosNum PosNum.one).length + 1 +
@@ -1123,7 +1112,6 @@ noncomputable def succ_ok_inSpace {q s n} {c d : List Γ'} :
                       reversePrefix c d⟩ =
                 some middle := by
             simp [middle, trPosNum, TM2.step, tr.eq_def]
-            rfl
           have first :
               EvalsToInSpace (TM2.step tr) TM2.stackSpace
                 ((trPosNum (PosNum.bit1 smaller)).length + 1 +
@@ -1174,7 +1162,6 @@ noncomputable def succ_ok_inSpace {q s n} {c d : List Γ'} :
                       reversePrefix c d⟩ =
                 some afterSucc := by
             simp [afterSucc, trPosNum, TM2.step, tr.eq_def]
-            rfl
           have run :
               EvalsToInSpace (TM2.step tr) TM2.stackSpace
                 ((trPosNum (PosNum.bit0 smaller)).length + 1 +
@@ -1253,7 +1240,6 @@ noncomputable def pred_ok_inSpace (q₁ q₂ s v)
                     [] c d⟩ =
               some afterPred := by
           simp [afterPred, TM2.step, tr.eq_def]
-          rfl
         have first :
             EvalsToInSpace (TM2.step tr) TM2.stackSpace
               (([Γ'.bit1, Γ'.cons] ++
@@ -1417,7 +1403,6 @@ noncomputable def pred_ok_inSpace (q₁ q₂ s v)
             have secondStep :
                 TM2.step tr middle = some afterPred := by
               simp [middle, afterPred, TM2.step, tr.eq_def]
-              rfl
             have second :
                 EvalsToInSpace (TM2.step tr) TM2.stackSpace
                   ((trPosNum PosNum.one.succ).length + 1 +
@@ -1450,7 +1435,6 @@ noncomputable def pred_ok_inSpace (q₁ q₂ s v)
                   some middle := by
               simp [middle, trPosNum, PosNum.succ,
                 TM2.step, tr.eq_def]
-              rfl
             have first :
                 EvalsToInSpace (TM2.step tr) TM2.stackSpace
                   ((trPosNum (PosNum.bit1 smaller).succ).length +
@@ -1520,7 +1504,7 @@ noncomputable def pred_ok_inSpace (q₁ q₂ s v)
                 encoding, notDelimiter,
                 show some Γ'.bit1 ≠ some Γ'.bit0 by decide,
                 Option.getD, -natEnd, TM2.step, tr.eq_def]
-              rfl
+              simp [natEnd]
             have run :
                 EvalsToInSpace (TM2.step tr) TM2.stackSpace
                   ((trPosNum (PosNum.bit0 smaller).succ).length +
@@ -1753,7 +1737,6 @@ noncomputable def trNormal_respects_inSpace
                   (trContStack continuation)⟩ =
             some target := by
         simp [target, TM2.step, tr.eq_def]
-        rfl
       have startBound :
           TM2.stackSpace
               ⟨some
@@ -2282,7 +2265,6 @@ noncomputable def tr_ret_respects_inSpace
         simp [afterGoto, firstMove, secondMove, thirdMove,
           recursiveLabel, recursiveContinuation,
           trCont, trContStack, TM2.step, tr.eq_def]
-        rfl
       have sourceBound :
           TM2.stackSpace
               ⟨some
@@ -2425,7 +2407,6 @@ noncomputable def tr_ret_respects_inSpace
             some afterGoto := by
         simp [afterGoto, trCont, trContStack,
           TM2.step, tr.eq_def]
-        rfl
       have sourceBound :
           TM2.stackSpace
               ⟨some
@@ -2497,7 +2478,6 @@ noncomputable def tr_ret_respects_inSpace
             some afterGoto := by
         simp [afterGoto, trCont, trContStack,
           TM2.step, tr.eq_def]
-        rfl
       have sourceBound :
           TM2.stackSpace
               ⟨some
@@ -2586,7 +2566,6 @@ noncomputable def tr_ret_respects_inSpace
           simp only [pop', TM2.stepAux, K'.elim_main,
             encodedHead.1, K'.elim_update_main]
           simp [afterPop, trContStack, encodedHead.2]
-          rfl
         have sourceBound :
             TM2.stackSpace
                 ⟨some
@@ -2672,7 +2651,6 @@ noncomputable def tr_ret_respects_inSpace
             encodedHead.1, K'.elim_update_main]
           simp [afterPop, recursiveLabel,
             recursiveContinuation, trCont, trContStack]
-          rfl
         have sourceBound :
             TM2.stackSpace
                 ⟨some

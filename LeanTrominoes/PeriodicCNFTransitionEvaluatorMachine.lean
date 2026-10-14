@@ -1449,7 +1449,6 @@ def readField_to_restore (source : FieldSource) (target : AtomSource)
             secondRoot, scratch⟩
         cases source <;>
           simp [readFieldScanData, TapeData.setField]
-      · simp
   | cons symbol word induction =>
       have symbolNotDelimiter : symbol ≠ Γ'.cons :=
         noDelimiter symbol (by simp)
@@ -1505,7 +1504,6 @@ def saveFreshRoot_to_restore (next : Phase) (data : TapeData)
         change fresh = [] at freshValue
         subst fresh
         rfl
-      · simp
   | cons symbol word induction =>
       let nextData := savedFreshSymbolData data symbol word
       have first := oneStep
@@ -1547,7 +1545,6 @@ def restoreFreshRoot_to_phase (next : Phase) (data : TapeData)
         change scratch = [] at scratchValue
         subst scratch
         rfl
-      · simp
   | cons symbol word induction =>
       let nextData := restoredFreshRootSymbolData data symbol word
       have first := oneStep
@@ -2048,7 +2045,6 @@ def copyAtom_to_restore (source : AtomSource) (next : Phase)
         cases source <;>
           simp [TapeData.atom] at sourceValue <;>
           simp [copiedAtomData, TapeData.setAtom, sourceValue]
-      · simp
   | cons symbol word induction =>
       have sourceHead : data.atom source = symbol :: word := sourceValue
       let nextData := copyBitData data source symbol word
@@ -2100,7 +2096,6 @@ def restoreAtom_to_phase (source : AtomSource) (next : Phase)
           simp at scratchValue <;>
           simp [restoredAtomData, TapeData.atom, TapeData.setAtom,
             scratchValue]
-      · simp
   | cons symbol word induction =>
       let nextData := restoreBitData data source symbol word
       have first := oneStep

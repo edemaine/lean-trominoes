@@ -36,6 +36,7 @@ theorem scan_encode_semanticWords (field : Field)
       dsimp
       unfold DelimitedBinaryWords.encode at induction
       rw [induction]
+      rfl
 
 /-- Every word contributes one selected unary field, and `finish` contributes
 the final unary-zero representative-lookup sentinel. -/

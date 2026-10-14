@@ -114,7 +114,6 @@ theorem selectedCount_embedData {Data : Type} (selected : Data → Bool)
       simp only [List.map_cons,
         UnaryPolynomialPaddingMachine.selectedCount_cons,
         AffineTemplateEmitterMachine.dataSelected, induction]
-      rfl
 
 @[simp]
 theorem selectedCount_map_inr {Data : Type} (selected : Data → Bool)

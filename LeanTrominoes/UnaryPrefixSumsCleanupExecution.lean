@@ -35,7 +35,6 @@ def clearSum_evalsInTime (symbols : List Symbol) (data : TapeData)
         (some (reverseOutputCfg { nextData with sum := [] }))
         first rest
       convert composed using 1
-      simp
 
 end UnaryPrefixSumsMachine
 end LeanTrominoes

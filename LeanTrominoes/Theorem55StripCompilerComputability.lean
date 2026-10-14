@@ -31,7 +31,7 @@ theorem preparedContains_primrec : Primrec₂ preparedContains := by
   have padding : Primrec (fun a : PeriodicStrip × Cell =>
       decide (a.2 ∈ StripTrominoPadding.region (Theorem55StripSource.period a.1))) :=
     padding_membership_primrec.decide.comp (period_primrec.comp Primrec.fst) Primrec.snd
-  exact Primrec.cond source (Primrec.const true) padding
+  exact Primrec.or.comp source padding
 
 theorem refinedContains_primrec : Primrec₂ refinedContains := by
   have source : Primrec (fun a : PeriodicStrip × Cell => preparedContains a.1 (PlusRefinement.parent a.2)) :=

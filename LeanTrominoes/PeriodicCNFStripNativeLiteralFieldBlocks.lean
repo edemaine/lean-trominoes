@@ -11,7 +11,7 @@ import LeanTrominoes.PositionedIncidenceFormulaFields
 noncomputable section
 namespace LeanTrominoes.PeriodicCNFStripReduction
 open Computability Turing UnaryColumn PositionedIncidenceRows PeriodicCNFFlatEncoding
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance nativeLiteralFieldStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack

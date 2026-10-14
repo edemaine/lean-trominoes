@@ -82,7 +82,7 @@ private theorem decodeKinds (kinds : List Bool) : (kinds.map Bool.toNat).mapM de
   simp only [List.mapM_map] at kinds
   simp [fields,decodeFields,kinds,edges]
 
-def finEncoding : _root_.Computability.FinEncoding Input :=
+def finEncoding : _root_.LeanTrominoes.FiniteEncoding Input :=
   finEncodingOfFields fields decodeFields decodeFields_fields
 
 @[simp] theorem edgeFields_length (record : PeriodicEdge Nat × WireColor) : (edgeFields record).length = 5 := by

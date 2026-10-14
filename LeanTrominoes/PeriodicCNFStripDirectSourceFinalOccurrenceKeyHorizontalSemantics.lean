@@ -30,7 +30,7 @@ private theorem activeOccurrence_rank_lt_count
   simpa only [PeriodicOneInThreeToThreeDM.occurrencesOf_length] using bound
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : PeriodicCNF.ProgramSource encoding language)
 

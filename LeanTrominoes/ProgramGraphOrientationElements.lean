@@ -22,7 +22,7 @@ namespace LeanTrominoes.PeriodicCNFStripReduction
 open Gadget PeriodicThreeDM Turing UnaryColumn
 attribute [local instance] sourceVariableDecidableEq horizontalRibbonInnerVariableDecidableEq
   horizontalRibbonRoutedVariableDecidableEq
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (source : PeriodicCNF.ProgramSource encoding language)
 set_option maxHeartbeats 400000
 set_option synthInstance.maxSize 2048

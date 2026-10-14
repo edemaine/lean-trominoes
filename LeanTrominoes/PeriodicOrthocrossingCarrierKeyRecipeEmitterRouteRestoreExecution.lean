@@ -60,7 +60,6 @@ def restoreRouteFirst_evalsInTime (recipes : List Recipe)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def restoreRouteSecond_evalsInTime (recipes : List Recipe)
     (index : Fin recipes.length)
@@ -109,7 +108,6 @@ def restoreRouteSecond_evalsInTime (recipes : List Recipe)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end CarrierKeyRecipeEmitterMachine
 end LeanTrominoes.PeriodicOrthocrossing

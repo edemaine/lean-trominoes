@@ -82,7 +82,6 @@ theorem horizontalVariableTypedIncidenceRouteComputed_eq_assembledFixedRed
           atom slot color
   · simp only [if_pos isRouted, dif_pos isRouted]
     rw [prefixEq, occurrence]
-    congr 2
   · simp only [if_neg isRouted, dif_neg isRouted]
     exact prefixEq
 

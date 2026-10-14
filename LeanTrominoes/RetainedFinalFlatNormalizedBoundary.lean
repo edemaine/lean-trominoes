@@ -23,7 +23,7 @@ namespace PeriodicOrthocrossing
 
 open PlanarThreeSAT
 
-set_option maxHeartbeats 1200000
+set_option maxHeartbeats 2000000
 
 /-- Two exact final route lists occupying opposite sides of one translated
 carrier boundary. -/

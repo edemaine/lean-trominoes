@@ -66,7 +66,7 @@ def addCounterComputableInPolyTime {Source : Type} [Fintype Source]
   simp
 
 
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (verifier : Complexity.VerifierInPolyTime encoding language)
 open Complexity.VerifierInPolyTime
 

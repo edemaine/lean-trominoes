@@ -128,7 +128,6 @@ def machine_outputsInTime (symbols : List Symbol) :
     rw [initList_eq_scanFirstCfg, haltList_eq_haltCfg,
       ← haltDataCfg_empty_eq_haltCfg]
     convert whole.evals_in_steps using 1
-    rfl
   · apply whole.steps_le_m.trans
     simp only [totalTime, afterFirst, afterSecond, suffix, first, rotated,
       List.length_reverse]

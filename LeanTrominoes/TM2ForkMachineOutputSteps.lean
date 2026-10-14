@@ -121,19 +121,6 @@ theorem step_drainFirstOutput_nil
         (.firstOutput none) [] secondOutput outputReverse output) := by
   simp [FinTM2.step, TM2.step, machine, outputAssemblyCfg,
     outputAssemblyStacks, program, firstOutputSymbol, haltList]
-  congr 2
-  funext stack
-  cases stack with
-  | input => simp [outputAssemblyStacks]
-  | inputReverse => simp [outputAssemblyStacks]
-  | first stack =>
-      by_cases equal : stack = first.tm.k₁
-      · subst stack
-        simp [outputAssemblyStacks, haltList]
-      · simp [outputAssemblyStacks, haltList, equal]
-  | second stack => simp [outputAssemblyStacks]
-  | outputReverse => simp [outputAssemblyStacks]
-  | output => simp [outputAssemblyStacks]
 
 theorem step_pushSeparator
     (secondOutput : List (second.tm.Γ second.tm.k₁))
@@ -211,19 +198,6 @@ theorem step_drainSecondOutput_nil
         (.output none) [] [] outputReverse output) := by
   simp [FinTM2.step, TM2.step, machine, outputAssemblyCfg,
     outputAssemblyStacks, program, secondOutputSymbol, haltList]
-  congr 2
-  funext stack
-  cases stack with
-  | input => simp [outputAssemblyStacks]
-  | inputReverse => simp [outputAssemblyStacks]
-  | first stack => simp [outputAssemblyStacks]
-  | second stack =>
-      by_cases equal : stack = second.tm.k₁
-      · subst stack
-        simp [outputAssemblyStacks, haltList]
-      · simp [outputAssemblyStacks, haltList, equal]
-  | outputReverse => simp [outputAssemblyStacks]
-  | output => simp [outputAssemblyStacks]
 
 theorem step_drainOutputReverse_cons
     (symbol : OutputSymbol FirstSymbol SecondSymbol)
@@ -268,9 +242,6 @@ theorem step_drainOutputReverse_nil
         (.output none) [] [] [] output) := by
   simp [FinTM2.step, TM2.step, machine, outputAssemblyCfg,
     outputAssemblyStacks, program, outputSymbol]
-  congr 2
-  funext stack
-  cases stack <;> simp [outputAssemblyStacks]
 
 theorem step_finish
     (output : List (OutputSymbol FirstSymbol SecondSymbol)) :

@@ -42,11 +42,6 @@ theorem values_eq_selectedValues_map
   rw [lookups_selectedRows_map_append_value
     base
     (paddedCarrierKeyCandidateStream descriptors) correct datum 0]
-  apply congrArg (List.map datum)
-  apply List.filter_congr
-  intro value _valueMember
-  by_cases member : value ∈ base.map some <;>
-    simp [member]
 
 end CarrierKeyAxisLookup
 end LeanTrominoes.PeriodicOrthocrossing

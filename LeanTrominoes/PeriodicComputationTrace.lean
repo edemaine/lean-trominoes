@@ -295,7 +295,7 @@ theorem stack_length_le_configurationSpace (tm : FinTM2)
 decider input respects the decider's global polynomial space bound, hence so
 does each individual stack. -/
 theorem AcceptingTrace.stacksFit_decider
-    {Input : Type} {encoding : Computability.FinEncoding Input}
+    {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : Complexity.DeciderInPolySpace encoding language)
     (input : Input) {accepts : decider.tm.Cfg → Prop} {limit : Nat}

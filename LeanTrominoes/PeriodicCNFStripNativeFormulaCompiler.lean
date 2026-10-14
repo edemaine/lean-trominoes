@@ -13,7 +13,7 @@ noncomputable section
 namespace LeanTrominoes.PeriodicCNFStripReduction
 open Computability Turing UnaryColumn PositionedIncidenceRows PeriodicCNFFlatEncoding
 open UnaryFieldEncoderMachine (unaryFields unaryField)
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance nativeFormulaStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
@@ -85,7 +85,8 @@ noncomputable def nativeFormulaEncodingCompiler :
     UnaryFieldEncoderMachine.computableInPolyTime
   apply TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq physical
   intro s
-  simp only [PeriodicCNFFlatEncoding.finEncoding, PeriodicCNFFlatEncoding.finEncodingOfFields, encodeNatFields_eq_trList, id_eq]
+  simp only [FiniteEncoding.encode, PeriodicCNFFlatEncoding.finEncoding,
+    PeriodicCNFFlatEncoding.finEncodingOfFields, encodeNatFields_eq_trList, id_eq]
 
 /-- Serialization uses an injective renaming and a clause-anchor change,
 both preserving exact-one satisfiability. -/

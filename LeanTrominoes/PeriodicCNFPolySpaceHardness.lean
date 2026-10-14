@@ -24,7 +24,7 @@ namespace PolySpaceHardness
 open Computability Turing
 
 variable {Input : Type}
-variable {encoding : _root_.Computability.FinEncoding Input}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
@@ -83,7 +83,6 @@ def sourceFormulaComputableInPolyTime
   all_goals
     simp only [PolySpaceNativeCompiler.nativeCompilerFields_sourceFields,
       PolySpaceNativeCompiler.trList_formulaFields_eq_finEncoding_encode]
-    rfl
 
 /-- Specialize the raw-symbol compiler to values of the source encoding. -/
 def reductionComputableInPolyTime
@@ -116,7 +115,7 @@ theorem polyTimeManyOneReducible
 
 /-- A uniform provider of the outstanding native request generators. -/
 def NativeRequestGenerators : Prop :=
-  ∀ {Input : Type} (encoding : _root_.Computability.FinEncoding Input)
+  ∀ {Input : Type} (encoding : _root_.LeanTrominoes.FiniteEncoding Input)
       (language : Input → Prop)
       (decider : Complexity.DeciderInPolySpace encoding language),
     Nonempty (NativeRequestGenerator decider)
@@ -162,7 +161,6 @@ def directSourceFormulaComputableInPolyTime :
   all_goals
     simp only [PolySpaceNativeCompiler.sourceCompilerRequest_compile,
       PolySpaceNativeCompiler.trList_formulaFields_eq_finEncoding_encode]
-    rfl
 
 /-- Specialize the concrete raw-symbol compiler to encoded source values. -/
 def directReductionComputableInPolyTime :

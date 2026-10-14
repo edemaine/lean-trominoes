@@ -17,7 +17,7 @@ namespace LeanTrominoes.PeriodicCNFStripReduction
 marker suffix. -/
 def directRetainedPlanarMetadataDecomposedVariableMarkers
     {Input : Type}
-    {encoding : _root_.Computability.FinEncoding Input}
+    {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :=

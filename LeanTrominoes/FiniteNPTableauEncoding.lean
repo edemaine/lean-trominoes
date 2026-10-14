@@ -9,7 +9,7 @@ import LeanTrominoes.FiniteCNFFlatEncoding
 noncomputable section
 namespace LeanTrominoes.Complexity.VerifierInPolyTime
 open Turing PeriodicCNF PeriodicCNF.BoundedMachineAtom
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (verifier : VerifierInPolyTime encoding language)
 attribute [local instance] FinTM2.kFin FinTM2.ΛFin FinTM2.σFin
 noncomputable local instance (stack : verifier.computer.tm.K) :

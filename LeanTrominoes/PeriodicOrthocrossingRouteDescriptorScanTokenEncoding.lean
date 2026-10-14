@@ -16,10 +16,10 @@ namespace RouteDescriptorScanTokens
 /-- The verified normalized token format as a finite encoding of descriptor
 lists. -/
 noncomputable def finEncoding :
-    _root_.Computability.FinEncoding (List RouteDescriptor) where
-  toEncoding :=
-    { Γ := Token
-      encode := encode
+    _root_.LeanTrominoes.FiniteEncoding (List RouteDescriptor) where
+  Γ := Token
+  encoding :=
+    { encode := encode
       decode := decode
       decode_encode := decode_encode }
   ΓFin := inferInstance

@@ -268,7 +268,6 @@ def scan_evalsInTime {Data : Type} [Inhabited Data]
               replicate_unit_add_one_right,
               replicate_unit_add_one_right]
             simp [nextData, List.reverse_cons, List.append_assoc]
-          · simp
         · have secondFalse :
               dataSelected parameters.secondSelected workspace = false :=
             Bool.eq_false_of_not_eq_true secondEq
@@ -303,7 +302,6 @@ def scan_evalsInTime {Data : Type} [Inhabited Data]
                     omega,
               replicate_unit_add_one_right]
             simp [nextData, List.reverse_cons, List.append_assoc]
-          · simp
       · have firstFalse :
             dataSelected parameters.firstSelected workspace = false :=
           Bool.eq_false_of_not_eq_true firstEq
@@ -340,7 +338,6 @@ def scan_evalsInTime {Data : Type} [Inhabited Data]
                     omega,
               replicate_unit_add_one_right]
             simp [nextData, List.reverse_cons, List.append_assoc]
-          · simp
         · have secondFalse :
               dataSelected parameters.secondSelected workspace = false :=
             Bool.eq_false_of_not_eq_true secondEq
@@ -370,7 +367,6 @@ def scan_evalsInTime {Data : Type} [Inhabited Data]
           convert composed using 1
           · simp [nextData, selectedCount_cons, firstFalse, secondFalse,
               List.reverse_cons, List.append_assoc]
-          · simp
 
 end TriangularTemplateEmitterMachine
 end PeriodicCNF

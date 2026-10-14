@@ -65,7 +65,6 @@ theorem map_finiteEvaluatorInputAlphabet_symm
   | cons head tail ih =>
       simp only [List.map_cons,
         finiteEvaluatorInputAlphabet_invFun_apply, ih]
-      rfl
 
 @[simp]
 theorem map_finiteEvaluatorOutputAlphabet_symm
@@ -76,7 +75,6 @@ theorem map_finiteEvaluatorOutputAlphabet_symm
   | cons head tail ih =>
       simp only [List.map_cons,
         finiteEvaluatorOutputAlphabet_invFun_apply, ih]
-      rfl
 
 theorem erase_finiteEvaluator_init (code : ToPartrec.Code)
     (input : List Nat) :

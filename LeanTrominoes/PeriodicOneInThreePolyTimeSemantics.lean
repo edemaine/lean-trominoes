@@ -16,7 +16,7 @@ noncomputable section
 namespace LeanTrominoes.PeriodicOneInThree.PolyTime
 open PeriodicCNF
 set_option maxHeartbeats 1000000
-variable {Input : Type} {encoding : _root_.Computability.FinEncoding Input} {language : Input → Prop}
+variable {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input} {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance exactOneSemanticsStackFintype (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack

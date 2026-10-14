@@ -32,7 +32,6 @@ private theorem idxOf_decidableEq_eq
   | nil => rfl
   | cons head tail induction =>
       simp only [List.idxOf_cons, Bool.cond_eq_ite, beq_iff_eq]
-      rw [induction]
 
 /-- The compiled index stream is the pointwise sum of each atom's
 last-occurrence-ordered block start and its rotated stable rank. -/

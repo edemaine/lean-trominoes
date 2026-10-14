@@ -16,16 +16,16 @@ open Computability
 
 /-- Disjoint tags prevent input symbols from being confused with certificate
 bits or with the separator. -/
-def encodeWitness {α : Type} (encoding : FinEncoding α) (input : α × List Bool) :
+def encodeWitness {α : Type} (encoding : FiniteEncoding α) (input : α × List Bool) :
     List (Sum encoding.Γ (Option Bool)) :=
   (encoding.encode input.1).map Sum.inl ++
     Sum.inr none :: input.2.map (fun bit => Sum.inr (some bit))
 
-theorem encodeWitness_length {α : Type} (encoding : FinEncoding α) (input : α × List Bool) :
+theorem encodeWitness_length {α : Type} (encoding : FiniteEncoding α) (input : α × List Bool) :
     (encodeWitness encoding input).length=(encoding.encode input.1).length+input.2.length+1 := by
   simp [encodeWitness]; omega
 
-structure VerifierInPolyTime {α : Type} (encoding : FinEncoding α) (language : α → Prop) where
+structure VerifierInPolyTime {α : Type} (encoding : FiniteEncoding α) (language : α → Prop) where
   verify : α → List Bool → Bool
   computer : FiniteAlphabetComputableInPolyTime (encodeWitness encoding)
     (primcodableFinEncoding Bool).encode (fun input => verify input.1 input.2)
@@ -33,18 +33,18 @@ structure VerifierInPolyTime {α : Type} (encoding : FinEncoding α) (language :
   correct : ∀ input, language input ↔ ∃ witness : List Bool,
     witness.length≤witnessBound.eval (encoding.encode input).length ∧ verify input witness=true
 
-def InNP {α : Type} (encoding : FinEncoding α) (language : α → Prop) : Prop :=
+def InNP {α : Type} (encoding : FiniteEncoding α) (language : α → Prop) : Prop :=
   Nonempty (VerifierInPolyTime encoding language)
 
-def NPHard {β : Type} (encoding : FinEncoding β) (language : β → Prop) : Prop :=
-  ∀ {α : Type} (sourceEncoding : FinEncoding α) (source : α → Prop),
+def NPHard {β : Type} (encoding : FiniteEncoding β) (language : β → Prop) : Prop :=
+  ∀ {α : Type} (sourceEncoding : FiniteEncoding α) (source : α → Prop),
     InNP sourceEncoding source → PolyTimeManyOneReducible sourceEncoding encoding source language
 
-def NPComplete {α : Type} (encoding : FinEncoding α) (language : α → Prop) : Prop :=
+def NPComplete {α : Type} (encoding : FiniteEncoding α) (language : α → Prop) : Prop :=
   InNP encoding language ∧ NPHard encoding language
 
-theorem NPHard.of_reduction {α β : Type} {sourceEncoding : FinEncoding α}
-    {targetEncoding : FinEncoding β} {source : α → Prop} {target : β → Prop}
+theorem NPHard.of_reduction {α β : Type} {sourceEncoding : FiniteEncoding α}
+    {targetEncoding : FiniteEncoding β} {source : α → Prop} {target : β → Prop}
     (hard : NPHard sourceEncoding source)
     (reduction : PolyTimeManyOneReducible sourceEncoding targetEncoding source target) :
     NPHard targetEncoding target := by

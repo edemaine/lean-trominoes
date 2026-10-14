@@ -36,7 +36,6 @@ def clearRowIndex_evalsInTime (tokens : List Unit) (data : TapeData)
         (some (reverseOutputCfg { nextData with rowIndex := [] }))
         first rest
       convert composed using 1
-      simp
 
 def reverseOutput_evalsInTime (symbols : List OutputSymbol)
     (data : TapeData) (reverseEq : data.outputReverse = symbols) :

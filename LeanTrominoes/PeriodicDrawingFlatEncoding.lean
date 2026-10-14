@@ -59,7 +59,7 @@ theorem decodeFields_fields (d : PeriodicGridDrawing) : decodeFields (fields d) 
   cases d
   rfl
 
-def finEncoding : _root_.Computability.FinEncoding PeriodicGridDrawing :=
+def finEncoding : _root_.LeanTrominoes.FiniteEncoding PeriodicGridDrawing :=
   PeriodicCNFFlatEncoding.finEncodingOfFields fields decodeFields decodeFields_fields
 
 end LeanTrominoes.PeriodicGridDrawing.Arithmetic

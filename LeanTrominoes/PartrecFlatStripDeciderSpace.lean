@@ -1994,6 +1994,7 @@ theorem flatStripSearchDepthCost_le_input
     encodedListSpace_nil, oneBits] at fieldsSpace encodedCost oneCostBound ⊢
   simp only [flatStripParameterComponentBound] at encodedCost ⊢
   rw [inputLengthDef] at *
+  dsimp only [inputLength, FiniteEncoding.encode] at *
   omega
 
 theorem flatStripPowerTwoCost_le_input
@@ -2064,6 +2065,7 @@ theorem flatStripCycleParametersCost_le_input
     at fieldsSpace depthCost stateCost identity depthBits stateBoundBits ⊢
   simp only [flatStripParameterSpaceBound,
     flatStripParameterComponentBound] at depthCost stateCost ⊢
+  dsimp only [inputLength, FiniteEncoding.encode] at *
   omega
 
 def flatPeriodicStripTrominoTilingSpaceBound (inputLength : Nat) : Nat :=

@@ -100,7 +100,6 @@ def machine_outputsInTime {Data : Type} [Fintype Data] [Inhabited Data]
               ending workspace))
     rw [initList_eq_scanCfg, haltList_eq_haltCfg]
     convert whole.evals_in_steps using 1
-    rfl
   · exact whole.steps_le_m.trans (by
       simp [totalTime]
       omega)

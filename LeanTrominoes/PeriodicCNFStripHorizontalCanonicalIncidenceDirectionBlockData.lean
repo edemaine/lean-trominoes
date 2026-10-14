@@ -250,7 +250,7 @@ noncomputable def horizontalCanonicalContractedDirectionBlocks
 emitter. -/
 noncomputable def directSparseCanonicalCompactContractedRouteSourceTokens
     {Input : Type}
-    {encoding : _root_.Computability.FinEncoding Input}
+    {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : Complexity.DeciderInPolySpace encoding language)
     (symbols : List encoding.Γ) :
@@ -267,7 +267,7 @@ noncomputable def directSparseCanonicalCompactContractedRouteSourceTokens
 canonical raster-request word. -/
 theorem directSparseCanonicalCompactContractedRouteSourceTokens_correct
     {Input : Type}
-    {encoding : _root_.Computability.FinEncoding Input}
+    {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : Complexity.DeciderInPolySpace encoding language)
     (symbols : List encoding.Γ) :

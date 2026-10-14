@@ -23,7 +23,7 @@ theorem fields_space_le (xs : List Nat) : encodedListSpace xs ≤ xs.sum+2*xs.le
 theorem raw_space_le (input : PeriodicStripTrominoPrefill) :
     encodedListSpace (fields input) ≤ 3*(CompletionStripEncoding.finEncoding.encode input).length+5 := by
   have h := fields_space_le (fields input)
-  simpa only [fields,List.sum_cons,List.length_cons,bound,
+  simpa only [FiniteEncoding.encode,fields,List.sum_cons,List.length_cons,bound,
     CompletionStripEncoding.finEncoding,CompletionStripEncoding.unaryFields_length] using
     (show encodedListSpace (fields input) ≤
       3*((CompletionStripEncoding.fields input).sum+(CompletionStripEncoding.fields input).length)+5 by

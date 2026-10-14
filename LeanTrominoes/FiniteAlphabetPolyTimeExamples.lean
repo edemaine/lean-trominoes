@@ -41,7 +41,6 @@ def ambientNatIdentity : TM2ComputableInPolyTime id id (id : List Bool → List 
     refine ⟨⟨1, ?_⟩, by simp⟩
     simp [flip, ambientNatMachine, FinTM2.step, TM2.step,
       TM2.stepAux, initList, haltList]
-    rfl
 
 example : FiniteAlphabetComputableInPolyTime id id (id : List Bool → List Bool) :=
   FiniteAlphabetComputableInPolyTime.ofComputableInPolyTime ambientNatIdentity

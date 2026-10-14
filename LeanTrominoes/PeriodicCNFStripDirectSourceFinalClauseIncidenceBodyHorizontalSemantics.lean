@@ -63,7 +63,7 @@ private theorem flatMap_const_eq_of_length
 /-- The direct fan stream and the actual typed horizontal source contain the
 same number of clauses. -/
 theorem directSourceFinalClauseFans_length_eq_horizontalTypedClauses
-    {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+    {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
@@ -78,7 +78,7 @@ theorem directSourceFinalClauseFans_length_eq_horizontalTypedClauses
 /-- Direct clause bodies are one copy of the fixed 27-body block per final
 clause fan. -/
 theorem directSourceFinalClauseIncidenceBodies_eq_fanBlocks
-    {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+    {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :
@@ -131,7 +131,7 @@ theorem horizontalTypedClauseIncidenceBodies_eq_clauseBlocks
 /-- The direct clause-incidence body suffix is exactly the clause part of the
 typed horizontal triple-order route-body presentation. -/
 theorem directSourceFinalClauseIncidenceBodies_eq_horizontalTyped
-    {Input : Type} {encoding : _root_.Computability.FinEncoding Input}
+    {Input : Type} {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :

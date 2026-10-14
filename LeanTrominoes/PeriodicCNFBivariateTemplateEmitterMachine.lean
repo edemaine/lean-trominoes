@@ -947,7 +947,6 @@ def scan_evalsInTime {Data : Type} [Inhabited Data]
               replicate_unit_add_one_right,
               replicate_unit_add_one_right]
             simp [nextData, List.reverse_cons, List.append_assoc]
-          · simp
         · have secondFalse :
               dataSelected secondSelected workspace = false :=
             Bool.eq_false_of_not_eq_true secondEq
@@ -982,7 +981,6 @@ def scan_evalsInTime {Data : Type} [Inhabited Data]
                   selectedCount firstSelected workspaces + 1 by omega,
               replicate_unit_add_one_right]
             simp [nextData, List.reverse_cons, List.append_assoc]
-          · simp
       · have firstFalse : dataSelected firstSelected workspace = false :=
           Bool.eq_false_of_not_eq_true firstEq
         by_cases secondEq : dataSelected secondSelected workspace = true
@@ -1017,7 +1015,6 @@ def scan_evalsInTime {Data : Type} [Inhabited Data]
                   selectedCount secondSelected workspaces + 1 by omega,
               replicate_unit_add_one_right]
             simp [nextData, List.reverse_cons, List.append_assoc]
-          · simp
         · have secondFalse :
               dataSelected secondSelected workspace = false :=
             Bool.eq_false_of_not_eq_true secondEq
@@ -1048,7 +1045,6 @@ def scan_evalsInTime {Data : Type} [Inhabited Data]
           convert composed using 1
           · simp [nextData, selectedCount_cons, firstFalse, secondFalse,
               List.reverse_cons, List.append_assoc]
-          · simp
 
 def scanFirst_evalsInTime {Data : Type} [Inhabited Data]
     (firstSelected secondSelected : Data → Bool) (recipes : List Recipe) (ending : List Token)
@@ -1107,7 +1103,6 @@ def scanFirst_evalsInTime {Data : Type} [Inhabited Data]
         rw [show firstStride * (word.length + 1) =
             firstStride * word.length + firstStride by ring,
           List.replicate_add, List.append_assoc]
-      · simp
 
 def restoreFirst_evalsInTime {Data : Type} [Inhabited Data]
     (firstSelected secondSelected : Data → Bool) (recipes : List Recipe) (ending : List Token)
@@ -1148,7 +1143,6 @@ def restoreFirst_evalsInTime {Data : Type} [Inhabited Data]
         firstStep rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def scanPosition_evalsInTime {Data : Type} [Inhabited Data]
     (firstSelected secondSelected : Data → Bool) (recipes : List Recipe)
@@ -1210,7 +1204,6 @@ def scanPosition_evalsInTime {Data : Type} [Inhabited Data]
         rw [show secondStride * (word.length + 1) =
             secondStride * word.length + secondStride by ring,
           List.replicate_add, List.append_assoc]
-      · simp
 
 def restorePosition_evalsInTime {Data : Type} [Inhabited Data]
     (firstSelected secondSelected : Data → Bool) (recipes : List Recipe)
@@ -1253,7 +1246,6 @@ def restorePosition_evalsInTime {Data : Type} [Inhabited Data]
         firstStep rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def recipeTime (first position : Nat) : Recipe → Nat
   | .fixed _ => 1
@@ -1723,7 +1715,6 @@ def reverseOutput_evalsInTime {Data : Type} [Inhabited Data]
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def clearFirst_evalsInTime {Data : Type} [Inhabited Data]
     (firstSelected secondSelected : Data → Bool) (recipes : List Recipe)
@@ -1937,7 +1928,6 @@ def machine_outputsInTime {Data : Type} [Fintype Data] [Inhabited Data]
               workspace))
     rw [initList_eq_scanCfg, haltList_eq_haltCfg]
     convert whole.evals_in_steps using 1
-    rfl
   · exact whole.steps_le_m.trans (by
       simp [totalTime, firstCount, secondCount]
       omega)

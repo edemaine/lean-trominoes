@@ -40,7 +40,6 @@ def machine_outputsInTime (recipes : List Recipe)
       some (haltList (machine recipes) (compiledTokens recipes input))
     rw [initList_eq_scanCfg, haltList_eq_haltDataCfg]
     convert whole.evals_in_steps using 1
-    rfl
   · exact whole.steps_le_m.trans (by
       simp [totalTime]
       omega)

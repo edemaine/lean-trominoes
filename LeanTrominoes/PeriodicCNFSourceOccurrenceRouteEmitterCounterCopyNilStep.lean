@@ -24,6 +24,5 @@ theorem step_copyCounter_nil (stage : CounterStage) (cursor : Cursor)
   have updateEq := update_tapes_counter data stage []
   simp only [CounterStage.units_nil] at updateEq
   rw [updateEq]
-  rfl
 
 end LeanTrominoes.PeriodicCNF.SourceOccurrenceRouteEmitterMachine

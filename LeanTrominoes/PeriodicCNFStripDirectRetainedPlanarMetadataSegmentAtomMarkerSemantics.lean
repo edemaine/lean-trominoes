@@ -16,7 +16,7 @@ open PeriodicCNF
 
 theorem directRetainedPlanarMetadataSegmentAtomMarkers_eq_replicate_shapeCounts
     {Input : Type}
-    {encoding : _root_.Computability.FinEncoding Input}
+    {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
     {language : Input → Prop}
     (decider : PeriodicCNF.ProgramSource encoding language)
     (symbols : List encoding.Γ) :

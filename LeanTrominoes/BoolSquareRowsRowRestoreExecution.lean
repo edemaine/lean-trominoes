@@ -47,7 +47,6 @@ def restoreRowCount_evalsInTime (tokens : List Unit) (data : TapeData)
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 end BoolSquareRowsMachine
 end LeanTrominoes

@@ -85,7 +85,6 @@ def copyHorizontal_evalsInTime (tromino : Tromino)
       · simp only [nextData, List.reverse_cons, List.append_assoc,
           List.singleton_append, List.length_cons]
         rw [coordinateReverse_succ]
-      · simp
 
 /-- Restore a drained horizontal counter and continue with the vertical
 copy. -/
@@ -125,7 +124,6 @@ def restoreHorizontal_evalsInTime (tromino : Tromino)
             scratch := [] })) first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 /-- Copy and restore one entire horizontal coordinate. -/
 def copyHorizontalThrough_evalsInTime (tromino : Tromino)
@@ -216,7 +214,6 @@ def copyVertical_evalsInTime (tromino : Tromino)
       · simp only [nextData, List.reverse_cons, List.append_assoc,
           List.singleton_append, List.length_cons]
         rw [coordinateReverse_succ]
-      · simp
 
 /-- Restore a drained vertical counter and advance the finite pixel cursor. -/
 def restoreVertical_evalsInTime (tromino : Tromino)
@@ -263,7 +260,6 @@ def restoreVertical_evalsInTime (tromino : Tromino)
             scratch := [] })) first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 /-- Copy and restore one entire vertical coordinate. -/
 def copyVerticalThrough_evalsInTime (tromino : Tromino)

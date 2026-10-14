@@ -65,7 +65,7 @@ def decode : List Nat → Option Input
   rcases input with ⟨bound,⟨target,rs⟩,forced⟩
   simp [fields,dataFields,decode,List.append_assoc,List.take_append,List.drop_append]
 
-def finEncoding : _root_.Computability.FinEncoding Input :=
+def finEncoding : _root_.LeanTrominoes.FiniteEncoding Input :=
   PeriodicCNFFlatEncoding.finEncodingOfFields fields decode decode_fields
 
 theorem fields_space (input : Input) :
@@ -105,7 +105,7 @@ def decode (p : Polynomial Nat) (values : List Nat) : Option (PolynomialBoxInput
   simp only [decode,fields,Encoding.decode_fields,Option.bind_some]
   simp [input.property]
 
-def finEncoding (p : Polynomial Nat) : _root_.Computability.FinEncoding (PolynomialBoxInput p) :=
+def finEncoding (p : Polynomial Nat) : _root_.LeanTrominoes.FiniteEncoding (PolynomialBoxInput p) :=
   PeriodicCNFFlatEncoding.finEncodingOfFields (fields p) (decode p) (decode_fields p)
 
 @[simp] theorem encode_length (p : Polynomial Nat) (input : PolynomialBoxInput p) :

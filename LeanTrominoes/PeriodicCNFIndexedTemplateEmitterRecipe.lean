@@ -80,7 +80,6 @@ def scanPosition_evalsInTime {Data : Type} [Inhabited Data]
         rw [show stride * (word.length + 1) =
             stride * word.length + stride by ring,
           List.replicate_add, List.append_assoc]
-      · simp
 
 def restorePosition_evalsInTime {Data : Type} [Inhabited Data]
     (family : Family Data) (item : Data)
@@ -120,7 +119,6 @@ def restorePosition_evalsInTime {Data : Type} [Inhabited Data]
         first rest
       convert composed using 1
       · simp [nextData, List.reverse_cons, List.append_assoc]
-      · simp
 
 def recipeTime (position : Nat) : Recipe → Nat
   | .fixed _ => 1

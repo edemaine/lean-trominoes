@@ -21,7 +21,6 @@ theorem step_scanRank_nil (data : TapeData) (ranksEq : data.ranks = []) :
   subst ranks
   simp [TM2.step, program, scanRankCfg, reverseOutputCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unarySymbol, clear]
-  rfl
 
 theorem step_scanRank_unit (data : TapeData)
     (remaining : List UnarySymbol)
@@ -34,7 +33,6 @@ theorem step_scanRank_unit (data : TapeData)
   subst ranks
   simp [TM2.step, program, scanRankCfg, positiveRankRestCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unaryIsUnit, unarySymbol, clear]
-  rfl
 
 theorem step_scanRank_delimiter (data : TapeData)
     (remaining : List UnarySymbol)
@@ -47,7 +45,6 @@ theorem step_scanRank_delimiter (data : TapeData)
   subst ranks
   simp [TM2.step, program, scanRankCfg, zeroRankFirstSizeCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unaryIsUnit, unarySymbol, clear]
-  rfl
 
 theorem step_positiveRankRest_unit (data : TapeData)
     (remaining : List UnarySymbol)
@@ -60,7 +57,6 @@ theorem step_positiveRankRest_unit (data : TapeData)
   subst ranks
   simp [TM2.step, program, positiveRankRestCfg, pushPositiveUnitCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unaryIsUnit, unarySymbol, clear]
-  rfl
 
 theorem step_positiveRankRest_delimiter (data : TapeData)
     (remaining : List UnarySymbol)
@@ -73,7 +69,6 @@ theorem step_positiveRankRest_delimiter (data : TapeData)
   subst ranks
   simp [TM2.step, program, positiveRankRestCfg, drainSizeCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unaryIsUnit, unarySymbol, clear]
-  rfl
 
 theorem step_pushPositiveUnit (data : TapeData) :
     machine.step (pushPositiveUnitCfg data) =
@@ -81,7 +76,6 @@ theorem step_pushPositiveUnit (data : TapeData) :
         { data with outputReverse := .unit :: data.outputReverse }) := by
   simp [TM2.step, program, pushPositiveUnitCfg, positiveRankRestCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_zeroRankFirstSize_unit (data : TapeData)
     (remaining : List UnarySymbol)
@@ -94,7 +88,6 @@ theorem step_zeroRankFirstSize_unit (data : TapeData)
   subst sizes
   simp [TM2.step, program, zeroRankFirstSizeCfg, zeroRankRestSizeCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unaryIsUnit, unarySymbol, clear]
-  rfl
 
 theorem step_zeroRankRestSize_unit (data : TapeData)
     (remaining : List UnarySymbol)
@@ -107,7 +100,6 @@ theorem step_zeroRankRestSize_unit (data : TapeData)
   subst sizes
   simp [TM2.step, program, zeroRankRestSizeCfg, pushZeroUnitCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unaryIsUnit, unarySymbol, clear]
-  rfl
 
 theorem step_zeroRankRestSize_delimiter (data : TapeData)
     (remaining : List UnarySymbol)
@@ -120,7 +112,6 @@ theorem step_zeroRankRestSize_delimiter (data : TapeData)
   subst sizes
   simp [TM2.step, program, zeroRankRestSizeCfg, emitDelimiterCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unaryIsUnit, unarySymbol, clear]
-  rfl
 
 theorem step_pushZeroUnit (data : TapeData) :
     machine.step (pushZeroUnitCfg data) =
@@ -128,7 +119,6 @@ theorem step_pushZeroUnit (data : TapeData) :
         { data with outputReverse := .unit :: data.outputReverse }) := by
   simp [TM2.step, program, pushZeroUnitCfg, zeroRankRestSizeCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_drainSize_unit (data : TapeData)
     (remaining : List UnarySymbol)
@@ -141,7 +131,6 @@ theorem step_drainSize_unit (data : TapeData)
   subst sizes
   simp [TM2.step, program, drainSizeCfg, emptyCfg, cfg, tapes,
     unaryIsNone, unaryIsUnit, unarySymbol, clear]
-  rfl
 
 theorem step_drainSize_delimiter (data : TapeData)
     (remaining : List UnarySymbol)
@@ -154,7 +143,6 @@ theorem step_drainSize_delimiter (data : TapeData)
   subst sizes
   simp [TM2.step, program, drainSizeCfg, emitDelimiterCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unaryIsUnit, unarySymbol, clear]
-  rfl
 
 theorem step_emitDelimiter (data : TapeData) :
     machine.step (emitDelimiterCfg data) =
@@ -162,7 +150,6 @@ theorem step_emitDelimiter (data : TapeData) :
         { data with outputReverse := .delimiter :: data.outputReverse }) := by
   simp [TM2.step, program, emitDelimiterCfg, scanRankCfg,
     emptyCfg, cfg, tapes]
-  rfl
 
 theorem step_reverseOutput_nil (data : TapeData)
     (reverseEq : data.outputReverse = []) :
@@ -174,7 +161,6 @@ theorem step_reverseOutput_nil (data : TapeData)
   subst outputReverse
   simp [TM2.step, program, reverseOutputCfg, haltDataCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unarySymbol, clear]
-  rfl
 
 theorem step_reverseOutput_cons (data : TapeData) (symbol : UnarySymbol)
     (remaining : List UnarySymbol)

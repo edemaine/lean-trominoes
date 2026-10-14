@@ -235,7 +235,6 @@ private theorem occurrence_idxOf_decidableEq_eq
   | cons head tail induction =>
       simp only [List.idxOf_cons, Bool.cond_eq_ite,
         beq_iff_eq]
-      rw [induction]
 
 theorem angularPortOfIndex_primrec : Primrec angularPortOfIndex := by
   let portList : List Port :=
