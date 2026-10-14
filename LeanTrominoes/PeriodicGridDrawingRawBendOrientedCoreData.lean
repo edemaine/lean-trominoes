@@ -39,23 +39,17 @@ theorem incidentCoreData {V : Type*} [DecidableEq V] {source : PeriodicGraph V} 
       simp only [GridSegment.direction] at vertical
       omega
     have coordinates := vertical_anchoredSegment_x planar degree (Cubic.coreFactor drawing.gridSize) member sameX
-    simpa only [incidentAnchoredSegment,Bool.false_eq_true,ite_false,coordinates.1,coordinates.2,sameX]
+    simp only [incidentAnchoredSegment,Bool.false_eq_true,ite_false,coordinates.1,coordinates.2,sameX]
   · refine ⟨targetPort_mem_allPorts _ member,shifted_target_portRayKey source drawing member,?_,?_,perturbed.reverse,rfl,?_⟩
     · exact fun equal => genuine equal.symm
-    · change |(subdivisionSegment source drawing tagged.1).reverse.direction.1| ≤ 2*(drawing.gridSize : Int) ∧
-        |(subdivisionSegment source drawing tagged.1).reverse.direction.2| ≤ 2*(drawing.gridSize : Int)
-      have x : (subdivisionSegment source drawing tagged.1).reverse.direction.1 = -(subdivisionSegment source drawing tagged.1).direction.1 := by
-        simp only [GridSegment.direction,GridSegment.reverse]; ring
-      have y : (subdivisionSegment source drawing tagged.1).reverse.direction.2 = -(subdivisionSegment source drawing tagged.1).direction.2 := by
-        simp only [GridSegment.direction,GridSegment.reverse]; ring
-      simpa only [x,y,abs_neg] using bounds
+    · simpa only [incidentRawSegment,ite_true,GridSegment.direction,GridSegment.reverse,Cell.sub,abs_sub_comm] using bounds
     · intro vertical
       have sameX : (subdivisionSegment source drawing tagged.1).start.1 = (subdivisionSegment source drawing tagged.1).finish.1 := by
         change (subdivisionSegment source drawing tagged.1).reverse.direction.1 = 0 at vertical
         simp only [GridSegment.direction,GridSegment.reverse] at vertical
         omega
       have coordinates := vertical_anchoredSegment_x planar degree (Cubic.coreFactor drawing.gridSize) member sameX
-      simpa only [incidentAnchoredSegment,ite_true,GridSegment.reverse,coordinates.1,coordinates.2,sameX]
+      simp only [incidentAnchoredSegment,ite_true,GridSegment.reverse,coordinates.1,coordinates.2,sameX]
 
 theorem IncidentCoreData.translate {V : Type*} [DecidableEq V] {source : PeriodicGraph V} {drawing : PeriodicGridDrawing}
     {port : GraphPort (Vertex V)} {raw core : GridSegment} (data : IncidentCoreData source drawing port raw core) (offset : Cell) :
@@ -63,21 +57,14 @@ theorem IncidentCoreData.translate {V : Type*} [DecidableEq V] {source : Periodi
       (core.translate (Cell.scale (Cubic.coreFactor drawing.gridSize) offset)) := by
   refine ⟨data.member,?_,?_,?_,?_,?_,?_⟩
   · simpa only [GridSegment.straightRayKey_translate] using data.key
-  · intro equal
-    have x := congrArg Prod.fst equal
-    have y := congrArg Prod.snd equal
-    apply data.genuine
-    apply Prod.ext <;> simp only [GridSegment.translate,Cell.add] at x y <;> omega
+  · exact fun equal => data.genuine (Cell.add_left_injective offset equal)
   · simpa only [GridSegment.direction_translate] using data.bounds
-  · change GridSegment.BoundedEndpointPerturbation 10 (Cubic.coreFactor drawing.gridSize) (raw.translate offset)
-      (core.translate (Cell.scale (Cubic.coreFactor drawing.gridSize) offset))
-    have cancel (first last shift : Int) : (Cubic.coreFactor drawing.gridSize : Int)*shift+first-
-        (Cubic.coreFactor drawing.gridSize : Int)*(shift+last) = first-(Cubic.coreFactor drawing.gridSize : Int)*last := by ring
-    simpa only [GridSegment.BoundedEndpointPerturbation,GridSegment.translate,Cell.add,Cell.scale,cancel] using data.perturbed
+  · simpa only [GridSegment.BoundedEndpointPerturbation,GridSegment.translate,Cell.add,Cell.scale,
+      mul_add,add_sub_add_left_eq_sub] using data.perturbed
   · change Cell.add (Cell.scale (Cubic.coreFactor drawing.gridSize) offset) core.start =
       Cell.add (Cell.scale (Cubic.coreFactor drawing.gridSize) (Cell.add offset raw.start)) (fanAnchor source drawing port)
     rw [data.start]
-    apply Prod.ext <;> simp only [GridSegment.translate,Cell.add,Cell.scale] <;> ring
+    apply Prod.ext <;> simp only [Cell.add,Cell.scale] <;> ring
   · intro vertical
     have equal := data.vertical (by simpa only [GridSegment.direction_translate] using vertical)
     simp only [GridSegment.translate,Cell.add,equal]

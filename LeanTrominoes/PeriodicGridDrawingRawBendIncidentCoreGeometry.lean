@@ -62,19 +62,18 @@ theorem vertical_x {V : Type*} [DecidableEq V] {source : PeriodicGraph V} {drawi
     (box : (core.scale (Cubic.rasterFactor drawing.gridSize)).RealBoxContains point) :
     point.1 = (Cubic.rasterFactor drawing.gridSize : ℝ)*(Cubic.coreFactor drawing.gridSize : ℝ)*raw.start.1 := by
   have anchor := fanAnchor_x planar degree data.member
-  rw [data.vertical_key vertical] at anchor
-  split_ifs at anchor <;> simp only [BendFan.horizontalSign,mul_zero] at anchor
-  all_goals
-    have equalX : (core.scale (Cubic.rasterFactor drawing.gridSize)).start.1 =
-        (core.scale (Cubic.rasterFactor drawing.gridSize)).finish.1 := by
-      simp only [GridSegment.scale,Cell.scale,data.vertical vertical]
-    have lower := box.1
-    have upper := box.2.1
-    rw [← equalX,min_self] at lower
-    rw [← equalX,max_self] at upper
-    simp only [GridSegment.scale,Cell.scale,data.start,Cell.add,anchor,
-      Int.cast_mul,Int.cast_add,Int.cast_natCast,Int.cast_zero,add_zero] at lower upper
-    nlinarith
+  rw [data.vertical_key vertical,apply_ite BendFan.horizontalSign] at anchor
+  simp only [BendFan.horizontalSign,ite_self,mul_zero] at anchor
+  have equalX : (core.scale (Cubic.rasterFactor drawing.gridSize)).start.1 =
+      (core.scale (Cubic.rasterFactor drawing.gridSize)).finish.1 := by
+    simp only [GridSegment.scale,Cell.scale,data.vertical vertical]
+  have lower := box.1
+  have upper := box.2.1
+  rw [← equalX,min_self] at lower
+  rw [← equalX,max_self] at upper
+  simp only [GridSegment.scale,Cell.scale,data.start,Cell.add,anchor,
+    Int.cast_mul,Int.cast_natCast,add_zero] at lower upper
+  nlinarith
 
 theorem vertical_y {V : Type*} [DecidableEq V] {source : PeriodicGraph V} {drawing : PeriodicGridDrawing}
     (planar : drawing.IsRealPlanarDrawing source) (degree : source.DegreeAtMost 4)
@@ -92,7 +91,7 @@ theorem vertical_y {V : Type*} [DecidableEq V] {source : PeriodicGraph V} {drawi
   have key := data.vertical_key vertical
   have rasterPositive : (0 : Int) < Cubic.rasterFactor drawing.gridSize := by exact_mod_cast Cubic.rasterFactor_positive drawing.gridSize
   split_ifs with up
-  · rw [if_pos up] at sign key
+  · rw [ite_eq_left up] at sign key
     have anchor := fanAnchor_vertical_y planar degree data.member true key
     simp only [ite_true] at anchor
     have scaledSign : 0 < (core.scale (Cubic.rasterFactor drawing.gridSize)).direction.2 := by
@@ -105,7 +104,7 @@ theorem vertical_y {V : Type*} [DecidableEq V] {source : PeriodicGraph V} {drawi
     simp only [GridSegment.scale,Cell.scale,data.start,Cell.add,anchor,
       Int.cast_mul,Int.cast_add,Int.cast_natCast,Int.cast_ofNat] at bound
     nlinarith
-  · rw [if_neg up] at sign key
+  · rw [ite_eq_right up] at sign key
     have anchor := fanAnchor_vertical_y planar degree data.member false key
     simp only [Bool.false_eq_true,ite_false] at anchor
     have scaledSign : (core.scale (Cubic.rasterFactor drawing.gridSize)).direction.2 < 0 := by

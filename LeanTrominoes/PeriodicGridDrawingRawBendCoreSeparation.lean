@@ -26,7 +26,7 @@ theorem distinct_lifted_coreRoutes_disjoint {V : Type*} [DecidableEq V] {source 
       ((subdivisionSegment source drawing first.1).translate (drawing.periodTranslation firstCopy)).RealContains original →
       ¬((subdivisionSegment source drawing second.1).translate (drawing.periodTranslation secondCopy)).RealContains original
   · exact liftedCoreRoutes_disjoint planar graphLocal drawingLocal firstMember secondMember firstCopy secondCopy disjoint firstContains
-  · push_neg at disjoint
+  · push Not at disjoint
     obtain ⟨original,firstOriginal,secondOriginal⟩ := disjoint
     obtain ⟨firstEndpoints,secondEndpoints⟩ := subdivision_segment_contacts planar firstMember secondMember firstCopy secondCopy different
       original firstOriginal secondOriginal
