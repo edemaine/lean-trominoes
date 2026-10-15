@@ -14,4 +14,6 @@ Useful entry points:
 - [Local planar line completeness](Line/PeriodicThreeDMPlanarLineCompleteness.lean)
 - [Line completeness](Line/PeriodicThreeDMLineCompleteness.lean)
 
-See the [repository organization guide](../../docs/organization.md) for the paper map, module migration, and validation commands.
+See the [repository overview](../../README.md#repository-organization) for the
+paper map and the [maintenance guide](../../docs/organization.md) for import
+migration and validation commands.

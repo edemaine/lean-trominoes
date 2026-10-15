@@ -44,23 +44,35 @@ completion is aperiodic: no nonzero translation preserves the completed tiling.
 
 ## Repository organization
 
-The library is organized by mathematical subject. The public root imports
-curated subject results; the verification batches jointly cover every local module.
+The library is organized by mathematical subject. The result and coverage tables
+below follow the paper's order.
 
-| Directory | Contents |
-| --- | --- |
-| [Graphs](LeanTrominoes/Graphs/README.md) | Periodic graph core, drawings and refinement, matching, and graph orientation |
-| [SAT](LeanTrominoes/SAT/README.md) | CNF, 3SAT, exact-one and planar SAT, 2SAT, and Horn algorithms |
-| [ThreeDM](LeanTrominoes/ThreeDM/README.md) | Three-dimensional matching, reductions, encodings, and completeness |
-| [Tiling](LeanTrominoes/Tiling/README.md) | Trominoes, polyominoes, polycubes, completion, and dominoes |
-| [Common](LeanTrominoes/Common/README.md) | Shared geometry, lists, arithmetic, and periodic constraints |
-| [Complexity](LeanTrominoes/Complexity/README.md) | Complexity interfaces, encodings, reductions, and certifications |
-| [Computation](LeanTrominoes/Computation/README.md) | Reusable machines, evaluators, encoders, and compiler combinators |
-| [Verification](LeanTrominoes/Verification/README.md) | Axiom audits and complete-library verification |
+| Directory | Contents | Paper material |
+| --- | --- | --- |
+| [Graphs](LeanTrominoes/Graphs/README.md) | `Core` and `Drawings`; `Orientation`; `Matching` | Section 2; Section 3 orientation; Section 4 matching |
+| [SAT](LeanTrominoes/SAT/README.md) | CNF, 3SAT, exact-one and planar SAT; `TwoSAT` and `Horn` algorithms | Section 3 reductions; Section 4 algorithms |
+| [ThreeDM](LeanTrominoes/ThreeDM/README.md) | Three-dimensional matching, reductions, encodings, and completeness | Section 3 planar 3DM |
+| [Tiling](LeanTrominoes/Tiling/README.md) | Trominoes, polyominoes, polycubes, completion, and dominoes | Section 5 |
+| [Common](LeanTrominoes/Common/README.md) | Shared geometry, lists, arithmetic, and periodic constraints | Shared infrastructure |
+| [Complexity](LeanTrominoes/Complexity/README.md) | Complexity interfaces, encodings, reductions, and certifications | Shared infrastructure |
+| [Computation](LeanTrominoes/Computation/README.md) | Reusable machines, evaluators, encoders, and compiler combinators | Shared infrastructure |
+| [Verification](LeanTrominoes/Verification/README.md) | Axiom audits and complete-library verification | Verification infrastructure |
 
-See [the organization guide](docs/organization.md) for the paper-to-directory map
-and [the module relocation map](data/module-relocations.json) for updated imports.
-Declaration namespaces and theorem names are preserved.
+Finite, line, plane, and slab variants stay with their mathematical subject.
+Specialized compilers stay with their reductions: the CNF-to-tromino strip
+compiler is in `Tiling/Tromino/Strip`, while SAT occurrence-splitting geometry
+is in `SAT/Planar/OccurrenceSplit`. Larger families have subdirectories for
+carriers, routes, raster requests, encodings, and finite certificates.
+
+The public root [LeanTrominoes.lean](LeanTrominoes.lean) imports each subject's
+`Results.lean`, collecting the previously exposed results. Orientation also has
+a [separate entry point](LeanTrominoes/Graphs/Orientation/Results.lean).
+The verification batches jointly cover every local module.
+
+Module paths changed during reorganization; declaration namespaces and theorem
+names are preserved. The [module relocation map](data/module-relocations.json)
+records updated imports. See [the maintenance guide](docs/organization.md) for
+import lookup, build and verification commands, and generator conventions.
 
 ## Main statements and proofs
 

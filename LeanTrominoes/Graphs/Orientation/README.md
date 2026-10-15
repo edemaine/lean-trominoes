@@ -11,4 +11,4 @@ Import `LeanTrominoes.Graphs.Orientation.Results` for the public results.
 - [Program-source finite encoding](Reduction/Program/ProgramGraphOrientationFiniteEncoding.lean)
 - [Results](Results.lean)
 - [Graph subjects](../README.md)
-- [Repository organization](../../../docs/organization.md)
+- [Repository organization](../../../README.md#repository-organization)

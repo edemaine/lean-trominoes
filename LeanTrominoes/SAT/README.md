@@ -14,4 +14,6 @@ Useful entry points:
 - [2SAT polynomial-time solver](TwoSAT/PeriodicTwoSATPolynomialTime.lean)
 - [Horn linear-time certificate](Horn/PeriodicHornLinearTime.lean)
 
-See the [repository organization guide](../../docs/organization.md) for the paper map, module migration, and validation commands.
+See the [repository overview](../../README.md#repository-organization) for the
+paper map and the [maintenance guide](../../docs/organization.md) for import
+migration and validation commands.

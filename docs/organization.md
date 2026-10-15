@@ -1,34 +1,10 @@
-# Repository organization
+# Module maintenance
 
-The module tree follows mathematical subjects. The paper's order is retained
-in the main README's result and coverage tables.
-
-| Paper material | Modules |
-| --- | --- |
-| Section 2: periodic graphs and drawings | `Graphs/Core`, `Graphs/Drawings` |
-| Section 3: SAT problems and reductions | `SAT` |
-| Section 3: planar 3DM | `ThreeDM` |
-| Section 3: trichromatic graph orientation | `Graphs/Orientation` |
-| Section 4: 2SAT and Horn algorithms | `SAT/TwoSAT`, `SAT/Horn` |
-| Section 4: graph matching algorithms | `Graphs/Matching` |
-| Section 5: tiling and completion | `Tiling` |
-
-Finite, line, plane, and slab variants remain with their mathematical subject.
-General computation infrastructure is in `Computation`; complexity interfaces
-and generic certification are in `Complexity`. Specialized compilers remain
-with the reductions they implement. In particular, the CNF-to-tromino strip
-compiler lives in `Tiling/Tromino/Strip`, while SAT-specific occurrence-splitting
-geometry lives in `SAT/Planar/OccurrenceSplit`.
-
-The largest families have further subdivisions for carriers, routes, raster
-requests, encodings, and finite certificates. Descriptive filenames are retained
-so existing searches and links remain recognizable.
+The [root README](../README.md#repository-organization) describes the subject
+layout, its correspondence to the paper, and the public entry points. This guide
+covers import migration, build and verification commands, and generators.
 
 ## Imports and declarations
-
-Each main subject has a `Results.lean` facade collecting the results previously
-exposed by the public root. `LeanTrominoes.lean` imports those facades. Orientation
-has an additional `Graphs/Orientation/Results.lean` entry point.
 
 File/module paths changed; declaration namespaces and theorem names did not.
 For example:

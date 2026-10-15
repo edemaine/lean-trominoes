@@ -11,4 +11,6 @@ Useful entry points:
 
 For an optional full fresh kernel replay after building, run `python scripts/check_module_layout.py --kernel`. This also rechecks imported foundations and can take hours and substantial memory.
 
-See the [repository organization guide](../../docs/organization.md) for the paper map, module migration, and validation commands.
+See the [repository overview](../../README.md#repository-organization) for the
+paper map and the [maintenance guide](../../docs/organization.md) for import
+migration and validation commands.

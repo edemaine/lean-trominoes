@@ -14,4 +14,6 @@ Useful entry points:
 - [Periodic matching solver](Matching/PeriodicMatchingSolver.lean)
 - [Period-one matching theorem](Matching/PeriodicMatchingPeriodOne.lean)
 
-See the [repository organization guide](../../docs/organization.md) for the paper map, module migration, and validation commands.
+See the [repository overview](../../README.md#repository-organization) for the
+paper map and the [maintenance guide](../../docs/organization.md) for import
+migration and validation commands.

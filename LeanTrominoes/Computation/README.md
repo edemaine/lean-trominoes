@@ -11,4 +11,6 @@ Useful entry points:
 - [Alphabet restriction](TM2/TM2FiniteAlphabetRestriction.lean)
 - [Sequential space composition](TM2/TM2SequentialSpace.lean)
 
-See the [repository organization guide](../../docs/organization.md) for the paper map, module migration, and validation commands.
+See the [repository overview](../../README.md#repository-organization) for the
+paper map and the [maintenance guide](../../docs/organization.md) for import
+migration and validation commands.
