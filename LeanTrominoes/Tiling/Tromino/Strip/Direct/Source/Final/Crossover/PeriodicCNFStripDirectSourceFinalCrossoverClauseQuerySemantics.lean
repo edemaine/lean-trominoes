@@ -1,0 +1,106 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.PeriodicCNFStripDirectRetainedFinalCrossoverClauseQueryData
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Clause.PeriodicCNFStripDirectSourceFinalClauseFamilies
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Formula.PeriodicCNFStripDirectSourceFormulaFacts
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Normalized.PeriodicCNFStripDirectSourceNormalizedFormula
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.PeriodicCNFStripDirectThreeCNFOccurrencePositiveOffsets
+import LeanTrominoes.SAT.Planar.OccurrenceSplit.AngularFan.Final.Copied.RetainedAngularFanFinalCopiedCrossoverClauseQuerySemantics
+import LeanTrominoes.SAT.Planar.OccurrenceSplit.AngularFan.Final.Copied.RetainedAngularFanFinalCopiedClauseQueryIndexedDirectnessPredicates
+import LeanTrominoes.SAT.Planar.OccurrenceSplit.AngularFan.Final.Direct.RetainedAngularFanFinalDirectCrossoverQueryDirectness
+
+/-! # Exact final crossover queries of the direct source -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicCNF PeriodicOrthocrossing
+open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
+open PeriodicEightOccurrenceSplit
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directFinalCrossoverQueryExactVariableDecidableEq :
+    DecidableEq Variable :=
+  directSourceVariableDecidableEq
+
+/-- The compiled crossover query prefix is the exact globally indexed
+query scan over the named crossover clause family. -/
+theorem directRetainedFinalCrossoverClauseQueries_eq_indexed
+    (symbols : List encoding.Γ) :
+    directRetainedFinalCrossoverClauseQueries decider symbols =
+      retainedFinalIndexedClauseQueriesFrom
+        (directSourceFormula decider symbols) 0
+        (directSourceFinalCrossoverClauses decider symbols) := by
+  let original := ProgramSource.formulaOfSymbols decider symbols
+  let source := PeriodicThreeCNF.formula original
+  let formula := PeriodicThreeSATThree.formula source
+  have sourceLocal : source.IsLocal :=
+    PeriodicThreeCNF.formula_isLocal
+      (formulaOfSymbols_sourceAdmissible decider symbols).2.1
+  have sourceWidth : source.WidthAtMost 3 :=
+    PeriodicThreeCNF.formula_widthAtMostThree original
+  have sourceClausesNonempty : ∀ clause ∈ source.clauses,
+      clause ≠ [] :=
+    PeriodicThreeCNF.formula_clausesNonempty original
+      (formulaOfSymbols_clauses_nonempty decider symbols)
+  have sourceEq : directSourceFormula decider symbols = formula := by
+    simpa only [formula, source, original] using
+      directSourceFormula_eq_threeSATThree decider symbols
+  have semantic :=
+    retainedFinalCrossoverClauseQueries_formula_eq
+      formula
+      (PeriodicThreeSATThree.formula_isLocal sourceLocal)
+      (PeriodicThreeSATThree.formula_widthAtMostThree sourceWidth)
+      (PeriodicThreeSATThree.formula_occurrencesAtMostThree_decidableEq
+        source)
+      (PeriodicThreeSATThree.formula_clausesNonempty
+        source sourceClausesNonempty)
+  unfold directRetainedFinalCrossoverClauseQueries
+    directSourceFinalCrossoverClauses
+    directThreeCNFSourceFormula
+  rw [sourceEq]
+  simpa only [formula, source, original] using semantic.symm
+
+/-- Consequently every exact indexed query in the crossover prefix is
+all-direct. -/
+theorem directSourceFinalIndexedCrossoverClauseQueries_allDirect
+    (symbols : List encoding.Γ) :
+    ∀ query ∈ retainedFinalIndexedClauseQueriesFrom
+        (directSourceFormula decider symbols) 0
+        (directSourceFinalCrossoverClauses decider symbols),
+      query.AllDirect := by
+  intro query queryMember
+  rw [← directRetainedFinalCrossoverClauseQueries_eq_indexed]
+    at queryMember
+  unfold directRetainedFinalCrossoverClauseQueries at queryMember
+  rcases List.mem_flatten.mp queryMember with
+    ⟨block, blockMember, queryMember⟩
+  have blockEq :
+      block = retainedFinalDirectCrossoverClauseQueries :=
+    (List.mem_replicate.mp blockMember).2
+  subst block
+  exact retainedFinalDirectCrossoverClauseQueries_allDirect
+    query queryMember
+
+/-- Predicate-packaged form of exact crossover query directness. -/
+theorem directSourceFinalIndexedCrossoverClauseQueriesAllDirect
+    (symbols : List encoding.Γ) :
+    FinalIndexedClauseQueriesAllDirect
+      (directSourceFormula decider symbols) 0
+      (directSourceFinalCrossoverClauses decider symbols) :=
+  ⟨directSourceFinalIndexedCrossoverClauseQueries_allDirect
+    decider symbols⟩
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

@@ -1,0 +1,21 @@
+import LeanTrominoes.ThreeDM.FiniteThreeDMSemantics
+import LeanTrominoes.ThreeDM.FiniteRetainedThreeDMOffsets
+import LeanTrominoes.ThreeDM.FiniteThreeDMContractionOffsets
+import LeanTrominoes.ThreeDM.FiniteRetainedFinalOffsets
+import LeanTrominoes.ThreeDM.FinitePlanarThreeDMOffsets
+import LeanTrominoes.ThreeDM.Line.PeriodicThreeDMPlanarLineCompleteness
+import LeanTrominoes.ThreeDM.Line.PeriodicThreeDMLineCompleteness
+import LeanTrominoes.ThreeDM.Line.PeriodicThreeDMLineDecision
+import LeanTrominoes.ThreeDM.Encoding.PeriodicThreeDMFlatEncoding
+import LeanTrominoes.ThreeDM.FixedPlanarThreeDMSeedCompleteness
+import LeanTrominoes.ThreeDM.Plane.PeriodicThreeDMPlaneCompleteness
+import LeanTrominoes.ThreeDM.Plane.PeriodicThreeDMLocalPlaneCompleteness
+import LeanTrominoes.ThreeDM.Reduction.FromSAT.PeriodicPlanarThreeDMContractedLocality
+import LeanTrominoes.ThreeDM.Reduction.FromSAT.PeriodicPlanarThreeDMIncidenceOffsets
+import LeanTrominoes.ThreeDM.Reduction.FromSAT.PeriodicPlanarThreeDMTerminalOffsets
+import LeanTrominoes.ThreeDM.PeriodicThreeDMContractionLocality
+
+/-! # ThreeDM results
+
+Curated entry point for the results formerly imported by `LeanTrominoes`.
+-/

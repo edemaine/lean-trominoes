@@ -1,10 +1,10 @@
 # Corollary 5.9: three connected polycubes by translation
 
 The target definitions are in
-[ThreeTranslationPolycubes.lean](../LeanTrominoes/ThreeTranslationPolycubes.lean).
+[ThreeTranslationPolycubes.lean](../LeanTrominoes/Tiling/Polycube/ThreeTranslationPolycubes.lean).
 The final proofs are `spaceProved`, `slabsProved`, and `proved` in namespace
 `LeanTrominoes.ThreeTranslationPolycubes`, exposed by
-[ThreeTranslationPolycubesProof.lean](../LeanTrominoes/ThreeTranslationPolycubesProof.lean).
+[ThreeTranslationPolycubesProof.lean](../LeanTrominoes/Tiling/Polycube/ThreeTranslationPolycubesProof.lean).
 
 Inputs explicitly list the variable polycube Q's voxels. The predicates
 reject empty or face-disconnected Q and allow only identity-symmetry
@@ -46,11 +46,11 @@ connectivity checker to prove co-r.e. membership.
 
 ## Validation
 
-`lake build +LeanTrominoes.ThreeTranslationPolycubesProof:olean` passed
+`lake build +LeanTrominoes.Tiling.Polycube.ThreeTranslationPolycubesProof:olean` passed
 (4738 jobs). The public import passed `lake env lean LeanTrominoes.lean`.
 The combined completeness theorem uses only `propext`, `Classical.choice`,
 and `Quot.sound`. All finite certificates use kernel reduction, and
-[axiom regression checks](../LeanTrominoes/AxiomAudit.lean) cover the final theorem.
+[axiom regression checks](../LeanTrominoes/Verification/AxiomAudit.lean) cover the final theorem.
 To inspect current dependencies, import the proof module and run
 `#print axioms LeanTrominoes.ThreeTranslationPolycubes.proved`.
 

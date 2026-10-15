@@ -1,0 +1,48 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Carrier.PeriodicCNFStripDirectSourceFinalCarrierStartUnfolding
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Carrier.PeriodicCNFStripDirectSourceFinalCarrierStartPublicUnfolding
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Carrier.PeriodicCNFStripDirectSourceFinalCarrierStartData
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Carrier.PeriodicCNFStripDirectSourceFinalCarrierStartEqualitySemantics
+
+/-! # Structural semantics of the final carrier start -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
+open PeriodicThreeSATThree
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directFinalCarrierStartSemanticsBaseDecidableEq :
+    DecidableEq (ThreeCNFVariable Nat) :=
+  Classical.decEq _
+
+local instance directFinalCarrierStartSemanticsVariableDecidableEq :
+    DecidableEq Variable :=
+  fiveFamilyNormalizedThreeOccurrenceDecidableEq
+
+/-- The named direct-source start and the generic final-carrier index start
+are propositionally equal without evaluating the crossover family. -/
+theorem directSourceFinalCarrierStart_structural
+    (symbols : List encoding.Γ) :
+    DirectSourceFinalCarrierStartStructural decider symbols := by
+  constructor
+  exact (directSourceFinalCarrierStart_raw decider symbols).eq.trans
+    ((directSourceFinalCarrierStart_unfolded decider symbols).eq.trans
+      (directSourceFinalCarrierStart_equalityIndependent
+        decider symbols).eq)
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

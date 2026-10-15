@@ -1,0 +1,55 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.SAT.CNF.FormulaShape.PeriodicCNFFormulaShapeRetainedPlanarMetadataCarrierGeometrySemantics
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Carrier.PeriodicCNFStripDirectSourceFinalCarrierFallbackRouteTailRecordData
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Formula.PeriodicCNFStripDirectSourceFormulaIncidenceDegree
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Retained.PeriodicCNFStripDirectSourceRetainedIncidencesNonempty
+
+/-! # Semantic links of direct-source carrier record geometries -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicCNF
+open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
+open PeriodicOrthocrossing
+open CarrierFallbackRouteTailRecords
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directFinalCarrierGeometrySemanticsVariableDecidableEq :
+    DecidableEq Variable :=
+  directSourceVariableDecidableEq
+
+/-- Direct normalized fallback record geometries are exactly the retained
+carrier-link geometries of the direct final source, in presentation order. -/
+theorem directSourceFinalCarrierFallbackRecordGeometries_eq_links
+    (symbols : List encoding.Γ) :
+    directSourceFinalCarrierFallbackRecordGeometries decider symbols =
+      (retainedDrawingCompleteCarrierLinks
+        (directSourceFormula decider symbols).incidenceGraph).map
+          (Geometry.ofLink (directSourceFormula decider symbols)) := by
+  unfold directSourceFinalCarrierFallbackRecordGeometries
+    directSourceFinalCarrierFallbackEntries
+  simpa only [routeDescriptorCarrierRankDatumsAtPeriod] using
+    numericCarrierGeometries_eq_links
+      (directSourceFormula decider symbols)
+      (PeriodicCNF.incidenceGraph_isWellFormed _)
+      (directSourceFormula_incidenceGraph_degreeAtMost decider symbols)
+      (by
+        unfold directSourceFormula
+        exact PeriodicCNF.incidenceGraph_isLocal (sourceFormula_isLocal _))
+      (directSource_incidencesWithMetadata_ne_nil decider symbols)
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

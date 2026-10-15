@@ -1,0 +1,40 @@
+{
+  "conflicts": {
+    "LeanTrominoes.PeriodicCNFStripReduction.instInhabitedClauseRibbonFanData": [
+      [
+        "LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Clause.PeriodicCNFStripDirectSourceFinalClauseFanCompiler",
+        "LeanTrominoes.Tiling.Tromino.Strip.Horizontal.PeriodicCNFStripHorizontalOccurrenceClauseFanComputability"
+      ]
+    ],
+    "LeanTrominoes.PeriodicCNFStripReduction.instInhabitedVariableRibbonFanData": [
+      [
+        "LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Grouped.PeriodicCNFStripDirectSourceFinalGroupedVariableFanSlotCompiler",
+        "LeanTrominoes.Tiling.Tromino.Strip.Horizontal.PeriodicCNFStripHorizontalOccurrenceVariableFanComputability"
+      ]
+    ],
+    "LeanTrominoes.PeriodicCNFStripReduction.instInhabitedWireColor": [
+      [
+        "LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Raster.PeriodicCNFStripDirectSourceFinalRasterColorCompiler",
+        "LeanTrominoes.Tiling.Tromino.Strip.Horizontal.PeriodicCNFStripHorizontalOccurrenceClauseCoordinatedRouteLaneComputability"
+      ]
+    ],
+    "LeanTrominoes.PeriodicOrthocrossing.RouteDescriptorPairAffine.Predicate.evalTokensComputableInPolyTime": [
+      [
+        "LeanTrominoes.Graphs.Drawings.Orthogonal.Route.PeriodicOrthocrossingRouteDescriptorPairAffineGuardedDirectionCompiler",
+        "LeanTrominoes.Graphs.Drawings.Orthogonal.Route.PeriodicOrthocrossingRouteDescriptorPairAffinePredicateCompiler"
+      ]
+    ],
+    "LeanTrominoes.PeriodicThreeDM.normalizeVertexPosition_add": [
+      [
+        "LeanTrominoes.Graphs.Orientation.Normalization.NormalizationRouteTranslation",
+        "LeanTrominoes.ThreeDM.PeriodicThreeDMVertexNormalizationRouteGeometry"
+      ]
+    ],
+    "LeanTrominoes.PeriodicThreeDM.stripRouteInteriorAssignments.match_1.congr_eq_1._sparseCasesOn_2": [
+      [
+        "LeanTrominoes.Graphs.Orientation.Normalization.PeriodicThreeDMNormalizationStripAssignmentComputability",
+        "LeanTrominoes.Tiling.Tromino.Strip.Direct.PeriodicCNFStripDirectSparseRouteRecordData"
+      ]
+    ]
+  }
+}

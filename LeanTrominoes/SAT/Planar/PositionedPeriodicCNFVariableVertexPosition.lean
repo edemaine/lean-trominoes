@@ -1,0 +1,41 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.Planar.PositionedPeriodicCNFIncidenceDrawing
+
+/-!
+# Variable-prefix vertex positions
+
+A named version of the variable-vertex position map used at the front of a
+positioned periodic CNF incidence drawing.  Naming this function lets
+separate modules share the map definition without forcing Lean to compare
+distinct generated helpers for identical inline pattern matches.
+-/
+
+namespace LeanTrominoes
+namespace PositionedPeriodicCNF
+
+/-- Position map on the variable-only prefix of the incidence vertex list. -/
+def incidenceVariableVertexPosition
+    {Variable : Type*}
+    (placement : PeriodicVariablePlacement Variable) :
+    CNFVertex Variable → Cell
+  | .variable atom => placement.position atom
+  | .clause _ => (0, 0)
+
+/-- Expose the incidence position list using the shared named variable-prefix
+map. -/
+theorem incidenceVertexPositions_eq_variablePrefix_append
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable) :
+    source.incidenceVertexPositions placement =
+      source.erase.incidenceVariableVertices.map
+          (incidenceVariableVertexPosition placement) ++
+        source.clauses.map (canonicalClausePosition placement) := by
+  rfl
+
+end PositionedPeriodicCNF
+end LeanTrominoes

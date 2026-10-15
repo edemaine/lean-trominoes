@@ -1,0 +1,93 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Clause.PeriodicCNFStripDirectSourceFinalClauseDescriptorSemantics
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Clause.PeriodicCNFStripDirectSourceFinalClauseFrameCompiler
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Grouped.PeriodicCNFStripDirectSourceFinalGroupedOccurrenceIndexSemantics
+import LeanTrominoes.Tiling.Tromino.Strip.Horizontal.PeriodicCNFStripHorizontalRoutedRouteHeaderFinalClauseParentIndexCompiler
+import LeanTrominoes.Computation.TM2.TM2EmptyAlphabetListInputCompiler
+import LeanTrominoes.Computation.Encoding.Unary.UnaryIndexedValueLookupCompiler
+
+/-! # Parent clause indices in grouped variable order -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open Computability Turing
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+/-- Zero-based actual final-clause index of every final occurrence in the
+original clause-major presentation. -/
+def directSourceFinalOccurrenceParentIndices
+    (symbols : List encoding.Γ) : List Nat :=
+  HorizontalRoutedRouteHeaderFinalClauseParentIndex.parentIndices
+    (directSourceFinalClauseDescriptors decider symbols)
+
+/-- Parent clause indices reordered beside the variable-major active
+occurrence stream. -/
+def directSourceFinalGroupedParentIndices
+    (symbols : List encoding.Γ) : List Nat :=
+  UnaryIndexedValueLookup.values
+    (directSourceFinalGroupedOccurrenceIndices decider symbols)
+    (directSourceFinalOccurrenceParentIndices decider symbols)
+
+@[simp] theorem directSourceFinalOccurrenceParentIndices_length
+    (symbols : List encoding.Γ) :
+    (directSourceFinalOccurrenceParentIndices decider symbols).length =
+      (directSourceFinalCompiledOccurrenceData decider symbols).length := by
+  unfold directSourceFinalOccurrenceParentIndices
+  rw [HorizontalRoutedRouteHeaderFinalClauseParentIndex.parentIndices_length]
+  change (directSourceFinalClauseFrames decider symbols).length = _
+  exact directSourceFinalClauseFrames_length decider symbols
+
+@[simp] theorem directSourceFinalGroupedParentIndices_length
+    (symbols : List encoding.Γ) :
+    (directSourceFinalGroupedParentIndices decider symbols).length =
+      (directSourceFinalUniqueFanQueryKeys decider symbols).length := by
+  unfold directSourceFinalGroupedParentIndices
+  rw [UnaryIndexedValueLookup.values_length,
+    directSourceFinalGroupedOccurrenceIndices_length]
+
+noncomputable def
+    directSourceFinalOccurrenceParentIndicesComputableInPolyTime :
+    TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
+      (directSourceFinalOccurrenceParentIndices decider) := by
+  unfold directSourceFinalOccurrenceParentIndices
+  exact TM2CompositionMachine.computableInPolyTime
+    (directSourceFinalClauseDescriptorsComputableInPolyTime decider)
+    HorizontalRoutedRouteHeaderFinalClauseParentIndex.parentIndicesComputableInPolyTime
+
+/-- Grouped parent-clause indices are polynomial-time computable from the
+direct source. -/
+noncomputable def
+    directSourceFinalGroupedParentIndicesComputableInPolyTime :
+    TM2ComputableInPolyTime id UnaryFieldEncoderMachine.unaryFields
+      (directSourceFinalGroupedParentIndices decider) := by
+  classical
+  exact if nonemptyAlphabet : Nonempty encoding.Γ then by
+    letI : Inhabited encoding.Γ := ⟨Classical.choice nonemptyAlphabet⟩
+    unfold directSourceFinalGroupedParentIndices
+    exact UnaryIndexedValueLookup.valuesComputableInPolyTime
+      id
+      (directSourceFinalGroupedOccurrenceIndices decider)
+      (directSourceFinalOccurrenceParentIndices decider)
+      (directSourceFinalGroupedOccurrenceIndicesComputableInPolyTime decider)
+      (directSourceFinalOccurrenceParentIndicesComputableInPolyTime decider)
+  else by
+    letI : IsEmpty encoding.Γ :=
+      ⟨fun symbol => nonemptyAlphabet ⟨symbol⟩⟩
+    exact TM2EmptyAlphabetListInputCompiler.computableInPolyTime
+      UnaryFieldEncoderMachine.unaryFields _
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

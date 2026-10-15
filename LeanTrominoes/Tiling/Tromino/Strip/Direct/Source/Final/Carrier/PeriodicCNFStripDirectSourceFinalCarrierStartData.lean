@@ -1,0 +1,44 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Carrier.PeriodicCNFStripDirectSourceFinalCarrierStartFamilyData
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Carrier.PeriodicCNFStripDirectSourceFinalCarrierEqualityData
+
+/-! # Structural final-carrier start certificates -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
+open PeriodicThreeSATThree
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directFinalCarrierStartDataBaseDecidableEq :
+    DecidableEq (ThreeCNFVariable Nat) :=
+  Classical.decEq _
+
+/-- Generic crossover-prefix length under structural final-variable equality. -/
+def directSourceFinalCarrierStructuralStart
+    (symbols : List encoding.Γ) : Nat :=
+  directSourceFinalCarrierStartFamily decider symbols
+    directSourceFinalStructuralVariableDecidableEq
+
+/-- Opaque certificate that the public carrier start uses the structural
+equality implementation of the generic crossover prefix. -/
+structure DirectSourceFinalCarrierStartStructural
+    (symbols : List encoding.Γ) : Prop where
+  eq : directSourceFinalCarrierStart decider symbols =
+    directSourceFinalCarrierStructuralStart decider symbols
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

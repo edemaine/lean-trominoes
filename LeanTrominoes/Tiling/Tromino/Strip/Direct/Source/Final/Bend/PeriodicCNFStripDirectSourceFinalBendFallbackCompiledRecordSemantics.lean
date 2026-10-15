@@ -1,0 +1,44 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Bend.PeriodicCNFStripDirectSourceFinalBendFallbackRecordRouteSemantics
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Bend.PeriodicCNFStripDirectSourceFinalBendFallbackRecordProfileSemantics
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Fallback.PeriodicCNFStripDirectSourceFinalFallbackRouteTailRecordCompiler
+
+/-! # Semantics of compiled bend fallback records -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+theorem directSourceFinalBendFallbackCompiledRecordInputTokens_eq
+    (symbols : List encoding.Γ) :
+    directSourceFinalBendFallbackCompiledRecordInputTokens decider symbols =
+      directSourceFinalBendFallbackRecordInputTokens decider symbols := by
+  unfold directSourceFinalBendFallbackCompiledRecordInputTokens
+    directSourceFinalBendFallbackRecordInputTokens
+  rw [directSourceFinalBendFallbackCompiledRecordProfiles_eq,
+    directSourceFinalBendFallbackRouteDirections_eq_blockRoutes]
+  exact BinaryRouteTailRecordProfileFraming.framed_blockProfiles_blockRoutes _
+
+theorem directSourceFinalBendFallbackCompiledRouteTailRecordTokens_eq
+    (symbols : List encoding.Γ) :
+    directSourceFinalBendFallbackCompiledRouteTailRecordTokens
+        decider symbols =
+      directSourceFinalBendFallbackRouteTailRecordTokens decider symbols := by
+  unfold directSourceFinalBendFallbackCompiledRouteTailRecordTokens
+  rw [directSourceFinalBendFallbackCompiledRecordInputTokens_eq,
+    directSourceFinalBendFallbackRecordFormatter_output]
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

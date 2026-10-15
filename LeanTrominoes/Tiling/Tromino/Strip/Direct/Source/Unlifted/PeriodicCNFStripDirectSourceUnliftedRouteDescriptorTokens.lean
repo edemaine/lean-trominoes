@@ -1,0 +1,39 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Lifted.PeriodicCNFStripDirectSourceLiftedRouteDescriptorTokens
+import LeanTrominoes.SAT.ThreeSAT.PeriodicThreeCNFLiftRenaming
+import LeanTrominoes.SAT.ThreeSAT.PeriodicThreeSATThreeFormulaRenaming
+
+/-! # Direct route tokens over the original flat CNF -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicCNF PeriodicOrthocrossing
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+/-- The exact direct-source route records can be emitted from the original
+flat natural-variable CNF, with neither 3CNF auxiliaries nor atom lifts. -/
+theorem directSourceRouteDescriptorTokens_eq_sourceSplitDescriptors
+    (symbols : List encoding.Γ) :
+    directSourceRouteDescriptorTokens decider symbols =
+      routeDescriptorTokens
+        (PeriodicThreeSATThree.splitRouteDescriptors
+          (ProgramSource.formulaOfSymbols decider symbols)) := by
+  rw [directSourceRouteDescriptorTokens_eq_liftedSource]
+  rw [PeriodicThreeCNF.liftFormula_eq_rename]
+  rw [PeriodicThreeSATThree.splitRouteDescriptors_rename_of_injective
+    (Sum.inl : Nat → ThreeCNFVariable Nat)
+    Sum.inl_injective]
+
+end LeanTrominoes.PeriodicCNFStripReduction

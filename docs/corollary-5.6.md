@@ -1,7 +1,7 @@
 # Corollary 5.6: three polyominoes by translation
 
 **Corollary 5.6 is proved** by `ThreeTranslationPolyominoes.proved` in
-[ThreeTranslationProof.lean](../LeanTrominoes/ThreeTranslationProof.lean): two fixed connected 15-ominoes (the horizontal
+[ThreeTranslationProof.lean](../LeanTrominoes/Tiling/Polyomino/ThreeTranslationProof.lean): two fixed connected 15-ominoes (the horizontal
 and vertical versions of P), and an input disconnected Q. Every placement
 must be a translation. The plane problem is co-r.e.-complete; the strip
 problem is PSPACE-complete under the same unary encoding as Theorem 5.5.
@@ -40,17 +40,17 @@ The final declarations are `planeProved`, `stripProved`, and `proved` in
 namespace `LeanTrominoes.ThreeTranslationPolyominoes`. `fixed_card`,
 `fixed_connected`, and `fixed_distinct` establish the two fixed tiles' properties.
 The target definitions are in
-[ThreeTranslationStatements.lean](../LeanTrominoes/ThreeTranslationStatements.lean).
+[ThreeTranslationStatements.lean](../LeanTrominoes/Tiling/Polyomino/ThreeTranslationStatements.lean).
 
 ## Validation
 
-`lake build +LeanTrominoes.ThreeTranslationProof:olean` completed
+`lake build +LeanTrominoes.Tiling.Polyomino.ThreeTranslationProof:olean` completed
 successfully (9880 jobs).
 
 The public import also passed `lake env lean LeanTrominoes.lean`.
 The combined completeness theorem uses only `propext`, `Classical.choice`,
 and `Quot.sound`. All finite certificates use kernel reduction, and
-[axiom regression checks](../LeanTrominoes/AxiomAudit.lean) cover the final theorem.
+[axiom regression checks](../LeanTrominoes/Verification/AxiomAudit.lean) cover the final theorem.
 To inspect current dependencies, import
 the proof module and run
 `#print axioms LeanTrominoes.ThreeTranslationPolyominoes.proved`.

@@ -1,0 +1,45 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.PeriodicCNFStripDirectExecutableFields
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.PeriodicCNFStripDirectSparseAssignmentData
+import LeanTrominoes.Graphs.Orientation.Normalization.PeriodicThreeDMNormalizationStripCompilerSize
+
+/-! # Exact periods of the direct sparse strip target -/
+
+noncomputable section
+
+namespace LeanTrominoes
+namespace PeriodicCNFStripReduction
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+@[simp] theorem directSparseCompiledTrominoStripOfSymbols_width
+    (tromino : Tromino) (symbols : List encoding.Γ) :
+    (directSparseCompiledTrominoStripOfSymbols decider tromino symbols).width =
+      6 * (directCompiledStripDrawingOfSymbols decider symbols).verticalPeriod := by
+  unfold directSparseCompiledTrominoStripOfSymbols
+    sparseCompiledTrominoStrip
+    PeriodicThreeDM.NormalizationCompiler.compileSparseStrip
+    directCompiledStripDrawingOfSymbols compiledStripDrawing
+  rw [PeriodicThreeDM.NormalizationCompiler.compileStrip_verticalPeriod]
+
+@[simp] theorem directSparseCompiledTrominoStripOfSymbols_period
+    (tromino : Tromino) (symbols : List encoding.Γ) :
+    (directSparseCompiledTrominoStripOfSymbols decider tromino symbols).period =
+      6 * (directCompiledStripDrawingOfSymbols decider symbols).horizontalPeriod := by
+  unfold directSparseCompiledTrominoStripOfSymbols
+    sparseCompiledTrominoStrip
+    PeriodicThreeDM.NormalizationCompiler.compileSparseStrip
+    directCompiledStripDrawingOfSymbols compiledStripDrawing
+  rw [PeriodicThreeDM.NormalizationCompiler.compileStrip_horizontalPeriod]
+
+end PeriodicCNFStripReduction
+end LeanTrominoes

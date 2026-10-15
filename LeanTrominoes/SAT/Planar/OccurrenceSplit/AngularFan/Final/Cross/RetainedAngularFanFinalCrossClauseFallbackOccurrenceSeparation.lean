@@ -1,0 +1,719 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.Planar.OccurrenceSplit.AngularFan.Final.Cross.RetainedAngularFanFinalCrossClauseFallbackBoundarySeparation
+import LeanTrominoes.SAT.Planar.OccurrenceSplit.AngularFan.Final.Cross.RetainedAngularFanFinalCrossClauseFallbackSuffixSeparation
+import LeanTrominoes.SAT.Planar.OccurrenceSplit.AngularFan.Final.Fallback.RetainedAngularFanFinalFallbackOccurrenceSeparation
+
+/-!
+# Completed cross-clause separation for final fallbacks
+
+For failed-selector routes in different final source clauses, the boundary
+splices, the two directed boundary/suffix pairings, and the two Figure 7
+suffixes are strictly separated.  This file joins those four certificates at
+the fan boundary for ordinary routes and, at distinct variable centers, for
+escaped routes, then transports the result to the public coordinated route
+family.
+-/
+
+namespace LeanTrominoes
+namespace PeriodicOrthocrossing
+
+open PeriodicEightOccurrenceSplit
+open PeriodicEightOccurrenceSplitPositioned
+open PeriodicThreeSATThree
+open OccurrenceSplitRing
+open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+
+set_option maxHeartbeats 8000000
+
+/-- The complete ordinary fallback occurrence routes of two genuine entries
+in different final source clauses are contact-free.  At distinct variable
+centers, the same certificate separates escaped/ordinary and escaped/escaped
+complete routes. -/
+theorem
+    retainedFinalCrossClauseOrdinaryFallbackExplicitOccurrenceRoutes_strictlyAvoid
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    (firstChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula firstClauseIndex firstLiteralIndex = none)
+    (secondChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula secondClauseIndex secondLiteralIndex = none)
+    (clauseIndicesDifferent :
+      firstClauseIndex ≠ secondClauseIndex) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let order := angularOccurrenceOrder source.erase routes
+    let firstScaledClause :=
+      firstClause.scale retainedAngularFanSourceClearanceFactor
+    let secondScaledClause :=
+      secondClause.scale retainedAngularFanSourceClearanceFactor
+    let firstRawRoute :=
+      finalCoordinatedSourceRoutes
+        formula firstClauseIndex firstLiteralIndex
+    let secondRawRoute :=
+      finalCoordinatedSourceRoutes
+        formula secondClauseIndex secondLiteralIndex
+    let firstRawTerminal :=
+      classifiedRetainedTerminalData
+        (routeTerminalVector firstRawRoute)
+    let secondRawTerminal :=
+      classifiedRetainedTerminalData
+        (routeTerminalVector secondRawRoute)
+    let firstRoute :=
+      scalePolyline retainedAngularFanSourceClearanceFactor
+        firstRawRoute
+    let secondRoute :=
+      scalePolyline retainedAngularFanSourceClearanceFactor
+        secondRawRoute
+    let firstTerminal :=
+      scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor firstRawTerminal
+    let secondTerminal :=
+      scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor secondRawTerminal
+    let firstSlot :=
+      retainedFinalCoordinatedOccurrenceSlot
+        formula firstLiteral firstClauseIndex firstLiteralIndex
+    let secondSlot :=
+      retainedFinalCoordinatedOccurrenceSlot
+        formula secondLiteral secondClauseIndex secondLiteralIndex
+    let firstPrefix :=
+      retainedAngularFanSplicedBoundaryRoute
+        firstRoute firstTerminal firstSlot
+    let secondPrefix :=
+      retainedAngularFanSplicedBoundaryRoute
+        secondRoute secondTerminal secondSlot
+    let firstEscapedPrefix :=
+      retainedAngularFanEscapedSplicedBoundaryRoute
+        firstRoute firstTerminal firstSlot
+    let secondEscapedPrefix :=
+      retainedAngularFanEscapedSplicedBoundaryRoute
+        secondRoute secondTerminal secondSlot
+    let firstSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement order
+          firstScaledClause firstLiteral
+          firstClauseIndex firstLiteralIndex)
+    let secondSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement order
+          secondScaledClause secondLiteral
+          secondClauseIndex secondLiteralIndex)
+    let firstCenter :=
+      PositionedPeriodicCNF.canonicalLiteralPosition
+        (finalCoordinatedPlacement formula)
+        firstClause firstLiteral
+    let secondCenter :=
+      PositionedPeriodicCNF.canonicalLiteralPosition
+        (finalCoordinatedPlacement formula)
+        secondClause secondLiteral
+    RoutesStrictlyAvoidEachOther
+        (joinAtEndpoint firstPrefix firstSuffix)
+        (joinAtEndpoint secondPrefix secondSuffix) ∧
+      (firstCenter ≠ secondCenter →
+        RoutesStrictlyAvoidEachOther
+          (joinAtEndpoint firstEscapedPrefix firstSuffix)
+          (joinAtEndpoint secondPrefix secondSuffix)) ∧
+      (firstCenter ≠ secondCenter →
+        RoutesStrictlyAvoidEachOther
+          (joinAtEndpoint firstEscapedPrefix firstSuffix)
+          (joinAtEndpoint secondEscapedPrefix secondSuffix)) := by
+  dsimp only
+  let source :=
+    (finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let placement :=
+    (finalCoordinatedPlacement formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let routes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes formula)
+  let order := angularOccurrenceOrder source.erase routes
+  let firstScaledClause :=
+    firstClause.scale retainedAngularFanSourceClearanceFactor
+  let secondScaledClause :=
+    secondClause.scale retainedAngularFanSourceClearanceFactor
+  let firstRawRoute :=
+    finalCoordinatedSourceRoutes
+      formula firstClauseIndex firstLiteralIndex
+  let secondRawRoute :=
+    finalCoordinatedSourceRoutes
+      formula secondClauseIndex secondLiteralIndex
+  let firstRawTerminal :=
+    classifiedRetainedTerminalData
+      (routeTerminalVector firstRawRoute)
+  let secondRawTerminal :=
+    classifiedRetainedTerminalData
+      (routeTerminalVector secondRawRoute)
+  let firstRoute :=
+    scalePolyline retainedAngularFanSourceClearanceFactor
+      firstRawRoute
+  let secondRoute :=
+    scalePolyline retainedAngularFanSourceClearanceFactor
+      secondRawRoute
+  let firstTerminal :=
+    scaleRetainedTerminalData
+      retainedAngularFanSourceClearanceFactor firstRawTerminal
+  let secondTerminal :=
+    scaleRetainedTerminalData
+      retainedAngularFanSourceClearanceFactor secondRawTerminal
+  let firstSlot :=
+    retainedFinalCoordinatedOccurrenceSlot
+      formula firstLiteral firstClauseIndex firstLiteralIndex
+  let secondSlot :=
+    retainedFinalCoordinatedOccurrenceSlot
+      formula secondLiteral secondClauseIndex secondLiteralIndex
+  let firstPrefix :=
+    retainedAngularFanSplicedBoundaryRoute
+      firstRoute firstTerminal firstSlot
+  let secondPrefix :=
+    retainedAngularFanSplicedBoundaryRoute
+      secondRoute secondTerminal secondSlot
+  let firstEscapedPrefix :=
+    retainedAngularFanEscapedSplicedBoundaryRoute
+      firstRoute firstTerminal firstSlot
+  let secondEscapedPrefix :=
+    retainedAngularFanEscapedSplicedBoundaryRoute
+      secondRoute secondTerminal secondSlot
+  let firstSuffix :=
+    scalePolyline retainedTerminalFanRoutingRefinement
+      (angularOccurrenceSuffix placement order
+        firstScaledClause firstLiteral
+        firstClauseIndex firstLiteralIndex)
+  let secondSuffix :=
+    scalePolyline retainedTerminalFanRoutingRefinement
+      (angularOccurrenceSuffix placement order
+        secondScaledClause secondLiteral
+        secondClauseIndex secondLiteralIndex)
+  let firstMiddle :=
+    Cell.scale retainedTerminalFanRoutingRefinement
+      (angularFanBoundaryPositionAt
+        placement firstLiteral.atom
+        (incidenceRelativeOffset firstScaledClause firstLiteral)
+        (angularOccurrenceIndex order
+          firstLiteral firstClauseIndex firstLiteralIndex))
+  let secondMiddle :=
+    Cell.scale retainedTerminalFanRoutingRefinement
+      (angularFanBoundaryPositionAt
+        placement secondLiteral.atom
+        (incidenceRelativeOffset secondScaledClause secondLiteral)
+        (angularOccurrenceIndex order
+          secondLiteral secondClauseIndex secondLiteralIndex))
+  have firstLength :
+      2 ≤ firstRawRoute.length := by
+    exact
+      finalCoordinatedSourceRoutes_length_ge_two
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty firstClauseMember firstLiteralMember
+  have secondLength :
+      2 ≤ secondRawRoute.length := by
+    exact
+      finalCoordinatedSourceRoutes_length_ge_two
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty secondClauseMember secondLiteralMember
+  have firstRouteLength :
+      2 ≤ firstRoute.length := by
+    simpa [firstRoute, scalePolyline] using firstLength
+  have secondRouteLength :
+      2 ≤ secondRoute.length := by
+    simpa [secondRoute, scalePolyline] using secondLength
+  have firstRouteClassified :
+      retainedTerminalDirectionClassify
+          (routeTerminalVector firstRoute) =
+        some firstTerminal := by
+    simpa [firstRoute, firstTerminal,
+      firstRawRoute, firstRawTerminal] using
+      finalCoordinatedScaledSourceRoute_classified
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty firstClauseMember firstLiteralMember
+  have secondRouteClassified :
+      retainedTerminalDirectionClassify
+          (routeTerminalVector secondRoute) =
+        some secondTerminal := by
+    simpa [secondRoute, secondTerminal,
+      secondRawRoute, secondRawTerminal] using
+      finalCoordinatedScaledSourceRoute_classified
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty secondClauseMember secondLiteralMember
+  have firstRawOrthogonal :
+      OrthogonalPolyline firstRawRoute := by
+    simpa [firstRawRoute] using
+      finalCoordinatedFallbackSourceRoute_orthogonal
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+        firstClauseMember firstLiteralMember firstChoiceNone
+  have secondRawOrthogonal :
+      OrthogonalPolyline secondRawRoute := by
+    simpa [secondRawRoute] using
+      finalCoordinatedFallbackSourceRoute_orthogonal
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+        secondClauseMember secondLiteralMember secondChoiceNone
+  have firstSpliceOrthogonal :
+      OrthogonalPolyline
+        (retainedAngularFanSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot) :=
+    retainedAngularFanSplicedBoundaryPolyline_orthogonal
+      firstRoute firstTerminal firstSlot
+      firstRouteLength firstRouteClassified
+      (by
+        simpa [firstRoute] using
+          firstRawOrthogonal.scalePolyline
+            retainedAngularFanSourceClearanceFactor_pos)
+  have secondSpliceOrthogonal :
+      OrthogonalPolyline
+        (retainedAngularFanSplicedBoundaryPolyline
+          secondRoute secondTerminal secondSlot) :=
+    retainedAngularFanSplicedBoundaryPolyline_orthogonal
+      secondRoute secondTerminal secondSlot
+      secondRouteLength secondRouteClassified
+      (by
+        simpa [secondRoute] using
+          secondRawOrthogonal.scalePolyline
+            retainedAngularFanSourceClearanceFactor_pos)
+  have prefixCertificates :=
+    retainedFinalCrossClauseFallbackOrdinaryBoundarySplices_strictlyAvoid
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember
+      firstChoiceNone secondChoiceNone clauseIndicesDifferent
+  have firstBoundarySuffixCertificates :=
+    retainedFinalCrossClauseOrdinaryBoundarySplice_strictlyAvoid_occurrenceSuffix
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember
+      firstChoiceNone clauseIndicesDifferent
+  have secondBoundarySuffixCertificates :=
+    retainedFinalCrossClauseOrdinaryBoundarySplice_strictlyAvoid_occurrenceSuffix
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+      secondClauseMember firstClauseMember
+      secondLiteralMember firstLiteralMember
+      secondChoiceNone (Ne.symm clauseIndicesDifferent)
+  have suffixesAvoid :=
+    retainedFinalCrossClauseOccurrenceSuffixes_strictlyAvoid
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember clauseIndicesDifferent
+  have firstPrefixEq :
+      firstPrefix =
+        retainedAngularFanSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot := by
+    simpa [firstPrefix,
+      retainedAngularFanSplicedBoundaryRoute] using
+      rasterizeRetainedPolyline_eq_of_orthogonal
+        firstSpliceOrthogonal
+  have secondPrefixEq :
+      secondPrefix =
+        retainedAngularFanSplicedBoundaryPolyline
+          secondRoute secondTerminal secondSlot := by
+    simpa [secondPrefix,
+      retainedAngularFanSplicedBoundaryRoute] using
+      rasterizeRetainedPolyline_eq_of_orthogonal
+        secondSpliceOrthogonal
+  have prefixesAvoid :
+      RoutesStrictlyAvoidEachOther firstPrefix secondPrefix := by
+    rw [firstPrefixEq, secondPrefixEq]
+    simpa [
+      firstRoute, secondRoute, firstTerminal, secondTerminal,
+      firstRawRoute, secondRawRoute,
+      firstRawTerminal, secondRawTerminal,
+      firstSlot, secondSlot] using prefixCertificates.1
+  have firstPrefixAvoidsSecondSuffix :
+      RoutesStrictlyAvoidEachOther firstPrefix secondSuffix := by
+    rw [firstPrefixEq]
+    simpa [
+      source, placement, routes, order,
+      firstScaledClause, secondScaledClause,
+      firstRoute, firstTerminal,
+      firstRawRoute, firstRawTerminal, firstSlot,
+      secondSuffix] using firstBoundarySuffixCertificates.1
+  have firstSuffixAvoidsSecondPrefix :
+      RoutesStrictlyAvoidEachOther firstSuffix secondPrefix := by
+    rw [secondPrefixEq]
+    simpa [
+      source, placement, routes, order,
+      firstScaledClause, secondScaledClause,
+      secondRoute, secondTerminal,
+      secondRawRoute, secondRawTerminal, secondSlot,
+      firstSuffix] using secondBoundarySuffixCertificates.1.symm
+  have suffixesAvoid' :
+      RoutesStrictlyAvoidEachOther firstSuffix secondSuffix := by
+    simpa [source, placement, routes, order,
+      firstScaledClause, secondScaledClause,
+      firstSuffix, secondSuffix] using suffixesAvoid
+  have firstEscapedValid :=
+    retainedFinalEscapedFallbackBoundaryPrefix_valid
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty firstClauseMember firstLiteralMember
+  have secondEscapedValid :=
+    retainedFinalEscapedFallbackBoundaryPrefix_valid
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty secondClauseMember secondLiteralMember
+  have firstEscapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength firstTerminal := by
+    simpa only [firstTerminal, firstRawTerminal, firstRawRoute] using
+      finalCoordinatedScaledSourceRoute_escapeFits
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty firstClauseMember firstLiteralMember
+  have secondEscapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength secondTerminal := by
+    simpa only [secondTerminal, secondRawTerminal, secondRawRoute] using
+      finalCoordinatedScaledSourceRoute_escapeFits
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty secondClauseMember secondLiteralMember
+  have firstEscapedSpliceOrthogonal :
+      OrthogonalPolyline
+        (retainedAngularFanEscapedSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot) :=
+    retainedAngularFanEscapedSplicedBoundaryPolyline_orthogonal
+      firstRoute firstTerminal firstSlot
+      firstRouteLength firstRouteClassified
+      (by
+        simpa only [firstRoute] using
+          firstRawOrthogonal.scalePolyline
+            retainedAngularFanSourceClearanceFactor_pos)
+      firstEscapeFits
+  have secondEscapedSpliceOrthogonal :
+      OrthogonalPolyline
+        (retainedAngularFanEscapedSplicedBoundaryPolyline
+          secondRoute secondTerminal secondSlot) :=
+    retainedAngularFanEscapedSplicedBoundaryPolyline_orthogonal
+      secondRoute secondTerminal secondSlot
+      secondRouteLength secondRouteClassified
+      (by
+        simpa only [secondRoute] using
+          secondRawOrthogonal.scalePolyline
+            retainedAngularFanSourceClearanceFactor_pos)
+      secondEscapeFits
+  have firstEscapedPrefixEq :
+      firstEscapedPrefix =
+        retainedAngularFanEscapedSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot := by
+    change
+      rasterizeRetainedPolyline
+          (retainedAngularFanEscapedSplicedBoundaryPolyline
+            firstRoute firstTerminal firstSlot) =
+        retainedAngularFanEscapedSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot
+    exact
+      rasterizeRetainedPolyline_eq_of_orthogonal
+        firstEscapedSpliceOrthogonal
+  have secondEscapedPrefixEq :
+      secondEscapedPrefix =
+        retainedAngularFanEscapedSplicedBoundaryPolyline
+          secondRoute secondTerminal secondSlot := by
+    change
+      rasterizeRetainedPolyline
+          (retainedAngularFanEscapedSplicedBoundaryPolyline
+            secondRoute secondTerminal secondSlot) =
+        retainedAngularFanEscapedSplicedBoundaryPolyline
+          secondRoute secondTerminal secondSlot
+    exact
+      rasterizeRetainedPolyline_eq_of_orthogonal
+        secondEscapedSpliceOrthogonal
+  have firstOrdinaryValid :=
+    retainedAngularFanSplicedBoundaryRoute_valid
+      firstRoute firstTerminal firstSlot
+      firstRouteLength firstRouteClassified
+      (by
+        simpa [firstRoute, firstRawRoute] using
+          finalCoordinatedScaledSourceRoute_retainedRay
+            formula sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty
+            firstClauseMember firstLiteralMember)
+      (by
+        simpa [firstRoute, firstRawRoute] using
+          finalCoordinatedScaledSourceRoute_head
+            formula sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty
+            firstClauseMember firstLiteralMember)
+  have secondOrdinaryValid :=
+    retainedAngularFanSplicedBoundaryRoute_valid
+      secondRoute secondTerminal secondSlot
+      secondRouteLength secondRouteClassified
+      (by
+        simpa [secondRoute, secondRawRoute] using
+          finalCoordinatedScaledSourceRoute_retainedRay
+            formula sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty
+            secondClauseMember secondLiteralMember)
+      (by
+        simpa [secondRoute, secondRawRoute] using
+          finalCoordinatedScaledSourceRoute_head
+            formula sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty
+            secondClauseMember secondLiteralMember)
+  have firstEscapedBoundary :
+      firstEscapedPrefix.getLast? = firstSuffix.head? := by
+    simpa [source, placement, routes, order,
+      firstScaledClause, firstRawRoute, firstRawTerminal,
+      firstSlot, firstRoute, firstTerminal,
+      firstEscapedPrefix, firstSuffix] using
+      retainedFinalEscapedFallbackOccurrenceRoute_boundary
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty firstClauseMember firstLiteralMember
+  have secondEscapedBoundary :
+      secondEscapedPrefix.getLast? = secondSuffix.head? := by
+    simpa [source, placement, routes, order,
+      secondScaledClause, secondRawRoute, secondRawTerminal,
+      secondSlot, secondRoute, secondTerminal,
+      secondEscapedPrefix, secondSuffix] using
+      retainedFinalEscapedFallbackOccurrenceRoute_boundary
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty secondClauseMember secondLiteralMember
+  have firstBoundary :
+      firstPrefix.getLast? = firstSuffix.head? := by
+    calc
+      firstPrefix.getLast? =
+          firstEscapedPrefix.getLast? := by
+        exact
+          firstOrdinaryValid.2.1.trans
+            (by
+              simpa [firstRawRoute, firstRawTerminal,
+                firstSlot, firstRoute, firstTerminal,
+                firstEscapedPrefix] using
+                firstEscapedValid.2.1.symm)
+      _ = firstSuffix.head? := firstEscapedBoundary
+  have secondBoundary :
+      secondPrefix.getLast? = secondSuffix.head? := by
+    calc
+      secondPrefix.getLast? =
+          secondEscapedPrefix.getLast? := by
+        exact
+          secondOrdinaryValid.2.1.trans
+            (by
+              simpa [secondRawRoute, secondRawTerminal,
+                secondSlot, secondRoute, secondTerminal,
+                secondEscapedPrefix] using
+                secondEscapedValid.2.1.symm)
+      _ = secondSuffix.head? := secondEscapedBoundary
+  have firstSuffixHead :
+      firstSuffix.head? = some firstMiddle := by
+    simp [firstSuffix, firstMiddle, scalePolyline]
+  have secondSuffixHead :
+      secondSuffix.head? = some secondMiddle := by
+    simp [secondSuffix, secondMiddle, scalePolyline]
+  have joinSeparated
+      (leftPrefix rightPrefix : List Cell)
+      (prefixesSeparated :
+        RoutesStrictlyAvoidEachOther leftPrefix rightPrefix)
+      (leftPrefixAvoidsRightSuffix :
+        RoutesStrictlyAvoidEachOther leftPrefix secondSuffix)
+      (leftSuffixAvoidsRightPrefix :
+        RoutesStrictlyAvoidEachOther firstSuffix rightPrefix)
+      (leftBoundary :
+        leftPrefix.getLast? = some firstMiddle)
+      (rightBoundary :
+        rightPrefix.getLast? = some secondMiddle) :
+      RoutesStrictlyAvoidEachOther
+        (joinAtEndpoint leftPrefix firstSuffix)
+        (joinAtEndpoint rightPrefix secondSuffix) := by
+    have leftPrefixAvoidsRightComplete :=
+      prefixesSeparated.join_right
+        leftPrefixAvoidsRightSuffix
+        rightBoundary secondSuffixHead
+    have leftSuffixAvoidsRightComplete :=
+      leftSuffixAvoidsRightPrefix.join_right
+        suffixesAvoid'
+        rightBoundary secondSuffixHead
+    exact
+      leftPrefixAvoidsRightComplete.join_left
+        leftSuffixAvoidsRightComplete
+        leftBoundary firstSuffixHead
+  have ordinarySeparated :
+      RoutesStrictlyAvoidEachOther
+        (joinAtEndpoint firstPrefix firstSuffix)
+        (joinAtEndpoint secondPrefix secondSuffix) :=
+    joinSeparated firstPrefix secondPrefix
+      prefixesAvoid firstPrefixAvoidsSecondSuffix
+      firstSuffixAvoidsSecondPrefix
+      (firstBoundary.trans firstSuffixHead)
+      (secondBoundary.trans secondSuffixHead)
+  constructor
+  · exact ordinarySeparated
+  constructor
+  · intro centersDifferent
+    have escapedPrefixesAvoid :
+        RoutesStrictlyAvoidEachOther
+          firstEscapedPrefix secondPrefix := by
+      rw [firstEscapedPrefixEq, secondPrefixEq]
+      simpa only [
+        firstRoute, secondRoute, firstTerminal, secondTerminal,
+        firstRawRoute, secondRawRoute,
+        firstRawTerminal, secondRawTerminal,
+        firstSlot, secondSlot] using
+          prefixCertificates.2.1 centersDifferent
+    have escapedPrefixAvoidsSecondSuffix :
+        RoutesStrictlyAvoidEachOther
+          firstEscapedPrefix secondSuffix := by
+      rw [firstEscapedPrefixEq]
+      simpa only [
+        source, placement, routes, order,
+        firstScaledClause, secondScaledClause,
+        firstRoute, firstTerminal,
+        firstRawRoute, firstRawTerminal, firstSlot,
+        secondSuffix] using
+          firstBoundarySuffixCertificates.2 centersDifferent
+    exact
+      joinSeparated firstEscapedPrefix secondPrefix
+        escapedPrefixesAvoid escapedPrefixAvoidsSecondSuffix
+        firstSuffixAvoidsSecondPrefix
+        (firstEscapedBoundary.trans firstSuffixHead)
+        (secondBoundary.trans secondSuffixHead)
+  · intro centersDifferent
+    have escapedPrefixesAvoid :
+        RoutesStrictlyAvoidEachOther
+          firstEscapedPrefix secondEscapedPrefix := by
+      rw [firstEscapedPrefixEq, secondEscapedPrefixEq]
+      simpa only [
+        firstRoute, secondRoute, firstTerminal, secondTerminal,
+        firstRawRoute, secondRawRoute,
+        firstRawTerminal, secondRawTerminal,
+        firstSlot, secondSlot] using
+          prefixCertificates.2.2 centersDifferent
+    have escapedPrefixAvoidsSecondSuffix :
+        RoutesStrictlyAvoidEachOther
+          firstEscapedPrefix secondSuffix := by
+      rw [firstEscapedPrefixEq]
+      simpa only [
+        source, placement, routes, order,
+        firstScaledClause, secondScaledClause,
+        firstRoute, firstTerminal,
+        firstRawRoute, firstRawTerminal, firstSlot,
+        secondSuffix] using
+          firstBoundarySuffixCertificates.2 centersDifferent
+    have firstSuffixAvoidsSecondEscapedPrefix :
+        RoutesStrictlyAvoidEachOther
+          firstSuffix secondEscapedPrefix := by
+      rw [secondEscapedPrefixEq]
+      simpa only [
+        source, placement, routes, order,
+        firstScaledClause, secondScaledClause,
+        secondRoute, secondTerminal,
+        secondRawRoute, secondRawTerminal, secondSlot,
+        firstSuffix] using
+          (secondBoundarySuffixCertificates.2
+            (Ne.symm centersDifferent)).symm
+    exact
+      joinSeparated firstEscapedPrefix secondEscapedPrefix
+        escapedPrefixesAvoid escapedPrefixAvoidsSecondSuffix
+        firstSuffixAvoidsSecondEscapedPrefix
+        (firstEscapedBoundary.trans firstSuffixHead)
+        (secondEscapedBoundary.trans secondSuffixHead)
+
+/-- In the non-singleton failed-selector branch, different genuine clauses of
+the public coordinated route family are strictly separated. -/
+theorem
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_crossClause_strictlyAvoid_of_choices_none_of_prefix_lengths_ne_one
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    (firstChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula firstClauseIndex firstLiteralIndex = none)
+    (secondChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula secondClauseIndex secondLiteralIndex = none)
+    (firstPrefixLengthNeOne :
+      (finalCoordinatedSourceRoutes
+        formula firstClauseIndex firstLiteralIndex).dropLast.length ≠ 1)
+    (secondPrefixLengthNeOne :
+      (finalCoordinatedSourceRoutes
+        formula secondClauseIndex secondLiteralIndex).dropLast.length ≠ 1)
+    (clauseIndicesDifferent :
+      firstClauseIndex ≠ secondClauseIndex) :
+    RoutesStrictlyAvoidEachOther
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula firstClauseIndex firstLiteralIndex)
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula secondClauseIndex secondLiteralIndex) := by
+  rw [
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none_of_prefix_length_ne_one
+      formula firstClauseIndex firstLiteralIndex
+      firstChoiceNone firstPrefixLengthNeOne,
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_eq_explicitOccurrenceJoin
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty firstClauseMember firstLiteralMember,
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none_of_prefix_length_ne_one
+      formula secondClauseIndex secondLiteralIndex
+      secondChoiceNone secondPrefixLengthNeOne,
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_eq_explicitOccurrenceJoin
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty secondClauseMember secondLiteralMember]
+  exact
+    (retainedFinalCrossClauseOrdinaryFallbackExplicitOccurrenceRoutes_strictlyAvoid
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember
+      firstChoiceNone secondChoiceNone clauseIndicesDifferent).1
+
+end PeriodicOrthocrossing
+end LeanTrominoes

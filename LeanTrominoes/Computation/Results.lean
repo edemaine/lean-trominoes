@@ -1,0 +1,16 @@
+import LeanTrominoes.Computation.Encoding.Unary.UnaryColumnBoundedSignedDifference
+import LeanTrominoes.Computation.Encoding.Unary.UnaryColumnChoiceCompiler
+import LeanTrominoes.Computation.Encoding.Unary.UnaryColumnDenseLookupCompiler
+import LeanTrominoes.Computation.Encoding.Unary.UnaryColumnFilterCompiler
+import LeanTrominoes.Computation.Encoding.Unary.UnaryColumnFiveCompiler
+import LeanTrominoes.Computation.Encoding.Unary.UnaryColumnOrdinalCompiler
+import LeanTrominoes.Computation.Encoding.Bool.BoolCoherentCount
+import LeanTrominoes.Computation.Encoding.Encoded.EncodedUnaryColumnCountCompiler
+import LeanTrominoes.Computation.Encoding.Encoded.EncodedUnaryColumnLogicCompiler
+import LeanTrominoes.Computation.Encoding.Encoded.EncodedUnaryColumnLookupCompiler
+import LeanTrominoes.Computation.Encoding.Unary.UnaryAllOnesCompiler
+
+/-! # Computation results
+
+Curated entry point for the results formerly imported by `LeanTrominoes`.
+-/

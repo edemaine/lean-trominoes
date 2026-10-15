@@ -1,0 +1,42 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.PeriodicCNFStripDirectPreparedTokenData
+import LeanTrominoes.Tiling.Tromino.Gadgets.GadgetPixelFiniteTokenCompiler
+
+/-! # Machine bridge from prepared geometric tokens to counted tokens -/
+
+noncomputable section
+
+namespace LeanTrominoes
+namespace PeriodicCNFStripReduction
+
+open Computability Turing
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+/-- A polynomial-time prepared-stream emitter composes with the fixed affine
+expander to produce the required counted-token emitter. -/
+def directCompiledTrominoStripCountedTokenEmitterOfPreparedEmitter
+    (tromino : Tromino)
+    (emitter :
+      TM2ComputableInPolyTime id id
+        (directCompiledTrominoStripPreparedTokensOfSymbols
+          decider tromino)) :
+    TM2ComputableInPolyTime id id
+      (directCompiledTrominoStripCountedTokensOfSymbols
+        decider tromino) := by
+  exact GadgetPixelFiniteTokenCompiler.computableInPolyTimeOfEmitter emitter
+    (fun symbols =>
+      expand_directCompiledTrominoStripPreparedTokensOfSymbols
+        decider tromino symbols)
+
+end PeriodicCNFStripReduction
+end LeanTrominoes

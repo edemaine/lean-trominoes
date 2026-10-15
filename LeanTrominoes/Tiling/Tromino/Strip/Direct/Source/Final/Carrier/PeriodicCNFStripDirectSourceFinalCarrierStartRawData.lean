@@ -1,0 +1,34 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Occurrence.PeriodicCNFStripDirectSourceFinalOccurrenceAtomCodeFamilies
+
+/-! # Raw crossover-prefix start of direct final carriers -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+/-- The raw duplicate-free crossover-prefix length under the original direct
+variable equality. -/
+def directSourceFinalCarrierRawStart
+    (symbols : List encoding.Γ) : Nat :=
+  (@crossoverMetadataNormalizedClausesDedup Variable
+    directSourceVariableDecidableEq
+      (PeriodicThreeSATThree.formula
+        (directThreeCNFSourceFormula decider symbols))).length
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

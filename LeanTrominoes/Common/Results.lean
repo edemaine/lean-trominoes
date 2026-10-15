@@ -1,0 +1,29 @@
+import LeanTrominoes.Common.Geometry.GridSegmentVerticalCore
+import LeanTrominoes.Common.Geometry.GridSegmentScaledIntegerNeighborhood
+import LeanTrominoes.Common.Geometry.GridSegmentVerticalCoreInterior
+import LeanTrominoes.Common.Geometry.GridSegmentLocalCellContact
+import LeanTrominoes.Common.Geometry.GridPolylinePerturbationSimplicity
+import LeanTrominoes.Common.Geometry.GridPolylineRealEndpointMap
+import LeanTrominoes.Common.Geometry.GridPolylineRealListedPointContacts
+import LeanTrominoes.Common.Geometry.GridPolylineRealPointUniqueness
+import LeanTrominoes.Common.Geometry.GridPolylineRealSegmentContacts
+import LeanTrominoes.Common.Geometry.GridSegmentCollinearIntervals
+import LeanTrominoes.Common.Geometry.GridSegmentCollinearSeparation
+import LeanTrominoes.Common.Geometry.GridSegmentDirectionPerturbation
+import LeanTrominoes.Common.Geometry.GridSegmentIntegerSeparator
+import LeanTrominoes.Common.Geometry.GridSegmentNonparallelSeparation
+import LeanTrominoes.Common.Geometry.GridSegmentPerturbationContacts
+import LeanTrominoes.Common.Geometry.GridSegmentPerturbationTranslation
+import LeanTrominoes.Common.Geometry.GridSegmentRayContacts
+import LeanTrominoes.Common.Geometry.GridSegmentSeparatingAxes
+import LeanTrominoes.Common.Geometry.GridSegmentSharedEndpointCriterion
+import LeanTrominoes.Common.Geometry.GridPolylineRealJoinSimple
+import LeanTrominoes.Common.Geometry.GridPolylineRealReplacementContacts
+import LeanTrominoes.Common.Geometry.GridPolylineRealRouteChain
+import LeanTrominoes.Common.Geometry.GridPolylineRealRouteChainClosure
+import LeanTrominoes.Common.Geometry.GridPolylineRealRouteChainTranslation
+
+/-! # Common results
+
+Curated entry point for the results formerly imported by `LeanTrominoes`.
+-/

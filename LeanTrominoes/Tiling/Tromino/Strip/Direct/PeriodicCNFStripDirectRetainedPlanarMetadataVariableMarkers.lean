@@ -1,0 +1,56 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.PeriodicCNFStripDirectRetainedPlanarMetadataDirectionDescriptorBlockData
+import LeanTrominoes.SAT.CNF.FormulaShape.PeriodicCNFFormulaShapeRetainedPlanarMetadataVariableEnumeration
+
+/-! # Canonical direct retained metadata variable markers -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicCNF PeriodicOrthocrossing
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directRetainedVariableMarkersDecidableEq :
+    DecidableEq Variable := Classical.decEq _
+
+/-- On direct PSPACE source symbols, the abstract distinct-variable marker
+suffix is exactly one marker per canonical retained periodic variable. -/
+theorem directRetainedPlanarMetadataVariableMarkers_eq_retainedVariables
+    (symbols : List encoding.Γ) :
+    directRetainedPlanarMetadataVariableMarkers decider symbols =
+      List.replicate
+        (retainedDrawingPeriodicPlanarSATVariables
+          (sourceFormula
+            (ProgramSource.formulaOfSymbols decider symbols))).length
+        .variable := by
+  unfold directRetainedPlanarMetadataVariableMarkers
+  refine Eq.trans ?_
+    (@FormulaShapeRetainedPlanarMetadataDirection.variableMarkers_eq_replicate_retainedVariables
+      Variable (Classical.decEq Variable)
+      (sourceFormula (ProgramSource.formulaOfSymbols decider symbols)) ?_ ?_ ?_ ?_)
+  · exact congrArg
+      (fun equality : DecidableEq Variable =>
+        @FormulaShapeRetainedPlanarMetadataDirection.variableMarkers
+          Variable equality
+          (sourceFormula (ProgramSource.formulaOfSymbols decider symbols)))
+      (Subsingleton.elim _ _)
+  · exact sourceFormula_occurrencesAtMostThree_canonicalBEq _
+  · exact PeriodicCNF.incidenceGraph_isWellFormed _
+  · exact PeriodicCNF.incidenceGraph_degreeAtMost
+      (sourceFormula_widthAtMostThree _)
+      (sourceFormula_occurrencesAtMostThree_canonicalBEq _)
+  · exact PeriodicCNF.incidenceGraph_isLocal
+      (sourceFormula_isLocal _)
+
+end LeanTrominoes.PeriodicCNFStripReduction

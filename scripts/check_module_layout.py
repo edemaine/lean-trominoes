@@ -1,0 +1,294 @@
+"""Check module paths, dependency coverage, and the mechanical reorganization."""
+
+from pathlib import Path
+import argparse
+import collections
+import json
+import re
+import os
+import shutil
+import subprocess
+import tarfile
+
+ROOT = Path(__file__).resolve().parent.parent
+HEADER = re.compile(r"^((?:(?:public|private|meta)\s+)?import\s+)([^\n]+)", re.M)
+NAME = re.compile(r"LeanTrominoes(?:\.[A-Za-z0-9_]+)+")
+ALL = "LeanTrominoes.Verification.All"
+ISOLATED = "LeanTrominoes.Verification.Isolated."
+
+
+def verification_roots(files):
+    return [ALL] + sorted(name for name in files if name.startswith(ISOLATED))
+
+
+def lake_executable():
+    toolchain = (ROOT / "lean-toolchain").read_text(encoding="utf-8").strip()
+    toolchain = toolchain.replace("/", "--").replace(":", "---")
+    native = Path.home() / ".elan/toolchains" / toolchain / "bin" / ("lake.exe" if os.name == "nt" else "lake")
+    return str(native) if native.exists() else shutil.which("lake") or "lake"
+
+
+def refresh_conflicts(files):
+    folder = ROOT / "tmp/module-declarations"
+    folder.mkdir(parents=True, exist_ok=True)
+    modules = sorted(set(files) - set(verification_roots(files)))
+    owners = {}
+    conflicts = {}
+    for start in range(0, len(modules), 256):
+        listing, output = folder / "input.tsv", folder / "output.json"
+        listing.write_text("".join(name + "\t" + str(ROOT / ".lake/build/lib/lean" /
+            (name.replace(".", "/") + ".olean")) + "\n"
+            for name in modules[start:start + 256]), encoding="utf-8", newline="\n")
+        result = subprocess.run([lake_executable(), "env", "lean", "--run",
+            "scripts/module_declarations.lean", str(listing), str(output)],
+            cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
+        if result.returncode:
+            raise RuntimeError(result.stdout + result.stderr)
+        for module, declarations in json.loads(output.read_text(encoding="utf-8")).items():
+            for name, signature in declarations:
+                previous = owners.setdefault(name, [])
+                for owner, old_signature in previous:
+                    if owner != module and (signature is None or signature != old_signature):
+                        conflicts.setdefault(name, []).append([owner, module])
+                previous.append((module, signature))
+        print(f"Scanned {min(start + 256, len(modules))}/{len(modules)} modules; "
+              f"{len(conflicts)} potentially incompatible names.", flush=True)
+    (ROOT / "data/verification-conflicts.json").write_text(
+        json.dumps({"conflicts": dict(sorted(conflicts.items()))}, indent=2) + "\n",
+        encoding="utf-8", newline="\n")
+    print(f"Recorded {len(conflicts)} potentially incompatible declaration names.")
+
+
+def write_verification(files, deps):
+    generated = set(verification_roots(files))
+    included = {name: items - generated for name, items in deps.items() if name not in generated}
+    sequence = order(included)
+    indices = {name: 1 << i for i, name in enumerate(sequence)}
+    conflicts = json.loads((ROOT / "data/verification-conflicts.json").read_text(encoding="utf-8"))["conflicts"]
+    incompatible = collections.defaultdict(int)
+    for pairs in conflicts.values():
+        for first, second in pairs:
+            assert {first, second} <= indices.keys(), "Refresh declaration conflicts after moving modules."
+            incompatible[first] |= indices[second]
+            incompatible[second] |= indices[first]
+    closure, blocked = {}, {}
+    for name in sequence:
+        closure[name], blocked[name] = indices[name], incompatible[name]
+        for imported in included[name]:
+            closure[name] |= closure[imported]
+            blocked[name] |= blocked[imported]
+        assert not closure[name] & blocked[name], f"Incompatible declarations inside {name}"
+    targets = set(included) - set().union(*included.values())
+    targets = sorted(targets, key=lambda n: (n != "LeanTrominoes", n != "LeanTrominoes.Verification.AxiomAudit", n))
+    groups, masks = [], []
+    for name in targets:
+        for i, mask in enumerate(masks):
+            if not mask & blocked[name]:
+                groups[i].append(name)
+                masks[i] |= closure[name]
+                break
+        else:
+            groups.append([name])
+            masks.append(closure[name])
+    directory = ROOT / "LeanTrominoes/Verification/Isolated"
+    directory.mkdir(exist_ok=True)
+    wanted = set()
+    for i, group in enumerate(groups):
+        target = ROOT / "LeanTrominoes/Verification/All.lean" if i == 0 else directory / f"Batch{i + 1:03d}.lean"
+        wanted.add(target)
+        target.write_text("\n".join("import " + name for name in group)
+            + f"\n\n/-! # Library verification batch {i + 1} of {len(groups)}\n\n"
+              "Generated by scripts/check_module_layout.py --write-all.\n"
+              "All batches together cover the complete local library.\n"
+              "Independent legacy helpers with duplicate names stay in separate environments.\n-/\n",
+            encoding="utf-8", newline="\n")
+    for path in directory.glob("Batch*.lean"):
+        if path not in wanted:
+            assert path.parent.resolve() == directory.resolve()
+            assert "Generated by scripts/check_module_layout.py" in path.read_text(encoding="utf-8")
+            path.unlink()
+    print(f"Generated {len(groups)} compatible verification batches.")
+
+
+def inventory():
+    files = {p.relative_to(ROOT).with_suffix("").as_posix().replace("/", "."): p
+             for p in (ROOT / "LeanTrominoes").rglob("*.lean")}
+    files["LeanTrominoes"] = ROOT / "LeanTrominoes.lean"
+    deps = {}
+    for name, path in files.items():
+        imports = [word for match in HEADER.finditer(path.read_text(encoding="utf-8"))
+                   for word in match[2].split() if word == "LeanTrominoes"
+                   or word.startswith("LeanTrominoes.")]
+        missing = set(imports) - files.keys()
+        assert not missing, f"{path.relative_to(ROOT)}: missing imports {missing}"
+        deps[name] = set(imports)
+    return files, deps
+
+
+def order(deps):
+    remaining = {name: len(items) for name, items in deps.items()}
+    users = collections.defaultdict(set)
+    for name, items in deps.items():
+        for dep in items:
+            users[dep].add(name)
+    ready = collections.deque(sorted(name for name, count in remaining.items() if count == 0))
+    result = []
+    while ready:
+        name = ready.popleft()
+        result.append(name)
+        for user in sorted(users[name]):
+            remaining[user] -= 1
+            if remaining[user] == 0:
+                ready.append(user)
+    assert len(result) == len(deps), f"Import cycle: {[n for n, c in remaining.items() if c][:20]}"
+    return result
+
+
+def module_lists(text, mapping):
+    return re.sub(
+        r"(let\s+\w*[Mm]odules\s*:\s*List Name\s*:=\s*\[)(.*?)(\])",
+        lambda m: m[1] + NAME.sub(lambda n: mapping.get(n[0], n[0]), m[2]) + m[3],
+        text, flags=re.S)
+
+
+def code(text):
+    """Discard imports, comments, and insignificant whitespace; preserve strings."""
+    text = HEADER.sub("", text)
+    out = []
+    i = 0
+    while i < len(text):
+        if text.startswith("/-", i):
+            depth = 1
+            i += 2
+            while depth:
+                assert i < len(text), "Unclosed Lean comment"
+                if text.startswith("/-", i):
+                    depth += 1
+                    i += 2
+                elif text.startswith("-/", i):
+                    depth -= 1
+                    i += 2
+                else:
+                    i += 1
+            out.append(" ")
+        elif text.startswith("--", i):
+            i = text.find("\n", i)
+            if i < 0:
+                break
+            out.append(" ")
+        elif text[i] == '"':
+            start = i
+            i += 1
+            while i < len(text):
+                if text[i] == "\\":
+                    i += 2
+                elif text[i] == '"':
+                    i += 1
+                    break
+                else:
+                    i += 1
+            # Keep literal whitespace significant when normalizing surrounding code.
+            out.append('"' + text[start:i].encode('utf-8').hex() + '"')
+        else:
+            out.append(text[i])
+            i += 1
+    return " ".join("".join(out).split())
+
+
+def inner(text):
+    value = code(text)
+    assert value.startswith("namespace LeanTrominoes ")
+    assert value.endswith(" end LeanTrominoes")
+    return value[len("namespace LeanTrominoes "):-len(" end LeanTrominoes")]
+
+
+def check_baseline(files, mapping, revision):
+    inverse = {new: old for old, new in mapping.items()}
+    originals = {}
+    process = subprocess.Popen(
+        ["git", "archive", revision, "LeanTrominoes"], cwd=ROOT, stdout=subprocess.PIPE)
+    assert process.stdout is not None
+    count = 0
+    with tarfile.open(fileobj=process.stdout, mode="r|") as archive:
+        for member in archive:
+            if not member.isfile() or not member.name.endswith(".lean"):
+                continue
+            stream = archive.extractfile(member)
+            assert stream is not None
+            old = member.name[:-5].replace("/", ".")
+            previous = stream.read().decode("utf-8")
+            current = files[mapping[old]].read_text(encoding="utf-8")
+            if old in {"LeanTrominoes.PeriodicGraph", "LeanTrominoes.PeriodicGraphCoreData"}:
+                originals[old] = previous
+            else:
+                if old == "LeanTrominoes.AxiomAudit":
+                    current = module_lists(current, inverse)
+                assert code(previous) == code(current), f"Declaration body changed: {old}"
+            count += 1
+    assert process.wait() == 0
+    assert count == len(mapping)
+    for old, generic in [
+        ("LeanTrominoes.PeriodicGraph", "LeanTrominoes.Graphs.Core.PeriodicGraph"),
+        ("LeanTrominoes.PeriodicGraphCoreData", "LeanTrominoes.Graphs.Core.PeriodicGraphCoreData"),
+    ]:
+        before = inner(originals[old])
+        after = (inner(files[generic].read_text(encoding="utf-8")) + " "
+                 + inner(files[mapping[old]].read_text(encoding="utf-8")))
+        assert before == after, f"Graph/SAT extraction changed declarations: {old}"
+    print(f"Preserved declaration bodies and namespaces in all {count} relocated modules.")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--baseline", action="store_true", help="Compare declarations with the recorded Git baseline.")
+    parser.add_argument("--write-all", action="store_true", help="Regenerate the complete verification import entry point.")
+    parser.add_argument("--refresh-conflicts", action="store_true", help="Read current OLeans to refresh verification batch separations.")
+    parser.add_argument("--kernel", action="store_true", help="Replay every verification batch in a fresh kernel environment.")
+    parser.add_argument("--lookup", metavar="MODULE", help="Print the current import name for a legacy module.")
+    args = parser.parse_args()
+    metadata = json.loads((ROOT / "data/module-relocations.json").read_text(encoding="utf-8"))
+    mapping = metadata["modules"]
+    if args.lookup:
+        name = mapping.get(args.lookup, args.lookup)
+        path = ROOT / (name.replace(".", "/") + ".lean")
+        if not path.exists():
+            parser.error(f"Unknown module: {args.lookup}")
+        print(name)
+        return
+    files, deps = inventory()
+    order(deps)
+    if args.refresh_conflicts:
+        refresh_conflicts(files)
+    if args.write_all:
+        write_verification(files, deps)
+        files, deps = inventory()
+        order(deps)
+    assert set(mapping.values()) <= files.keys()
+    assert not list((ROOT / "LeanTrominoes").glob("*.lean")), "Flat legacy modules remain."
+    for name in files:
+        legacy = deps[name] & mapping.keys()
+        assert not legacy, f"{name}: legacy imports {legacy}"
+    covered = set()
+    pending = verification_roots(files)
+    while pending:
+        name = pending.pop()
+        if name not in covered:
+            covered.add(name)
+            pending.extend(deps[name])
+    assert covered == files.keys(), f"Verification misses modules: {sorted(files.keys()-covered)}"
+    print(f"Validated {len(files)} modules: imports resolve, no cycles or legacy paths, complete verification coverage.")
+    if args.baseline:
+        check_baseline(files, mapping, metadata["baseline_commit"])
+    if args.kernel:
+        env = os.environ.copy()
+        env["LEAN_NUM_THREADS"] = "1"
+        for name in verification_roots(files):
+            print(f"Fresh kernel replay: {name}", flush=True)
+            subprocess.run([lake_executable(), "env", "leanchecker", "--fresh", name],
+                           cwd=ROOT, env=env, check=True,
+                           creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
+
+
+if __name__ == "__main__":
+    main()

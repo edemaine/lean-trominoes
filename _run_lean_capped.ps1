@@ -12,7 +12,10 @@ $outLog = [IO.Path]::GetTempFileName()
 $errLog = [IO.Path]::GetTempFileName()
 try {
   $arguments = @('env', 'lean', '-j', '1',
-    '-DrelaxedAutoImplicit=false', '-o', $Output, $Source)
+    '-DrelaxedAutoImplicit=false',
+    '-Dbackward.isDefEq.respectTransparency=false',
+    '-DmaxHeartbeats=2000000', '-DmaxRecDepth=10000',
+    '-o', $Output, $Source)
   $startArguments = @{
     FilePath = $LakeExecutable
     ArgumentList = $arguments

@@ -1,0 +1,35 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.Complexity.Complexity
+import LeanTrominoes.Tiling.Periodic.Periodic
+import LeanTrominoes.Tiling.Periodic.PeriodicStripFlatEncoding
+import LeanWang.Final
+
+/-!
+# Theorem 5.2 target
+
+This file records the exact proposition to be proved and deliberately contains
+only definitions, not a proof of any part of the target.
+-/
+
+namespace LeanTrominoes.Theorem52
+
+/-- The 2D assertion of Theorem 5.2, separately for each tromino. -/
+def planeStatement : Prop :=
+  ∀ tromino : Tromino, LeanWang.CoREComplete (PeriodicTrominoTiling tromino)
+
+/-- The 1.5D assertion of Theorem 5.2, separately for each tromino. -/
+def stripStatement : Prop :=
+  ∀ tromino : Tromino,
+    Complexity.PSPACEComplete
+      PeriodicStripFlatEncoding.finEncoding
+      (PeriodicStripTrominoTiling tromino)
+
+/-- The complete formal target corresponding to Theorem 5.2. -/
+def statement : Prop :=
+  planeStatement ∧ stripStatement
+
+end LeanTrominoes.Theorem52

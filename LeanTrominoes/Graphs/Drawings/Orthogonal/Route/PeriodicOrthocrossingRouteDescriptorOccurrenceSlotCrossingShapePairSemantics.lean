@@ -1,0 +1,138 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.Graphs.Drawings.Orthogonal.Route.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotCrossingShapePairIndexSemantics
+import LeanTrominoes.Graphs.Drawings.Orthogonal.Route.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotFieldValueSemantics
+import LeanTrominoes.Graphs.Drawings.Orthogonal.Route.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotPairProjectionSemantics
+import LeanTrominoes.Graphs.Drawings.Orthogonal.Route.PeriodicOrthocrossingRouteDescriptorPairAffineCrossingCompiler
+import LeanTrominoes.Graphs.Drawings.Orthogonal.Route.PeriodicOrthocrossingRouteDescriptorPairAffineCrossingScanLocalSemantics
+
+/-! # Exact semantics of one route-shape slot crossing scan -/
+
+namespace LeanTrominoes.PeriodicOrthocrossing
+namespace RouteDescriptorOccurrenceSlotCrossing
+
+open RouteDescriptorOccurrenceSlotBinaryWords
+open RouteDescriptorOccurrenceSlotPairFieldTags
+open RouteDescriptorPairAffine
+
+/-- For the selected route-shape pair, the full slot predicate keeps its
+unique indexed affine occurrence pair exactly when that pair is a canonical
+oriented crossing. -/
+theorem filter_routeShapePairCrossingSlots_evalTokens_of_matches
+    (shapes : RouteShape × RouteShape)
+    (pair : TaggedDescriptor × TaggedDescriptor)
+    (firstMatches : shapes.1.Matches pair.1.1)
+    (secondMatches : shapes.2.Matches pair.2.1) :
+    (routeShapePairCrossingSlots shapes).filter (fun slot =>
+      slot.evalTokens (descriptorSlotPairTokens pair)) =
+      match
+        shapes.1.paddedOccurrenceAtSlot .first pair.1.2,
+        shapes.2.paddedOccurrenceAtSlot .second pair.2.2
+      with
+      | some first, some second =>
+          if canonicalOrientedOccurrencePairLinearAtPeriod
+              pair.1.1.gridSize
+              (first.evalPair .first (pair.1.1, pair.2.1),
+                second.evalPair .second (pair.1.1, pair.2.1))
+          then
+            [{ descriptorPredicate :=
+                  guardedCrossingPredicate shapes (first, second)
+               occurrences := (first, second)
+               firstSlot := pair.1.2.val
+               secondSlot := pair.2.2.val }]
+          else []
+      | _, _ => [] := by
+  have filterEq :
+      (routeShapePairCrossingSlots shapes).filter (fun slot =>
+        slot.evalTokens (descriptorSlotPairTokens pair)) =
+        ((routeShapePairCrossingSlots shapes).filter (fun slot =>
+          decide (pair.1.2.val = slot.firstSlot) &&
+            decide (pair.2.2.val = slot.secondSlot))).filter fun slot =>
+              slot.descriptorPredicate.evalTokens
+                (descriptorTokens (descriptorSlotPairTokens pair)) := by
+    rw [List.filter_filter]
+    apply congrArg
+      (fun predicate : Slot → Bool =>
+        (routeShapePairCrossingSlots shapes).filter predicate)
+    funext slot
+    unfold Slot.evalTokens
+    rw [slotValue_descriptorSlotPairTokens,
+      slotValue_descriptorSlotPairTokens]
+    simp only
+      [Bool.and_assoc, Bool.and_comm, Bool.and_left_comm]
+  rw [filterEq, filter_routeShapePairCrossingSlots_indices]
+  cases firstLookup :
+      shapes.1.paddedOccurrenceAtSlot .first pair.1.2 with
+  | none => rfl
+  | some first =>
+      cases secondLookup :
+          shapes.2.paddedOccurrenceAtSlot .second pair.2.2 with
+      | none => rfl
+      | some second =>
+          simp only [List.filter_cons, List.filter_nil]
+          have enabled :
+              routeShapePairEnabled
+                  (RouteDescriptorPairFieldTags.descriptorPairTokens
+                    (pair.1.1, pair.2.1)) shapes = true :=
+            (routeShapePairEnabled_descriptorPairTokens
+              shapes (pair.1.1, pair.2.1)).2
+                ⟨firstMatches, secondMatches⟩
+          rw [guardedCrossingPredicate_evalTokens,
+            descriptorTokens_descriptorSlotPairTokens,
+            enabled, Bool.true_and]
+          rw [evalTokens_crossingPredicate]
+
+/-- An active slot in a selected shape-pair scan carries occurrence
+templates from those shapes, horizontal first and vertical second. -/
+theorem Slot.occurrence_members_axes_of_active
+    (shapes : RouteShape × RouteShape)
+    (pair : TaggedDescriptor × TaggedDescriptor)
+    (firstMatches : shapes.1.Matches pair.1.1)
+    (secondMatches : shapes.2.Matches pair.2.1)
+    (slot : Slot)
+    (slotMember : slot ∈ routeShapePairCrossingSlots shapes)
+    (active : slot.evalTokens (descriptorSlotPairTokens pair) = true) :
+    (slot.occurrences.1 ∈ shapes.1.occurrences .first ∧
+      slot.occurrences.2 ∈ shapes.2.occurrences .second) ∧
+    ((slot.occurrences.1.evalPair .first
+        (pair.1.1, pair.2.1)).1.segment.IsHorizontal ∧
+      (slot.occurrences.2.evalPair .second
+        (pair.1.1, pair.2.1)).1.segment.IsVertical) := by
+  unfold routeShapePairCrossingSlots at slotMember
+  rcases List.mem_map.mp slotMember with
+    ⟨tagged, taggedMember, slotEq⟩
+  subst slot
+  have occurrenceMembers := List.mem_product.mp taggedMember
+  have descriptorActive :
+      (guardedCrossingPredicate shapes
+        (tagged.1.1, tagged.2.1)).evalTokens
+          (descriptorTokens (descriptorSlotPairTokens pair)) = true := by
+    simp only [Slot.evalTokens, Bool.and_eq_true] at active
+    exact active.1.1
+  have enabled :
+      routeShapePairEnabled
+          (RouteDescriptorPairFieldTags.descriptorPairTokens
+            (pair.1.1, pair.2.1)) shapes = true :=
+    (routeShapePairEnabled_descriptorPairTokens
+      shapes (pair.1.1, pair.2.1)).2
+        ⟨firstMatches, secondMatches⟩
+  rw [descriptorTokens_descriptorSlotPairTokens,
+    guardedCrossingPredicate_evalTokens, enabled, Bool.true_and,
+    evalTokens_crossingPredicate] at descriptorActive
+  have canonicalActive :
+      canonicalOrientedOccurrencePairAtPeriod pair.1.1.gridSize
+          (tagged.1.1.evalPair .first (pair.1.1, pair.2.1),
+            tagged.2.1.evalPair .second (pair.1.1, pair.2.1)) = true := by
+    rw [canonicalOrientedOccurrencePairAtPeriod_eq_linear]
+    exact descriptorActive
+  exact ⟨
+    ⟨List.fst_mem_of_mem_zipIdx occurrenceMembers.1,
+      List.fst_mem_of_mem_zipIdx occurrenceMembers.2⟩,
+    axes_of_canonicalOrientedOccurrencePairAtPeriod
+      pair.1.1.gridSize _ canonicalActive⟩
+
+end RouteDescriptorOccurrenceSlotCrossing
+end LeanTrominoes.PeriodicOrthocrossing

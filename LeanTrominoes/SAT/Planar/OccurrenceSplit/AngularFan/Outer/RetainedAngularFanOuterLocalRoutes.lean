@@ -1,0 +1,511 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.Planar.OccurrenceSplit.AngularFan.Outer.RetainedAngularFanOuterCollarSeparatedRoutes
+
+/-!
+# Complete finite routes through the retained angular fan
+
+The separated outer collar ends at exactly the head of the previously
+certified refined fan route.  This file joins those two finite pieces,
+yielding a radius-288 lane-port route all the way to the matching refined
+Figure 7 boundary site.
+
+In addition to separation within each piece family, a finite certificate
+checks that every collar route strictly avoids every different slot's inner
+fan route.  The four resulting pairwise combinations compose into strict
+continuous separation of the complete local routes.  Finally the whole
+certificate is translated to an arbitrary retained variable center.
+-/
+
+namespace LeanTrominoes
+namespace PeriodicEightOccurrenceSplit
+
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 10000
+
+open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+
+private theorem collarFanBoxes_case0 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.east) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.east)) firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem collarFanBoxes_case1 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.left) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.left)) firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem collarFanBoxes_case2 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.southeast) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southeast)) firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem collarFanBoxes_case3 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.south) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.south)) firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem collarFanBoxes_case4 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.right) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.right)) firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem collarFanBoxes_case5 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.southwest) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.southwest)) firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem collarFanBoxes_case6 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.west) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.west)) firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem collarFanBoxes_case7 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.northwest) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northwest)) firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem collarFanBoxes_case8 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.north) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.north)) firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem collarFanBoxes_case9 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.northeast) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanOuterCollarSeparatedRoute (.compass (.northeast)) firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem collarFanBoxes_case10 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.middle) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanOuterCollarSeparatedRoute (.routedClause (.middle)) firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+/-- An earlier outer collar route strictly avoids a later
+order-compatible complete inner fan route. -/
+theorem retainedTerminalFanOuterCollarRoute_strictlyAvoid_laterFanRoute :
+    ∀ (firstDirection secondDirection :
+        RetainedTerminalDirection)
+      (firstSlot secondSlot : RetainedTerminalSlot),
+      firstDirection.angularRank ≤ secondDirection.angularRank →
+      firstSlot.val < secondSlot.val →
+        RoutesStrictlyAvoidEachOther
+          (retainedTerminalFanOuterCollarSeparatedRoute
+            firstDirection firstSlot)
+          (retainedTerminalFanRefinedRoute
+            secondDirection secondSlot) := by
+  intro firstDirection secondDirection firstSlot secondSlot directionsLe slotsLt
+  have checked :
+      ∀ secondDirection firstSlot secondSlot,
+        firstDirection.angularRank ≤ secondDirection.angularRank →
+        firstSlot.val < secondSlot.val →
+          segmentBoxesSeparateCheck
+            (retainedTerminalFanOuterCollarSeparatedRoute firstDirection firstSlot)
+            (retainedTerminalFanRefinedRoute secondDirection secondSlot) = true := by
+    cases firstDirection with
+    | compass port =>
+      cases port with
+      | east => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using collarFanBoxes_case0
+      | southeast => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using collarFanBoxes_case2
+      | south => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using collarFanBoxes_case3
+      | southwest => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using collarFanBoxes_case5
+      | west => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using collarFanBoxes_case6
+      | northwest => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using collarFanBoxes_case7
+      | north => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using collarFanBoxes_case8
+      | northeast => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using collarFanBoxes_case9
+    | routedClause arm =>
+      cases arm with
+      | left => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using collarFanBoxes_case1
+      | right => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using collarFanBoxes_case4
+      | middle => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using collarFanBoxes_case10
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked secondDirection firstSlot secondSlot directionsLe slotsLt)
+
+private theorem fanCollarBoxes_case0 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.east) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanRefinedRoute (.compass (.east)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem fanCollarBoxes_case1 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.left) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanRefinedRoute (.routedClause (.left)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem fanCollarBoxes_case2 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.southeast) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanRefinedRoute (.compass (.southeast)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem fanCollarBoxes_case3 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.south) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanRefinedRoute (.compass (.south)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem fanCollarBoxes_case4 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.right) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanRefinedRoute (.routedClause (.right)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem fanCollarBoxes_case5 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.southwest) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanRefinedRoute (.compass (.southwest)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem fanCollarBoxes_case6 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.west) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanRefinedRoute (.compass (.west)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem fanCollarBoxes_case7 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.northwest) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanRefinedRoute (.compass (.northwest)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem fanCollarBoxes_case8 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.north) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanRefinedRoute (.compass (.north)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem fanCollarBoxes_case9 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.compass (.northeast) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanRefinedRoute (.compass (.northeast)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+private theorem fanCollarBoxes_case10 :
+    (finiteAll fun secondDirection : RetainedTerminalDirection =>
+      finiteAll fun firstSlot : RetainedTerminalSlot => finiteAll fun secondSlot : RetainedTerminalSlot =>
+        guardedCheck ((.routedClause (.middle) : RetainedTerminalDirection).angularRank ≤ secondDirection.angularRank ∧
+          firstSlot.val < secondSlot.val)
+          (segmentBoxesSeparateCheck (retainedTerminalFanRefinedRoute (.routedClause (.middle)) firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot))) = true := by
+  decide +kernel
+
+/-- An earlier complete inner fan route strictly avoids a later
+order-compatible outer collar route. -/
+theorem retainedTerminalFanRefinedRoute_strictlyAvoid_laterOuterCollar :
+    ∀ (firstDirection secondDirection :
+        RetainedTerminalDirection)
+      (firstSlot secondSlot : RetainedTerminalSlot),
+      firstDirection.angularRank ≤ secondDirection.angularRank →
+      firstSlot.val < secondSlot.val →
+        RoutesStrictlyAvoidEachOther
+          (retainedTerminalFanRefinedRoute
+            firstDirection firstSlot)
+          (retainedTerminalFanOuterCollarSeparatedRoute
+            secondDirection secondSlot) := by
+  intro firstDirection secondDirection firstSlot secondSlot directionsLe slotsLt
+  have checked :
+      ∀ secondDirection firstSlot secondSlot,
+        firstDirection.angularRank ≤ secondDirection.angularRank →
+        firstSlot.val < secondSlot.val →
+          segmentBoxesSeparateCheck
+            (retainedTerminalFanRefinedRoute firstDirection firstSlot)
+            (retainedTerminalFanOuterCollarSeparatedRoute secondDirection secondSlot) = true := by
+    cases firstDirection with
+    | compass port =>
+      cases port with
+      | east => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using fanCollarBoxes_case0
+      | southeast => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using fanCollarBoxes_case2
+      | south => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using fanCollarBoxes_case3
+      | southwest => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using fanCollarBoxes_case5
+      | west => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using fanCollarBoxes_case6
+      | northwest => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using fanCollarBoxes_case7
+      | north => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using fanCollarBoxes_case8
+      | northeast => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using fanCollarBoxes_case9
+    | routedClause arm =>
+      cases arm with
+      | left => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using fanCollarBoxes_case1
+      | right => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using fanCollarBoxes_case4
+      | middle => simpa only [finiteAll_eq_true, guardedCheck_eq_true, and_imp] using fanCollarBoxes_case10
+  exact routesStrictlyAvoidEachOther_of_segmentBoxesCheck _ _
+    (checked secondDirection firstSlot secondSlot directionsLe slotsLt)
+
+/-- Complete finite local route from one radius-288 lane port through the
+outer collar and the refined fan to its Figure 7 boundary site. -/
+def retainedTerminalFanOuterLocalRoute
+    (direction : RetainedTerminalDirection)
+    (slot : RetainedTerminalSlot) : List Cell :=
+  joinAtEndpoint
+    (retainedTerminalFanOuterCollarSeparatedRoute direction slot)
+    (retainedTerminalFanRefinedRoute direction slot)
+
+/-- Every complete local route starts at its exact radius-288 lane port. -/
+@[simp]
+theorem retainedTerminalFanOuterLocalRoute_head?
+    (direction : RetainedTerminalDirection)
+    (slot : RetainedTerminalSlot) :
+    (retainedTerminalFanOuterLocalRoute direction slot).head? =
+      some
+        (retainedTerminalFanOuterLanePortOffset
+          direction slot) := by
+  exact joinAtEndpoint_head?
+    (retainedTerminalFanOuterCollarSeparatedRoute_head?
+      direction slot)
+
+/-- Every complete local route ends at its matching refined Figure 7
+boundary site. -/
+@[simp]
+theorem retainedTerminalFanOuterLocalRoute_getLast?
+    (direction : RetainedTerminalDirection)
+    (slot : RetainedTerminalSlot) :
+    (retainedTerminalFanOuterLocalRoute direction slot).getLast? =
+      some
+        (Cell.scale retainedTerminalFanRoutingRefinement
+          (angularFanBoundaryOffset slot.val)) := by
+  exact joinAtEndpoint_getLast?
+    (retainedTerminalFanOuterCollarSeparatedRoute_getLast?
+      direction slot)
+    (retainedTerminalFanRefinedRoute_head? direction slot)
+    (retainedTerminalFanRefinedRoute_getLast? direction slot)
+
+/-- Every complete finite local route is orthogonal. -/
+theorem retainedTerminalFanOuterLocalRoute_orthogonal
+    (direction : RetainedTerminalDirection)
+    (slot : RetainedTerminalSlot) :
+    PeriodicOrthocrossing.OrthogonalPolyline
+      (retainedTerminalFanOuterLocalRoute direction slot) := by
+  exact
+    (retainedTerminalFanOuterCollarSeparatedRoute_orthogonal
+      direction slot).joinAtEndpoint
+      (retainedTerminalFanRefinedRoute_orthogonal direction slot)
+      (retainedTerminalFanOuterCollarSeparatedRoute_getLast?
+        direction slot)
+      (retainedTerminalFanRefinedRoute_head? direction slot)
+
+/-- Every complete local route stays inside the radius-288 frame. -/
+theorem retainedTerminalFanOuterLocalRoute_points_within_outer_frame :
+    ∀ (direction : RetainedTerminalDirection)
+      (slot : RetainedTerminalSlot) (point : Cell),
+      point ∈ retainedTerminalFanOuterLocalRoute direction slot →
+        WithinCoordinateRadius 288 (0, 0) point := by
+  have checked : (finiteAll fun direction : RetainedTerminalDirection =>
+      finiteAll fun slot : RetainedTerminalSlot =>
+        (retainedTerminalFanOuterLocalRoute direction slot).all
+          fun point => decide (WithinCoordinateRadius 288 (0, 0) point)) = true := by
+    decide +kernel
+  simpa only [finiteAll_eq_true, List.all_eq_true, decide_eq_true_eq] using checked
+
+/-- Every complete local route stays outside the refined Figure 7
+interior. -/
+theorem retainedTerminalFanOuterLocalRoute_points_outside_fan :
+    ∀ (direction : RetainedTerminalDirection)
+      (slot : RetainedTerminalSlot) (point : Cell),
+      point ∈ retainedTerminalFanOuterLocalRoute direction slot →
+        ¬ WithinCoordinateRadius
+          (12 * retainedTerminalFanRoutingRefinement - 1)
+          (0, 0) point := by
+  have checked : (finiteAll fun direction : RetainedTerminalDirection =>
+      finiteAll fun slot : RetainedTerminalSlot =>
+        (retainedTerminalFanOuterLocalRoute direction slot).all
+          fun point => decide (¬ WithinCoordinateRadius (12 * retainedTerminalFanRoutingRefinement - 1) (0, 0) point)) = true := by
+    decide +kernel
+  simpa only [finiteAll_eq_true, List.all_eq_true, decide_eq_true_eq] using checked
+
+/-- Order-compatible complete local routes are strictly separated. -/
+theorem retainedTerminalFanOuterLocalRoutes_strictlyAvoidEachOther
+    (firstDirection secondDirection : RetainedTerminalDirection)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (directionsLe :
+      firstDirection.angularRank ≤ secondDirection.angularRank)
+    (slotsLt : firstSlot.val < secondSlot.val) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterLocalRoute
+        firstDirection firstSlot)
+      (retainedTerminalFanOuterLocalRoute
+        secondDirection secondSlot) := by
+  have collarAvoidCollar :=
+    retainedTerminalFanOuterCollarSeparatedRoutes_strictlyAvoid
+      firstDirection secondDirection firstSlot secondSlot
+      directionsLe slotsLt
+  have collarAvoidSecondFan :=
+    retainedTerminalFanOuterCollarRoute_strictlyAvoid_laterFanRoute
+      firstDirection secondDirection firstSlot secondSlot
+      directionsLe slotsLt
+  have firstFanAvoidCollar :=
+    retainedTerminalFanRefinedRoute_strictlyAvoid_laterOuterCollar
+      firstDirection secondDirection firstSlot secondSlot
+      directionsLe slotsLt
+  have fanAvoidFan :=
+    retainedTerminalFanRefinedRoutes_strictlyAvoidEachOther
+      firstDirection secondDirection firstSlot secondSlot
+      directionsLe slotsLt
+  have completeFirstAvoidCollar :=
+    collarAvoidCollar.join_left firstFanAvoidCollar
+      (retainedTerminalFanOuterCollarSeparatedRoute_getLast?
+        firstDirection firstSlot)
+      (retainedTerminalFanRefinedRoute_head?
+        firstDirection firstSlot)
+  have completeFirstAvoidFan :=
+    collarAvoidSecondFan.join_left fanAvoidFan
+      (retainedTerminalFanOuterCollarSeparatedRoute_getLast?
+        firstDirection firstSlot)
+      (retainedTerminalFanRefinedRoute_head?
+        firstDirection firstSlot)
+  exact completeFirstAvoidCollar.join_right
+    completeFirstAvoidFan
+    (retainedTerminalFanOuterCollarSeparatedRoute_getLast?
+      secondDirection secondSlot)
+    (retainedTerminalFanRefinedRoute_head?
+      secondDirection secondSlot)
+
+/-- Translate a complete finite local route to an arbitrary variable
+center. -/
+def retainedTerminalFanOuterLocalRouteAt
+    (center : Cell)
+    (direction : RetainedTerminalDirection)
+    (slot : RetainedTerminalSlot) : List Cell :=
+  (retainedTerminalFanOuterLocalRoute direction slot).map
+    (Cell.add center)
+
+/-- A positioned complete route starts at its positioned radius-288 lane
+port. -/
+@[simp]
+theorem retainedTerminalFanOuterLocalRouteAt_head?
+    (center : Cell)
+    (direction : RetainedTerminalDirection)
+    (slot : RetainedTerminalSlot) :
+    (retainedTerminalFanOuterLocalRouteAt
+      center direction slot).head? =
+        some
+          (retainedTerminalFanOuterLanePort
+            center direction slot) := by
+  simp [retainedTerminalFanOuterLocalRouteAt,
+    retainedTerminalFanOuterLanePort]
+
+/-- A positioned complete route ends at its positioned refined Figure 7
+boundary site. -/
+@[simp]
+theorem retainedTerminalFanOuterLocalRouteAt_getLast?
+    (center : Cell)
+    (direction : RetainedTerminalDirection)
+    (slot : RetainedTerminalSlot) :
+    (retainedTerminalFanOuterLocalRouteAt
+      center direction slot).getLast? =
+        some
+          (Cell.add center
+            (Cell.scale retainedTerminalFanRoutingRefinement
+              (angularFanBoundaryOffset slot.val))) := by
+  simp [retainedTerminalFanOuterLocalRouteAt]
+
+/-- Positioning preserves orthogonality of a complete finite local route. -/
+theorem retainedTerminalFanOuterLocalRouteAt_orthogonal
+    (center : Cell)
+    (direction : RetainedTerminalDirection)
+    (slot : RetainedTerminalSlot) :
+    PeriodicOrthocrossing.OrthogonalPolyline
+      (retainedTerminalFanOuterLocalRouteAt
+        center direction slot) := by
+  exact
+    OccurrenceSplitRing.PeriodicOrthocrossing.OrthogonalPolyline.map_add
+      (retainedTerminalFanOuterLocalRoute_orthogonal direction slot)
+      center
+
+/-- Positioned order-compatible complete local routes remain strictly
+separated. -/
+theorem retainedTerminalFanOuterLocalRoutesAt_strictlyAvoidEachOther
+    (center : Cell)
+    (firstDirection secondDirection : RetainedTerminalDirection)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (directionsLe :
+      firstDirection.angularRank ≤ secondDirection.angularRank)
+    (slotsLt : firstSlot.val < secondSlot.val) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterLocalRouteAt
+        center firstDirection firstSlot)
+      (retainedTerminalFanOuterLocalRouteAt
+        center secondDirection secondSlot) := by
+  exact
+    RoutesStrictlyAvoidEachOther.map_add
+      (retainedTerminalFanOuterLocalRoutes_strictlyAvoidEachOther
+        firstDirection secondDirection firstSlot secondSlot
+        directionsLe slotsLt)
+      center
+
+end PeriodicEightOccurrenceSplit
+end LeanTrominoes

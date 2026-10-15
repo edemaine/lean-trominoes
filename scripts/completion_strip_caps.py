@@ -8,7 +8,7 @@ HEADER = '''/-
 Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import LeanTrominoes.FiniteTrominoCompletion
+import LeanTrominoes.Tiling.Completion.FiniteTrominoCompletion
 import Mathlib.Data.Int.Interval
 
 /-! # Fully prefilled collars for false strip-boundary connectors
@@ -48,7 +48,7 @@ theorem {side}_tiling (t : Tromino) :
   cases t <;> decide +kernel
 ''')
     out.append('\nend LeanTrominoes.CompletionPattern.StripCaps\n')
-    (ROOT/'LeanTrominoes/CompletionStripCaps.lean').write_text('\n'.join(out), encoding='utf-8', newline='\n')
+    (ROOT/'LeanTrominoes/Tiling/Completion/CompletionStripCaps.lean').write_text('\n'.join(out), encoding='utf-8', newline='\n')
 
 if __name__ == '__main__':
     generate()

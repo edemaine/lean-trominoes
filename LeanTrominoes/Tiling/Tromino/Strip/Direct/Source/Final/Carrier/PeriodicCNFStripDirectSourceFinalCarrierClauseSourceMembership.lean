@@ -1,0 +1,45 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Carrier.PeriodicCNFStripDirectSourceFinalCarrierClauseGenericLookup
+
+/-! # Direct-source membership of final carrier clauses -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicCNF
+open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directFinalCarrierClauseSourceMembershipVariableDecidableEq :
+    DecidableEq Variable :=
+  directSourceVariableDecidableEq
+
+/-- Every direct final-carrier implication occupies its declared global index
+in the duplicate-free final direct-source clause presentation. -/
+theorem directSourceFinalCarrierClauses_indexedMember
+    (symbols : List encoding.Γ) :
+    ∀ taggedClause ∈
+        (directSourceFinalCarrierClauses decider symbols).zipIdx
+          (directSourceFinalCarrierStart decider symbols),
+      taggedClause ∈
+        (deduplicatedClauses
+          (directSourceFormula decider symbols)).zipIdx := by
+  rw [directSourceFormula_eq_finalNormalized decider symbols]
+  simpa only [directSourceFinalNormalizedFormula] using
+    directSourceFinalCarrierClauses_normalizedIndexedMember
+      decider symbols
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

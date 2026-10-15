@@ -1,0 +1,303 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.PeriodicCNFPlanarRouteOccurrenceData
+import LeanTrominoes.SAT.CNF.PeriodicCNFPlanarRouteTerminalData
+import LeanTrominoes.Graphs.Drawings.Orthogonal.Planar.PeriodicOrthocrossingPlanarEndpoints
+
+/-!
+# SAT incidence metadata for planar routes
+
+`PeriodicCNF.incidenceGraph` deliberately stores only graph edges.  Planar
+SAT gadgets also need to recover the clause, literal sign, and literal
+position that created each edge.  This file gives the same flattened
+enumeration with that metadata retained and proves that its global indices
+agree exactly with the incidence graph's protoedge indices.
+-/
+
+namespace LeanTrominoes
+
+namespace CNFIncidence
+
+/-- Clause protovertex at the source of the incidence edge. -/
+@[simp]
+theorem edge_source {Variable : Type*}
+    (incidence : CNFIncidence Variable) :
+    incidence.edge.source = .clause incidence.clauseIndex := by
+  rfl
+
+/-- Variable protovertex at the target of the incidence edge. -/
+@[simp]
+theorem edge_target {Variable : Type*}
+    (incidence : CNFIncidence Variable) :
+    incidence.edge.target = .variable incidence.literal.atom := by
+  rfl
+
+/-- Target-cell offset from the clause anchor to the literal occurrence. -/
+@[simp]
+theorem edge_offset {Variable : Type*}
+    (incidence : CNFIncidence Variable) :
+    incidence.edge.offset =
+      Cell.sub incidence.literal.offset
+        (PeriodicCNF.clauseAnchor incidence.clause) := by
+  rfl
+
+end CNFIncidence
+
+namespace PeriodicCNF
+
+/-- Presentation indices make the flattened periodic incidence metadata
+duplicate-free, even when clauses or literals repeat as values. -/
+theorem incidencesWithMetadata_nodup
+    {Variable : Type*}
+    (formula : PeriodicCNF Variable) :
+    (incidencesWithMetadata formula).Nodup := by
+  have clauseIndicesPairwise :
+      formula.clauses.zipIdx.Pairwise
+        (fun first second => first.2 ≠ second.2) := by
+    rw [← List.pairwise_map]
+    exact List.nodup_zipIdx_map_snd formula.clauses
+  rw [incidencesWithMetadata, List.nodup_flatMap]
+  constructor
+  · intro taggedClause _
+    have taggedLiteralsNodup :
+        taggedClause.1.zipIdx.Nodup :=
+      (List.nodup_zipIdx_map_snd
+        taggedClause.1).of_map Prod.snd
+    apply taggedLiteralsNodup.map_on
+    intro first firstMember second secondMember equal
+    have indexEqual :
+        first.2 = second.2 :=
+      congrArg CNFIncidence.literalIndex equal
+    have firstLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp firstMember
+    have secondLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp secondMember
+    have valueEqual : first.1 = second.1 := by
+      rw [indexEqual] at firstLookup
+      exact Option.some.inj
+        (firstLookup.symm.trans secondLookup)
+    exact Prod.ext valueEqual indexEqual
+  · exact clauseIndicesPairwise.imp fun
+      {first second} clauseIndexNe => by
+        change List.Disjoint _ _
+        rw [List.disjoint_left]
+        intro incidence firstMember secondMember
+        rcases List.mem_map.mp firstMember with
+          ⟨firstLiteral, _, incidenceEqual⟩
+        rcases List.mem_map.mp secondMember with
+          ⟨secondLiteral, _, incidenceEqual'⟩
+        exact clauseIndexNe
+          (congrArg CNFIncidence.clauseIndex
+            (incidenceEqual.trans incidenceEqual'.symm))
+
+/-- Membership in the flattened periodic incidence list is exactly
+membership at both indexed presentation levels. -/
+theorem mem_incidencesWithMetadata_iff
+    {Variable : Type*}
+    (formula : PeriodicCNF Variable)
+    (incidence : CNFIncidence Variable) :
+    incidence ∈ incidencesWithMetadata formula ↔
+      (incidence.clause, incidence.clauseIndex) ∈
+          formula.clauses.zipIdx ∧
+        (incidence.literal, incidence.literalIndex) ∈
+          incidence.clause.zipIdx := by
+  constructor
+  · intro incidenceMember
+    rcases List.mem_flatMap.mp incidenceMember with
+      ⟨taggedClause, taggedClauseMember, incidenceMember⟩
+    rcases List.mem_map.mp incidenceMember with
+      ⟨taggedLiteral, taggedLiteralMember, incidenceEqual⟩
+    subst incidence
+    exact ⟨taggedClauseMember, taggedLiteralMember⟩
+  · rintro ⟨clauseMember, literalMember⟩
+    apply List.mem_flatMap.mpr
+    refine
+      ⟨(incidence.clause, incidence.clauseIndex),
+        clauseMember, ?_⟩
+    exact List.mem_map.mpr
+      ⟨(incidence.literal, incidence.literalIndex),
+        literalMember, by cases incidence; rfl⟩
+
+/-- Two genuine periodic incidences with the same clause and literal
+presentation indices are the same metadata-rich occurrence. -/
+theorem incidence_eq_of_indices_eq
+    {Variable : Type*}
+    (formula : PeriodicCNF Variable)
+    {first second : CNFIncidence Variable}
+    (firstMember : first ∈ incidencesWithMetadata formula)
+    (secondMember : second ∈ incidencesWithMetadata formula)
+    (clauseIndexEqual :
+      first.clauseIndex = second.clauseIndex)
+    (literalIndexEqual :
+      first.literalIndex = second.literalIndex) :
+    first = second := by
+  have firstMembers :=
+    (mem_incidencesWithMetadata_iff formula first).mp firstMember
+  have secondMembers :=
+    (mem_incidencesWithMetadata_iff formula second).mp secondMember
+  have firstClauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp firstMembers.1
+  have secondClauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp secondMembers.1
+  have clauseEqual : first.clause = second.clause := by
+    rw [clauseIndexEqual] at firstClauseLookup
+    exact Option.some.inj
+      (firstClauseLookup.symm.trans secondClauseLookup)
+  have firstLiteralLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp firstMembers.2
+  have secondLiteralLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp secondMembers.2
+  have literalEqual : first.literal = second.literal := by
+    rw [clauseEqual, literalIndexEqual] at firstLiteralLookup
+    exact Option.some.inj
+      (firstLiteralLookup.symm.trans secondLiteralLookup)
+  cases first
+  cases second
+  simp_all
+
+/-- Forgetting the metadata yields exactly the protoedge presentation used
+by `incidenceGraph`, in the same order. -/
+theorem incidencesWithMetadata_edges
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    (incidencesWithMetadata formula).map CNFIncidence.edge =
+      (incidenceGraph formula).edges := by
+  unfold incidencesWithMetadata incidenceGraph
+  simp only [List.map_flatMap, clauseIncidenceEdges]
+  apply List.flatMap_congr
+  intro taggedClause taggedClauseMem
+  calc
+    (taggedClause.1.zipIdx.map
+        (fun taggedLiteral =>
+          (⟨taggedClause.2, taggedClause.1,
+            taggedLiteral.2, taggedLiteral.1⟩ :
+              CNFIncidence Variable))).map CNFIncidence.edge =
+        (taggedClause.1.zipIdx.map Prod.fst).map
+          (PeriodicCNF.incidenceEdge taggedClause.2
+            (PeriodicCNF.clauseAnchor taggedClause.1)) := by
+              rw [List.map_map, List.map_map]
+              rfl
+    _ = taggedClause.1.map
+          (PeriodicCNF.incidenceEdge taggedClause.2
+            (PeriodicCNF.clauseAnchor taggedClause.1)) := by
+              rw [List.zipIdx_map_fst]
+
+/-- A metadata occurrence and its global flattened index name the matching
+tagged protoedge. -/
+theorem tagged_incidence_edge_mem
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {tagged : CNFIncidence Variable × Nat}
+    (taggedMem : tagged ∈ (incidencesWithMetadata formula).zipIdx) :
+    (tagged.1.edge, tagged.2) ∈
+      (incidenceGraph formula).edges.zipIdx := by
+  rw [← incidencesWithMetadata_edges formula, List.zipIdx_map]
+  exact List.mem_map.mpr
+    ⟨tagged, taggedMem, by cases tagged; rfl⟩
+
+end PeriodicCNF
+
+namespace PeriodicOrthocrossing
+
+@[simp]
+theorem CNFRouteOccurrence.sourceTerminal_routeKey
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrence : CNFRouteOccurrence Variable) :
+    (occurrence.sourceTerminal formula).routeKey =
+      occurrence.routeKey := by
+  rfl
+
+@[simp]
+theorem CNFRouteOccurrence.targetTerminal_routeKey
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrence : CNFRouteOccurrence Variable) :
+    (occurrence.targetTerminal formula).routeKey =
+      occurrence.routeKey := by
+  rfl
+
+/-- A routed endpoint paired with the SAT incidence metadata that created
+its protoedge. -/
+structure CNFRouteEndpoint (Variable : Type*) where
+  occurrence : CNFRouteOccurrence Variable
+  endpoint : RouteEndpoint (CNFVertex Variable)
+  deriving DecidableEq, Repr
+
+/-- Both geometric endpoints of one routed CNF incidence occurrence. -/
+def CNFRouteOccurrence.endpoints
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrence : CNFRouteOccurrence Variable) :
+    List (CNFRouteEndpoint Variable) :=
+  let graph := PeriodicCNF.incidenceGraph formula
+  (translatedEdgeRouteEndpoints graph
+      (occurrence.edge, occurrence.edgeIndex)
+      occurrence.translate).map fun endpoint =>
+    ⟨occurrence, endpoint⟩
+
+/-- All metadata-rich route endpoints in the neighboring block. -/
+def drawingCNFRouteEndpoints
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    List (CNFRouteEndpoint Variable) :=
+  (drawingCNFRouteOccurrences formula).flatMap
+    fun occurrence => occurrence.endpoints formula
+
+/-- Every metadata-rich route occurrence has its source and target endpoint. -/
+theorem CNFRouteOccurrence.endpoints_length
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrence : CNFRouteOccurrence Variable) :
+    (occurrence.endpoints formula).length = 2 := by
+  simp only [CNFRouteOccurrence.endpoints, List.length_map]
+  exact translatedEdgeRouteEndpoints_length
+    (PeriodicCNF.incidenceGraph formula)
+    (occurrence.edge, occurrence.edgeIndex)
+    occurrence.translate
+
+/-- The endpoint terminal retains its metadata occurrence's route key. -/
+theorem CNFRouteEndpoint.terminal_routeKey
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {routeEndpoint : CNFRouteEndpoint Variable}
+    (endpointMem :
+      routeEndpoint ∈
+        routeEndpoint.occurrence.endpoints formula) :
+    routeEndpoint.endpoint.terminal.routeKey =
+      routeEndpoint.occurrence.routeKey := by
+  simp only [CNFRouteOccurrence.endpoints, List.mem_map] at endpointMem
+  rcases endpointMem with ⟨endpoint, endpointMem, endpointEq⟩
+  have endpointFieldEq :
+      endpoint = routeEndpoint.endpoint :=
+    congrArg CNFRouteEndpoint.endpoint endpointEq
+  rw [← endpointFieldEq]
+  have terminalKey :=
+    routeEndpointsFromSegments_terminal_routeKey
+      routeEndpoint.occurrence.edge
+      routeEndpoint.occurrence.edgeIndex
+      routeEndpoint.occurrence.translate
+      (gridPolylineSegments
+        (constructedEdgeRoute
+          (PeriodicCNF.incidenceGraph formula)
+          routeEndpoint.occurrence.edge
+          routeEndpoint.occurrence.edgeIndex)).zipIdx
+      endpointMem
+  have endpointKey :=
+    routeEndpointsFromSegments_routeKey
+      routeEndpoint.occurrence.edge
+      routeEndpoint.occurrence.edgeIndex
+      routeEndpoint.occurrence.translate
+      (gridPolylineSegments
+        (constructedEdgeRoute
+          (PeriodicCNF.incidenceGraph formula)
+          routeEndpoint.occurrence.edge
+          routeEndpoint.occurrence.edgeIndex)).zipIdx
+      endpointMem
+  exact terminalKey.trans endpointKey
+
+end PeriodicOrthocrossing
+end LeanTrominoes

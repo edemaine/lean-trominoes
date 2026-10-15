@@ -1,0 +1,47 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.PeriodicCNFStripDirectRetainedPlanarMetadataCrossingMarkerAffineCompiler
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.PeriodicCNFStripDirectRetainedPlanarMetadataCrossoverClauseDescriptorData
+import LeanTrominoes.Computation.Encoding.Thirteen.ThirteenMarkerPairBlockCompiler
+import LeanTrominoes.Computation.TM2.TM2CompositionMachine
+
+/-! # Compiling the fixed crossover descriptor postprocess -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open Computability Turing PeriodicCNF
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+noncomputable def
+    directRetainedPlanarMetadataCompiledCrossoverClauseDescriptorsComputableInPolyTime :
+    DirectRetainedPlanarMetadataCompiledCrossoverClauseDescriptorCompiler
+      decider := by
+  let markers :=
+    directRetainedPlanarMetadataCrossingMarkersComputableInPolyTime decider
+  let descriptors :=
+    ThirteenMarkerPairBlocks.computableInPolyTime
+      (Marker := FormulaShapeDirectionOrdering.Token)
+      FormulaShapeCrossoverDirection.descriptorPair
+  change @TM2ComputableInPolyTime
+    (List encoding.Γ) (List FormulaShapeDirectionOrdering.Token)
+    encoding.Γ FormulaShapeDirectionOrdering.Token id id
+    (fun symbols =>
+      ThirteenMarkerPairBlocks.output
+        FormulaShapeCrossoverDirection.descriptorPair
+        (directRetainedPlanarMetadataCrossingMarkers decider symbols))
+  exact TM2CompositionMachine.computableInPolyTime markers descriptors
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

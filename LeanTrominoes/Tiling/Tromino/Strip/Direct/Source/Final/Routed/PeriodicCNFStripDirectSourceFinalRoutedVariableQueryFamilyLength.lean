@@ -1,0 +1,39 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Routed.PeriodicCNFStripDirectSourceFinalRoutedVariableQuerySemantics
+
+/-! # Length of the final routed-variable query family -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicEightOccurrenceSplit
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directFinalRoutedVariableQueryLengthVariableDecidableEq :
+    DecidableEq Variable :=
+  directSourceVariableDecidableEq
+
+theorem directRetainedFinalRoutedVariableClauseQueries_length
+    (symbols : List encoding.Γ) :
+    (directRetainedFinalRoutedVariableClauseQueries
+        decider symbols).length =
+      (directSourceFinalRoutedVariableClauses decider symbols).length := by
+  rw [directRetainedFinalRoutedVariableClauseQueries_eq_indexed]
+  rw [directSourceFinalIndexedRoutedVariableQueries_eq_named]
+  unfold retainedFinalIndexedClauseQueriesFrom
+  simp only [List.length_map, List.length_zipIdx]
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

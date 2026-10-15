@@ -1,0 +1,78 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Computation.Encoding.Binary.BinaryRouteTailRecordClockwiseRelabelBatchSemantics
+import LeanTrominoes.Computation.Encoding.Binary.BinaryRouteTailRecordClockwiseRelabelCompiler
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Carrier.PeriodicCNFStripDirectSourceFinalCarrierBatchedRecordSemantics
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Carrier.PeriodicCNFStripDirectSourceFinalCarrierNormalizedFallbackCompiledRecordSemantics
+import LeanTrominoes.Tiling.Tromino.Strip.Horizontal.PeriodicCNFStripHorizontalRoutedRouteTailRecordCompiler
+import LeanTrominoes.Computation.TM2.TM2CompositionMachine
+
+/-! # Compiled batched semantics of direct final carriers -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open Computability Turing
+open PeriodicEightOccurrenceSplit
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+attribute [local implicit_reducible]
+  directSourceFinalStructuralBaseDecidableEq
+attribute [local instance]
+  directSourceFinalStructuralBaseDecidableEq
+
+/-- Complete compiled carrier record phase: normalized block formatting,
+clockwise source-slot relabeling, and batched routed-record expansion. -/
+def directSourceFinalCarrierCompiledBatchedRecords
+    (symbols : List encoding.Γ) :
+    List HorizontalRoutedRouteHeaderTail.Token :=
+  HorizontalRoutedRouteTailRecord.batchedRecords
+    (BinaryRouteTailRecordClockwiseRelabel.output
+      (directSourceFinalCarrierNormalizedFallbackCompiledRouteTailRecordTokens
+        decider symbols))
+
+/-- Formatting the compiled normalized carrier routes, relabeling them
+clockwise, and expanding them in batches produces the batched semantic records
+of the direct carrier clauses. -/
+theorem directSourceFinalCarrierCompiledBatchedRecords_eq_semantic
+    (symbols : List encoding.Γ) :
+    directSourceFinalCarrierCompiledBatchedRecords decider symbols =
+      HorizontalRoutedRouteTailRecord.batchedRecords
+        (retainedFinalNormalizedClauseSemanticRouteTailRecordTokens
+          (directSourceFormula decider symbols)
+          (directSourceFinalCarrierStart decider symbols)
+          (directSourceFinalCarrierClauses decider symbols)) := by
+  unfold directSourceFinalCarrierCompiledBatchedRecords
+  rw [directSourceFinalCarrierNormalizedFallbackCompiledRouteTailRecordTokens_eq]
+  unfold directSourceFinalCarrierNormalizedFallbackRouteTailRecordTokens
+  rw [BinaryRouteTailRecordClockwiseRelabel.batchedRecords_output_batchFormatter_records]
+  apply Eq.symm
+  exact @directSourceFinalCarrierBatchedSemanticRecords_eq_decodedRecords
+    Input encoding language decider symbols
+
+/-- The complete compiled carrier record phase is polynomial-time. -/
+noncomputable def
+    directSourceFinalCarrierCompiledBatchedRecordsComputableInPolyTime :
+    TM2ComputableInPolyTime id id
+      (directSourceFinalCarrierCompiledBatchedRecords decider) := by
+  unfold directSourceFinalCarrierCompiledBatchedRecords
+  exact TM2CompositionMachine.computableInPolyTime
+    (TM2CompositionMachine.computableInPolyTime
+      (directSourceFinalCarrierNormalizedFallbackCompiledRouteTailRecordTokensComputableInPolyTime
+        decider)
+      BinaryRouteTailRecordClockwiseRelabel.outputComputableInPolyTime)
+    HorizontalRoutedRouteTailRecord.batchedRecordsComputableInPolyTime
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

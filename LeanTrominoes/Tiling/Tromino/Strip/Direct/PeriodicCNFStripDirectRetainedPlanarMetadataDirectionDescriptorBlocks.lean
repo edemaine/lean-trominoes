@@ -1,0 +1,51 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.SAT.CNF.FormulaShape.PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorBlocks
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.PeriodicCNFStripDirectRetainedPlanarMetadataDirectionDescriptorBlockData
+
+/-! # Exact direct retained metadata descriptor block split -/
+
+noncomputable section
+
+namespace LeanTrominoes
+namespace PeriodicCNFStripReduction
+
+open PeriodicCNF
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directRetainedMetadataBlocksVariableDecidableEq :
+    DecidableEq Variable :=
+  Classical.decEq _
+
+/-- The direct metadata stream is exactly its separately streamable clause
+and variable phases. -/
+theorem directRetainedPlanarMetadataDirectionDescriptors_eq_blocks
+    (symbols : List encoding.Γ) :
+    directRetainedPlanarMetadataDirectionDescriptors decider symbols =
+      directRetainedPlanarMetadataClauseDescriptors decider symbols ++
+        directRetainedPlanarMetadataVariableMarkers decider symbols := by
+  unfold directRetainedPlanarMetadataDirectionDescriptors
+    directRetainedPlanarMetadataClauseDescriptors
+    directRetainedPlanarMetadataVariableMarkers
+    directSourceFormula
+  rw [FormulaShapeRetainedPlanarMetadataDirection.descriptors_eq_blocks]
+  apply congrArg₂ List.append
+  · rfl
+  · exact congrArg
+      (fun equality : DecidableEq Variable =>
+        @FormulaShapeRetainedPlanarMetadataDirection.variableMarkers
+          Variable equality
+          (sourceFormula (ProgramSource.formulaOfSymbols decider symbols)))
+      (Subsingleton.elim _ _)
+
+end PeriodicCNFStripReduction
+end LeanTrominoes

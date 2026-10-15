@@ -1,0 +1,57 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.Graphs.Drawings.Orthogonal.Crossover.PeriodicOrthocrossingCrossoverIncidenceDrawing
+import LeanTrominoes.Graphs.Drawings.Orthogonal.Crossover.PeriodicOrthocrossingCrossoverCarrierInterface
+
+/-!
+# Carrier interfaces of placed crossover components
+
+Translation and logical scoping preserve all four internal carrier-boundary
+and endpoint-contact certificates of the fixed crossover drawing.
+-/
+
+namespace LeanTrominoes
+namespace PeriodicOrthocrossing
+
+open PlanarThreeSAT
+
+/-- Every route of a placed crossover remains inside the carrier boundary
+at any one of its four external sides. -/
+theorem
+    drawingPlanarSATCrossoverIncidenceDrawing_routePoints_insideCarrierBoundary
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (crossing : CrossingRecord)
+    (side : CrossingSide) :
+    (drawingPlanarSATCrossoverIncidenceDrawing
+      formula crossing).RoutePointsSatisfy
+        (side.carrierPort.InsideCarrierBoundaryAt
+          (crossingMacroOrigin crossing)) := by
+  unfold drawingPlanarSATCrossoverIncidenceDrawing
+  exact
+    (crossoverStraightIncidenceDrawing_translate_routePoints_insideCarrierBoundary
+      side (crossingMacroOrigin crossing)).rename _ _
+
+/-- A placed crossover has endpoint-only contact with each physical
+carrier port. -/
+theorem
+    drawingPlanarSATCrossoverIncidenceDrawing_routeContactsAt_carrierPort
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (crossing : CrossingRecord)
+    (side : CrossingSide) :
+    (drawingPlanarSATCrossoverIncidenceDrawing
+      formula crossing).RouteContactsAtEndpoint
+        (Cell.add
+          (crossingMacroOrigin crossing)
+          side.carrierPort.position) := by
+  unfold drawingPlanarSATCrossoverIncidenceDrawing
+  exact
+    (crossoverStraightIncidenceDrawing_translate_routeContactsAt_carrierPort
+      side (crossingMacroOrigin crossing)).rename _ _
+
+end PeriodicOrthocrossing
+end LeanTrominoes

@@ -1,0 +1,26 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.Graphs.Drawings.Orthogonal.Route.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotCrossingCarrierKeyStreamData
+import LeanTrominoes.Graphs.Drawings.Orthogonal.Route.PeriodicOrthocrossingRouteDescriptorPairAffineTerminalCarrierKeyCandidateStreamData
+
+/-! # Complete padded carrier-key candidate streams -/
+
+namespace LeanTrominoes.PeriodicOrthocrossing
+
+open PaddedSupportedLastRepresentativeEqualityRows
+
+abbrev CarrierKey := Nat × Nat × Cell
+
+/-- Complete padded candidate stream: terminal prefix followed by the exact
+`descriptor₁, slot₁, descriptor₂, slot₂` crossing stream. -/
+def paddedCarrierKeyCandidateStream
+    (descriptors : List RouteDescriptor) : List (Candidate CarrierKey) :=
+  RouteDescriptorPairAffine.paddedTerminalCarrierKeyCandidateStream
+      descriptors ++
+    RouteDescriptorOccurrenceSlotCrossing.paddedCrossingCarrierKeyCandidateStream
+      descriptors
+
+end LeanTrominoes.PeriodicOrthocrossing

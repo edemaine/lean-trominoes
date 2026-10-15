@@ -1,0 +1,68 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Terminal.PeriodicCNFStripDirectSourceFinalTerminalDirectionSemanticCompiler
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Terminal.PeriodicCNFStripDirectSourceFinalTerminalRadialSemanticCompiler
+import LeanTrominoes.SAT.Planar.OccurrenceSplit.RetainedAngularOccurrenceTerminalCoordinateComponentCompiler
+import LeanTrominoes.Computation.TM2.TM2EmptyAlphabetListInputCompiler
+
+/-! # Compiler for final terminal-coordinate strict order -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open Computability Turing
+open PeriodicEightOccurrenceSplit
+open PeriodicEightOccurrenceSplit.TerminalCoordinateComponents
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directFinalTerminalStrictLowerVariableDecidableEq :
+    DecidableEq Variable :=
+  directSourceVariableDecidableEq
+
+/-- The complete direct terminal columns compile the semantic strict-lower
+matrix of final occurrence coordinates. -/
+noncomputable def
+    directSourceFinalTerminalStrictLowerBitsComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List encoding.Γ) (List Bool) encoding.Γ Bool id id
+      (fun symbols =>
+        retainedOccurrenceGlobalTerminalStrictLowerBits
+          (PeriodicOrthocrossing.finalCoordinatedSource
+            (directSourceFormula decider symbols)).erase
+          (PeriodicOrthocrossing.finalCoordinatedSourceRoutes
+            (directSourceFormula decider symbols))) := by
+  classical
+  exact if nonemptyAlphabet : Nonempty encoding.Γ then by
+    letI : Inhabited encoding.Γ :=
+      ⟨Classical.choice nonemptyAlphabet⟩
+    exact
+      retainedOccurrenceGlobalTerminalStrictLowerBitsComputableInPolyTimeOf
+        id
+        (fun symbols =>
+          (PeriodicOrthocrossing.finalCoordinatedSource
+            (directSourceFormula decider symbols)).erase)
+        (fun symbols =>
+          PeriodicOrthocrossing.finalCoordinatedSourceRoutes
+            (directSourceFormula decider symbols))
+        (directSourceFinalActualTerminalDirectionRanksComputableInPolyTime
+          decider)
+        (directSourceFinalActualTerminalRadialLengthsComputableInPolyTime
+          decider)
+  else by
+    letI : IsEmpty encoding.Γ :=
+      ⟨fun symbol => nonemptyAlphabet ⟨symbol⟩⟩
+    exact TM2EmptyAlphabetListInputCompiler.computableInPolyTime id _
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

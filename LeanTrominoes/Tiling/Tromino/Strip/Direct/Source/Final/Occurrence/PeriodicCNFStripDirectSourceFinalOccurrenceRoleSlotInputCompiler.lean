@@ -1,0 +1,43 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Occurrence.PeriodicCNFStripDirectSourceFinalOccurrenceRoleSlotInputData
+import LeanTrominoes.SAT.Planar.OccurrenceSplit.AngularFan.Final.Occurrence.RetainedAngularFanFinalOccurrenceRoleSlotGrouperCompiler
+import LeanTrominoes.Computation.TM2.TM2CompositionMachine
+
+/-! # Compiler for final copied-clause slot inputs -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open Computability Turing
+open PeriodicEightOccurrenceSplit
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+/-- Decoding followed by one finite-state grouping pass compiles the exact
+slot-input stream expected by direct Figure 9 route-record attachment. -/
+noncomputable def
+    directSourceFinalClauseRouteTailRecordSlotInputsComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List encoding.Γ)
+      (List RetainedDirectClauseRouteTailRecordSlotInput)
+      encoding.Γ RetainedDirectClauseRouteTailRecordSlotInput
+      id id
+      (directSourceFinalClauseRouteTailRecordSlotInputs decider) := by
+  unfold directSourceFinalClauseRouteTailRecordSlotInputs
+  exact TM2CompositionMachine.computableInPolyTime
+    (directSourceFinalOccurrenceRoleSlotPairsComputableInPolyTime decider)
+    FinalOccurrenceRoleSlotGrouper.computableInPolyTime
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

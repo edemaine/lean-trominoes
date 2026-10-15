@@ -1,0 +1,48 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Routed.PeriodicCNFStripDirectSourceFinalRoutedClauseNormalizedRecordQuerySemantics
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Routed.PeriodicCNFStripDirectSourceFinalRoutedPhaseRouteTailRecordSemantics
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Routed.PeriodicCNFStripDirectSourceFinalRoutedVariableNormalizedRecordQuerySemantics
+
+/-! # Normalized-clause semantics of the routed record phase -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicEightOccurrenceSplit
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directRoutedNormalizedSemanticsVariableDecidableEq :
+    DecidableEq Variable :=
+  directSourceVariableDecidableEq
+
+/-- The compiled routed phase is exactly the normalized routed-clause block
+followed by the normalized routed-variable block. -/
+theorem directSourceFinalRoutedRouteTailRecordTokens_eq_normalizedSemantic
+    (symbols : List encoding.Γ) :
+    directSourceFinalRoutedRouteTailRecordTokens decider symbols =
+      retainedFinalNormalizedClauseSemanticRouteTailRecordTokens
+          (directSourceFormula decider symbols)
+          (directSourceFinalRoutedClauseStart decider symbols)
+          (directSourceFinalRoutedClauseClauses decider symbols) ++
+        retainedFinalNormalizedClauseSemanticRouteTailRecordTokens
+          (directSourceFormula decider symbols)
+          (directSourceFinalRoutedVariableStart decider symbols)
+          (directSourceFinalRoutedVariableClauses decider symbols) := by
+  rw [directSourceFinalRoutedRouteTailRecordTokens_eq_semantic,
+    directSourceFinalRoutedClauseRecordQueryStream_eq_normalizedSemantic,
+    directSourceFinalRoutedVariableRecordQueryStream_eq_normalizedSemantic]
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end

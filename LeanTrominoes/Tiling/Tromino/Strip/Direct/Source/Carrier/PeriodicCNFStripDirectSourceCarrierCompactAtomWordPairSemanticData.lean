@@ -1,0 +1,46 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.SAT.CNF.FormulaShape.PeriodicCNFFormulaShapeRetainedPlanarMetadataCarrierVariableNormalizationData
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Carrier.PeriodicCNFStripDirectSourceCarrierCompactAtomWordPairData
+import LeanTrominoes.Graphs.Drawings.Orthogonal.Retained.PeriodicOrthocrossingRetainedCompactAtomWord
+
+/-! # Semantic target for direct compact carrier word pairs -/
+
+noncomputable section
+
+namespace LeanTrominoes
+namespace PeriodicCNFStripReduction
+
+open PeriodicCNF PeriodicOrthocrossing
+open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directCarrierCompactPairSemanticDataVariableDecidableEq :
+    DecidableEq Variable :=
+  directSourceVariableDecidableEq
+
+/-- Compact endpoint-word pairs of the wrapped normalized semantic retained
+carrier links. -/
+def directSourceCarrierNormalizedCompactAtomWordPairs
+    (sourceWord : Variable → List Bool)
+    (symbols : List encoding.Γ) : DelimitedBinaryWordPairs.Input :=
+  let source := directSourceFormula decider symbols
+  ⟨((retainedDrawingCompleteCarrierLinks source.incidenceGraph).map
+    (PeriodicEquality.normalizeLink
+      (carrierWrappedVariableNormalization source))).map fun link =>
+        (RetainedCompactAtomWords.word sourceWord link.first,
+          RetainedCompactAtomWords.word sourceWord link.second)⟩
+
+end PeriodicCNFStripReduction
+end LeanTrominoes
+
+end

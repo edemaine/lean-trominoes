@@ -1,0 +1,218 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman
+-/
+import LeanTrominoes.SAT.ExactOne.PeriodicOneInThreePolarityNormalizationMetadataRouteSourceIndexedListSemantics
+
+/-! # Actual literal atoms selected by source-indexed polarity operations -/
+
+namespace LeanTrominoes.PeriodicOneInThreePolarityNormalizationRouteSubdivision
+
+open PeriodicCNF.ClauseProfilePolarityRouteOperation
+
+/-- Decode a polarity operation at its source occurrence. Fresh atoms retain
+the exact source literal, as required by the semantic normalization. -/
+def SourceIndexedDescriptor.atom? {Variable : Type*}
+    (descriptor : SourceIndexedDescriptor) (source : PeriodicCNF Variable) :
+    Option (PolarityNormalizedVariable Variable) :=
+  (source.clauses[descriptor.sourceClauseIndex]?).bind fun clause =>
+    (clause[descriptor.sourceLiteralIndex]?).map fun literal =>
+      match descriptor.operation with
+      | .compatible | .complementOriginal => .inl literal.atom
+      | .incompatible | .complementFresh =>
+          .inr ((descriptor.sourceClauseIndex, descriptor.sourceLiteralIndex), literal)
+
+/-- The decoded atom's original/fresh constructor is exactly the operation's
+classification, whenever its source lookup succeeds. -/
+theorem SourceIndexedDescriptor.atom_isFresh_iff {Variable : Type*}
+    (source : PeriodicCNF Variable) (descriptor : SourceIndexedDescriptor)
+    (atom : PolarityNormalizedVariable Variable)
+    (decoded : descriptor.atom? source = some atom) :
+    (∃ fresh, atom = .inr fresh) ↔
+      descriptor.operation = .incompatible ∨ descriptor.operation = .complementFresh := by
+  obtain ⟨clause, _, decodedLiteral⟩ := Option.bind_eq_some_iff.mp decoded
+  obtain ⟨literal, _, atomEq⟩ := Option.map_eq_some_iff.mp decodedLiteral
+  rw [← atomEq]
+  cases descriptor.operation <;> simp
+
+/-- Fresh atoms decoded in one source are equal exactly when their source
+coordinates agree. The literal payload introduces no extra identity test. -/
+theorem SourceIndexedDescriptor.fresh_atom_eq_iff {Variable : Type*}
+    (source : PeriodicCNF Variable) (first second : SourceIndexedDescriptor)
+    (firstFresh : first.operation = .incompatible ∨ first.operation = .complementFresh)
+    (secondFresh : second.operation = .incompatible ∨ second.operation = .complementFresh)
+    (firstAtom secondAtom : PolarityNormalizedVariable Variable)
+    (firstDecoded : first.atom? source = some firstAtom)
+    (secondDecoded : second.atom? source = some secondAtom) :
+    firstAtom = secondAtom ↔
+      (first.sourceClauseIndex, first.sourceLiteralIndex) =
+        (second.sourceClauseIndex, second.sourceLiteralIndex) := by
+  have freshShape (descriptor : SourceIndexedDescriptor)
+      (fresh : descriptor.operation = .incompatible ∨ descriptor.operation = .complementFresh)
+      (atom : PolarityNormalizedVariable Variable)
+      (decoded : descriptor.atom? source = some atom) :
+      ∃ literal, atom = .inr ((descriptor.sourceClauseIndex, descriptor.sourceLiteralIndex), literal) := by
+    obtain ⟨clause, _, decodedLiteral⟩ := Option.bind_eq_some_iff.mp decoded
+    obtain ⟨literal, _, atomEq⟩ := Option.map_eq_some_iff.mp decodedLiteral
+    rcases fresh with fresh | fresh <;>
+      exact ⟨literal, by simpa only [fresh] using atomEq.symm⟩
+  constructor
+  · intro atomEq
+    obtain ⟨firstLiteral, firstShape⟩ := freshShape first firstFresh firstAtom firstDecoded
+    obtain ⟨secondLiteral, secondShape⟩ := freshShape second secondFresh secondAtom secondDecoded
+    exact congrArg Prod.fst (Sum.inr.inj (firstShape.symm.trans (atomEq.trans secondShape)))
+  · intro coordinatesEq
+    have clauseEq : first.sourceClauseIndex = second.sourceClauseIndex :=
+      congrArg Prod.fst coordinatesEq
+    have literalEq : first.sourceLiteralIndex = second.sourceLiteralIndex :=
+      congrArg Prod.snd coordinatesEq
+    have decodedEq : first.atom? source = second.atom? source := by
+      rcases firstFresh with firstFresh | firstFresh <;>
+        rcases secondFresh with secondFresh | secondFresh <;>
+        simp only [SourceIndexedDescriptor.atom?, firstFresh, secondFresh, clauseEq, literalEq]
+    exact Option.some.inj (firstDecoded.symm.trans (decodedEq.trans secondDecoded))
+
+/-- A fresh semantic atom can equal only another fresh atom at the same
+source coordinates; original atoms cannot collide with it. -/
+theorem SourceIndexedDescriptor.atom_eq_iff_of_fresh {Variable : Type*}
+    (source : PeriodicCNF Variable) (first second : SourceIndexedDescriptor)
+    (firstFresh : first.operation = .incompatible ∨ first.operation = .complementFresh)
+    (firstAtom secondAtom : PolarityNormalizedVariable Variable)
+    (firstDecoded : first.atom? source = some firstAtom)
+    (secondDecoded : second.atom? source = some secondAtom) :
+    firstAtom = secondAtom ↔
+      (second.operation = .incompatible ∨ second.operation = .complementFresh) ∧
+        (first.sourceClauseIndex, first.sourceLiteralIndex) =
+          (second.sourceClauseIndex, second.sourceLiteralIndex) := by
+  constructor
+  · intro equal
+    have freshShape := (first.atom_isFresh_iff source firstAtom firstDecoded).mpr firstFresh
+    rw [equal] at freshShape
+    have secondFresh := (second.atom_isFresh_iff source secondAtom secondDecoded).mp freshShape
+    exact ⟨secondFresh, (fresh_atom_eq_iff source first second firstFresh secondFresh
+      firstAtom secondAtom firstDecoded secondDecoded).mp equal⟩
+  · rintro ⟨secondFresh, coordinatesEq⟩
+    exact (fresh_atom_eq_iff source first second firstFresh secondFresh
+      firstAtom secondAtom firstDecoded secondDecoded).mpr coordinatesEq
+
+private theorem flatMap_filterMap {α β γ : Type*}
+    (source : List α) (select : α → Option β) (emit : β → List γ) :
+    (source.filterMap select).flatMap emit =
+      source.flatMap (fun item => (select item).toList.flatMap emit) := by
+  induction source with
+  | nil => rfl
+  | cons item rest ih =>
+      cases selected : select item <;> simp [selected, ih]
+
+/-- Every operation in one clause's schedule decodes to the actual output
+atom, including both occurrences of each fresh complement variable. -/
+theorem indexedDescriptors_map_atom? {Variable : Type*}
+    (source : PeriodicCNF Variable) (clauseIndex : Nat)
+    (clause : PeriodicClause Variable)
+    (clauseLookup : source.clauses[clauseIndex]? = some clause) :
+    (indexedDescriptors (clause.map PeriodicLiteral.value)).map
+        (fun descriptor => (sourceIndexedDescriptorOf clauseIndex descriptor).atom? source) =
+      (PeriodicOneInThreePolarityNormalization.clauseClauses clauseIndex clause).flatMap
+        (fun output => output.map (fun literal => some literal.atom)) := by
+  have normalized :
+      clause.zipIdx.map (fun tagged =>
+        (sourceIndexedDescriptorOf clauseIndex
+          (normalizedIndexedDescriptor (tagged.1.value, tagged.2))).atom? source) =
+      (PeriodicOneInThreePolarityNormalization.normalizeClause clauseIndex clause).map
+        (fun literal => some literal.atom) := by
+    unfold PeriodicOneInThreePolarityNormalization.normalizeClause
+      PeriodicOneInThreePolarityNormalization.normalizeClauseFrom
+    rw [List.map_map]
+    apply List.map_congr_left
+    intro tagged member
+    have literalLookup := List.mem_zipIdx_iff_getElem?.mp member
+    by_cases compatible : tagged.1.value =
+        PeriodicOneInThreePolarityNormalization.normalizedPolarity tagged.2 <;>
+      simp [SourceIndexedDescriptor.atom?, sourceIndexedDescriptorOf,
+        normalizedIndexedDescriptor, clauseLookup, literalLookup, compatible,
+        PeriodicCNF.ClauseProfilePolarityNormalization.normalizedPolarity_eq_semantic,
+        PeriodicOneInThreePolarityNormalization.normalizeLiteral,
+        PeriodicOneInThreePolarityNormalization.liftLiteral,
+        PeriodicOneInThreePolarityNormalization.complementLiteral]
+  have complements :
+      clause.zipIdx.flatMap (fun tagged =>
+        (complementIndexedDescriptorBlock (tagged.1.value, tagged.2)).map
+          (fun descriptor =>
+            (sourceIndexedDescriptorOf clauseIndex descriptor).atom? source)) =
+      (PeriodicOneInThreePolarityNormalization.complementClauses clauseIndex clause).flatMap
+        (fun output => output.map (fun literal => some literal.atom)) := by
+    unfold PeriodicOneInThreePolarityNormalization.complementClauses
+      PeriodicOneInThreePolarityNormalization.complementClausesFrom
+    rw [flatMap_filterMap]
+    apply List.flatMap_congr
+    intro tagged member
+    have literalLookup := List.mem_zipIdx_iff_getElem?.mp member
+    by_cases compatible : tagged.1.value =
+        PeriodicOneInThreePolarityNormalization.normalizedPolarity tagged.2 <;>
+      simp [complementIndexedDescriptorBlock, compatible,
+        PeriodicCNF.ClauseProfilePolarityNormalization.normalizedPolarity_eq_semantic,
+        SourceIndexedDescriptor.atom?, sourceIndexedDescriptorOf,
+        clauseLookup, literalLookup,
+        PeriodicOneInThreePolarityNormalization.complementClause,
+        PeriodicOneInThreePolarityNormalization.complementFalseLiteral,
+        PeriodicOneInThreePolarityNormalization.originalFalseLiteral]
+  simp only [indexedDescriptors, List.map_append, List.zipIdx_map,
+    List.map_map, List.map_flatMap, List.flatMap_map, Function.comp_def,
+    Prod.map, id_eq, PeriodicOneInThreePolarityNormalization.clauseClauses,
+    List.flatMap_cons]
+  rw [normalized, complements]
+
+/-- Decoding the complete schedule gives the actual normalized atom column
+in clause-major, literal-minor order; no occurrence lookup is missing. -/
+theorem sourceIndexedDescriptors_map_atom? {Variable : Type*}
+    (source : PeriodicCNF Variable) :
+    (source.clauses.zipIdx.flatMap fun tagged =>
+      (indexedDescriptors (tagged.1.map PeriodicLiteral.value)).map
+        (sourceIndexedDescriptorOf tagged.2)).map
+          (fun descriptor => descriptor.atom? source) =
+      (PeriodicOneInThreePolarityNormalization.formula source).clauses.flatMap
+        (fun clause => clause.map (fun literal => some literal.atom)) := by
+  simp only [List.map_flatMap, List.map_map,
+    PeriodicOneInThreePolarityNormalization.formula, List.flatMap_assoc]
+  apply List.flatMap_congr
+  intro tagged member
+  exact indexedDescriptors_map_atom? source tagged.2 tagged.1
+    (List.mem_zipIdx_iff_getElem?.mp member)
+
+/-- The exact route-block schedule also identifies every actual routed atom.
+Decoding uses the refined source literal; the final gauge preserves its atom. -/
+theorem exactMetadataRouteBlocks_map_atom? {Variable : Type}
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes) :
+    (exactMetadataRouteBlocks source sourcePlacement sourceRoutes).map
+        (fun block => block.sourceIndexedDescriptor.atom?
+          (refinedSource source sourcePlacement).erase) =
+      (formula source sourcePlacement sourceRoutes).erase.clauses.flatMap
+        (fun clause => clause.map (fun literal => some literal.atom)) := by
+  have schedule :=
+    (exactMetadataRouteBlocks_map_sourceIndexedDescriptor
+      source sourcePlacement sourceRoutes).trans
+      (formulaClauseMetadata_flatMap_sourceIndexedDescriptor
+        (rawPositions sourcePlacement sourceRoutes)
+        (refinedSource source sourcePlacement))
+  have atoms := congrArg
+    (List.map (fun descriptor => descriptor.atom?
+      (refinedSource source sourcePlacement).erase)) schedule
+  rw [List.map_map] at atoms
+  calc
+    _ = _ := atoms
+    _ = (PeriodicOneInThreePolarityNormalization.formula
+          (refinedSource source sourcePlacement).erase).clauses.flatMap
+            (fun clause => clause.map (fun literal => some literal.atom)) := by
+      simpa only [PositionedPeriodicCNF.erase, List.zipIdx_map,
+        List.flatMap_map, List.map_map, Function.comp_def, Prod.map, id_eq] using
+        sourceIndexedDescriptors_map_atom? (refinedSource source sourcePlacement).erase
+    _ = _ := by
+      rw [erase_formula]
+      simp only [PeriodicCNF.variableGauge, PeriodicClause.variableGauge,
+        List.flatMap_map, List.map_map, Function.comp_def,
+        PeriodicLiteral.variableGauge_atom]
+
+end LeanTrominoes.PeriodicOneInThreePolarityNormalizationRouteSubdivision

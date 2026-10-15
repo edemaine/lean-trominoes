@@ -1,0 +1,62 @@
+/-
+Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Erik Demaine, Stefan Langerman, GPT 5.6
+-/
+import LeanTrominoes.SAT.CNF.Compiler.PeriodicCNFProgramSource
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Carrier.PeriodicCNFStripDirectSourceCarrierTerminalColumnData
+import LeanTrominoes.Tiling.Tromino.Strip.Direct.Source.Final.Clause.PeriodicCNFStripDirectSourceFinalClauseFamilyStarts
+import LeanTrominoes.SAT.Planar.OccurrenceSplit.RetainedAngularFinalRouteDecidableEqIrrelevance
+
+/-! # Transport of direct carrier radial data to the width-three source -/
+
+noncomputable section
+
+namespace LeanTrominoes.PeriodicCNFStripReduction
+
+open PeriodicOrthocrossing
+
+variable {Input : Type}
+variable {encoding : _root_.LeanTrominoes.FiniteEncoding Input}
+variable {language : Input → Prop}
+variable (decider : PeriodicCNF.ProgramSource encoding language)
+
+
+local instance directCarrierRadialTransportVariableDecidableEq :
+    DecidableEq Variable :=
+  directSourceVariableDecidableEq
+
+/-- Replacing the public final formula and equality implementation by the
+raw five-family boundary leaves the carrier radial stream unchanged. -/
+theorem directSourceCarrierTerminalRadialLengths_eq_raw
+    (symbols : List encoding.Γ) :
+    directSourceCarrierTerminalRadialLengths decider symbols =
+      CarrierRankOrderedPairs.retainedTerminalRadialLengths
+        (@PeriodicCNF.numericRouteDescriptors Variable
+          PeriodicThreeSATThree.fiveFamilyNormalizedThreeOccurrenceDecidableEq
+          (directSourceFinalNormalizedFormula decider symbols)) := by
+  unfold directSourceCarrierTerminalRadialLengths
+  calc
+    CarrierRankOrderedPairs.retainedTerminalRadialLengths
+          (@PeriodicCNF.numericRouteDescriptors Variable
+            directSourceVariableDecidableEq
+            (directSourceFormula decider symbols)) =
+        CarrierRankOrderedPairs.retainedTerminalRadialLengths
+          (@PeriodicCNF.numericRouteDescriptors Variable
+            directSourceVariableDecidableEq
+            (directSourceFinalNormalizedFormula decider symbols)) :=
+      congrArg CarrierRankOrderedPairs.retainedTerminalRadialLengths
+        (congrArg
+          (@PeriodicCNF.numericRouteDescriptors Variable
+            directSourceVariableDecidableEq)
+          (directSourceFormula_eq_finalNormalized decider symbols))
+    _ = _ :=
+      congrArg CarrierRankOrderedPairs.retainedTerminalRadialLengths
+        (numericRouteDescriptors_decidableEq_irrel
+          directSourceVariableDecidableEq
+          PeriodicThreeSATThree.fiveFamilyNormalizedThreeOccurrenceDecidableEq
+          (directSourceFinalNormalizedFormula decider symbols))
+
+end LeanTrominoes.PeriodicCNFStripReduction
+
+end
