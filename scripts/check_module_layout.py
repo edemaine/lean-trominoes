@@ -265,7 +265,11 @@ def main():
         files, deps = inventory()
         order(deps)
     assert set(mapping.values()) <= files.keys()
-    assert not list((ROOT / "LeanTrominoes").glob("*.lean")), "Flat legacy modules remain."
+    root_interfaces = {"GraphAbstract.lean", "GraphAbstractBridge.lean",
+                       "TilingAbstract.lean", "TilingAbstractBridge.lean"}
+    unexpected = [p.name for p in (ROOT / "LeanTrominoes").glob("*.lean")
+                  if p.name not in root_interfaces]
+    assert not unexpected, f"Flat legacy modules remain: {unexpected}"
     for name in files:
         legacy = deps[name] & mapping.keys()
         assert not legacy, f"{name}: legacy imports {legacy}"

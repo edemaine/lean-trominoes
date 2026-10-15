@@ -42,6 +42,30 @@ Strip completion is PSPACE-complete under the explicit unary encoding.
 For each tromino, there is also a completable periodic prefill whose every
 completion is aperiodic: no nonzero translation preserves the completed tiling.
 
+## Formal abstracts
+
+Two formal abstracts present the main results with the mathematical definitions
+needed to read their statements. To review what the formalization proves, check
+these definitions and theorem statements; Lean verifies the proofs through the
+corresponding bridges and the rest of the development. Section comments organize
+each abstract. The two abstracts are independent and reuse the canonical
+complexity notions.
+
+| Abstract | Proof bridge |
+| --- | --- |
+| [Graphs, constraints, and algorithms](LeanTrominoes/GraphAbstract.lean) | [GraphAbstractBridge](LeanTrominoes/GraphAbstractBridge.lean) |
+| [Tiling and completion](LeanTrominoes/TilingAbstract.lean) | [TilingAbstractBridge](LeanTrominoes/TilingAbstractBridge.lean) |
+
+Import `LeanTrominoes.GraphAbstract` or `LeanTrominoes.TilingAbstract` individually;
+`import LeanTrominoes` includes both. To check both abstracts and their bridges:
+
+```sh
+lake build +LeanTrominoes.GraphAbstract:olean +LeanTrominoes.TilingAbstract:olean
+```
+
+The [axiom audit](LeanTrominoes/Verification/AxiomAudit.lean) checks every declaration
+in all four files, including future additions.
+
 ## Repository organization
 
 The library is organized by mathematical subject. The result and coverage tables

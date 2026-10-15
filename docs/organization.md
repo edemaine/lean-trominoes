@@ -4,6 +4,11 @@ The [root README](../README.md#repository-organization) describes the subject
 layout, its correspondence to the paper, and the public entry points. This guide
 covers import migration, build and verification commands, and generators.
 
+The four root-level `GraphAbstract`, `TilingAbstract`, and corresponding bridge
+modules are reader-facing interfaces. They summarize the subject tree without
+moving the mathematical implementation back to the root. Their scope and build
+command are listed in the [README](../README.md#formal-abstracts).
+
 ## Imports and declarations
 
 File/module paths changed; declaration namespaces and theorem names did not.

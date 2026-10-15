@@ -147,6 +147,8 @@ import LeanTrominoes.Graphs.Drawings.Grid.PeriodicGridDrawingCubicRefinementTheo
 import LeanTrominoes.Graphs.Drawings.Refinement.Polygonal.PeriodicGridDrawingRawBendIncidentSourceCores
 import LeanTrominoes.Graphs.Drawings.Orthogonal.OrthogonalBendFanBoundaryLocality
 import Lean.Util.CollectAxioms
+import LeanTrominoes.GraphAbstract
+import LeanTrominoes.TilingAbstract
 import LeanTrominoes.Graphs.Drawings.Grid.PeriodicGridDrawingIndexing
 import LeanTrominoes.ThreeDM.Reduction.FromSAT.PeriodicPlanarThreeDMContractedLocality
 import LeanTrominoes.ThreeDM.Reduction.FromSAT.PeriodicPlanarThreeDMIncidenceOffsets
@@ -1447,3 +1449,28 @@ run_cmd do
           throwError "{name} depends on unexpected axioms: {extra}"
         count := count+1
   logInfo m!"Cubic refinement construction: strict axiom audit passed for {count} declarations."
+
+/-! The two formal abstracts and their bridges must use only standard axioms.
+Audit every declaration in these four modules, including auxiliary definitions,
+so a newly added headline theorem cannot accidentally escape the audit. -/
+open Lean Elab Command in
+run_cmd do
+  let env ← getEnv
+  let modules := #[`LeanTrominoes.GraphAbstract, `LeanTrominoes.GraphAbstractBridge,
+    `LeanTrominoes.TilingAbstract, `LeanTrominoes.TilingAbstractBridge]
+  for module in modules do
+    unless env.header.moduleNames.contains module do
+      throwError "Missing formal abstract module: {module}"
+  let mut count : Nat := 0
+  for (name, _) in env.constants.toList do
+    if let some index := env.getModuleIdxFor? name then
+      if modules.contains env.header.moduleNames[index.toNat]! then
+        let axioms ← Lean.collectAxioms name
+        let extra := axioms.filter fun ax =>
+          ax != ``propext && ax != ``Classical.choice && ax != ``Quot.sound
+        unless extra.isEmpty do
+          throwError "{name} depends on unexpected axioms: {extra}"
+        count := count + 1
+  unless 0 < count do
+    throwError "Formal abstract audit found no declarations"
+  logInfo m!"Formal abstracts and bridges: strict axiom audit passed for {count} declarations."
