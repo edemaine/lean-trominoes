@@ -147,6 +147,8 @@ import LeanTrominoes.Graphs.Drawings.Grid.PeriodicGridDrawingCubicRefinementTheo
 import LeanTrominoes.Graphs.Drawings.Refinement.Polygonal.PeriodicGridDrawingRawBendIncidentSourceCores
 import LeanTrominoes.Graphs.Drawings.Orthogonal.OrthogonalBendFanBoundaryLocality
 import Lean.Util.CollectAxioms
+import LeanTrominoes.ComplexityAbstractBridge
+import LeanTrominoes.Verification.AbstractRAM
 import LeanTrominoes.GraphAbstract
 import LeanTrominoes.TilingAbstract
 import LeanTrominoes.Graphs.Drawings.Grid.PeriodicGridDrawingIndexing
@@ -1450,13 +1452,14 @@ run_cmd do
         count := count+1
   logInfo m!"Cubic refinement construction: strict axiom audit passed for {count} declarations."
 
-/-! The two formal abstracts and their bridges must use only standard axioms.
-Audit every declaration in these four modules, including auxiliary definitions,
+/-! The formal abstracts, their bridges, and the RAM semantic checks must use only standard axioms.
+Audit every declaration in these modules, including auxiliary definitions,
 so a newly added headline theorem cannot accidentally escape the audit. -/
 open Lean Elab Command in
 run_cmd do
   let env ← getEnv
-  let modules := #[`LeanTrominoes.GraphAbstract, `LeanTrominoes.GraphAbstractBridge,
+  let modules := #[`LeanTrominoes.ComplexityAbstract, `LeanTrominoes.ComplexityAbstractBridge,
+    `LeanTrominoes.Verification.AbstractRAM, `LeanTrominoes.GraphAbstract, `LeanTrominoes.GraphAbstractBridge,
     `LeanTrominoes.TilingAbstract, `LeanTrominoes.TilingAbstractBridge]
   for module in modules do
     unless env.header.moduleNames.contains module do

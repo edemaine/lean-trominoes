@@ -48,11 +48,14 @@ Two formal abstracts present the main results with the mathematical definitions
 needed to read their statements. To review what the formalization proves, check
 these definitions and theorem statements; Lean verifies the proofs through the
 corresponding bridges and the rest of the development. Section comments organize
-each abstract. The two abstracts are independent and reuse the canonical
-complexity notions.
+each abstract. `ComplexityAbstract` supplies the shared complexity definitions
+and a unit-cost integer RAM model; Mathlib and `lean-wang` are background.
+The solver operation counters still need simulation proofs to give bounds
+in that RAM model.
 
 | Abstract | Proof bridge |
 | --- | --- |
+| [Complexity and RAM model](LeanTrominoes/ComplexityAbstract.lean) | [ComplexityAbstractBridge](LeanTrominoes/ComplexityAbstractBridge.lean) |
 | [Graphs, constraints, and algorithms](LeanTrominoes/GraphAbstract.lean) | [GraphAbstractBridge](LeanTrominoes/GraphAbstractBridge.lean) |
 | [Tiling and completion](LeanTrominoes/TilingAbstract.lean) | [TilingAbstractBridge](LeanTrominoes/TilingAbstractBridge.lean) |
 
@@ -64,7 +67,8 @@ lake build +LeanTrominoes.GraphAbstract:olean +LeanTrominoes.TilingAbstract:olea
 ```
 
 The [axiom audit](LeanTrominoes/Verification/AxiomAudit.lean) checks every declaration
-in all four files, including future additions.
+in all six files, including future additions, and the
+[RAM semantics checks](LeanTrominoes/Verification/AbstractRAM.lean).
 
 ## Repository organization
 

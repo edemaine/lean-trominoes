@@ -265,7 +265,8 @@ def main():
         files, deps = inventory()
         order(deps)
     assert set(mapping.values()) <= files.keys()
-    root_interfaces = {"GraphAbstract.lean", "GraphAbstractBridge.lean",
+    root_interfaces = {"ComplexityAbstract.lean", "ComplexityAbstractBridge.lean",
+                       "GraphAbstract.lean", "GraphAbstractBridge.lean",
                        "TilingAbstract.lean", "TilingAbstractBridge.lean"}
     unexpected = [p.name for p in (ROOT / "LeanTrominoes").glob("*.lean")
                   if p.name not in root_interfaces]

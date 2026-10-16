@@ -5,6 +5,7 @@ import LeanTrominoes.Graphs.Results
 import LeanTrominoes.SAT.Results
 import LeanTrominoes.ThreeDM.Results
 import LeanTrominoes.Tiling.Results
+import LeanTrominoes.ComplexityAbstract
 import LeanTrominoes.GraphAbstract
 import LeanTrominoes.TilingAbstract
 
