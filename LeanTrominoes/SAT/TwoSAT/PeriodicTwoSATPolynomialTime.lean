@@ -8,8 +8,10 @@ import LeanTrominoes.SAT.TwoSAT.PeriodicTwoSATSolver
 
 The bound is conservative and includes period calculation, explicit base-M
 indices, cover construction, query preparation, and the indexed Horn solver.
-The model is the unit-cost indexed RAM, as in the other Section 4 solvers;
-this is not a Lean VM timing or a formal bit-Turing runtime claim.
+The theorem bounds an instrumented operation counter. `PeriodicTwoSATWordBounds`
+bounds normalization and cover magnitudes. The separate original-input theorem
+in `PeriodicTwoSATWordRAMPolynomialTime` proves a complete bounded-word program,
+including cover construction and all solver calls.
 -/
 namespace LeanTrominoes.PeriodicTwoSAT
 open PeriodicLatticeGraph ImplicationGraph

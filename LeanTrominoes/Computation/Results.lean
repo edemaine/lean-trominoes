@@ -1,3 +1,7 @@
+import LeanTrominoes.Computation.Compiler.FiniteReachWordRAM
+import LeanTrominoes.Computation.RAM.WordBounds
+import LeanTrominoes.Computation.RAM.Arrays
+import LeanTrominoes.Computation.RAM.NaturalAllocation
 import LeanTrominoes.Computation.Encoding.Unary.UnaryColumnBoundedSignedDifference
 import LeanTrominoes.Computation.Encoding.Unary.UnaryColumnChoiceCompiler
 import LeanTrominoes.Computation.Encoding.Unary.UnaryColumnDenseLookupCompiler

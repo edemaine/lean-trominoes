@@ -49,15 +49,64 @@ needed to read their statements. To review what the formalization proves, check
 these definitions and theorem statements; Lean verifies the proofs through the
 corresponding bridges and the rest of the development. Section comments organize
 each abstract. `ComplexityAbstract` supplies the shared complexity definitions
-and a unit-cost integer RAM model; Mathlib and `lean-wang` are background.
-The solver operation counters still need simulation proofs to give bounds
-in that RAM model.
+and a bounded-word RAM model; Mathlib and `lean-wang` are background.
+All other graph and tiling notions and encodings are defined within the
+abstract suite; only proof bodies refer to the implementation.
+`ComplexityAbstract.RAM.DecidesWithin` is defined in the shared abstract's
+bounded-word RAM section. The verification files contain full proofs and examples;
+they are separate from the public abstract suite.
+
+The abstracts’ supplied planar SAT drawings are orthogonal and continuously planar, with
+coincident lifted listed points allowed only at outer route endpoints.
+The co-r.e. and PSPACE classifications include these conditions for ordinary
+and exact-one SAT, including the occurrence-bounded variants.
+
+A RAM algorithm must use one fixed program for every sufficiently large word
+size `w ≥ c log₂(n+2)` accommodating the input words. Arithmetic overflow and
+out-of-range addresses fault. Horn SAT, local periodic 2SAT, finite bipartite matching, and periodic domino
+decision now have complete original-input program simulations in this model.
+
+The [word RAM with memory allocation](LeanTrominoes/Computation/RAM/Allocation.lean)
+reserves fresh blocks without freeing or reusing addresses. A zeroed block of
+`k` words takes exactly `4k+7` primitive instructions;
+[indexed array reads and writes](LeanTrominoes/Computation/RAM/Arrays.lean)
+take two instructions each. Fixed-size records use the same blocks with constant
+field indices. These operations compile to the RAM above. Space usage is the
+high-water mark, including storage no longer used. Its bound ensures pointers
+fit in words; this does not assert a separate solver space-complexity result.
+
+The [concrete Horn RAM program](LeanTrominoes/SAT/Horn/HornWordRAMProgram.lean)
+has a checked [linear-time decision theorem](LeanTrominoes/SAT/Horn/HornWordRAMLinearTime.lean):
+one fixed 32-register program decides the original finite Horn rule/occurrence
+encoding in at most `120(S+1)` primitive instructions for every
+`w ≥ 27 log₂(S+2)+2`. Here `S` counts variables, rules, occurrences, and one.
+The bound includes allocation and zeroing, occurrence indexing, initial-stack
+construction, propagation, the answer test, and halt. Duplicate premises and
+clauses with a contradiction head are included.
+The [finite reachability query kernel](LeanTrominoes/Computation/Compiler/FiniteReachWordRAM.lean)
+also has a linear word-RAM bound in its explicit dense graph-query encoding.
+The [complete periodic 2SAT program](LeanTrominoes/SAT/TwoSAT/PeriodicTwoSATWordRAMPolynomialTime.lean)
+now has a polynomial-time RAM theorem from its original signed clause records,
+including normalization, cover construction, query batching, and halt.
+The [finite matching program](LeanTrominoes/Graphs/Matching/BipartiteMatchingDenseWordRAMPolynomialTime.lean)
+uses 64 registers and at most `1000(S+1)^4` instructions, where
+`S = left vertices + right vertices + edge records + 1`, for every
+`w ≥ 8 log₂(S+2)+2`. It reads the original endpoint arrays and includes
+allocation, search, path rewrites, answer, and halt.
+
+The [periodic domino program](LeanTrominoes/Tiling/Domino/DominoWordRAMPolynomialTime.lean)
+uses 128 registers and decides valid original binary presentations in every
+fixed dimension. Its conservative instruction bound is `C(d)(S+1)^16`, with
+`w ≥ k(d) log₂(S+2)+2`; `S` is the explicitly defined binary presentation size.
+The proof includes multiword signed arithmetic, determinant and lattice tests,
+all candidate loops, endpoint packing, matching, and halt. The candidate scan
+has a quartic bound; clearing the cold matching arena accounts for exponent 16.
 
 | Abstract | Proof bridge |
 | --- | --- |
 | [Complexity and RAM model](LeanTrominoes/ComplexityAbstract.lean) | [ComplexityAbstractBridge](LeanTrominoes/ComplexityAbstractBridge.lean) |
-| [Graphs, constraints, and algorithms](LeanTrominoes/GraphAbstract.lean) | [GraphAbstractBridge](LeanTrominoes/GraphAbstractBridge.lean) |
-| [Tiling and completion](LeanTrominoes/TilingAbstract.lean) | [TilingAbstractBridge](LeanTrominoes/TilingAbstractBridge.lean) |
+| [Graphs, constraints, and algorithms](LeanTrominoes/GraphAbstract.lean) | [Graphs](LeanTrominoes/GraphAbstractBridge.lean), [drawings](LeanTrominoes/GraphDrawingAbstractBridge.lean), [constraints](LeanTrominoes/GraphConstraintsAbstractBridge.lean), [planar SAT](LeanTrominoes/GraphPlanarAbstractBridge.lean), [3DM](LeanTrominoes/GraphThreeDMAbstractBridge.lean), [orientation](LeanTrominoes/GraphOrientationAbstractBridge.lean), [Horn and matching](LeanTrominoes/GraphAlgorithmsAbstractBridge.lean), [2SAT](LeanTrominoes/GraphTwoSATAbstractBridge.lean) |
+| [Tiling and completion](LeanTrominoes/TilingAbstract.lean) | [TilingAbstractBridge](LeanTrominoes/TilingAbstractBridge.lean), [domino algorithm](LeanTrominoes/TilingAlgorithmsAbstractBridge.lean) |
 
 Import `LeanTrominoes.GraphAbstract` or `LeanTrominoes.TilingAbstract` individually;
 `import LeanTrominoes` includes both. To check both abstracts and their bridges:
@@ -66,9 +115,26 @@ Import `LeanTrominoes.GraphAbstract` or `LeanTrominoes.TilingAbstract` individua
 lake build +LeanTrominoes.GraphAbstract:olean +LeanTrominoes.TilingAbstract:olean
 ```
 
+The [dependency audit](LeanTrominoes/Verification/AbstractDependencies.lean) checks
+the public definition and theorem-statement boundary transitively.
 The [axiom audit](LeanTrominoes/Verification/AxiomAudit.lean) checks every declaration
-in all six files, including future additions, and the
-[RAM semantics checks](LeanTrominoes/Verification/AbstractRAM.lean).
+in the abstracts and their bridges, including future additions, the
+[RAM semantics checks](LeanTrominoes/Verification/WordRAM.lean), and the word-bound modules below.
+
+[Polynomial magnitudes fit logarithmic words](LeanTrominoes/Computation/RAM/WordBounds.lean),
+uniformly for every larger word size. Checked magnitude invariants cover
+[Horn counters and queues](LeanTrominoes/SAT/Horn/HornWorklistWordBounds.lean),
+[matching breadth-first labels](LeanTrominoes/Graphs/Matching/BipartiteMatchingWordBounds.lean),
+[2SAT finite-cover indices](LeanTrominoes/SAT/TwoSAT/PeriodicTwoSATWordBounds.lean), and
+[domino coordinate decoding](LeanTrominoes/Tiling/Domino/PeriodicDominoWordBounds.lean).
+These establish scalar bounds; they do not supply the missing program simulations.
+Domino inputs permit arbitrary integer coordinates and period matrices. Their
+decoder bounds depend on input-entry magnitudes as well as dimension. A determinant
+can exceed a single input word, so accommodating all input words alone does not
+justify one-word determinant arithmetic. For fixed dimension, the new proofs
+show that determinants and neighbor probes need only a constant number of input
+words. The multiword arithmetic implementation and its instruction costs remain
+to be proved.
 
 ## Repository organization
 
@@ -140,6 +206,8 @@ otherwise.
 | Theorem 3.2, local 1D periodic CNF SAT PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicCNF1DSAT_PSPACEComplete` | [PeriodicCNFPolySpaceMembership](LeanTrominoes/SAT/CNF/PeriodicCNFPolySpaceMembership.lean) |
 | Theorem 3.3, local 1D periodic 3SAT PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeCNF1DSAT_PSPACEComplete` | [PeriodicCNFFieldWidth](LeanTrominoes/SAT/CNF/PeriodicCNFFieldWidth.lean) |
 | Theorem 3.4, local 1D periodic 3SAT-3 PSPACE completeness | `PeriodicCNF.PolySpaceHardness.localPeriodicThreeSATThree1DSAT_PSPACEComplete` | [PeriodicThreeSATThreePolySpaceCompleteness](LeanTrominoes/SAT/ThreeSAT/PeriodicThreeSATThreePolySpaceCompleteness.lean) |
+| Supplied-drawing planar SAT, all four variants, full orthogonal/contact geometry, plane co-r.e. completeness | `PeriodicPlanarSAT.GeometricNat.ordinary`, `ordinaryThree`, `exactOne`, `exactOneThree` | [PeriodicPlanarSATGeometricNatCompleteness](LeanTrominoes/SAT/Planar/PeriodicPlanarSATGeometricNatCompleteness.lean) |
+| Supplied-drawing planar SAT, all four variants, full orthogonal/contact geometry, binary PSPACE completeness on the line | `PeriodicPlanarSAT.geometricOrdinary_PSPACEComplete`, `geometricOrdinaryThree_PSPACEComplete`, `geometricExactOne_PSPACEComplete`, `geometricExactOneThree_PSPACEComplete` | [PeriodicPlanarSATGeometricCompleteness](LeanTrominoes/SAT/Planar/PeriodicPlanarSATGeometricCompleteness.lean) |
 | Local 1D planar SAT, all four variants, total semantic reductions with linear grid bounds | `PeriodicPlanarSAT.LineReduction.ordinary_correct`, `ordinaryThreeOccurrence_correct`, `exactOne_correct`, `exactOneThreeOccurrence_correct` | [PeriodicPlanarSATLineReduction](LeanTrominoes/SAT/Planar/PeriodicPlanarSATLineReduction.lean) |
 | Local 1D planar 3SAT and 3SAT-3, native flat-encoded PSPACE completeness | `PeriodicPlanarSAT.ordinary_PSPACEComplete`, `ordinaryThree_PSPACEComplete` | [PeriodicPlanarOrdinaryLinePolySpaceCompleteness](LeanTrominoes/SAT/Planar/PeriodicPlanarOrdinaryLinePolySpaceCompleteness.lean) |
 | Local 1D planar 1-in-3SAT and 1-in-3SAT-3, native flat-encoded PSPACE completeness | `PeriodicPlanarSAT.exactOne_PSPACEComplete`, `exactOneThree_PSPACEComplete` | [PeriodicPlanarExactOneLinePolySpaceCompleteness](LeanTrominoes/SAT/Planar/PeriodicPlanarExactOneLinePolySpaceCompleteness.lean) |
@@ -166,14 +234,14 @@ otherwise.
 | Ordinary finite colored graph orientation, native binary NP completeness | `TrichromaticGraphOrientation.finiteProblem_npComplete` | [TrichromaticGraphOrientationFiniteBinaryInNP](LeanTrominoes/Graphs/Orientation/TrichromaticGraphOrientationFiniteBinaryInNP.lean), [TrichromaticGraphOrientationFiniteHardness](LeanTrominoes/Graphs/Orientation/TrichromaticGraphOrientationFiniteHardness.lean) |
 | Periodic Horn and dual Horn SAT, period-one models in every dimension | `Horn.exists_period_one`, `Horn.dual_exists_period_one` | [PeriodicHornCore](LeanTrominoes/SAT/Horn/PeriodicHornCore.lean), [PeriodicHornSolver](LeanTrominoes/SAT/Horn/PeriodicHornSolver.lean) |
 | Periodic Horn and dual Horn SAT, executable solvers and period-one model construction | `Horn.periodicCheck_correct`, `periodicDualCheck_correct`; `PeriodicCNF.hornCheck_correct`, `dualHornCheck_correct`, `hornModel_correct`, `dualHornModel_correct` | [PeriodicHornSolver](LeanTrominoes/SAT/Horn/PeriodicHornSolver.lean), [PeriodicHornDecision](LeanTrominoes/SAT/Horn/PeriodicHornDecision.lean) |
-| Periodic Horn and dual Horn SAT, linear indexed-RAM bound | `Horn.Indexed.certified`, `Horn.PeriodicIndexed.certified` | [HornIndexedTime](LeanTrominoes/SAT/Horn/HornIndexedTime.lean), [PeriodicHornLinearTime](LeanTrominoes/SAT/Horn/PeriodicHornLinearTime.lean) |
+| Periodic Horn and dual Horn SAT, linear charged-operation bound | `Horn.Indexed.certified`, `Horn.PeriodicIndexed.certified` | [HornIndexedTime](LeanTrominoes/SAT/Horn/HornIndexedTime.lean), [PeriodicHornLinearTime](LeanTrominoes/SAT/Horn/PeriodicHornLinearTime.lean) |
 | Theorem 4.1, local periodic 2SAT in every fixed dimension | `PeriodicTwoSAT.local_certified`, `solveLocal_correct`, `solveLocal_polynomial` | [PeriodicTwoSATLocalTime](LeanTrominoes/SAT/TwoSAT/PeriodicTwoSATLocalTime.lean), [PeriodicTwoSATPolynomialTime](LeanTrominoes/SAT/TwoSAT/PeriodicTwoSATPolynomialTime.lean) |
 | Lemma 5.1, arbitrary periodic subspace tiling and completion membership | `PeriodicSubspaceTiling.lemma51`, `lattice_tileable_coRE`, `lattice_completable_coRE`, `Strip.tiling_inPSPACE`, `Strip.completion_inPSPACE` | [Lemma51](LeanTrominoes/Tiling/Periodic/Lemma51.lean) |
 | Lemma 4.3, bounded-diameter augmenting paths in general periodic graphs | `PeriodicLatticeGraph.bounded_augmenting_path`, `perfect_or_bounded_augmenting` | [PeriodicGeneralAugmentingPath](LeanTrominoes/Graphs/Matching/PeriodicGeneralAugmentingPath.lean) |
 | Lemma 4.4, 2-periodic bipartition of a connected bipartite periodic graph | `PeriodicLatticeGraph.bipartition_two_periodic` | [PeriodicBipartitionDoubling](LeanTrominoes/Graphs/Matching/PeriodicBipartitionDoubling.lean) |
 | Lemma 4.5, a protovertex-simple augmenting path shorter than the quotient vertex count | `PeriodicBipartite.perfect_or_short_augmenting` | [PeriodicShortAugmentingProperties](LeanTrominoes/Graphs/Matching/PeriodicShortAugmentingProperties.lean) |
 | Theorem 4.6, period-one bipartite perfect matching in every dimension | `PeriodicBipartite.exists_period_one`, `perfect_iff_quotient` | [PeriodicMatchingPeriodOne](LeanTrominoes/Graphs/Matching/PeriodicMatchingPeriodOne.lean) |
-| Theorem 4.7, bipartite perfect matching decision and construction in `O(E√V)` indexed-RAM operations | `PeriodicBipartite.matchingSolver_certified`, `matchingSolver_edge_sqrt_bound` | [PeriodicMatchingSolver](LeanTrominoes/Graphs/Matching/PeriodicMatchingSolver.lean) |
+| Theorem 4.7, bipartite perfect matching decision and construction with an `O(E√V)` charged-operation bound | `PeriodicBipartite.matchingSolver_certified`, `matchingSolver_edge_sqrt_bound` | [PeriodicMatchingSolver](LeanTrominoes/Graphs/Matching/PeriodicMatchingSolver.lean) |
 | Finite 3CNF tableaux for bounded-time TM2 acceptance, with symbolic initial configurations and polynomial formula-size bounds | `FiniteMachineTrace.paddedFormula_iff_evals`, `symbolicFormula_iff_evals`, `symbolicFormula_length_le`, `symbolicFormula_width` | [FiniteMachineAcceptanceCNF](LeanTrominoes/Complexity/FiniteMachineAcceptanceCNF.lean), [FiniteSymbolicMachineCNF](LeanTrominoes/Complexity/FiniteSymbolicMachineCNF.lean) |
 | Cook–Levin: every verifier-defined NP language reduces by an actual polynomial-time machine to ordinary finite 3CNF SAT | `FiniteCNF.threeSatisfiable_npHard`, `satisfiable_npHard`; `Complexity.VerifierInPolyTime.finiteCNFReduction`; `FiniteNPRequestEmitter.computableInPolyTime` | [FiniteSATNPHard](LeanTrominoes/SAT/CNF/FiniteSATNPHard.lean), [FiniteNPRequestEmitter](LeanTrominoes/Complexity/FiniteNPRequestEmitter.lean), [FiniteNPSeparatedRequest](LeanTrominoes/Complexity/FiniteNPSeparatedRequest.lean) |
 | Complete polynomial-time verifier initialization and accepting self-loop emission, matching the existing finite tableau programs | `FiniteNPInitializationEmitter.computableInPolyTime`, `initialProgram_encode`; `FiniteNPCertificateStackEmitter.stackProgram_eq`; `FiniteNPPaddedProgramEmitter.computableInPolyTime`, `program_eq` | [FiniteNPInitializationEmitter](LeanTrominoes/Complexity/FiniteNPInitializationEmitter.lean), [FiniteNPCertificateStackEmitterCorrectness](LeanTrominoes/Complexity/FiniteNPCertificateStackEmitterCorrectness.lean), [FiniteNPPaddedProgramEmitter](LeanTrominoes/Complexity/FiniteNPPaddedProgramEmitter.lean) |
@@ -187,7 +255,7 @@ otherwise.
 | Polynomial-time exact-cover verifier backend for both trominoes, with geometric certificate correctness and serialized candidate-table bounds | `FiniteExactCoverVerifier.finiteAlphabetComputableInPolyTime`; `Tromino.FiniteVerifier.check_correct`, `tileable_iff_certificate`, `completion_iff_certificate`, `nativeRequest_encode_length_le` | [FiniteExactCoverVerifier](LeanTrominoes/SAT/ExactOne/FiniteExactCoverVerifier.lean), [FiniteTrominoVerifierBackend](LeanTrominoes/Tiling/Tromino/Finite/FiniteTrominoVerifierBackend.lean), [FiniteTrominoVerifierSize](LeanTrominoes/Tiling/Tromino/Finite/FiniteTrominoVerifierSize.lean) |
 | Theorem 5.12, finite-preplacement completion decidability for both trominoes | `Tromino.FiniteWitness.decideCompletion_correct`, `completion_iff_bounded_witness` | [FiniteCompletionDecision](LeanTrominoes/Tiling/Completion/FiniteCompletionDecision.lean) |
 | Theorem 5.13 and Corollary 5.14, doubled-period domino tilings and completions | `Domino.theorem513`, `corollary514` | [DominoTheorems](LeanTrominoes/Tiling/Domino/DominoTheorems.lean) |
-| Corollary 5.15, executable periodic domino decision with a fixed-dimensional polynomial RAM bound | `Domino.corollary515` | [PeriodicDominoSolverCost](LeanTrominoes/Tiling/Domino/PeriodicDominoSolverCost.lean) |
+| Corollary 5.15, executable periodic domino decision with a fixed-dimensional polynomial arithmetic-operation budget | `Domino.corollary515` | [PeriodicDominoSolverCost](LeanTrominoes/Tiling/Domino/PeriodicDominoSolverCost.lean) |
 | Theorem 3.1, Wang tiling co-r.e.-completeness | `LeanWang.domino_problem_coRE_complete` | Dependency module `LeanWang.Final` |
 
 `import LeanTrominoes` exposes these main results. Import
@@ -259,8 +327,8 @@ at most `72(n + m + L + 2)` charged operations for periodic Horn or dual Horn
 SAT, where `n` is the explicit number of variable slots, `m` the rule count,
 and `L` the number of premise occurrences (including duplicates). The bound
 includes quotient preparation, occurrence indexing, initialization, and
-propagation. The [cost model](LeanTrominoes/SAT/Horn/HornWorklistRAM.lean) uses unit-cost
-indexed RAM access; it is not a bit-Turing or Lean VM runtime bound. Inputs
+propagation. The [cost model](LeanTrominoes/SAT/Horn/HornWorklistRAM.lean) charges indexed accesses at unit cost. Counter and queue magnitudes are bounded
+above, but an instruction-level bounded-word implementation remains to be proved. Inputs
 already use `Fin n` variable indices; renaming arbitrary variable names is
 not included. [Examples](LeanTrominoes/SAT/Horn/HornWorklistExamples.lean) check duplicate
 premises and heads, cycles, empty inputs, contradictions, and 3D offsets.
@@ -287,18 +355,18 @@ paper theorem being complete; the entries below distinguish these cases.
 | Theorems 2.1–2.2, Lemma 2.3 | Theorem 2.1 is proved for arbitrary degrees, loops, and isolated vertices: simple real routes, locality, orthocrossing, vertex avoidance, grid size ≤16(|V|+|E|+1), and orthogonality at degree four. Lemma 2.3 preserves rational vertex positions, planarity, simplicity, and locality, multiplies the grid by 32, and normalizes degree-three incidence directions. Theorem 2.2 is proved with the current manuscript’s O(M³) bound: `PeriodicGridDrawing.polygonal_cubic_refinement` gives a planar local orthogonal drawing of any planar local polygonal drawing of degree at most four, with grid size ≤84480M³. It includes loops and periodic seam bends and scales original vertices exactly by (16M+32)(160M+1600). The straight-input theorem retains its sharper constant ≤3300M³ |
 | Theorems 3.5–3.7 | Complete with supplied, verified planar drawings in 1D and 2D. Local planar 3SAT, 3SAT-3, 1-in-3SAT, and 1-in-3SAT-3 have the polynomial grid restriction (in fact linear in 2D). Local planar 3DM has colored degree 2 or 3. Native encodings have PSPACE completeness in 1D and co-r.e. completeness in 2D |
 | Theorem 3.8 | Normalized trichromatic orientation is co-r.e. complete in 2D and PSPACE complete in 1D under its native binary encoding. Finite normalized planar drawings are NP-complete under a sparse unary encoding. Ordinary local periodic colored graph orientation is co-r.e. complete, with hard outputs admitting verified orthogonal planar presentations. Ordinary local 1D colored graph orientation is PSPACE-complete under a lossless native binary encoding of vertex kinds and edge records. The decider verifies endpoints, offsets, degree three, and colors, then searches three-column states with one bit per edge and column. The polynomial-time reduction compiles the actual contracted graph, including dense vertex names and signed offsets. Ordinary finite colored graph orientation is NP-complete under the same native binary encoding. An actual polynomial-time verifier checks endpoint bounds, zero offsets, degree and color constraints, and inward counts, with one witness bit per edge. Oversized binary fields are rejected before unary expansion; loops contribute two incidences. NP completeness also holds for the lossless unary graph encoding |
-| Theorem 4.2 | Horn and dual Horn SAT: period-one models in every dimension, finite-quotient equivalence, and executable solvers proved; linear operation bound proved for explicitly indexed inputs in the unit-cost RAM model |
-| Theorem 4.1 | Executable local periodic 2SAT decision in every fixed dimension, with a verified polynomial indexed-RAM operation bound including clause normalization and finite-cover construction |
+| Theorem 4.2 | Horn and dual Horn SAT: period-one models in every dimension, finite-quotient equivalence, and executable solvers proved; linear operation-counter bound and original-input word-RAM theorem proved (`120(S+1)` instructions) |
+| Theorem 4.1 | Executable local periodic 2SAT decision in every fixed dimension, with a polynomial operation-counter bound including normalization and finite-cover construction; complete original-input polynomial-time word-RAM theorem proved |
 | Lemma 4.3 | In every dimension, every free vertex of a period-one matching in a local periodic graph with a perfect matching starts a simple augmenting path of diameter at most `2*d*|E|`; no bipartiteness assumption |
 | Lemma 4.4 | Every proper bipartition of a connected periodic graph is invariant under twice every lattice translation, in every dimension |
 | Lemma 4.5 | Any imperfect period-one partial matching of a bipartite periodic graph with a perfect matching has an augmenting path with no repeated protovertex and edge length strictly less than the quotient vertex count |
 | Theorem 4.6 | Every perfect matching in a bipartite periodic graph implies a period-one perfect matching; equivalence with finite quotient matching proved in every dimension, without a locality restriction |
-| Theorem 4.7 | Executable decision and period-one matching construction in every dimension, with a verified `O(E√V)` bound for indexed inputs in the unit-cost RAM model |
+| Theorem 4.7 | Executable decision and period-one matching construction in every dimension, with a `O(E√V)` operation-counter bound for indexed inputs; separate original-input dense word-RAM program proved with a quartic instruction bound |
 | Lemma 5.1 | Arbitrary finite-footprint periodic subspace tiling and completion are co-r.e. in every dimension. Both strip problems are in PSPACE for each fixed polynomial bounding box under native binary encoding; the palette, target, and prefill are all input |
 | Theorem 5.12 | Decidability and NP-completeness proved for both trominoes, with the canonical bounding box listed in the encoding: `Tromino.FiniteCoordinateColumns.completion_npComplete` |
 | Theorem 5.13 | Every tileable periodic domino region has a tiling invariant under twice each original generator, in every ambient dimension and periodic rank |
 | Corollary 5.14 | Every completable periodic domino prefill has a completion with those doubled periods |
-| Corollary 5.15 | Executable decision from cell representatives and arbitrary nonsingular integer period matrices; quadratic operation budget in the number of representatives for each fixed dimension, in the unit-cost arithmetic RAM model |
+| Corollary 5.15 | Executable decision from cell representatives and arbitrary nonsingular integer period matrices; quadratic arithmetic-operation budget in the number of representatives for fixed dimension; complete original-binary-input word-RAM theorem proved with a conservative degree-16 instruction bound |
 | Corollary 5.4 | Proved for both trominoes under the explicit unary coordinate encoding: `Tromino.FiniteCoordinateColumns.region_npComplete` |
 
 The [finite-seed polyomino search](LeanTrominoes/Tiling/Polyomino/FinitePolyominoCompletionSearch.lean)
@@ -394,8 +462,8 @@ The decision procedure derives adjacency using an integer-matrix coordinate
 decoder, doubles the period lattice to preserve checkerboard colors, and runs
 the finite matching solver. Its budget includes coordinate searches and cover
 construction. Dimension-dependent constants include `2^d` and determinant
-preparation; this is a fixed-dimension arithmetic-RAM bound, not a bit-Turing
-or Lean VM runtime claim. [Kernel-evaluated examples](LeanTrominoes/Tiling/Domino/PeriodicDominoExamples.lean)
+preparation. The quadratic result bounds charged arithmetic operations; arbitrary
+integer input entries require the magnitude and multiword considerations above. [Kernel-evaluated examples](LeanTrominoes/Tiling/Domino/PeriodicDominoExamples.lean)
 cover holes, skew periods, and empty and zero-dimensional regions.
 
 The [general subspace membership proof](LeanTrominoes/Tiling/Periodic/Lemma51.lean) uses
@@ -426,8 +494,10 @@ solver for opposite-literal reachability tests. The
 [cover theorem](LeanTrominoes/Graphs/Reachability/PeriodicPowerTwoCover.lean) proves that a uniformly
 chosen power-of-two period preserves contradictions. For every fixed `d`, the
 complete operation bound has degree `3(d²+d+1)` in `n + clauses + 1`, where `n`
-is the number of explicit variable slots. It uses the same unit-cost indexed
-RAM model as the matching and Horn solvers. The
+is the number of explicit variable slots. Normalization produces two-bit offset
+differences, and cover indices have polynomial magnitude. The [instruction-level word-RAM theorem](LeanTrominoes/SAT/TwoSAT/PeriodicTwoSATWordRAMPolynomialTime.lean)
+now proves polynomial time for the whole original-input program, including
+cover construction and reachability calls. The
 [regressions](LeanTrominoes/SAT/TwoSAT/PeriodicTwoSATExamples.lean) include kernel-evaluated
 units, inconsistent units, empty inputs, and dimension zero, as well as a
 satisfiable alternation formula with no period-one assignment.
@@ -438,8 +508,11 @@ quotient indexing, vertex-array initialization, and selection of a finite
 protoedge table describing the period-one matching. Here `E` counts edge
 records and `V` counts vertex slots. The uniform bound is
 `1000(E+1)(⌊√V⌋+1)`, with `4000E⌊√V⌋` for nonempty edge tables.
-Indices and scalar operations have unit cost; coordinate vectors remain in
-the input store. This is not a bit-Turing or Lean VM runtime bound.
+The counter charges indices and scalar operations at unit cost; coordinate vectors
+remain in the input store. Search labels are bounded by the vertex count. A [separate dense matching program](LeanTrominoes/Graphs/Matching/BipartiteMatchingDenseWordRAMPolynomialTime.lean)
+has a checked concrete layout and quartic word-RAM instruction bound from
+original endpoint records. The `O(E√V)` bound remains a result about the
+blocking-path solver's operation counter.
 
 The local 1D CNF endpoint is now **PSPACE-complete** under the native flat
 encoding. The [machine certificate](LeanTrominoes/SAT/CNF/PeriodicCNFPolySpaceMembership.lean)

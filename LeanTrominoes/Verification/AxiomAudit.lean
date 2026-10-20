@@ -147,8 +147,28 @@ import LeanTrominoes.Graphs.Drawings.Grid.PeriodicGridDrawingCubicRefinementTheo
 import LeanTrominoes.Graphs.Drawings.Refinement.Polygonal.PeriodicGridDrawingRawBendIncidentSourceCores
 import LeanTrominoes.Graphs.Drawings.Orthogonal.OrthogonalBendFanBoundaryLocality
 import Lean.Util.CollectAxioms
+import LeanTrominoes.Computation.RAM.WordBounds
+import LeanTrominoes.Computation.RAM.Arrays
+import LeanTrominoes.Computation.Compiler.FiniteReachWordRAM
+import LeanTrominoes.SAT.Horn.HornWordRAMLinearTime
+import LeanTrominoes.SAT.Horn.HornWordRAMPropagation
+import LeanTrominoes.Graphs.Matching.BipartiteMatchingWordBounds
+import LeanTrominoes.SAT.Horn.HornWorklistWordBounds
+import LeanTrominoes.SAT.TwoSAT.PeriodicTwoSATWordBounds
+import LeanTrominoes.Tiling.Domino.PeriodicDominoWordBounds
 import LeanTrominoes.ComplexityAbstractBridge
-import LeanTrominoes.Verification.AbstractRAM
+import LeanTrominoes.Verification.WordRAM
+import LeanTrominoes.GraphConstraintsAbstractBridge
+import LeanTrominoes.GraphDrawingAbstractBridge
+import LeanTrominoes.Verification.AbstractDependencies
+import LeanTrominoes.GraphPlanarAbstractBridge
+import LeanTrominoes.GraphThreeDMAbstractBridge
+import LeanTrominoes.GraphOrientationAbstractBridge
+import LeanTrominoes.SAT.Planar.PeriodicPlanarSATGeometricCompleteness
+import LeanTrominoes.SAT.Planar.PeriodicPlanarSATGeometricNatCompleteness
+import LeanTrominoes.Tiling.Domino.DominoWordRAMPolynomialTime
+import LeanTrominoes.Graphs.Matching.BipartiteMatchingDenseWordRAMPolynomialTime
+import LeanTrominoes.SAT.TwoSAT.PeriodicTwoSATWordRAMPolynomialTime
 import LeanTrominoes.GraphAbstract
 import LeanTrominoes.TilingAbstract
 import LeanTrominoes.Graphs.Drawings.Grid.PeriodicGridDrawingIndexing
@@ -1452,15 +1472,83 @@ run_cmd do
         count := count+1
   logInfo m!"Cubic refinement construction: strict axiom audit passed for {count} declarations."
 
-/-! The formal abstracts, their bridges, and the RAM semantic checks must use only standard axioms.
+/-! The formal abstracts, their bridges, word bounds, and RAM semantic checks must use only standard axioms.
 Audit every declaration in these modules, including auxiliary definitions,
 so a newly added headline theorem cannot accidentally escape the audit. -/
 open Lean Elab Command in
 run_cmd do
   let env ← getEnv
   let modules := #[`LeanTrominoes.ComplexityAbstract, `LeanTrominoes.ComplexityAbstractBridge,
-    `LeanTrominoes.Verification.AbstractRAM, `LeanTrominoes.GraphAbstract, `LeanTrominoes.GraphAbstractBridge,
-    `LeanTrominoes.TilingAbstract, `LeanTrominoes.TilingAbstractBridge]
+    `LeanTrominoes.Verification.WordRAM, `LeanTrominoes.GraphAbstract, `LeanTrominoes.GraphAbstractBridge,
+    `LeanTrominoes.TilingAbstract, `LeanTrominoes.TilingAbstractBridge,
+    `LeanTrominoes.Computation.RAM.WordBounds,
+    `LeanTrominoes.Computation.RAM.Execution,
+    `LeanTrominoes.Computation.RAM.Structured,
+    `LeanTrominoes.Computation.RAM.StructuredCompile,
+    `LeanTrominoes.Computation.RAM.Allocation,
+    `LeanTrominoes.Computation.RAM.Arrays,
+    `LeanTrominoes.Computation.RAM.NaturalData,
+    `LeanTrominoes.Computation.RAM.NaturalAllocation,
+    `LeanTrominoes.SAT.Horn.HornWordRAMProgram,
+    `LeanTrominoes.SAT.Horn.HornWordRAMIndex,
+    `LeanTrominoes.SAT.Horn.HornWordRAMPrepare,
+    `LeanTrominoes.SAT.Horn.HornWordRAMInput,
+    `LeanTrominoes.SAT.Horn.HornWordRAMLayout,
+    `LeanTrominoes.SAT.Horn.HornWordRAMInitialization,
+    `LeanTrominoes.SAT.Horn.HornWordRAMIndexArrays,
+    `LeanTrominoes.SAT.Horn.HornWordRAMAnswer,
+    `LeanTrominoes.SAT.Horn.HornWordRAMEventArrays,
+    `LeanTrominoes.SAT.Horn.HornWordRAMEventBounds,
+    `LeanTrominoes.SAT.Horn.HornWordRAMEventEffects,
+    `LeanTrominoes.SAT.Horn.HornWordRAMEvents,
+    `LeanTrominoes.SAT.Horn.HornWordRAMIndexInvariant,
+    `LeanTrominoes.SAT.Horn.HornWordRAMInitializationCorrect,
+    `LeanTrominoes.SAT.Horn.HornWordRAMInputTables,
+    `LeanTrominoes.SAT.Horn.HornWordRAMLinearTime,
+    `LeanTrominoes.Computation.Compiler.FiniteReachWordRAM,
+    `LeanTrominoes.SAT.Horn.HornWordRAMLinkedIndex,
+    `LeanTrominoes.SAT.Horn.HornWordRAMMark,
+    `LeanTrominoes.SAT.Horn.HornWordRAMPop,
+    `LeanTrominoes.SAT.Horn.HornWordRAMPopArrays,
+    `LeanTrominoes.SAT.Horn.HornWordRAMPopSimulation,
+    `LeanTrominoes.SAT.Horn.HornWordRAMPropagationExecution,
+    `LeanTrominoes.SAT.Horn.HornWordRAMRepresentation,
+    `LeanTrominoes.SAT.Horn.HornWordRAMStack,
+    `LeanTrominoes.SAT.Horn.HornWordRAMStackArrays,
+    `LeanTrominoes.SAT.Horn.HornWordRAMStackBounds,
+    `LeanTrominoes.SAT.Horn.HornWordRAMStackInput,
+    `LeanTrominoes.SAT.Horn.HornWordRAMStackInvariant,
+    `LeanTrominoes.SAT.Horn.HornWordRAMTickExecution,
+    `LeanTrominoes.SAT.Horn.HornWordRAMTickInvariant,
+    `LeanTrominoes.SAT.Horn.HornWordRAMTickStep,
+    `LeanTrominoes.SAT.Horn.HornWordRAMPropagation,
+    `LeanTrominoes.Graphs.Matching.BipartiteMatchingWordBounds,
+    `LeanTrominoes.SAT.Horn.HornWorklistWordBounds,
+    `LeanTrominoes.SAT.TwoSAT.PeriodicTwoSATWordBounds,
+    `LeanTrominoes.Tiling.Domino.PeriodicDominoWordBounds]
+  let algorithms := env.header.moduleNames.filter fun name =>
+    let text := name.toString
+    text.startsWith "LeanTrominoes.Computation.RAM." ||
+    text.startsWith "LeanTrominoes.Computation.Compiler.FiniteTwoSAT" ||
+    text.startsWith "LeanTrominoes.Computation.Compiler.FiniteTable" ||
+    text.startsWith "LeanTrominoes.SAT.Horn.HornWordRAM" ||
+    text.startsWith "LeanTrominoes.SAT.TwoSAT.PeriodicTwoSAT" ||
+    text == "LeanTrominoes.Graphs.Matching.BipartiteMatchingDummyVertex" ||
+    text.startsWith "LeanTrominoes.Graphs.Matching.BipartiteMatchingDense" ||
+    text.startsWith "LeanTrominoes.Graphs.Matching.BipartiteMatchingWordRAM" ||
+    text.startsWith "LeanTrominoes.Tiling.Domino.DominoWordRAM" ||
+    text == "LeanTrominoes.GraphConstraintsAbstractBridge" ||
+    text == "LeanTrominoes.GraphDrawingAbstractBridge" ||
+    text == "LeanTrominoes.GraphPlanarAbstractBridge" ||
+    text == "LeanTrominoes.GraphThreeDMAbstractBridge" ||
+    text == "LeanTrominoes.GraphOrientationAbstractBridge" ||
+    text.startsWith "LeanTrominoes.SAT.Planar.PeriodicPlanarSATGeometric" ||
+    text == "LeanTrominoes.Graphs.Drawings.Grid.PeriodicDrawingEndpointResidues" ||
+    text == "LeanTrominoes.Graphs.Drawings.Grid.PeriodicDrawingEndpointResidueProgram" ||
+    text == "LeanTrominoes.GraphAlgorithmsAbstractBridge" ||
+    text == "LeanTrominoes.GraphTwoSATAbstractBridge" ||
+    text == "LeanTrominoes.TilingAlgorithmsAbstractBridge"
+  let modules := modules ++ algorithms
   for module in modules do
     unless env.header.moduleNames.contains module do
       throwError "Missing formal abstract module: {module}"
@@ -1476,4 +1564,4 @@ run_cmd do
         count := count + 1
   unless 0 < count do
     throwError "Formal abstract audit found no declarations"
-  logInfo m!"Formal abstracts and bridges: strict axiom audit passed for {count} declarations."
+  logInfo m!"Formal abstracts, bridges, and bounded-word algorithms: strict axiom audit passed for {count} declarations."

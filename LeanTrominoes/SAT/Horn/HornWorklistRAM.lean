@@ -10,8 +10,10 @@ Array lookup/update, scalar arithmetic/comparison, and linked-cell operations
 cost one unit. `tickCost` charges each counter read/write and conditional ready
 push; `queueCost` charges the complete rule-table scan. `totalCost` additionally
 charges zeroing both atom arrays and the counter array, building the occurrence
-index, running the worklist, and reading the answer. These are RAM costs, not
-costs of evaluating the extensional function representation in Lean's VM.
+index, running the worklist, and reading the answer. These are instrumented operation counts.
+`HornWorklistWordBounds` bounds reachable counters and queue lengths.
+`HornWordRAMLinearTime` separately proves a concrete bounded-word program with
+all allocation, propagation and halt instructions counted.
 -/
 namespace LeanTrominoes.Horn.Worklist.RAM
 open Worklist

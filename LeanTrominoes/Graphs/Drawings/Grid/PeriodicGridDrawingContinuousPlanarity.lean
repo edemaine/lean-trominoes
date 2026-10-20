@@ -15,12 +15,14 @@ touching another integer-grid segment, but a coincident pair of unit
 segments has intersecting relative interiors with no integer point in that
 intersection.
 
-This file records the exact additional condition needed before thickening
-or substituting finite gadgets into a periodic drawing.  It uses
+This file adds continuous segment-interior separation using
 `GridSegment.InteriorsMeet`, whose collinear cases compare open integer
-intervals directly.  Existing planarity remains part of the strengthened
-predicate so endpoint contacts and vertex/route contacts continue to be
-excluded.
+intervals directly. These tests describe horizontal and vertical segments;
+`IsContinuouslyPlanar` does not itself require orthogonality or exclude
+contacts between listed bends. Faithful orthogonal drawings also require
+`IsOrthogonal` and `RoutePointsMeetOnlyAtEndpoints`. The supplied-drawing
+SAT geometry predicate combines orthogonality with `IsRibbonReady`, which
+requires continuous separation and the listed-point contact condition.
 -/
 
 namespace LeanTrominoes

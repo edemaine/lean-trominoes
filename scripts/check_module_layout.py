@@ -196,6 +196,26 @@ def code(text):
     return " ".join("".join(out).split())
 
 
+def check_abstract_proofs():
+    """Public abstracts use bridge calls, with tactic scripts confined to proof modules."""
+    for name in ("ComplexityAbstract", "GraphAbstract", "TilingAbstract"):
+        source = code((ROOT / "LeanTrominoes" / (name + ".lean")).read_text(encoding="utf-8"))
+        assert not re.search(r"\bby\b", source), f"{name}: move tactic proofs into its bridge"
+        for theorem in re.finditer(r"\btheorem\s+(\w+).*?\s:=\s+(\S+)", source):
+            bridges = {
+                "ComplexityAbstract": ("ComplexityAbstractBridge.",),
+                "GraphAbstract": ("GraphAbstractBridge.", "GraphConstraintsAbstractBridge.",
+                                  "GraphAlgorithmsAbstractBridge.", "GraphTwoSATAbstractBridge.",
+                                  "GraphDrawingAbstractBridge.", "GraphPlanarAbstractBridge.",
+                                  "GraphThreeDMAbstractBridge.", "GraphOrientationAbstractBridge."),
+                "TilingAbstract": ("TilingAbstractBridge.", "TilingAlgorithmsAbstractBridge."),
+            }
+            expected = bridges[name]
+            assert theorem[2].startswith(expected), (
+                f"{name}.{theorem[1]}: public proof must invoke {expected} directly")
+    print("Public abstract proofs: bridge calls only, no tactic scripts.")
+
+
 def inner(text):
     value = code(text)
     assert value.startswith("namespace LeanTrominoes ")
@@ -258,6 +278,7 @@ def main():
         return
     files, deps = inventory()
     order(deps)
+    check_abstract_proofs()
     if args.refresh_conflicts:
         refresh_conflicts(files)
     if args.write_all:
@@ -267,7 +288,11 @@ def main():
     assert set(mapping.values()) <= files.keys()
     root_interfaces = {"ComplexityAbstract.lean", "ComplexityAbstractBridge.lean",
                        "GraphAbstract.lean", "GraphAbstractBridge.lean",
-                       "TilingAbstract.lean", "TilingAbstractBridge.lean"}
+                       "TilingAbstract.lean", "TilingAbstractBridge.lean",
+                       "GraphConstraintsAbstractBridge.lean", "GraphAlgorithmsAbstractBridge.lean",
+                       "GraphTwoSATAbstractBridge.lean", "TilingAlgorithmsAbstractBridge.lean",
+                       "GraphDrawingAbstractBridge.lean", "GraphPlanarAbstractBridge.lean",
+                       "GraphThreeDMAbstractBridge.lean", "GraphOrientationAbstractBridge.lean"}
     unexpected = [p.name for p in (ROOT / "LeanTrominoes").glob("*.lean")
                   if p.name not in root_interfaces]
     assert not unexpected, f"Flat legacy modules remain: {unexpected}"

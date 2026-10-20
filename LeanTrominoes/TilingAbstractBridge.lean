@@ -378,6 +378,12 @@ def sideGraph (s : Shape) : SimpleGraph {c // c ∈ s} where
   symm := ⟨by intros a b h; unfold SideAdjacent at *; omega⟩
   loopless := ⟨by intros a h; unfold SideAdjacent at h; omega⟩
 
+theorem sideGraph_symm (s : Shape) : Std.Symm (fun a b : {c // c ∈ s} => SideAdjacent a.val b.val) :=
+  (sideGraph s).symm
+
+theorem sideGraph_loopless (s : Shape) : Std.Irrefl (fun a b : {c // c ∈ s} => SideAdjacent a.val b.val) :=
+  (sideGraph s).loopless
+
 def Connected (s : Shape) : Prop := (sideGraph s).Connected
 
 def Strip (height : ℕ) : Set Cell := {c | 0 ≤ c.2 ∧ c.2 < height}
@@ -481,6 +487,12 @@ def faceGraph (p : Polycube) : SimpleGraph {c // c ∈ p} where
   Adj a b := FaceAdjacent a.val b.val
   symm := ⟨by intros a b h; simp only [FaceAdjacent, SideAdjacent, Prod.ext_iff] at *; omega⟩
   loopless := ⟨by intros a h; simp only [FaceAdjacent, SideAdjacent] at h; omega⟩
+
+theorem faceGraph_symm (p : Polycube) : Std.Symm (fun a b : {c // c ∈ p} => FaceAdjacent a.val b.val) :=
+  (faceGraph p).symm
+
+theorem faceGraph_loopless (p : Polycube) : Std.Irrefl (fun a b : {c // c ∈ p} => FaceAdjacent a.val b.val) :=
+  (faceGraph p).loopless
 
 def Connected3 (p : Polycube) : Prop := (faceGraph p).Connected
 
@@ -1241,6 +1253,13 @@ def doubledPeriod {d r : ℕ} (period : Lattice r →+ Lattice d) : Lattice r �
   toFun z := period (z+z)
   map_zero' := by simp
   map_add' := by intros; simp only [map_add]; abel
+
+theorem doubledPeriod_zero {d r : ℕ} (period : Lattice r →+ Lattice d) : period (0+0)=0 :=
+  (doubledPeriod period).map_zero
+
+theorem doubledPeriod_add {d r : ℕ} (period : Lattice r →+ Lattice d) (x y : Lattice r) :
+    period ((x+y)+(x+y)) = period (x+x)+period (y+y) :=
+  (doubledPeriod period).map_add x y
 
 theorem domino_doubled {V : Type} [DecidableEq V] [Fintype V] {d r : ℕ}
     (C : Chart V d r) (unique : C.Valid) (tileable : ∃ chosen, DominoTiling C.region chosen) :

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LeanTrominoes.ComplexityAbstract
 import LeanTrominoes.TilingAbstractBridge
+import LeanTrominoes.TilingAlgorithmsAbstractBridge
 
 /-!
 # Tiling and completion: a formal abstract
@@ -79,8 +80,8 @@ def SideAdjacent (a b : Cell) : Prop :=
     (a.2 = b.2 ∧ (a.1+1 = b.1 ∨ b.1+1 = a.1))
 def sideGraph (s : Shape) : SimpleGraph {c // c ∈ s} where
   Adj a b := SideAdjacent a.val b.val
-  symm := ⟨by intros a b h; unfold SideAdjacent at *; omega⟩
-  loopless := ⟨by intros a h; unfold SideAdjacent at h; omega⟩
+  symm := TilingAbstractBridge.Data.sideGraph_symm s
+  loopless := TilingAbstractBridge.Data.sideGraph_loopless s
 def Connected (s : Shape) : Prop := (sideGraph s).Connected
 def Strip (height : ℕ) : Set Cell := {c | 0 ≤ c.2 ∧ c.2 < height}
 def Pair (p q : Shape) : Bool → Shape := fun b => if b then q else p
@@ -228,8 +229,8 @@ def FaceAdjacent (a b : Voxel) : Prop :=
     (a.1 = b.1 ∧ (a.2+1 = b.2 ∨ b.2+1 = a.2))
 def faceGraph (p : Polycube) : SimpleGraph {c // c ∈ p} where
   Adj a b := FaceAdjacent a.val b.val
-  symm := ⟨by intros a b h; simp only [FaceAdjacent, SideAdjacent, Prod.ext_iff] at *; omega⟩
-  loopless := ⟨by intros a h; simp only [FaceAdjacent, SideAdjacent] at h; omega⟩
+  symm := TilingAbstractBridge.Data.faceGraph_symm p
+  loopless := TilingAbstractBridge.Data.faceGraph_loopless p
 def Connected3 (p : Polycube) : Prop := (faceGraph p).Connected
 def Tileable3 {I : Type} (tiles : I → Polycube) (region : Set Voxel) : Prop :=
   ∃ chosen, ExactCover (voxelCells tiles) region chosen
@@ -376,8 +377,8 @@ def PeriodicTiles {d r : ℕ} (period : Lattice r →+ Lattice d)
 
 def doubledPeriod {d r : ℕ} (period : Lattice r →+ Lattice d) : Lattice r →+ Lattice d where
   toFun z := period (z+z)
-  map_zero' := by simp
-  map_add' := by intros; simp only [map_add]; abel
+  map_zero' := TilingAbstractBridge.Data.doubledPeriod_zero period
+  map_add' := TilingAbstractBridge.Data.doubledPeriod_add period
 
 /-- Theorem 5.13: a tileable periodic domino region has a tiling invariant
 under twice each original period generator, in every dimension and rank. -/
@@ -397,15 +398,48 @@ theorem domino_completion_doubled {V : Type} [DecidableEq V] [Fintype V] {d r : 
       PeriodicTiles (doubledPeriod C.period) chosen :=
   TilingAbstractBridge.Data.domino_completion_doubled C unique seed periodic completable
 
-/-- Corollary 5.15: representatives and a nonsingular integer period matrix
-give an executable decision. A valid `BasisData n d` lists n distinct cell
-orbits and its d×d period matrix; the instrumented arithmetic cost is at most
-C(d)(n+1)² for the explicit coefficient `polynomialCoefficient d`.
-Dimension is fixed; arithmetic and indexed access each have unit cost in
-the counter. A shared-RAM execution bound additionally needs a program simulation. -/
-theorem domino_decision {n d : ℕ} (B : Domino.BasisData n d) (valid : B.Valid) :
-    (B.solve = true ↔ ∃ chosen, DominoTiling (B.chart valid).region chosen) ∧
-      B.totalCost ≤ Domino.polynomialCoefficient d*(n+1)^2 :=
-  TilingAbstractBridge.Native.domino_decision B valid
+/-- A full-rank presentation lists an integer period matrix and one origin
+for each cell orbit. Validity requires a nonsingular matrix and unique
+representation of every cell in the region. -/
+abbrev DominoBasis (n d : ℕ) := Matrix (Fin d) (Fin d) ℤ × (Fin n → Lattice d)
+def DominoBasis.basis {n d : ℕ} (B : DominoBasis n d) := B.1
+def DominoBasis.origin {n d : ℕ} (B : DominoBasis n d) := B.2
+def DominoBasis.realize {n d : ℕ} (B : DominoBasis n d) (a : Fin n × Lattice d) : Lattice d :=
+  B.origin a.1+B.basis.mulVec a.2
+def DominoBasis.Valid {n d : ℕ} (B : DominoBasis n d) : Prop :=
+  B.basis.det≠0 ∧ Function.Injective B.realize
+def DominoBasis.region {n d : ℕ} (B : DominoBasis n d) : Set (Lattice d) := Set.range B.realize
+abbrev DominoInput (d : ℕ) := Σ n : ℕ, {B : DominoBasis n d // B.Valid}
+
+/-- Binary fields appear in row-major order: the matrix followed by the
+origins. Each signed integer is its residue modulo 2^L, written in L little
+endian bits. A fixed dimension-dependent padding factor chooses L; the
+three header words give the representative count, entry-bit bound, and L. -/
+def dominoMagnitude {n d : ℕ} (B : DominoBasis n d) : ℕ :=
+  1+(∑ i, ∑ j, (B.basis i j).natAbs)+(∑ v, ∑ i, (B.origin v i).natAbs)
+def dominoEntryBits {n d : ℕ} (B : DominoBasis n d) : ℕ := Nat.log2 (dominoMagnitude B+1)+2
+def dominoPrecision {n d : ℕ} (padding : ℕ) (B : DominoBasis n d) : ℕ := padding*dominoEntryBits B+4
+def dominoBits (length value : ℕ) : List ℤ :=
+  (List.range length).map (fun i => ((value/2^i)%2 : ℕ))
+
+def dominoIntegerBits (length : ℕ) (z : ℤ) : List ℤ := dominoBits length (z%(2^length : ℤ)).toNat
+def dominoFields {n d : ℕ} (B : DominoBasis n d) : List ℤ :=
+  (List.finRange d).flatMap (fun i => (List.finRange d).map (fun j => B.basis i j)) ++
+    (List.finRange n).flatMap (fun v => (List.finRange d).map (fun i => B.origin v i))
+def dominoEncoding {d : ℕ} (padding : ℕ) (input : DominoInput d) : List ℤ :=
+  [(input.1 : ℤ),(dominoEntryBits input.2.val : ℤ),(dominoPrecision padding input.2.val : ℤ)]++
+    (dominoFields input.2.val).flatMap (dominoIntegerBits (dominoPrecision padding input.2.val))
+def dominoInputSize {d : ℕ} (padding : ℕ) (input : DominoInput d) : ℕ :=
+  input.1+dominoEntryBits input.2.val+dominoPrecision padding input.2.val+(dominoEncoding padding input).length+1
+
+/-- Corollary 5.15: domino tilability of valid full-rank presentations is
+decidable in polynomial time on the bounded-word RAM, for each fixed
+dimension. A single dimension-dependent precision padding is used for all
+inputs. The bound includes binary arithmetic, allocation, graph construction,
+matching, and halt, and works for every sufficiently large logarithmic word. -/
+theorem domino_decision (d : ℕ) : ∃ padding,
+    ComplexityAbstract.RAM.PolynomialTime (dominoEncoding (d:=d) padding) (dominoInputSize padding)
+      (fun input => ∃ chosen, DominoTiling input.2.val.region chosen) :=
+  TilingAlgorithmsAbstractBridge.polynomialTime d
 
 end LeanTrominoes.TilingAbstract

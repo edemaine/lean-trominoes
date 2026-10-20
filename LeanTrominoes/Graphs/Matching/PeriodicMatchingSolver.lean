@@ -11,7 +11,10 @@ Inputs use dense left/right indices and a list of protoedge records; the
 lattice dimension and offsets are arbitrary. The RAM has constant-time typed
 indices, array reads/writes, scalars, and linked-list cells. Edge vectors stay
 in the input store and the answer stores references. Charges and phase traces
-are ghost instrumentation. This is not a bit-cost or Lean VM runtime claim.
+are ghost instrumentation. `BipartiteMatchingWordBounds` bounds breadth-first
+labels. `BipartiteMatchingDenseWordRAMPolynomialTime` separately proves a concrete
+bounded-word matching program with a quartic instruction bound; the square-root
+operation count here belongs to the blocking-path solver.
 -/
 namespace LeanTrominoes.PeriodicBipartite
 

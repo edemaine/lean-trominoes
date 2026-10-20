@@ -1,3 +1,7 @@
+import LeanTrominoes.Graphs.Drawings.Grid.PeriodicDrawingEndpointResidues
+import LeanTrominoes.Graphs.Drawings.Grid.PeriodicDrawingEndpointResidueProgram
+import LeanTrominoes.Graphs.Matching.BipartiteMatchingDenseWordRAMPolynomialTime
+import LeanTrominoes.Graphs.Matching.BipartiteMatchingWordBounds
 import LeanTrominoes.Graphs.Matching.PeriodicGeneralAugmentingPath
 import LeanTrominoes.Graphs.Matching.PeriodicBipartitionDoubling
 import LeanTrominoes.Graphs.Matching.PeriodicShortAugmentingProperties

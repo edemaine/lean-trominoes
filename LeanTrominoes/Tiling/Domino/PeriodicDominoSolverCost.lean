@@ -8,7 +8,12 @@ import LeanTrominoes.Tiling.Domino.PeriodicDominoSolver
 
 The dimension is fixed. Integer arithmetic (including division), comparisons,
 and indexed accesses have unit cost, as in the matching solver. This is not a
-bit-Turing or Lean VM runtime bound. Matrices and coordinate vectors are stored
+bounded-word RAM execution bound. `PeriodicDominoWordBounds` bounds decoder
+magnitudes in the input-entry magnitudes. Input entries can be arbitrary
+integers, so a determinant may need more than one input word.
+`DominoWordRAMPolynomialTime` separately proves a complete bounded-word program
+on original binary presentations, including multiword arithmetic and matching.
+Matrices and coordinate vectors are stored
 in dense arrays; the inverse data is prepared once and reused.
 
 The charges below include coordinate decoding, neighbor generation, the parity

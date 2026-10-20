@@ -1,3 +1,5 @@
+import LeanTrominoes.Tiling.Domino.DominoWordRAMPolynomialTime
+import LeanTrominoes.Tiling.Domino.PeriodicDominoWordBounds
 import LeanTrominoes.Tiling.Tromino.Finite.FiniteRetainedTrominoRegion
 import LeanTrominoes.Tiling.Tromino.Finite.FiniteGadgetSubstitution
 import LeanTrominoes.Tiling.Tromino.Finite.FiniteGadgetRegionCompiler
